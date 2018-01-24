@@ -14,6 +14,17 @@ services:
       - ./data/$DASHD_DATADIR:/data
     command: dashd -conf=/dash/dash.conf -datadir=/data -port=$DASHD_PORT $DASHD_SEED_NODE_ARGS $DASHD_NETWORK_ARGS $MASTERNODE_ARGS $EXTERNALIP_ARGS
 
+  sentinel:
+    image: ablock/sentinel
+    restart: always
+    environment:
+      - DEBUG=false
+      - RPCUSER=dashrpc
+      - RPCPASSWORD=password
+      - RPCHOST=core
+      - RPCPORT=20002
+      - NETWORK=$DASH_NETWORK
+
   ipfs:
     image: jbenet/go-ipfs:latest
     ports:
