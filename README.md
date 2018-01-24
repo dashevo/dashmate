@@ -69,7 +69,13 @@ node connected to the same devnet to make working with it easier.
 
 1. Connect a normal dash-qt wallet to the devnet
 
-Use the example configuration provided in `examples/dash-qt-devnet`
+Use the example configuration provided in `examples/dash-qt-devnet`.
+
+It is important that you use a version of dash-qt that is compatible to the used devnet.
+If you connect to a public devnet, use the latest released version (>=0.12.3, which is not released at time of writing)
+or compile it by yourself from [dashpay/dash](https://github.com/dashpay/dash) (branch develop).
+
+For the private dashevo devnet, use a self compiled binary from [dashevo/dash](https://github.com/dashevo/dash)
 
 2. Fund the MN collateral
 
