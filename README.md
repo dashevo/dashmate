@@ -47,6 +47,12 @@ to view the logs in the foreground:
 $ ./mn-bootstrap.sh regtest logs
 ```
 
+If you want to call dash-cli inside of the dashd container, you can use the `dash-cli.sh` wrapper
+
+```bash
+$ ./dash-cli.sh regtest getinfo
+```
+
 To shut down everything, use:
 
 ```bash
