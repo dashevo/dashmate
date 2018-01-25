@@ -45,7 +45,7 @@ services:
     links:
       - core:dashcore
     volumes:
-      - ./networks/$INSIGHT_CONFIG_FILE:/insight/bitcore-node-dash.json
+      - ./data/bitcore-node-dash.json:/insight/bitcore-node-dash.json
 
   drive:
     image: $REPO_URL/dashevo/dashdrive:latest
