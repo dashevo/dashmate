@@ -7,7 +7,7 @@ if [[ -z "$NETWORK" || ! -f networks/$NETWORK.env ]]; then
 fi
 shift 1
 
-./mn-bootstrap.sh regtest down &&
+./mn-bootstrap.sh $NETWORK down &&
 ./mn-bootstrap.sh $NETWORK rm -fv &&
 
 sudo su <<HERE
