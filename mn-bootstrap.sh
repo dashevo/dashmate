@@ -11,4 +11,12 @@ shift 1
 
 source networks/$NETWORK.env
 
+RELEASE=$1
+if [[ -z "$RELEASE" || ! -f releases/$RELEASE.env ]]; then
+  source releases/latest.env
+else
+  source releases/$RELEASE.env
+  shift 1
+fi
+
 docker-compose "$@"
