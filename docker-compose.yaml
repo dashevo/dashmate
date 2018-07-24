@@ -37,6 +37,13 @@ services:
       - ./data/ipfs:/data/ipfs
     command: daemon --migrate=true --enable-pubsub-experiment
 
+  mongodb:
+    image: mongo:3.6
+    volumes:
+      - ./data/mongodb:/data/db
+    ports:
+      - 27017:27017
+
   insight:
     image: $REPO_URL/dashevo/evoinsight:latest
     restart: always
@@ -55,6 +62,7 @@ services:
     depends_on:
       - core
       - ipfs
+      - mongodb
     ports:
       - 127.0.0.1:6000:5001
 
