@@ -41,8 +41,6 @@ services:
     image: mongo:3.6
     volumes:
       - ./data/mongodb:/data/db
-    ports:
-      - 27017:27017
 
   insight:
     image: $REPO_URL/dashevo/evoinsight:latest
