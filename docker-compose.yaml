@@ -34,7 +34,7 @@ services:
       - 127.0.0.1:8080:8080
       - 127.0.0.1:8081:8081
     volumes:
-      - ./data/ipfs:/data/ipfs
+      - ipfs:/data/ipfs
     command: daemon --migrate=true --enable-pubsub-experiment --offline
 
   insight:
@@ -52,7 +52,7 @@ services:
   drive_mongodb:
     image: mongo:3.6
     volumes:
-      - ./data/mongodb:/data/db
+      - drive_mongodb:/data/db
 
   drive_sync:
     image: $REPO_URL/dashevo/dashdrive:latest
@@ -101,3 +101,7 @@ services:
       - DASHCORE_ZMQ_HOST=core
       - DASHCORE_ZMQ_PORT=29998
       - NETWORK=$DASH_NETWORK
+
+volumes:
+  drive_mongodb:
+  ipfs:
