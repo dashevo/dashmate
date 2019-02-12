@@ -11,11 +11,11 @@ shift 1
 
 source networks/$NETWORK.env
 
-RELEASE=$1
-if [[ -z "$RELEASE" || ! -f releases/$RELEASE.env ]]; then
-  source releases/latest.env
+PRESET=$1
+if [[ -z "$PRESET" || ! -f presets/$PRESET.env ]]; then
+  source presets/latest.env
 else
-  source releases/$RELEASE.env
+  source presets/$PRESET.env
   shift 1
 fi
 
