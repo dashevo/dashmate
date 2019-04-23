@@ -38,7 +38,7 @@ services:
     command: daemon --migrate=true --enable-pubsub-experiment --offline
 
   insight:
-    image: dashpay/insight:$EVOINSIGHT_VERSION
+    image: dashpay/insight-api:$EVOINSIGHT_VERSION
     restart: always
     depends_on:
       - core
