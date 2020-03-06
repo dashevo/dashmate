@@ -98,7 +98,7 @@ services:
     volumes:
       - ./configs/${PRESET:?err}/tendermint:/tendermint
       - ./data/${PRESET:?err}/tendermint:/data
-    entrypoint: sh -c "sleep 20 && /usr/bin/tendermint init && /usr/bin/tendermint node"
+    entrypoint: sh -c "sleep 30 && /usr/bin/tendermint init && /usr/bin/tendermint node"
 
   dapi_insight:
     image: dashpay/insight-api:${DAPI_INSIGHT_VERSION:-latest}
