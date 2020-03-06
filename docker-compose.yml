@@ -8,7 +8,7 @@ services:
       - 20001:20001 # P2P
     volumes:
       - ./configs/${PRESET:?err}/core/dashd.conf:/dashd.conf
-      - ./data/core:/data
+      - ./data/${PRESET:?err}/core:/data
     command:
       - dashd
       - -conf=/dashd.conf
@@ -48,7 +48,7 @@ services:
       - TENDERMINT_RPC_PORT=26657
       - DPNS_CONTRACT_ID=${DPNS_CONTRACT_ID}
       - DPNS_TOP_LEVEL_IDENTITY=${DPNS_TOP_LEVEL_IDENTITY}
-    command: npm run updateState
+    command: sh -c "sleep 10 && npm run updateState"
 
   drive_api:
     image: dashpay/drive:${DRIVE_VERSION:-latest}
@@ -97,8 +97,8 @@ services:
       - 26656:26656 # P2P
     volumes:
       - ./configs/${PRESET:?err}/tendermint:/tendermint
-      - ./data/tendermint:/data
-    entrypoint: sh -c "sleep 5 && /usr/bin/tendermint init && /usr/bin/tendermint node"
+      - ./data/${PRESET:?err}/tendermint:/data
+    entrypoint: sh -c "sleep 20 && /usr/bin/tendermint init && /usr/bin/tendermint node"
 
   dapi_insight:
     image: dashpay/insight-api:${DAPI_INSIGHT_VERSION:-latest}
