@@ -89,7 +89,7 @@ services:
     command: npm run abci
 
   tendermint:
-    image: tendermint/tendermint:${TENDERMINT_VERSION:-0.32.8}
+    image: tendermint/tendermint:${TENDERMINT_VERSION:-v0.32.8}
     restart: always
     depends_on:
       - machine

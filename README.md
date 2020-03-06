@@ -2,7 +2,7 @@
 
 ### Pre-requisites to be Installed
 
-* [docker](https://docs.docker.com/engine/installation/) (version 17.04.0+)
+* [docker](https://docs.docker.com/engine/installation/) (version 18.06.0+)
 * docker-compose (`pip install -U docker-compose`)
 
 ### Setup
