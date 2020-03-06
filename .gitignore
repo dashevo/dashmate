@@ -1,13 +1,8 @@
 # ignore JetBrains IDE project specific files
 .idea
 
-# ignore data folders
-data/core/
-data/tendermint/
-
-# include data folders
-!data/tendermint/.gitkeep
-!data/core/.gitkeep
-
 # Env file
-.env1111
+.env
+
+# Tendermint creates `data` dir in configs for some reason
+configs/*/tendermint/data
