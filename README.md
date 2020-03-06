@@ -1,6 +1,6 @@
 # MN Bootstrap
 
-> Distribution package for easy Dash Evonet masternode installation
+> Distribution package for Dash Evolution Masternode installation
 
 ## Table of Contents
 
@@ -10,52 +10,34 @@
 - [Contributing](#contributing)
 - [License](#license)
 
-## Pre-requisites to be Installed
+## Pre-requisites
 
-* [docker](https://docs.docker.com/engine/installation/) (version 18.06.0+)
-* [docker-compose](https://docs.docker.com/compose/install/)
+* [Docker](https://docs.docker.com/engine/installation/)
+* [Docker compose](https://docs.docker.com/compose/install/)
 
 ## Install
 
-Download, unzip & cd to the directory:
+Download and unzip [package](https://github.com/dashevo/mn-bootstrap/archive/master.zip).
 
-```
-curl -LOk  https://github.com/dashevo/mn-bootstrap/archive/master.zip
-unzip master.zip
-rm master.zip
-cd mn-bootstrap-master
-```
 ## Usage
 
-1. regtest
+Package contains Docker Compose file and configuration presets.
 
-mn-bootstrap provides a wrapper around docker-compose to make using different networks
-and presets easier. It is called this way:
+### Configure
 
-```bash
-$ docker-compose --env-file=.env.local up
-```
+Package contains several configuration presets:
+ - Local - standalone masternode for local development
+ - Evonet - masternode with Evonet configuration
 
-Or copy .env.local to .env and use docker-compose without additional parameters:
+There are two ways to apply a present:
+ 1. Rename corresponding dotenv file (i.e. `.env.local`) to `.env`
+ 2. Add `--env-file` option to `docker-compose` command
 
-```bash
-$ cp .env.local .env
-$ docker-compose up
-```
+### Start
 
-2. evonet
-
-To connect mn-bootstrap to an existing evonet, you'll have to do some preparations first. You'll have
-to edit `.env.evonet`, and fill CORE_MASTERNODE_BLS_PRIV_KEY and CORE_EXTERNAL_IP.
+In order to run mastenode use Docker Compose:
 
 ```bash
-$ docker-compose --env-file=.env.evonet up
-```
-
-Or copy .env.local to .env and use docker-compose without additional parameters:
-
-```bash
-$ cp .env.evonet .env
 $ docker-compose up
 ```
 
