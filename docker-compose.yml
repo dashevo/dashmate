@@ -16,6 +16,20 @@ services:
       - -masternodeblsprivkey=${CORE_MASTERNODE_BLS_PRIV_KEY:?err}
       - -externalip=${CORE_EXTERNAL_IP:?err}
 
+  sentinel:
+    image: ablock/sentinel
+    restart: always
+    depends_on:
+      - core
+    environment:
+      - DEBUG=false
+      - RPCUSER=dashrpc
+      - RPCPASSWORD=password
+      - RPCHOST=core
+      - RPCPORT=20002
+      - NETWORK=${SENTINEL_NETWORK}
+      - SENTINEL_ARGS=-b
+
   drive_mongodb:
     image: mongo:${DRIVE_MONGODB_VERSION:-4.2}
     restart: always
