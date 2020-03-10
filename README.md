@@ -35,7 +35,7 @@ There are two ways to apply a present:
 
 ### Start
 
-In order to run mastenode use Docker Compose:
+In order to run a masternode use Docker Compose:
 
 ```bash
 $ docker-compose up
