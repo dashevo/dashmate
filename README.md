@@ -13,7 +13,7 @@
 ## Pre-requisites
 
 * [Docker](https://docs.docker.com/engine/installation/)
-* [Docker compose](https://docs.docker.com/compose/install/)
+* [Docker compose](https://docs.docker.com/compose/install/) (v1.25.0+)
 
 ## Install
 
@@ -31,7 +31,7 @@ Package contains several configuration presets:
 
 There are two ways to apply a present:
  1. Rename corresponding dotenv file (i.e. `.env.local`) to `.env`
- 2. Add `--env-file` option to `docker-compose` command (requires `docker-compose` v1.25.0+)
+ 2. Add `--env-file` option to `docker-compose` command
 
 ### Start
 
