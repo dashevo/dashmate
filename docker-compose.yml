@@ -5,7 +5,7 @@ services:
     image: dashpay/dashd:${CORE_VERSION:-latest}
     restart: always
     ports:
-      - ${P2P_PORT}:${P2P_PORT} # P2P
+      - ${CORE_P2P_PORT}:20001 # P2P
     volumes:
       - ./configs/${PRESET:?err}/core/dashd.conf:/dashd.conf
       - ./data/${PRESET:?err}/core:/data
@@ -26,6 +26,6 @@ services:
       - RPCUSER=dashrpc
       - RPCPASSWORD=password
       - RPCHOST=core
-      - RPCPORT=${RPC_PORT}
+      - RPCPORT=20002
       - NETWORK=${SENTINEL_NETWORK}
       - SENTINEL_ARGS=-b
