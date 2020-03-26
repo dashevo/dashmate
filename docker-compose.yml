@@ -5,7 +5,7 @@ services:
     image: dashpay/dashd:${CORE_VERSION:-latest}
     restart: always
     ports:
-      - ${CORE_P2P_PORT}:20001 # P2P
+      - ${CORE_P2P_PORT}:${CORE_P2P_PORT} # P2P
     volumes:
       - ./configs/${PRESET:?err}/core/dashd.conf:/dashd.conf
       - ./data/${PRESET:?err}/core:/data
