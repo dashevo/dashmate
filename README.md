@@ -36,10 +36,10 @@ There are two ways to apply a present:
 
 ### Start
 
-In order to run a masternode use Docker Compose (optionally with evo services):
+In order to run a masternode use Docker Compose:
 
 ```bash
-$ docker-compose up -f docker-compose.yml (-f docker-compose.evo.yml)
+$ docker-compose up -d
 ```
 
 ## Contributing
