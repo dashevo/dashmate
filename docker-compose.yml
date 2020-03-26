@@ -7,12 +7,11 @@ services:
     ports:
       - ${CORE_P2P_PORT}:${CORE_P2P_PORT} # P2P
     volumes:
-      - ./configs/${PRESET:?err}/core/dashd.conf:/dashd.conf
-      - ./data/${PRESET:?err}/core:/data
+      - ./configs/${PRESET:?err}/core/dashd.conf:/dash/.dashcore/dash.conf
+      - ./data/${PRESET:?err}/core:/dash/data
     command:
       - dashd
-      - -conf=/dashd.conf
-      - -datadir=/data
+      - -datadir=/dash/data
       - -masternodeblsprivkey=${CORE_MASTERNODE_BLS_PRIV_KEY:?err}
       - -externalip=${CORE_EXTERNAL_IP:?err}
 
