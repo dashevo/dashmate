@@ -12,6 +12,7 @@ services:
     command:
       - dashd
       - -datadir=/dash/data
+      - -port=${CORE_P2P_PORT:?err}
       - -masternodeblsprivkey=${CORE_MASTERNODE_BLS_PRIV_KEY:?err}
       - -externalip=${CORE_EXTERNAL_IP:?err}
 
