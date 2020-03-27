@@ -39,7 +39,7 @@ There are two ways to apply a present:
 In order to run a masternode use Docker Compose:
 
 ```bash
-$ docker-compose up -d
+$ docker-compose up
 ```
 
 ## Contributing
