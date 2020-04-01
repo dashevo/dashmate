@@ -75,8 +75,8 @@ services:
       - DASHCORE_P2P_PORT=20001
       - DASHCORE_P2P_NETWORK=devnet
       - NETWORK=devnet
-      - TENDERMINT_CORE_HOST=tendermint
-      - TENDERMINT_CORE_PORT=26657
+      - TENDERMINT_RPC_HOST=tendermint
+      - TENDERMINT_RPC_PORT=26657
     command: npm run api
 
   dapi_tx_filter_stream:
