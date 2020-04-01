@@ -38,7 +38,7 @@ services:
     image: tendermint/tendermint:${TENDERMINT_VERSION:-v0.32.8}
     restart: always
     depends_on:
-      - machine
+      - drive_abci
     ports:
       - 26656:26656 # P2P
     volumes:
