@@ -84,7 +84,7 @@ services:
     restart: always
     depends_on:
       - core
-      - tendermint
+      - dapi_insight
     environment:
       - INSIGHT_URI=http://dapi_insight:3001/insight-api
       - TX_FILTER_STREAM_GRPC_PORT=3006
