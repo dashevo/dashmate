@@ -6,7 +6,7 @@ services:
     restart: always
     volumes:
       - drive_mongodb:/data/db
-    command: mongod --replSet driveDocumentIndices --bind_ip_all
+    command: mongod --replSet driveDocuments --bind_ip_all
 
   drive_mongodb_replica_init:
     image: mongo:${DRIVE_MONGODB_VERSION:-4.2}
@@ -29,7 +29,7 @@ services:
       - DASHCORE_JSON_RPC_PASS=password
       - DASHCORE_JSON_RPC_HOST=core
       - DASHCORE_JSON_RPC_PORT=20002
-      - DOCUMENT_MONGODB_URL=mongodb://drive_mongodb:27017
+      - DOCUMENT_MONGODB_URL=mongodb://drive_mongodb:27017?replicaSet=driveDocuments
       - DPNS_CONTRACT_ID=${DPNS_CONTRACT_ID}
       - DPNS_TOP_LEVEL_IDENTITY=${DPNS_TOP_LEVEL_IDENTITY}
     command: sh -c "sleep 15 && npm run abci"
