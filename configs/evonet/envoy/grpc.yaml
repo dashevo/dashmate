@@ -7,6 +7,11 @@ static_resources:
     - filters:
       - name: envoy.http_connection_manager
         config:
+# Uncomment next lines to enable access logs
+#          access_log:
+#            - name: envoy.file_access_log
+#              config:
+#                path: "/tmp/access.log"
           codec_type: auto
           stat_prefix: ingress_http
           route_config:
