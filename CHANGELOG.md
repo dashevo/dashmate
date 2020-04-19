@@ -9,6 +9,11 @@
 * remove spork private key from сore config ([#11](https://github.com/dashevo/mn-bootstrap/issues/11))
 
 
+### Code Refactoring
+
+* tidy up services and configs ([#27](https://github.com/dashevo/mn-bootstrap/issues/27))
+
+
 ### Features
 
 * add testnet preset ([#15](https://github.com/dashevo/mn-bootstrap/issues/15))
@@ -17,10 +22,12 @@
 
 ### BREAKING CHANGES
 
-* new version of drive is incompatible with 0.11 so you need to wipe data before upgrade:
-  * `drive_mongodb` and `drive_leveldb` volumes
-  * `docker-commpose --env-file=.env.<PRESET> run tendermint unsafe_reset_all`
-                                                                                                                :
+* data and config dir paths are changed
+* `tendermint` service now called `drive_tendermint`
+* `machine` is removed due to merging Machine into Drive
+* new version of Drive is incompatible with 0.11 so you need to wipe data before run 0.12:
+  * drop `drive_mongodb` and `drive_leveldb` volumes
+  * `docker-commpose --env-file=.env.<PRESET> run drive_tendermint unsafe_reset_all`
 
 
 ## 0.11.1 (2020-03-17)
