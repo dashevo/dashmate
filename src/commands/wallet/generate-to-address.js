@@ -5,6 +5,8 @@ const { flags: flagTypes } = require('@oclif/command');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
 
+const PRESETS = require('../../presets');
+
 class GenerateToAddressCommand extends BaseCommand {
   async run() {
     const { flags, args } = this.parse(GenerateToAddressCommand);
@@ -25,6 +27,19 @@ class GenerateToAddressCommand extends BaseCommand {
                 const startCore = this.container.resolve('startCore');
 
                 ctx.coreService = await startCore(preset, { wallet: true });
+              },
+            },
+            {
+              title: 'Sync Core with network',
+              enabled: () => preset !== PRESETS.LOCAL,
+              task: async (ctx) => {
+                /**
+                 *
+                 * @type {waitForCoreSync}
+                 */
+                const waitForCoreSync = this.container.resolve('waitForCoreSync');
+
+                await waitForCoreSync(ctx.coreService);
               },
             },
             {
@@ -56,6 +71,7 @@ class GenerateToAddressCommand extends BaseCommand {
                     amount,
                     ctx.address,
                     (balance) => {
+                      ctx.balance = balance;
                       observer.next(`${balance} dash generated`);
                     },
                   );
@@ -66,38 +82,42 @@ class GenerateToAddressCommand extends BaseCommand {
             },
             {
               title: 'Wait for 100 confirmations',
-              task: async (ctx, task) => {
-                if (preset === 'local') {
-                  // generate 100 blocks to unlock dash
-                  await ctx.coreService.getRpcClient().generate(100);
-                } else {
-                  task.skip('You need to wait at least 100 block');
-                }
+              enabled: () => preset === PRESETS.LOCAL,
+              task: async (ctx) => {
+                // generate 100 blocks to unlock dash
+                await ctx.coreService.getRpcClient().generate(100);
               },
             },
           ])
         ),
       },
-    ]);
+    ],
+    { collapse: false });
 
     let context;
     try {
       context = await tasks.run({
         address,
       });
+
+      this.log('\n');
+      this.log(`Generated ${context.balance} dash`);
+      this.log(`Address: ${context.address}`);
+
+      if (context.privateKey) {
+        this.log(`Private key: ${context.privateKey}`);
+      }
+
+      if (preset !== PRESETS.LOCAL) {
+        this.log('You need to wait at least 100 blocks');
+      }
     } catch (e) {
       context = e.context;
-
-      throw e;
     } finally {
-      if (context.coreService) {
+      if (context && context.coreService) {
         await context.coreService.stop();
       }
     }
-
-    // this.info(`Generated ${addressBalance} dash`);
-    // this.info(`Address: ${address}\nPrivate key: ${privateKey}`);
-    // this.info(`Balance is ${addressBalance} dash`);
   }
 }
 
@@ -113,15 +133,15 @@ GenerateToAddressCommand.flags = {
 GenerateToAddressCommand.args = [{
   name: 'preset',
   required: true,
-  description: '-preset to use',
+  description: 'preset to use',
   options: [
-    'evonet',
-    'local',
+    PRESETS.EVONET,
+    PRESETS.LOCAL,
   ],
 }, {
   name: 'amount',
   required: true,
-  description: '-amount of dash to be generated to new address',
+  description: 'amount of dash to be generated to new address',
   parse: (input) => parseInt(input, 10),
 }];
 

@@ -24,9 +24,9 @@ class CoreService {
    * @return {Promise<boolean>}
    */
   async isRunning() {
-    const { State: state } = await this.dockerContainer.inspect();
+    const { State: { Status: status } } = await this.dockerContainer.inspect();
 
-    return state === 'running';
+    return status === 'running';
   }
 
   /**

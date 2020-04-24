@@ -2,6 +2,7 @@ const path = require('path');
 
 const CoreService = require('./CoreService');
 const CoreStartError = require('./errors/CoreStartError');
+const CoreIsAlreadyStartedError = require('./errors/CoreIsAlreadyStartedError');
 
 /**
  * @param {createRpcClient} createRpcClient
@@ -31,15 +32,11 @@ function startCoreFactory(
 
     // Start Core
 
-    const dockerComposeRunOptions = {
-      cwd: path.join(__dirname, '../../../'),
+    const dockerComposeOptions = {
+      cwd: path.join(__dirname, '../../'),
       config: 'docker-compose.yml',
       composeOptions: [
         '--env-file', `.env.${preset}`,
-      ],
-      commandOptions: [
-        '--publish=20002:20002',
-        '--detach',
       ],
     };
 
@@ -54,13 +51,36 @@ function startCoreFactory(
       coreCommand.push('--disablewallet=0');
     }
 
+    // Check if Core service is already started
+    let coreContainerId;
+
+    try {
+      ({ out: coreContainerId } = await dockerCompose.ps({
+        ...dockerComposeOptions,
+        commandOptions: ['-q', 'core'],
+      }));
+    } catch (e) {
+      throw new CoreStartError(e);
+    }
+
+    if (coreContainerId !== '') {
+      throw new CoreIsAlreadyStartedError();
+    }
+
+    // Run Core service
     let dockerContainerName;
 
     try {
       ({ out: dockerContainerName } = await dockerCompose.run(
         'core',
         coreCommand,
-        dockerComposeRunOptions,
+        {
+          ...dockerComposeOptions,
+          commandOptions: [
+            '--publish=20002:20002',
+            '--detach',
+          ],
+        },
       ));
     } catch (e) {
       throw new CoreStartError(e);
@@ -76,11 +96,6 @@ function startCoreFactory(
 
     // Wait Core to start
     await waitForCoreStart(coreService);
-
-    // Wait Core to be synced
-    if (preset !== 'local') {
-      await waitForCoreSync(coreService);
-    }
 
     return coreService;
   }

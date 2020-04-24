@@ -1,7 +1,6 @@
 const {
   createContainer: createAwilixContainer,
   InjectionMode,
-  asClass,
   asFunction,
   asValue,
 } = require('awilix');
@@ -27,7 +26,9 @@ async function createDIContainer() {
    */
   container.register({
     dockerCompose: asValue(dockerCompose),
-    docker: asClass(Docker),
+    docker: asFunction(() => (
+      new Docker()
+    )).singleton(),
   });
 
   /**

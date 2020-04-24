@@ -1,5 +1,11 @@
 const wait = require('../util/wait');
 
+/**
+ * Wait for Core to start
+ *
+ * @param {CoreService} coreService
+ * @return {Promise<void>}
+ */
 async function waitForCoreStart(coreService) {
   let retires = 0;
   let isReady = false;

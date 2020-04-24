@@ -1,5 +1,12 @@
 const wait = require('../util/wait');
 
+/**
+ * Wait Core to be synced
+ *
+ * @typedef {waitForCoreSync}
+ * @param {CoreService} coreService
+ * @return {Promise<void>}
+ */
 async function waitForCoreSync(coreService) {
   let isSynced = false;
 

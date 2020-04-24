@@ -1,15 +1,11 @@
-const { Command } = require('@oclif/command');
-const compose = require('docker-compose');
-const Docker = require('dockerode');
-const RpcClient = require('@dashevo/dashd-rpc/promise');
+const Listr = require('listr');
+const { Observable } = require('rxjs');
 
-const registerMasternodeFactory = require('../core/mn/registerMasternodeFactory');
-const waitForCoreSyncFactory = require('../core/waitForCoreSync');
-const waitForCoreStartFactory = require('../core/waitForCoreStart');
-const getInputsForAmountFactory = require('../core/wallet/getInputsForAmountFactory');
-const waitForConfirmationsFactory = require('../core/waitForConfirmationsFactory');
+const BaseCommand = require('../oclif/command/BaseCommand');
 
-class RegisterCommand extends Command {
+const PRESETS = require('../presets');
+
+class RegisterCommand extends BaseCommand {
   async run() {
     const { args } = this.parse(RegisterCommand);
     const {
@@ -20,41 +16,8 @@ class RegisterCommand extends Command {
     } = args;
     this.log(`Starting to register masternode using preset ${preset}`);
 
-    const logger = {
-      log: this.log.bind(this),
-      info: this.log.bind(this),
-      warn: this.warn.bind(this),
-      error: this.error.bind(this),
-    };
+    const tasks = new Listr([]);
 
-    const docker = new Docker();
-
-    const dashcoreConfig = {
-      protocol: 'http',
-      user: 'dashrpc',
-      pass: 'password',
-      host: '127.0.0.1',
-      port: 20002,
-    };
-
-    const coreClient = new RpcClient(dashcoreConfig);
-    const waitForCoreStart = waitForCoreStartFactory(logger, coreClient);
-    const waitForCoreSync = waitForCoreSyncFactory(logger, coreClient);
-    const waitForConfirmations = waitForConfirmationsFactory(logger, coreClient);
-    const getInputsForAmount = getInputsForAmountFactory(coreClient);
-
-    const registerMasternode = registerMasternodeFactory(
-      logger,
-      docker,
-      compose,
-      coreClient,
-      waitForCoreStart,
-      waitForCoreSync,
-      waitForConfirmations,
-      getInputsForAmount,
-    );
-
-    await registerMasternode(preset, privateKey, externalIp, port);
   }
 }
 
@@ -66,24 +29,20 @@ Register masternode using predefined presets
 RegisterCommand.args = [{
   name: 'preset',
   required: true,
-  description: '-preset to use',
-  options: [
-    'evonet',
-    'local',
-    'testnet',
-  ],
+  description: 'preset to use',
+  options: Object.values(PRESETS),
 }, {
   name: 'private-key',
   required: true,
-  description: '-private key with more than 1000 dash',
+  description: 'private key with more than 1000 dash',
 }, {
   name: 'external-ip',
   required: true,
-  description: '-masternode external IP',
+  description: 'masternode external IP',
 }, {
   name: 'port',
   required: true,
-  description: '-masternode P2P port',
+  description: 'masternode P2P port',
 }];
 
 module.exports = RegisterCommand;
