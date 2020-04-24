@@ -1,5 +1,13 @@
 const { Command } = require('@oclif/command');
-const registerMasternode = require('../../lib/commands/registerMasternode');
+const compose = require('docker-compose');
+const Docker = require('dockerode');
+const RpcClient = require('@dashevo/dashd-rpc/promise');
+
+const registerMasternodeFactory = require('../core/mn/registerMasternodeFactory');
+const waitForCoreSyncFactory = require('../core/waitForCoreSyncFactory');
+const waitForCoreStartFactory = require('../core/waitForCoreStartFactory');
+const getInputsForAmount = require('../core/wallet/getInputsForAmount');
+const waitForConfirmationsFactory = require('../core/waitForConfirmationsFactory');
 
 class RegisterCommand extends Command {
   async run() {
@@ -11,6 +19,30 @@ class RegisterCommand extends Command {
       port,
     } = args;
     this.log(`Starting to register masternode using preset ${preset}`);
+
+    const logger = {
+      log: this.log.bind(this),
+      info: this.log.bind(this),
+      warn: this.warn.bind(this),
+      error: this.error.bind(this),
+    };
+
+    const docker = new Docker();
+
+    const dashcoreConfig = {
+      protocol: 'http',
+      user: 'dashrpc',
+      pass: 'password',
+      host: '127.0.0.1',
+      port: 20002,
+    };
+
+    const coreClient = new RpcClient(dashcoreConfig);
+    const waitForConfirmations = waitForConfirmationsFactory(logger, coreClient);
+    const waitForCoreStart = waitForCoreStartFactory(logger, coreClient);
+    const waitForCoreSync = waitForCoreSyncFactory(logger, coreClient);
+
+    const registerMasternode = registerMasternodeFactory(logger, docker, compose);
 
     await registerMasternode(preset, privateKey, externalIp, port);
   }

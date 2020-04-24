@@ -1,8 +1,8 @@
 {
-  "name": "mn-bootstrap",
-  "version": "0.12.0-dev.1",
-  "description": "Dash masternode bootstrap",
-  "main": "lib/index.js",
+  "name": "@dashevo/mn-bootstrap",
+  "version": "0.13.0-dev.1",
+  "description": "Distribution package for Dash Masternode installation",
+  "main": "src/index.js",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint .",
@@ -14,7 +14,7 @@
     "url": "git+https://github.com/dashevo/mn-bootstrap.git"
   },
   "bin": {
-    "mn": "./bin/run"
+    "mn": "bin/mn"
   },
   "contributors": [
     {
@@ -48,12 +48,14 @@
   "homepage": "https://github.com/dashevo/mn-bootstrap#readme",
   "dependencies": {
     "@dashevo/dashcore-lib": "^0.18.0",
-    "@dashevo/dashd-rpc": "^2.0.0",
+    "@dashevo/dashd-rpc": "dashevo/dashd-rpc",
     "@oclif/command": "^1.5.19",
     "@oclif/config": "^1.15.1",
     "@oclif/plugin-help": "^2.2.3",
     "bls-signatures": "^0.1.9",
-    "docker-compose": "^0.23.3"
+    "cli-ux": "^5.4.5",
+    "docker-compose": "^0.23.3",
+    "dockerode": "^3.2.0"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.22.2",
