@@ -4,8 +4,8 @@ const Docker = require('dockerode');
 const RpcClient = require('@dashevo/dashd-rpc/promise');
 
 const registerMasternodeFactory = require('../core/mn/registerMasternodeFactory');
-const waitForCoreSyncFactory = require('../core/waitForCoreSyncFactory');
-const waitForCoreStartFactory = require('../core/waitForCoreStartFactory');
+const waitForCoreSyncFactory = require('../core/waitForCoreSync');
+const waitForCoreStartFactory = require('../core/waitForCoreStart');
 const getInputsForAmountFactory = require('../core/wallet/getInputsForAmountFactory');
 const waitForConfirmationsFactory = require('../core/waitForConfirmationsFactory');
 

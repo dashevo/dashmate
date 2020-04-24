@@ -52,10 +52,13 @@
     "@oclif/command": "^1.5.19",
     "@oclif/config": "^1.15.1",
     "@oclif/plugin-help": "^2.2.3",
+    "awilix": "^4.2.6",
     "bls-signatures": "^0.1.9",
     "cli-ux": "^5.4.5",
     "docker-compose": "^0.23.3",
-    "dockerode": "^3.2.0"
+    "dockerode": "^3.2.0",
+    "listr": "^0.14.3",
+    "rxjs": "latest"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.22.2",

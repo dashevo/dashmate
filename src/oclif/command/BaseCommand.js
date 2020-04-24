@@ -1,8 +1,10 @@
 const { Command } = require('@oclif/command');
 
+const createDIContainer = require('../../createDIContainer');
+
 class BaseCommand extends Command {
   async init() {
-    // paste code here
+    this.container = await createDIContainer();
   }
 }
 
