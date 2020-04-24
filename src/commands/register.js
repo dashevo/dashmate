@@ -6,7 +6,7 @@ const RpcClient = require('@dashevo/dashd-rpc/promise');
 const registerMasternodeFactory = require('../core/mn/registerMasternodeFactory');
 const waitForCoreSyncFactory = require('../core/waitForCoreSyncFactory');
 const waitForCoreStartFactory = require('../core/waitForCoreStartFactory');
-const getInputsForAmount = require('../core/wallet/getInputsForAmount');
+const getInputsForAmountFactory = require('../core/wallet/getInputsForAmountFactory');
 const waitForConfirmationsFactory = require('../core/waitForConfirmationsFactory');
 
 class RegisterCommand extends Command {
@@ -38,11 +38,21 @@ class RegisterCommand extends Command {
     };
 
     const coreClient = new RpcClient(dashcoreConfig);
-    const waitForConfirmations = waitForConfirmationsFactory(logger, coreClient);
     const waitForCoreStart = waitForCoreStartFactory(logger, coreClient);
     const waitForCoreSync = waitForCoreSyncFactory(logger, coreClient);
+    const waitForConfirmations = waitForConfirmationsFactory(logger, coreClient);
+    const getInputsForAmount = getInputsForAmountFactory(coreClient);
 
-    const registerMasternode = registerMasternodeFactory(logger, docker, compose);
+    const registerMasternode = registerMasternodeFactory(
+      logger,
+      docker,
+      compose,
+      coreClient,
+      waitForCoreStart,
+      waitForCoreSync,
+      waitForConfirmations,
+      getInputsForAmount,
+    );
 
     await registerMasternode(preset, privateKey, externalIp, port);
   }

@@ -1,7 +1,4 @@
 const path = require('path');
-const RpcClient = require('@dashevo/dashd-rpc/promise');
-const waitForCoreStartFactory = require('../waitForCoreStartFactory');
-const waitForCoreSyncFactory = require('../waitForCoreSyncFactory');
 
 const SATOSHI_MULTIPLIER = 10 ** 8;
 
@@ -15,9 +12,19 @@ const SATOSHI_MULTIPLIER = 10 ** 8;
  * @property {function} error
  * @param {Docker} docker
  * @param {Object} compose
+ * @param {RpcClient} coreClient
+ * @param {waitForCoreStart} waitForCoreStart
+ * @param {waitForCoreSync} waitForCoreSync
  * @returns {generateToAddress}
  */
-function generateToAddressFactory(logger, docker, compose) {
+function generateToAddressFactory(
+  logger,
+  docker,
+  compose,
+  coreClient,
+  waitForCoreStart,
+  waitForCoreSync,
+) {
   /**
    *
    * @typedef generateToAddress
@@ -60,24 +67,12 @@ function generateToAddressFactory(logger, docker, compose) {
 
       container = docker.getContainer(containerName.trim());
 
-      const dashcoreConfig = {
-        protocol: 'http',
-        user: 'dashrpc',
-        pass: 'password',
-        host: '127.0.0.1',
-        port: 20002,
-      };
-
-      const coreClient = new RpcClient(dashcoreConfig);
-      const waitForCoreStart = waitForCoreStartFactory(logger, coreClient);
-      const waitForCoreSync = waitForCoreSyncFactory(logger, coreClient);
-
       // wait dash core to start
-      await waitForCoreStart(coreClient);
+      await waitForCoreStart();
 
       // wait dash core to be synced
       if (preset !== 'local') {
-        await waitForCoreSync(coreClient);
+        await waitForCoreSync();
       }
 
       let address = addressToGenerate;

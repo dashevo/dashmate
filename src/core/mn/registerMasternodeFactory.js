@@ -3,8 +3,6 @@ const { Transaction, PrivateKey } = require('@dashevo/dashcore-lib');
 const { PrivateKey: BlsPrivateKey } = require('bls-signatures');
 const crypto = require('crypto');
 
-
-
 const MASTERNODE_DASH_AMOUNT = 1000;
 const SATOSHI_MULTIPLIER = 10 ** 8;
 
@@ -19,9 +17,9 @@ const SATOSHI_MULTIPLIER = 10 ** 8;
  * @param {Docker} docker
  * @param {Object} compose
  * @param {RpcClient} coreClient
- * @param {waitForConfirmations} waitForConfirmations
  * @param {waitForCoreStart} waitForCoreStart
  * @param {waitForCoreSync} waitForCoreSync
+ * @param {waitForConfirmations} waitForConfirmations
  * @param {getInputsForAmount} getInputsForAmount
  * @returns {registerMasternode}
  */
@@ -30,9 +28,9 @@ function registerMasternodeFactory(
   docker,
   compose,
   coreClient,
-  waitForConfirmations,
   waitForCoreStart,
   waitForCoreSync,
+  waitForConfirmations,
   getInputsForAmount,
 ) {
   /**
@@ -84,15 +82,14 @@ function registerMasternodeFactory(
 
       const network = 'testnet';
 
-
       // wait dash core to start
-      await waitForCoreStart(coreClient);
+      await waitForCoreStart();
 
       await coreClient.importPrivKey(fundSourcePrivateKey);
 
       // wait dash core to be synced
       if (preset !== 'local') {
-        await waitForCoreSync(coreClient);
+        await waitForCoreSync();
       }
 
       // generate BLS
