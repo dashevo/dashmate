@@ -86,18 +86,15 @@ class GenerateToAddressCommand extends BaseCommand {
             },
             {
               title: 'Mine 1 block to confirm',
-              task: async (ctx, task) => (
+              task: async (ctx) => (
                 new Observable(async (observer) => {
                   await generateBlocks(
                     ctx.coreService,
                     1,
                     (blocks) => {
-                      observer.next(`${blocks} generated`);
+                      observer.next(`${blocks} ${blocks > 1 ? 'blocks' : 'block'} mined`);
                     },
                   );
-
-                  // eslint-disable-next-line no-param-reassign
-                  task.output = null;
 
                   observer.complete();
                 })
@@ -124,13 +121,13 @@ class GenerateToAddressCommand extends BaseCommand {
   }
 }
 
-GenerateToAddressCommand.description = `Generate new address
+GenerateToAddressCommand.description = `Generate dash to address
 ...
-Generate new address with defined amount of dash
+Generate specified amount of dash to a new address or specified one
 `;
 
 GenerateToAddressCommand.flags = {
-  address: flagTypes.string({ char: 'a', description: 'amount of dash to be generated to new address', default: null }),
+  address: flagTypes.string({ char: 'a', description: 'recipient address instead of a new one', default: null }),
 };
 
 GenerateToAddressCommand.args = [{
@@ -144,7 +141,7 @@ GenerateToAddressCommand.args = [{
 }, {
   name: 'amount',
   required: true,
-  description: 'amount of dash to be generated to new address',
+  description: 'amount of dash to be generated to address',
   parse: (input) => parseInt(input, 10),
 }];
 

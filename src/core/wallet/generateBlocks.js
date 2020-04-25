@@ -14,11 +14,13 @@ async function generateBlocks(
   let generatedBlocks = 0;
 
   do {
-    const { result: blockHashes } = await coreService.getRpcClient().generate(blocks, 10000000);
+    const { result: blockHashes } = await coreService.getRpcClient().generate(1, 10000000);
 
     generatedBlocks += blockHashes.length;
 
-    await progressCallback(generatedBlocks);
+    if (blockHashes.length > 0) {
+      await progressCallback(generatedBlocks);
+    }
   } while (generatedBlocks < blocks);
 }
 
