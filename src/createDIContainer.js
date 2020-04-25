@@ -3,10 +3,12 @@ const {
   InjectionMode,
   asFunction,
   asValue,
+  asClass,
 } = require('awilix');
 
 const Docker = require('dockerode');
-const dockerCompose = require('docker-compose');
+
+const DockerCompose = require('./docker/DockerCompose');
 
 const startCoreFactory = require('./core/startCoreFactory');
 const createRpcClient = require('./core/createRpcClient');
@@ -14,6 +16,7 @@ const waitForCoreStart = require('./core/waitForCoreStart');
 const waitForCoreSync = require('./core/waitForCoreSync');
 
 const createNewAddress = require('./core/wallet/createNewAddress');
+const generateBlocks = require('./core/wallet/generateBlocks');
 const generateToAddressFactory = require('./core/wallet/generateToAddress');
 
 async function createDIContainer() {
@@ -25,10 +28,10 @@ async function createDIContainer() {
    * Docker
    */
   container.register({
-    dockerCompose: asValue(dockerCompose),
     docker: asFunction(() => (
       new Docker()
     )).singleton(),
+    dockerCompose: asClass(DockerCompose),
   });
 
   /**
@@ -46,6 +49,7 @@ async function createDIContainer() {
    */
   container.register({
     createNewAddress: asValue(createNewAddress),
+    generateBlocks: asValue(generateBlocks),
     generateToAddress: asValue(generateToAddressFactory),
   });
 

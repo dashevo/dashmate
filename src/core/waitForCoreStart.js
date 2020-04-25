@@ -3,6 +3,7 @@ const wait = require('../util/wait');
 /**
  * Wait for Core to start
  *
+ * @typedef {waitForCoreStart}
  * @param {CoreService} coreService
  * @return {Promise<void>}
  */

@@ -28,13 +28,6 @@ async function generateToAddress(
 
     await progressCallback(addressBalance);
   } while (addressBalance < amount);
-  // } catch (e) {
-  //   if (!(e instanceof Error)) {
-  //     throw new Error(`Error: ${JSON.stringify(e)}`);
-  //   } else {
-  //     throw e;
-  //   }
-  // }
 }
 
 

@@ -1,15 +1,10 @@
-const path = require('path');
-
 const CoreService = require('./CoreService');
-const CoreStartError = require('./errors/CoreStartError');
-const CoreIsAlreadyStartedError = require('./errors/CoreIsAlreadyStartedError');
 
 /**
  * @param {createRpcClient} createRpcClient
  * @param {waitForCoreStart} waitForCoreStart
  * @param {waitForCoreSync} waitForCoreSync
- * @param {Object} dockerCompose
- * @param {Docker} docker
+ * @param {DockerCompose} dockerCompose
  * @return {startCore}
  */
 function startCoreFactory(
@@ -17,7 +12,6 @@ function startCoreFactory(
   waitForCoreStart,
   waitForCoreSync,
   dockerCompose,
-  docker,
 ) {
   /**
    * @typedef startCore
@@ -30,15 +24,7 @@ function startCoreFactory(
     // eslint-disable-next-line no-param-reassign
     options = { wallet: false, ...options };
 
-    // Start Core
-
-    const dockerComposeOptions = {
-      cwd: path.join(__dirname, '../../'),
-      config: 'docker-compose.yml',
-      composeOptions: [
-        '--env-file', `.env.${preset}`,
-      ],
-    };
+    // Run Core service
 
     const coreCommand = [
       'dashd',
@@ -51,50 +37,25 @@ function startCoreFactory(
       coreCommand.push('--disablewallet=0');
     }
 
-    // Check if Core service is already started
-    let coreContainerId;
-
-    try {
-      ({ out: coreContainerId } = await dockerCompose.ps({
-        ...dockerComposeOptions,
-        commandOptions: ['-q', 'core'],
-      }));
-    } catch (e) {
-      throw new CoreStartError(e);
-    }
-
-    if (coreContainerId !== '') {
-      throw new CoreIsAlreadyStartedError();
-    }
-
-    // Run Core service
-    let dockerContainerName;
-
-    try {
-      ({ out: dockerContainerName } = await dockerCompose.run(
-        'core',
-        coreCommand,
-        {
-          ...dockerComposeOptions,
-          commandOptions: [
-            '--publish=20002:20002',
-            '--detach',
-          ],
-        },
-      ));
-    } catch (e) {
-      throw new CoreStartError(e);
-    }
+    const coreContainer = await dockerCompose.runService(
+      preset,
+      'core',
+      coreCommand,
+      [
+        '--publish=20002:20002',
+        '--detach',
+      ],
+    );
 
     const rpcClient = createRpcClient();
-    const dockerContainer = docker.getContainer(dockerContainerName.trim());
 
     const coreService = new CoreService(
       rpcClient,
-      dockerContainer,
+      coreContainer,
     );
 
     // Wait Core to start
+
     await waitForCoreStart(coreService);
 
     return coreService;

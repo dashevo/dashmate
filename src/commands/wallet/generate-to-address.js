@@ -4,68 +4,69 @@ const { Observable } = require('rxjs');
 const { flags: flagTypes } = require('@oclif/command');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
+const UpdateRendererWithOutput = require('../../oclif/renderer/UpdateRendererWithOutput');
 
 const PRESETS = require('../../presets');
 
 class GenerateToAddressCommand extends BaseCommand {
-  async run() {
-    const { flags, args } = this.parse(GenerateToAddressCommand);
-    const { address } = flags;
-    const { preset, amount } = args;
-
+  /**
+   * @param {Object} args
+   * @param {Object} flags
+   * @param {startCore} startCore
+   * @param {createNewAddress} createNewAddress
+   * @param {generateToAddress} generateToAddress
+   * @param {generateBlocks} generateBlocks
+   * @param {waitForCoreSync} waitForCoreSync
+   * @return {Promise<void>}
+   */
+  async runWithDependencies(
+    { preset, amount },
+    { address },
+    startCore,
+    createNewAddress,
+    generateToAddress,
+    generateBlocks,
+    waitForCoreSync,
+  ) {
     const tasks = new Listr([
       {
-        title: `Generate ${amount} dash to ${address || 'new'} address using ${preset} preset`,
+        title: `Generate ${amount} dash to address using ${preset} preset`,
         task: () => (
           new Listr([
             {
               title: 'Start Core',
               task: async (ctx) => {
-                /**
-                 * @type {startCore}
-                 */
-                const startCore = this.container.resolve('startCore');
-
                 ctx.coreService = await startCore(preset, { wallet: true });
               },
             },
             {
               title: 'Sync Core with network',
               enabled: () => preset !== PRESETS.LOCAL,
-              task: async (ctx) => {
-                /**
-                 *
-                 * @type {waitForCoreSync}
-                 */
-                const waitForCoreSync = this.container.resolve('waitForCoreSync');
-
-                await waitForCoreSync(ctx.coreService);
-              },
+              task: async (ctx) => waitForCoreSync(ctx.coreService),
             },
             {
-              title: 'Create new address',
-              enabled: (ctx) => ctx.address === null,
-              task: async (ctx) => {
-                /**
-                 * @type {createNewAddress}
-                 */
-                const createNewAddress = this.container.resolve('createNewAddress');
+              title: 'Create a new address',
+              skip: (ctx) => {
+                if (ctx.address !== null) {
+                  return `Use specified address ${ctx.address}`;
+                }
 
+                return false;
+              },
+              task: async (ctx, task) => {
                 ({
                   address: ctx.address,
                   privateKey: ctx.privateKey,
                 } = await createNewAddress(ctx.coreService));
+
+                // eslint-disable-next-line no-param-reassign
+                task.output = `Address: ${ctx.address}\nPrivate key: ${ctx.privateKey}`;
               },
             },
             {
               title: `Generate ${amount} dash to address`,
-              task: (ctx) => {
-                /**
-                 * @type {generateToAddress}
-                 */
-                const generateToAddress = this.container.resolve('generateToAddress');
-
-                return new Observable(async (observer) => {
+              task: (ctx, task) => (
+                new Observable(async (observer) => {
                   await generateToAddress(
                     ctx.coreService,
                     amount,
@@ -76,41 +77,43 @@ class GenerateToAddressCommand extends BaseCommand {
                     },
                   );
 
+                  // eslint-disable-next-line no-param-reassign
+                  task.output = `Generated ${ctx.balance} dash`;
+
                   observer.complete();
-                });
-              },
+                })
+              ),
             },
             {
-              title: 'Wait for 100 confirmations',
-              enabled: () => preset === PRESETS.LOCAL,
-              task: async (ctx) => {
-                // generate 100 blocks to unlock dash
-                await ctx.coreService.getRpcClient().generate(100);
-              },
+              title: 'Mine 1 block to confirm',
+              task: async (ctx, task) => (
+                new Observable(async (observer) => {
+                  await generateBlocks(
+                    ctx.coreService,
+                    1,
+                    (blocks) => {
+                      observer.next(`${blocks} generated`);
+                    },
+                  );
+
+                  // eslint-disable-next-line no-param-reassign
+                  task.output = null;
+
+                  observer.complete();
+                })
+              ),
             },
           ])
         ),
       },
     ],
-    { collapse: false });
+    { collapse: false, renderer: UpdateRendererWithOutput });
 
     let context;
     try {
       context = await tasks.run({
         address,
       });
-
-      this.log('\n');
-      this.log(`Generated ${context.balance} dash`);
-      this.log(`Address: ${context.address}`);
-
-      if (context.privateKey) {
-        this.log(`Private key: ${context.privateKey}`);
-      }
-
-      if (preset !== PRESETS.LOCAL) {
-        this.log('You need to wait at least 100 blocks');
-      }
     } catch (e) {
       context = e.context;
     } finally {
