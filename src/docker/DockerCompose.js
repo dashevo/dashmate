@@ -63,7 +63,7 @@ class DockerCompose {
       throw new DockerComposeError(e);
     }
 
-    const coreContainerIds = psOutput.trim().split('\n');
+    const coreContainerIds = psOutput.trim().split('\n').filter((containerId) => containerId !== '');
 
     for (const containerId of coreContainerIds) {
       const container = this.docker.getContainer(containerId);
@@ -98,7 +98,7 @@ class DockerCompose {
    * @return {Promise<void>}
    */
   async throwErrorIfNotReady() {
-    if (!this.isReady()) {
+    if (!(await this.isReady())) {
       throw new Error('Docker Compose doesn\'t respond');
     }
   }
