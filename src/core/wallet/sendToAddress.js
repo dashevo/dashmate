@@ -1,5 +1,4 @@
-// TODO move to converter
-const SATOSHI_MULTIPLIER = 10 ** 8;
+const { toSatoshi } = require('../../util/satoshiConverter');
 
 /**
  * Send Dash to address
@@ -13,7 +12,7 @@ const SATOSHI_MULTIPLIER = 10 ** 8;
 async function sendToAddress(coreService, address, amount) {
   const fee = 10000;
 
-  const amountToSend = amount * SATOSHI_MULTIPLIER;
+  const amountToSend = toSatoshi(amount);
 
   const inputs = await getInputsForAmount(
     coreClient,

@@ -1,4 +1,4 @@
-const SATOSHI_MULTIPLIER = 10 ** 8;
+const { toDash } = require('../../util/satoshiConverter');
 
 /**
  *
@@ -24,7 +24,7 @@ async function generateToAddress(
       addresses: [address],
     });
 
-    addressBalance = balance / SATOSHI_MULTIPLIER;
+    addressBalance = toDash(balance);
 
     await progressCallback(addressBalance);
   } while (addressBalance < amount);

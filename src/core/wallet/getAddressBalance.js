@@ -1,4 +1,4 @@
-const SATOSHI_MULTIPLIER = 10 ** 8;
+const { toDash } = require('../../util/satoshiConverter');
 
 /**
  * Get balance of the address
@@ -13,7 +13,7 @@ async function getAddressBalance(coreService, address) {
     addresses: [address],
   });
 
-  return balance / SATOSHI_MULTIPLIER;
+  return toDash(balance);
 }
 
 module.exports = getAddressBalance;
