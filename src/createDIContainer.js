@@ -14,10 +14,17 @@ const startCoreFactory = require('./core/startCoreFactory');
 const createRpcClient = require('./core/createRpcClient');
 const waitForCoreStart = require('./core/waitForCoreStart');
 const waitForCoreSync = require('./core/waitForCoreSync');
+const waitForBlocks = require('./core/waitForBlocks');
+const waitForConfirmations = require('./core/waitForConfirmations');
+const generateBlsKeys = require('./core/generateBlsKeys');
 
 const createNewAddress = require('./core/wallet/createNewAddress');
 const generateBlocks = require('./core/wallet/generateBlocks');
-const generateToAddressFactory = require('./core/wallet/generateToAddress');
+const generateToAddress = require('./core/wallet/generateToAddress');
+const importPrivateKey = require('./core/wallet/importPrivateKey');
+const getAddressBalance = require('./core/wallet/getAddressBalance');
+const sendToAddress = require('./core/wallet/sendToAddress');
+const registerMasternode = require('./core/wallet/registerMasternode');
 
 async function createDIContainer() {
   const container = createAwilixContainer({
@@ -42,6 +49,9 @@ async function createDIContainer() {
     waitForCoreStart: asValue(waitForCoreStart),
     waitForCoreSync: asValue(waitForCoreSync),
     startCore: asFunction(startCoreFactory).singleton(),
+    waitForBlocks: asValue(waitForBlocks),
+    waitForConfirmations: asValue(waitForConfirmations),
+    generateBlsKeys: asValue(generateBlsKeys),
   });
 
   /**
@@ -50,7 +60,9 @@ async function createDIContainer() {
   container.register({
     createNewAddress: asValue(createNewAddress),
     generateBlocks: asValue(generateBlocks),
-    generateToAddress: asValue(generateToAddressFactory),
+    generateToAddress: asValue(generateToAddress),
+    importPrivateKey: asValue(importPrivateKey),
+    getAddressBalance: asValue(getAddressBalance),
   });
 
   return container;

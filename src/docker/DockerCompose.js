@@ -2,6 +2,8 @@ const path = require('path');
 
 const dockerCompose = require('docker-compose');
 
+const hasbin = require('hasbin');
+
 const DockerComposeError = require('./errors/DockerComposeError');
 const ServiceAlreadyRunningError = require('./errors/ServiceAlreadyRunningError');
 
@@ -25,13 +27,14 @@ class DockerCompose {
     }
 
     let containerName;
+    const env = this.getPlaceholderEnvOptions();
 
     try {
       ({ out: containerName } = await dockerCompose.run(
         serviceName,
         command,
         {
-          ...this.getOptions(preset),
+          ...this.getOptions(preset, env),
           commandOptions: options,
         },
       ));
@@ -50,13 +53,15 @@ class DockerCompose {
    * @return {Promise<boolean>}
    */
   async isServiceRunning(preset, serviceName) {
-    await this.throwErrorIfNotReady();
+    await this.throwErrorIfNotInstalled();
 
     let psOutput;
 
+    const env = this.getPlaceholderEnvOptions();
+
     try {
       ({ out: psOutput } = await dockerCompose.ps({
-        ...this.getOptions(preset),
+        ...this.getOptions(preset, env),
         commandOptions: ['-q', serviceName],
       }));
     } catch (e) {
@@ -79,42 +84,51 @@ class DockerCompose {
   }
 
   /**
-   * Is Docker Compose ready?
-   *
-   * @return {Promise<boolean>}
-   */
-  async isReady() {
-    try {
-      await dockerCompose.ps(this.getOptions('local'));
-    } catch (e) {
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
    * @private
    * @return {Promise<void>}
    */
-  async throwErrorIfNotReady() {
-    if (!(await this.isReady())) {
-      throw new Error('Docker Compose doesn\'t respond');
+  async throwErrorIfNotInstalled() {
+    if (!hasbin.sync('docker')) {
+      throw new Error('Docker is not installed');
+    }
+
+    if (!hasbin.sync('docker-compose')) {
+      throw new Error('Docker Compose is not installed');
     }
   }
 
   /**
    * @private
    * @param {string} preset
+   * @param {Object} [envOptions]
    * @return {{cwd: string, config: string, composeOptions: [string, string]}}
    */
-  getOptions(preset) {
+  getOptions(preset, envOptions = undefined) {
+    let env;
+
+    if (envOptions !== undefined) {
+      env = Object.assign(process.env, envOptions);
+    }
+
     return {
       cwd: path.join(__dirname, '../../'),
       config: 'docker-compose.yml',
       composeOptions: [
         '--env-file', `.env.${preset}`,
       ],
+      env,
+    };
+  }
+
+  /**
+   * @private
+   * @return {Object}
+   */
+  getPlaceholderEnvOptions() {
+    return {
+      CORE_EXTERNAL_IP: '127.0.0.1',
+      CORE_MASTERNODE_BLS_PRIV_KEY: 'bls',
+      CORE_P2P_PORT: 20001,
     };
   }
 }

@@ -17,6 +17,7 @@ class GenerateToAddressCommand extends BaseCommand {
    * @param {generateToAddress} generateToAddress
    * @param {generateBlocks} generateBlocks
    * @param {waitForCoreSync} waitForCoreSync
+   * @param {waitForBlocks} waitForBlocks
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -27,6 +28,7 @@ class GenerateToAddressCommand extends BaseCommand {
     generateToAddress,
     generateBlocks,
     waitForCoreSync,
+    waitForBlocks,
   ) {
     const tasks = new Listr([
       {
@@ -37,6 +39,11 @@ class GenerateToAddressCommand extends BaseCommand {
               title: 'Start Core',
               task: async (ctx) => {
                 ctx.coreService = await startCore(preset, { wallet: true });
+
+                process.on('SIGINT', async () => {
+                  await ctx.coreService.stop();
+                  process.exit();
+                });
               },
             },
             {
@@ -64,7 +71,7 @@ class GenerateToAddressCommand extends BaseCommand {
               },
             },
             {
-              title: `Generate ${amount} dash to address`,
+              title: `Generate ≈${amount} dash to address`,
               task: (ctx, task) => (
                 new Observable(async (observer) => {
                   await generateToAddress(
@@ -85,12 +92,30 @@ class GenerateToAddressCommand extends BaseCommand {
               ),
             },
             {
-              title: 'Mine 1 block to confirm',
+              title: 'Mine 100 blocks to confirm',
+              enabled: () => preset === PRESETS.LOCAL,
               task: async (ctx) => (
                 new Observable(async (observer) => {
                   await generateBlocks(
                     ctx.coreService,
-                    1,
+                    100,
+                    (blocks) => {
+                      observer.next(`${blocks} ${blocks > 1 ? 'blocks' : 'block'} mined`);
+                    },
+                  );
+
+                  observer.complete();
+                })
+              ),
+            },
+            {
+              title: 'Wait 100 blocks to be mined',
+              enabled: () => preset === PRESETS.EVONET,
+              task: async (ctx) => (
+                new Observable(async (observer) => {
+                  await waitForBlocks(
+                    ctx.coreService,
+                    100,
                     (blocks) => {
                       observer.next(`${blocks} ${blocks > 1 ? 'blocks' : 'block'} mined`);
                     },
@@ -107,6 +132,7 @@ class GenerateToAddressCommand extends BaseCommand {
     { collapse: false, renderer: UpdateRendererWithOutput });
 
     let context;
+
     try {
       context = await tasks.run({
         address,
