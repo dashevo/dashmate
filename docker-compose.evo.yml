@@ -1,0 +1,129 @@
+version: '3.7'
+
+services:
+  drive_mongodb:
+    image: mongo:${DRIVE_MONGODB_VERSION:-4.2}
+    restart: always
+    volumes:
+      - drive_mongodb:/data/db
+    command: mongod --replSet driveDocumentIndices --bind_ip_all
+
+  drive_mongodb_replica_init:
+    image: mongo:${DRIVE_MONGODB_VERSION:-4.2}
+    depends_on:
+      - drive_mongodb
+    volumes:
+      - ./scripts/initiate_mongodb_replica.sh:/initiate_mongodb_replica.sh
+    entrypoint: /initiate_mongodb_replica.sh
+
+  drive_abci:
+    image: dashpay/drive:${DRIVE_VERSION:-latest}
+    restart: always
+    depends_on:
+      - drive_mongodb_replica_init
+      - core
+    volumes:
+      - drive_leveldb:/usr/src/app/db
+    environment:
+      - CORE_JSON_RPC_USERNAME=dashrpc
+      - CORE_JSON_RPC_PASSWORD=password
+      - CORE_JSON_RPC_HOST=core
+      - CORE_JSON_RPC_PORT=20002
+      - DOCUMENT_MONGODB_URL=mongodb://drive_mongodb:27017
+      - DPNS_CONTRACT_ID=${DPNS_CONTRACT_ID}
+      - DPNS_TOP_LEVEL_IDENTITY=${DPNS_TOP_LEVEL_IDENTITY}
+    command: sh -c "sleep 15 && npm run abci"
+
+  drive_tendermint:
+    image: tendermint/tendermint:${TENDERMINT_VERSION:-v0.32.8}
+    restart: always
+    depends_on:
+      - drive_abci
+    ports:
+      - 26656:26656 # P2P
+    volumes:
+      - ./configs/${PRESET:?err}/drive/tendermint:/tendermint
+      - ./data/${PRESET:?err}/drive/tendermint:/data
+    entrypoint: sh -c "sleep 30 && /usr/bin/tendermint init && /usr/bin/tendermint node"
+
+  dapi_insight:
+    image: dashpay/insight-api:${DAPI_INSIGHT_VERSION:-latest}
+    restart: always
+    depends_on:
+      - core
+    volumes:
+      - ./configs/${PRESET:?err}/dapi/insight/dashcore-node.json:/insight/dashcore-node.json
+
+  dapi_api:
+    image: dashpay/dapi:${DAPI_VERSION:-latest}
+    restart: always
+    depends_on:
+      - drive_tendermint
+      - dapi_insight
+      - core
+    environment:
+      - INSIGHT_URI=http://dapi_insight:3001/insight-api
+      - API_JSON_RPC_PORT=3004
+      - API_GRPC_PORT=3005
+      - DASHCORE_RPC_HOST=core
+      - DASHCORE_RPC_PORT=20002
+      - DASHCORE_RPC_USER=dashrpc
+      - DASHCORE_RPC_PASS=password
+      - DASHCORE_ZMQ_HOST=core
+      - DASHCORE_ZMQ_PORT=29998
+      - DASHCORE_P2P_HOST=core
+      - DASHCORE_P2P_PORT=20001
+      - DASHCORE_P2P_NETWORK=devnet
+      - NETWORK=devnet
+      - TENDERMINT_RPC_HOST=drive_tendermint
+      - TENDERMINT_RPC_PORT=26657
+    command: npm run api
+
+  dapi_tx_filter_stream:
+    image: dashpay/dapi:${DAPI_VERSION:-latest}
+    restart: always
+    depends_on:
+      - core
+      - dapi_insight
+    environment:
+      - INSIGHT_URI=http://dapi_insight:3001/insight-api
+      - TX_FILTER_STREAM_GRPC_PORT=3006
+      - DASHCORE_RPC_HOST=core
+      - DASHCORE_RPC_PORT=20002
+      - DASHCORE_RPC_USER=dashrpc
+      - DASHCORE_RPC_PASS=password
+      - DASHCORE_ZMQ_HOST=core
+      - DASHCORE_ZMQ_PORT=29998
+      - DASHCORE_P2P_HOST=core
+      - DASHCORE_P2P_PORT=20001
+      - DASHCORE_P2P_NETWORK=devnet
+      - NETWORK=devnet
+    command: npm run tx-filter-stream
+
+  dapi_envoy:
+    image: envoyproxy/envoy:${DAPI_ENVOY_VERSION:-latest}
+    restart: always
+    depends_on:
+      - dapi_api
+      - dapi_tx_filter_stream
+    volumes:
+      - ./configs/${PRESET:?err}/dapi/envoy/grpc.yaml:/etc/envoy/envoy.yaml
+
+  dapi_nginx:
+    image: nginx:${DAPI_NGINX_VERSION:-latest}
+    restart: always
+    depends_on:
+      - dapi_api
+      - dapi_tx_filter_stream
+      - dapi_envoy
+    ports:
+      - 3000:80 # JSON RPC and gRPC Web
+      - 3010:50051 # gRPC Native
+    volumes:
+      - ./configs/${PRESET:?err}/dapi/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./configs/${PRESET:?err}/dapi/nginx/grpc.conf:/etc/nginx/conf.d/grpc.conf
+      - ./configs/${PRESET:?err}/dapi/nginx/errors.grpc_conf:/etc/nginx/conf.d/errors.grpc_conf
+
+volumes:
+  drive_mongodb:
+  drive_leveldb:

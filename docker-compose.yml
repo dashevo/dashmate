@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+  core:
+    image: dashpay/dashd:${CORE_VERSION:-latest}
+    restart: always
+    ports:
+      - ${CORE_P2P_PORT:?err}:${CORE_P2P_PORT:?err} # P2P
+    volumes:
+      - ./configs/${PRESET:?err}/core/dashd.conf:/dash/.dashcore/dash.conf
+      - ./data/${PRESET:?err}/core:/dash/data
+    command:
+      - dashd
+      - -conf=/dash/.dashcore/dash.conf
+      - -datadir=/dash/data
+      - -port=${CORE_P2P_PORT:?err}
+      - -masternodeblsprivkey=${CORE_MASTERNODE_BLS_PRIV_KEY:?err}
+      - -externalip=${CORE_EXTERNAL_IP:?err}
+
+  sentinel:
+    image: ablock/sentinel
+    restart: always
+    depends_on:
+      - core
+    environment:
+      - DEBUG=false
+      - RPCUSER=dashrpc
+      - RPCPASSWORD=password
+      - RPCHOST=core
+      - RPCPORT=20002
+      - NETWORK=${SENTINEL_NETWORK?:err}
+      - SENTINEL_ARGS=-b
