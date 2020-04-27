@@ -1,8 +1,6 @@
 const Listr = require('listr');
 const { Observable } = require('rxjs');
 
-const { flags: flagTypes } = require('@oclif/command');
-
 const { PrivateKey } = require('@dashevo/dashcore-lib');
 
 const BaseCommand = require('../oclif/command/BaseCommand');
@@ -17,7 +15,7 @@ class RegisterCommand extends BaseCommand {
     {
       preset, port, 'private-key': privateKey, 'external-ip': externalIp,
     },
-    {},
+    flags,
     startCore,
     createNewAddress,
     generateToAddress,
