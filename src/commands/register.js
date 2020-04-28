@@ -140,7 +140,7 @@ class RegisterCommand extends BaseCommand {
                     15,
                     (confirmations) => {
                       ctx.balance = confirmations;
-                      observer.next(`${confirmations} ${confirmations > 1 ? 'confirmation' : 'confirmations'}`);
+                      observer.next(`${confirmations} ${confirmations > 1 ? 'confirmations' : 'confirmation'}`);
                     },
                   );
 
