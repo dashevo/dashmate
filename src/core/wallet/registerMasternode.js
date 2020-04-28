@@ -7,7 +7,7 @@
  * @param {string} masternodeExternalIp
  * @param {number} masternodeP2PPort
  * @param {string} ownerAddress
- * @param {string} blsPublicKey
+ * @param {string} operatorPublicKey
  * @param {string} fundSourceAddress
  * @return {Promise<string>}
  */
@@ -17,7 +17,7 @@ async function registerMasternode(
   masternodeExternalIp,
   masternodeP2PPort,
   ownerAddress,
-  blsPublicKey,
+  operatorPublicKey,
   fundSourceAddress,
 ) {
   // get collateral index
@@ -25,19 +25,19 @@ async function registerMasternode(
 
   const collateralIndex = parseInt(masternodeOutputs[collateralHash], 10);
 
-  const { result: protx } = await coreService.getRpcClient().protx(
+  const { result: proRegTxId } = await coreService.getRpcClient().protx(
     'register',
-    collateralHash,
-    collateralIndex,
-    `${masternodeExternalIp}:${masternodeP2PPort}`,
-    ownerAddress,
-    blsPublicKey,
-    ownerAddress,
-    0,
-    fundSourceAddress,
+    collateralHash, // The txid of the 1000 Dash collateral funding transaction
+    collateralIndex, // The output index of the 1000 Dash funding transaction
+    `${masternodeExternalIp}:${masternodeP2PPort}`, // Masternode IP address and port, in the format x.x.x.x:yyyy
+    ownerAddress, // The new Dash address for the owner/voting address
+    operatorPublicKey, // The Operator BLS public key
+    ownerAddress, // The new Dash address, or the address of a delegate, used for proposal voting
+    0, // The percentage of the block reward allocated to the operator as payment
+    fundSourceAddress, // A new or existing Dash address to receive the owner’s masternode rewards
   );
 
-  return protx;
+  return proRegTxId;
 }
 
 module.exports = registerMasternode;
