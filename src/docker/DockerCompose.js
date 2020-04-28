@@ -128,7 +128,6 @@ class DockerCompose {
     return {
       CORE_EXTERNAL_IP: '127.0.0.1',
       CORE_MASTERNODE_BLS_PRIV_KEY: 'bls',
-      CORE_P2P_PORT: 20001,
     };
   }
 }
