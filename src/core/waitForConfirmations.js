@@ -19,7 +19,7 @@ async function waitForConfirmations(
 
   do {
     await wait(20000);
-    ({ result: { confirmationsReached } } = await coreService
+    ({ result: { confirmations: confirmationsReached } } = await coreService
       .getRpcClient()
       .getrawtransaction(txHash, 1));
 
