@@ -23,7 +23,7 @@ async function waitForConfirmations(
       .getRpcClient()
       .getrawtransaction(txHash, 1));
 
-    if (confirmations === undefined) {
+    if (confirmationsReached === undefined) {
       confirmationsReached = 0;
     }
 
