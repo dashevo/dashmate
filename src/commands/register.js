@@ -178,7 +178,8 @@ class RegisterCommand extends BaseCommand {
                       ctx.coreService,
                       1000 - height,
                       (blocks) => {
-                        observer.next(`${1000 - height - blocks} remaining`);
+                        const remaining = 1000 - height - blocks;
+                        observer.next(`${remaining} ${remaining > 1 ? 'blocks' : 'block'} remaining`);
                       },
                     );
 
