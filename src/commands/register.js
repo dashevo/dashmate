@@ -29,7 +29,7 @@ class RegisterCommand extends BaseCommand {
    */
   async runWithDependencies(
     {
-      preset, port, 'private-key': privateKey, 'external-ip': externalIp,
+      preset, port, 'funding-private-key': fundingPrivateKeyString, 'external-ip': externalIp,
     },
     flags,
     startCore,
@@ -45,12 +45,13 @@ class RegisterCommand extends BaseCommand {
     registerMasternode,
   ) {
     const network = 'testnet';
-    const fundSourceAddress = new PrivateKey(
-      privateKey,
+
+    const fundingPrivateKey = new PrivateKey(
+      fundingPrivateKeyString,
       network,
-    )
-      .toAddress(network)
-      .toString();
+    );
+
+    const fundingAddress = fundingPrivateKey.toAddress(network).toString();
 
     const tasks = new Listr([
       {
@@ -71,7 +72,7 @@ class RegisterCommand extends BaseCommand {
             },
             {
               title: 'Import private key',
-              task: async (ctx) => importPrivateKey(ctx.coreService, ctx.fundSourcePrivateKey),
+              task: async (ctx) => importPrivateKey(ctx.coreService, ctx.fundingPrivateKeyString),
             },
             {
               title: 'Sync Core with network',
@@ -79,25 +80,25 @@ class RegisterCommand extends BaseCommand {
               task: async (ctx) => waitForCoreSync(ctx.coreService),
             },
             {
-              title: 'Check balance',
+              title: 'Check address balance',
               task: async (ctx) => {
-                const balance = await getAddressBalance(ctx.coreService, ctx.fundSourceAddress);
+                const balance = await getAddressBalance(ctx.coreService, ctx.fundingAddress);
                 if (balance <= MASTERNODE_DASH_AMOUNT) {
                   throw new Error('You need to have more than 1000 Dash on your funding address');
                 }
               },
             },
             {
-              title: 'Generate BLS keys',
+              title: 'Generate masternode operator key',
               task: async (ctx, task) => {
-                ctx.bls = await generateBlsKeys();
+                ctx.operator = await generateBlsKeys();
 
                 // eslint-disable-next-line no-param-reassign
-                task.output = `Public key: ${ctx.bls.publicKey}\nPrivate key: ${ctx.bls.privateKey}`;
+                task.output = `Public key: ${ctx.operator.publicKey}\nPrivate key: ${ctx.operator.privateKey}`;
               },
             },
             {
-              title: 'Generate collateral address',
+              title: 'Create collateral address',
               task: async (ctx, task) => {
                 ctx.collateral = await createNewAddress(ctx.coreService);
 
@@ -106,7 +107,7 @@ class RegisterCommand extends BaseCommand {
               },
             },
             {
-              title: 'Generate owner addresses',
+              title: 'Create owner addresses',
               task: async (ctx, task) => {
                 ctx.owner = await createNewAddress(ctx.coreService);
 
@@ -115,18 +116,18 @@ class RegisterCommand extends BaseCommand {
               },
             },
             {
-              title: 'Send 1000 Dash to collateral address',
+              title: 'Send 1000 dash from funding address to collateral address',
               task: async (ctx, task) => {
-                ctx.tx = await sendToAddress(
+                ctx.collateralTxId = await sendToAddress(
                   ctx.coreService,
-                  ctx.fundSourcePrivateKey,
-                  ctx.fundSourceAddress,
+                  ctx.fundingPrivateKeyString,
+                  ctx.fundingAddress,
                   ctx.collateral.address,
                   1000,
                 );
 
                 // eslint-disable-next-line no-param-reassign
-                task.output = `Hash: ${ctx.tx}`;
+                task.output = `Collateral transaction ID: ${ctx.collateralTxId}`;
               },
             },
             {
@@ -136,10 +137,9 @@ class RegisterCommand extends BaseCommand {
                 new Observable(async (observer) => {
                   await waitForConfirmations(
                     ctx.coreService,
-                    ctx.tx,
+                    ctx.collateralTxId,
                     15,
                     (confirmations) => {
-                      ctx.balance = confirmations;
                       observer.next(`${confirmations} ${confirmations > 1 ? 'confirmations' : 'confirmation'}`);
                     },
                   );
@@ -166,7 +166,7 @@ class RegisterCommand extends BaseCommand {
               ),
             },
             {
-              title: 'Reach 1000 blocks',
+              title: 'Reach 1000 blocks to enable DML',
               enabled: () => preset === PRESETS.LOCAL,
               // eslint-disable-next-line consistent-return
               task: async (ctx) => {
@@ -189,20 +189,20 @@ class RegisterCommand extends BaseCommand {
               },
             },
             {
-              title: 'Register masternode',
+              title: 'Broadcast masternode registration transaction',
               task: async (ctx, task) => {
-                const tx = await registerMasternode(
+                const proRegTx = await registerMasternode(
                   ctx.coreService,
-                  ctx.tx,
+                  ctx.collateralTxId,
                   ctx.externalIp,
                   ctx.port,
                   ctx.owner.address,
-                  ctx.bls.publicKey,
-                  ctx.fundSourceAddress,
+                  ctx.operator.publicKey,
+                  ctx.fundingAddress,
                 );
 
                 // eslint-disable-next-line no-param-reassign
-                task.output = `Hash: ${tx}\nDon't forget to add bls private key to your configuration`;
+                task.output = `ProRegTx transaction ID: ${proRegTx}\nDon't forget to add bls private key to your configuration`;
               },
             },
           ])
@@ -215,8 +215,8 @@ class RegisterCommand extends BaseCommand {
 
     try {
       context = await tasks.run({
-        fundSourceAddress,
-        fundSourcePrivateKey: privateKey,
+        fundingAddress,
+        fundingPrivateKeyString,
         externalIp,
         port,
       });
@@ -241,9 +241,9 @@ RegisterCommand.args = [{
   description: 'preset to use',
   options: Object.values(PRESETS),
 }, {
-  name: 'private-key',
+  name: 'funding-private-key',
   required: true,
-  description: 'private key with more than 1000 dash',
+  description: 'private key with more than 1000 dash for funding collateral',
 }, {
   name: 'external-ip',
   required: true,

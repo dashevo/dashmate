@@ -27,7 +27,7 @@ class DockerCompose {
     }
 
     let containerName;
-    const env = this.getPlaceholderEnvOptions();
+    const env = this.getPlaceholderEmptyEnvOptions();
 
     try {
       ({ out: containerName } = await dockerCompose.run(
@@ -57,7 +57,7 @@ class DockerCompose {
 
     let psOutput;
 
-    const env = this.getPlaceholderEnvOptions();
+    const env = this.getPlaceholderEmptyEnvOptions();
 
     try {
       ({ out: psOutput } = await dockerCompose.ps({
@@ -68,7 +68,9 @@ class DockerCompose {
       throw new DockerComposeError(e);
     }
 
-    const coreContainerIds = psOutput.trim().split('\n').filter((containerId) => containerId !== '');
+    const coreContainerIds = psOutput.trim()
+      .split('\n')
+      .filter((containerId) => containerId !== '');
 
     for (const containerId of coreContainerIds) {
       const container = this.docker.getContainer(containerId);
@@ -124,7 +126,7 @@ class DockerCompose {
    * @private
    * @return {Object}
    */
-  getPlaceholderEnvOptions() {
+  getPlaceholderEmptyEnvOptions() {
     return {
       CORE_EXTERNAL_IP: '127.0.0.1',
       CORE_MASTERNODE_BLS_PRIV_KEY: 'bls',
