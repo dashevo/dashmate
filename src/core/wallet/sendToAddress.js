@@ -1,3 +1,4 @@
+const { Transaction } = require('@dashevo/dashcore-lib');
 const { toSatoshi } = require('../../util/satoshiConverter');
 
 /**
@@ -5,31 +6,54 @@ const { toSatoshi } = require('../../util/satoshiConverter');
  *
  * @typedef {sendToAddress}
  * @param {CoreService} coreService
+ * @param {string} fundSourcePrivateKey
+ * @param {string} fundSourceAddress
  * @param {string} address
- * @param {number} amount
+ * @param {number} amount Amount in dash
  * @return {Promise<string>}
  */
-async function sendToAddress(coreService, address, amount) {
+async function sendToAddress(
+  coreService,
+  fundSourcePrivateKey,
+  fundSourceAddress,
+  address,
+  amount,
+) {
   const fee = 10000;
 
   const amountToSend = toSatoshi(amount);
 
-  const inputs = await getInputsForAmount(
-    coreClient,
-    fundSourceAddress,
-    amountToSend + fee,
-  );
+  const { result: utxos } = await coreService
+    .getRpcClient()
+    .getAddressUtxos({ addresses: [fundSourceAddress] });
+
+  const sortedUtxos = utxos
+    .sort((a, b) => a.satoshis > b.satoshis);
+
+  const inputs = [];
+  let sum = 0;
+  let i = 0;
+
+  do {
+    const input = sortedUtxos[i];
+    inputs.push(input);
+    sum += input.satoshis;
+
+    ++i;
+  } while (sum < amountToSend + fee && i < sortedUtxos.length);
 
   const transaction = new Transaction();
   transaction.from(inputs)
-    .to(collateralAddress, amountToSend)
+    .to(address, amountToSend)
     .change(fundSourceAddress)
     .fee(fee)
     .sign(fundSourcePrivateKey);
 
-  const { result: hash } = await coreClient.sendrawtransaction(
-    transaction.serialize(),
-  );
+  const { result: hash } = await coreService
+    .getRpcClient()
+    .sendrawtransaction(
+      transaction.serialize(),
+    );
 
   return hash;
 }

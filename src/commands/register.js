@@ -11,6 +11,22 @@ const PRESETS = require('../presets');
 const MASTERNODE_DASH_AMOUNT = 1000;
 
 class RegisterCommand extends BaseCommand {
+  /**
+   * @param {Object} args
+   * @param {Object} flags
+   * @param {startCore} startCore
+   * @param {createNewAddress} createNewAddress
+   * @param {generateToAddress} generateToAddress
+   * @param {generateBlocks} generateBlocks
+   * @param {waitForCoreSync} waitForCoreSync
+   * @param {importPrivateKey} importPrivateKey
+   * @param {getAddressBalance} getAddressBalance
+   * @param {generateBlsKeys} generateBlsKeys
+   * @param {sendToAddress} sendToAddress
+   * @param {waitForConfirmations} waitForConfirmations
+   * @param {registerMasternode} registerMasternode
+   * @return {Promise<void>}
+   */
   async runWithDependencies(
     {
       preset, port, 'private-key': privateKey, 'external-ip': externalIp,
@@ -38,135 +54,158 @@ class RegisterCommand extends BaseCommand {
 
     const tasks = new Listr([
       {
-        title: 'Start Core',
-        task: async (ctx) => {
-          ctx.coreService = await startCore(preset, { wallet: true });
+        title: `Register masternode using ${preset} preset`,
+        task: () => (
+          new Listr([
 
-          process.on('SIGINT', async () => {
-            await ctx.coreService.stop();
-            process.exit();
-          });
-        },
-      },
-      {
-        title: 'Import private key',
-        task: async (ctx) => importPrivateKey(ctx.coreService, ctx.privateKey),
-      },
-      {
-        title: 'Sync Core with network',
-        enabled: () => preset !== PRESETS.LOCAL,
-        task: async (ctx) => waitForCoreSync(ctx.coreService),
-      },
-      {
-        title: 'Check balance',
-        task: async (ctx) => {
-          const balance = await getAddressBalance(ctx.coreService, ctx.fundSourceAddress);
-          if (balance <= MASTERNODE_DASH_AMOUNT) {
-            throw new Error('You need to have more than 1000 Dash on your funding address');
-          }
-        },
-      },
-      {
-        title: 'Generate BLS keys',
-        task: async (ctx, task) => {
-          ctx.bls = await generateBlsKeys();
+            {
+              title: 'Start Core',
+              task: async (ctx) => {
+                ctx.coreService = await startCore(preset, { wallet: true });
 
-          // eslint-disable-next-line no-param-reassign
-          task.output = `Address: ${ctx.bls.address}\nPrivate key: ${ctx.bls.privateKey}`;
-        },
-      },
-      {
-        title: 'Generate collateral address',
-        task: async (ctx, task) => {
-          ctx.collateral = await createNewAddress(ctx.coreService);
-
-          // eslint-disable-next-line no-param-reassign
-          task.output = `Address: ${ctx.collateral.address}\nPrivate key: ${ctx.collateral.privateKey}`;
-        },
-      },
-      {
-        title: 'Generate owner addresses',
-        task: async (ctx, task) => {
-          ctx.owner = await createNewAddress(ctx.coreService);
-
-          // eslint-disable-next-line no-param-reassign
-          task.output = `Address: ${ctx.owner.address}\nPrivate key: ${ctx.owner.privateKey}`;
-        },
-      },
-      {
-        title: 'Send 1000 Dash to collateral address',
-        task: async (ctx, task) => {
-          ctx.tx = await sendToAddress();
-
-          // eslint-disable-next-line no-param-reassign
-          task.output = `Hash: ${ctx.tx}`;
-        },
-      },
-      {
-        title: 'Wait for 15 confirmations',
-        enabled: () => preset !== PRESETS.LOCAL,
-        task: async (ctx) => (
-          new Observable(async (observer) => {
-            await waitForConfirmations(
-              ctx.coreService,
-              ctx.tx,
-              15,
-              (confirmations) => {
-                ctx.balance = confirmations;
-                observer.next(`${confirmations} ${confirmations > 1 ? 'confirmation' : 'confirmations'}`);
+                process.on('SIGINT', async () => {
+                  await ctx.coreService.stop();
+                  process.exit();
+                });
               },
-            );
-
-            observer.complete();
-          })
-        ),
-      },
-      {
-        title: 'Mine 15 blocks to confirm',
-        enabled: () => preset === PRESETS.LOCAL,
-        task: async (ctx) => (
-          new Observable(async (observer) => {
-            await generateBlocks(
-              ctx.coreService,
-              15,
-              (blocks) => {
-                observer.next(`${blocks} ${blocks > 1 ? 'blocks' : 'block'} mined`);
+            },
+            {
+              title: 'Import private key',
+              task: async (ctx) => importPrivateKey(ctx.coreService, ctx.fundSourcePrivateKey),
+            },
+            {
+              title: 'Sync Core with network',
+              enabled: () => preset !== PRESETS.LOCAL,
+              task: async (ctx) => waitForCoreSync(ctx.coreService),
+            },
+            {
+              title: 'Check balance',
+              task: async (ctx) => {
+                const balance = await getAddressBalance(ctx.coreService, ctx.fundSourceAddress);
+                if (balance <= MASTERNODE_DASH_AMOUNT) {
+                  throw new Error('You need to have more than 1000 Dash on your funding address');
+                }
               },
-            );
+            },
+            {
+              title: 'Generate BLS keys',
+              task: async (ctx, task) => {
+                ctx.bls = await generateBlsKeys();
 
-            observer.complete();
-          })
+                // eslint-disable-next-line no-param-reassign
+                task.output = `Public key: ${ctx.bls.publicKey}\nPrivate key: ${ctx.bls.privateKey}`;
+              },
+            },
+            {
+              title: 'Generate collateral address',
+              task: async (ctx, task) => {
+                ctx.collateral = await createNewAddress(ctx.coreService);
+
+                // eslint-disable-next-line no-param-reassign
+                task.output = `Address: ${ctx.collateral.address}\nPrivate key: ${ctx.collateral.privateKey}`;
+              },
+            },
+            {
+              title: 'Generate owner addresses',
+              task: async (ctx, task) => {
+                ctx.owner = await createNewAddress(ctx.coreService);
+
+                // eslint-disable-next-line no-param-reassign
+                task.output = `Address: ${ctx.owner.address}\nPrivate key: ${ctx.owner.privateKey}`;
+              },
+            },
+            {
+              title: 'Send 1000 Dash to collateral address',
+              task: async (ctx, task) => {
+                ctx.tx = await sendToAddress(
+                  ctx.coreService,
+                  ctx.fundSourcePrivateKey,
+                  ctx.fundSourceAddress,
+                  ctx.collateral.address,
+                  1000,
+                );
+
+                // eslint-disable-next-line no-param-reassign
+                task.output = `Hash: ${ctx.tx}`;
+              },
+            },
+            {
+              title: 'Wait for 15 confirmations',
+              enabled: () => preset !== PRESETS.LOCAL,
+              task: async (ctx) => (
+                new Observable(async (observer) => {
+                  await waitForConfirmations(
+                    ctx.coreService,
+                    ctx.tx,
+                    15,
+                    (confirmations) => {
+                      ctx.balance = confirmations;
+                      observer.next(`${confirmations} ${confirmations > 1 ? 'confirmation' : 'confirmations'}`);
+                    },
+                  );
+
+                  observer.complete();
+                })
+              ),
+            },
+            {
+              title: 'Mine 15 blocks to confirm',
+              enabled: () => preset === PRESETS.LOCAL,
+              task: async (ctx) => (
+                new Observable(async (observer) => {
+                  await generateBlocks(
+                    ctx.coreService,
+                    15,
+                    (blocks) => {
+                      observer.next(`${blocks} ${blocks > 1 ? 'blocks' : 'block'} mined`);
+                    },
+                  );
+
+                  observer.complete();
+                })
+              ),
+            },
+            {
+              title: 'Reach 1000 blocks',
+              enabled: () => preset === PRESETS.LOCAL,
+              // eslint-disable-next-line consistent-return
+              task: async (ctx) => {
+                const { result: height } = await ctx.coreService.getRpcClient().getBlockCount();
+
+                if (height < 1000) {
+                  return new Observable(async (observer) => {
+                    await generateBlocks(
+                      ctx.coreService,
+                      1000 - height,
+                      (blocks) => {
+                        observer.next(`${1000 - height - blocks} remaining`);
+                      },
+                    );
+
+                    observer.complete();
+                  });
+                }
+              },
+            },
+            {
+              title: 'Register masternode',
+              task: async (ctx, task) => {
+                const tx = await registerMasternode(
+                  ctx.coreService,
+                  ctx.tx,
+                  ctx.externalIp,
+                  ctx.port,
+                  ctx.owner.address,
+                  ctx.bls.publicKey,
+                  ctx.fundSourceAddress,
+                );
+
+                // eslint-disable-next-line no-param-reassign
+                task.output = `Hash: ${tx}\nDon't forget to add bls private key to your configuration`;
+              },
+            },
+          ])
         ),
-      },
-      {
-        title: 'Reach 1000 blocks',
-        enabled: () => preset === PRESETS.LOCAL,
-        task: async (ctx) => {
-          const { result: height } = ctx.coreService.getRpcClient().getBlockCount();
-
-          if (height < 1000) {
-            await new Observable(async (observer) => {
-              await generateBlocks(
-                ctx.coreService,
-                1000 - height,
-                (blocks) => {
-                  observer.next(`${1000 - height - blocks} remaining`);
-                },
-              );
-
-              observer.complete();
-            });
-          }
-        },
-      },
-      {
-        title: 'Register masternode',
-        task: async (ctx, task) => {
-          const tx = await registerMasternode();
-
-          // eslint-disable-next-line no-param-reassign
-          task.output = `Hash: ${tx}\nDon't forget to add bls private key to your configuration`;
-        },
       },
     ],
     { collapse: false, renderer: UpdateRendererWithOutput });
@@ -176,7 +215,7 @@ class RegisterCommand extends BaseCommand {
     try {
       context = await tasks.run({
         fundSourceAddress,
-        privateKey,
+        fundSourcePrivateKey: privateKey,
         externalIp,
         port,
       });

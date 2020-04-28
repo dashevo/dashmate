@@ -63,6 +63,8 @@ async function createDIContainer() {
     generateToAddress: asValue(generateToAddress),
     importPrivateKey: asValue(importPrivateKey),
     getAddressBalance: asValue(getAddressBalance),
+    sendToAddress: asValue(sendToAddress),
+    registerMasternode: asValue(registerMasternode),
   });
 
   return container;
