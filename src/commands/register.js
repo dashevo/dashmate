@@ -71,7 +71,7 @@ class RegisterCommand extends BaseCommand {
               },
             },
             {
-              title: 'Import private key',
+              title: 'Import funding private key',
               task: async (ctx) => importPrivateKey(ctx.coreService, ctx.fundingPrivateKeyString),
             },
             {
@@ -80,7 +80,7 @@ class RegisterCommand extends BaseCommand {
               task: async (ctx) => waitForCoreSync(ctx.coreService),
             },
             {
-              title: 'Check address balance',
+              title: 'Check funding address balance',
               task: async (ctx) => {
                 const balance = await getAddressBalance(ctx.coreService, ctx.fundingAddress);
                 if (balance <= MASTERNODE_DASH_AMOUNT) {
@@ -89,7 +89,7 @@ class RegisterCommand extends BaseCommand {
               },
             },
             {
-              title: 'Generate masternode operator key',
+              title: 'Generate a masternode operator key',
               task: async (ctx, task) => {
                 ctx.operator = await generateBlsKeys();
 
@@ -98,7 +98,7 @@ class RegisterCommand extends BaseCommand {
               },
             },
             {
-              title: 'Create collateral address',
+              title: 'Create a new collateral address',
               task: async (ctx, task) => {
                 ctx.collateral = await createNewAddress(ctx.coreService);
 
@@ -107,7 +107,7 @@ class RegisterCommand extends BaseCommand {
               },
             },
             {
-              title: 'Create owner addresses',
+              title: 'Create a new owner addresses',
               task: async (ctx, task) => {
                 ctx.owner = await createNewAddress(ctx.coreService);
 
