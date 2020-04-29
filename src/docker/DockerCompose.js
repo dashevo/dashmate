@@ -8,9 +8,6 @@ const semver = require('semver');
 const DockerComposeError = require('./errors/DockerComposeError');
 const ServiceAlreadyRunningError = require('./errors/ServiceAlreadyRunningError');
 
-const DOCKER_COMPOSE_MIN_VERSION = '1.25.0';
-
-
 class DockerCompose {
   /**
    * @param {Docker} docker
@@ -111,8 +108,8 @@ class DockerCompose {
     }
 
     const { out: version } = await dockerCompose.version();
-    if (semver.lt(version.trim(), DOCKER_COMPOSE_MIN_VERSION)) {
-      throw new Error(`Update Docker Compose to version ${DOCKER_COMPOSE_MIN_VERSION} or higher`);
+    if (semver.lt(version.trim(), DockerCompose.DOCKER_COMPOSE_MIN_VERSION)) {
+      throw new Error(`Update Docker Compose to version ${DockerCompose.DOCKER_COMPOSE_MIN_VERSION} or higher`);
     }
   }
 
@@ -150,5 +147,7 @@ class DockerCompose {
     };
   }
 }
+
+DockerCompose.DOCKER_COMPOSE_MIN_VERSION = '1.25.0';
 
 module.exports = DockerCompose;

@@ -9,7 +9,8 @@ class StartedContainers {
 
   /**
    * Add started docker container ID
-   * @param containerId
+   *
+   * @param {string} containerId
    */
   addContainer(containerId) {
     this.containers.add(containerId);
@@ -18,7 +19,7 @@ class StartedContainers {
   /**
    * Get all started docker container IDs
    *
-   * @return {*[]}
+   * @return {string[]}
    */
   getContainers() {
     return [...this.containers];

@@ -29,29 +29,21 @@ const renderHelper = (tasks, options, level) => {
       if ((task.isCompleted() || task.isPending() || task.isSkipped() || task.hasFailed()) && utils.isDefined(task.output)) {
         let data = task.output;
 
-        if (typeof data === 'string') {
-          if (task.isCompleted()) {
-            const lines = data.trim().split('\n').filter(Boolean).map((line, i) => {
-              if (i > 0) {
-                return `\n${indentString(`${figures.arrowRight} ${line}`, level, '    ')}`;
-              }
+        if (typeof data !== 'string' && data !== null && data !== undefined) {
+          data = data.toString();
+        }
 
-              return line;
-            });
+        data = data.trim().split('\n').map(stripAnsi).filter(Boolean);
 
-            data = stripAnsi(lines);
-          } else {
-            data = stripAnsi(data.trim().split('\n').filter(Boolean).pop());
-          }
-
-          if (data === '') {
-            data = undefined;
-          }
+        if (!task.isCompleted()) {
+          data = data.slice(0, 1);
         }
 
         if (utils.isDefined(data)) {
-          const out = indentString(`${figures.arrowRight} ${[...data].join('')}`, level, '  ');
-          output.push(`   ${chalk.gray(cliTruncate(out, process.stdout.columns - 3))}`);
+          data.forEach((line) => {
+            const out = indentString(`${figures.arrowRight} ${line}`, level, '  ');
+            output.push(`   ${chalk.gray(cliTruncate(out, process.stdout.columns - 3))}`);
+          });
         }
       }
 

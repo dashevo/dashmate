@@ -3,10 +3,9 @@ const { Observable } = require('rxjs');
 
 const { PrivateKey } = require('@dashevo/dashcore-lib');
 
-const graceful = require('node-graceful');
-
 const BaseCommand = require('../oclif/command/BaseCommand');
 const UpdateRendererWithOutput = require('../oclif/renderer/UpdateRendererWithOutput');
+const MutedError = require('../oclif/errors/MutedError');
 
 const PRESETS = require('../presets');
 
@@ -27,8 +26,6 @@ class RegisterCommand extends BaseCommand {
    * @param {sendToAddress} sendToAddress
    * @param {waitForConfirmations} waitForConfirmations
    * @param {registerMasternode} registerMasternode
-   * @param {StartedContainers} startedContainers
-   * @param {stopAllContainers} stopAllContainers
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -47,8 +44,6 @@ class RegisterCommand extends BaseCommand {
     sendToAddress,
     waitForConfirmations,
     registerMasternode,
-    startedContainers,
-    stopAllContainers,
   ) {
     const network = 'testnet';
 
@@ -211,17 +206,6 @@ class RegisterCommand extends BaseCommand {
     ],
     { collapse: false, renderer: UpdateRendererWithOutput });
 
-    graceful.exitOnDouble = false;
-    graceful.on('exit', async () => {
-      process.removeAllListeners('uncaughtException');
-      process.removeAllListeners('unhandledRejection');
-
-      process.on('unhandledRejection', () => {});
-      process.on('uncaughtException', () => {});
-
-      await stopAllContainers(startedContainers.getContainers());
-    });
-
     try {
       await tasks.run({
         fundingAddress,
@@ -230,9 +214,8 @@ class RegisterCommand extends BaseCommand {
         port,
       });
     } catch (e) {
-      // do nothing
-    } finally {
-      await stopAllContainers(startedContainers.getContainers());
+      // we already output errors through listr
+      throw new MutedError(e);
     }
   }
 }

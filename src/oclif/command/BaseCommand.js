@@ -1,5 +1,7 @@
 const { Command } = require('@oclif/command');
 
+const graceful = require('node-graceful');
+
 const getFunctionParams = require('../../util/getFunctionParams');
 
 const createDIContainer = require('../../createDIContainer');
@@ -10,6 +12,23 @@ const createDIContainer = require('../../createDIContainer');
 class BaseCommand extends Command {
   async init() {
     this.container = await createDIContainer();
+
+    const stopAllContainers = this.container.resolve('stopAllContainers');
+    const startedContainers = this.container.resolve('startedContainers');
+
+    // graceful exit
+    graceful.exitOnDouble = false;
+    graceful.on('exit', async () => {
+      // remove all attached listeners from other libraries to mute there output
+      process.removeAllListeners('uncaughtException');
+      process.removeAllListeners('unhandledRejection');
+
+      process.on('unhandledRejection', () => {});
+      process.on('uncaughtException', () => {});
+
+      // stop and remove all started containers
+      await stopAllContainers(startedContainers.getContainers());
+    });
   }
 
   async run() {
@@ -24,6 +43,15 @@ class BaseCommand extends Command {
     const { args, flags } = this.parse(this.constructor);
 
     return this.runWithDependencies(args, flags, ...dependencies);
+  }
+
+  async finally(err) {
+    const stopAllContainers = this.container.resolve('stopAllContainers');
+    const startedContainers = this.container.resolve('startedContainers');
+
+    await stopAllContainers(startedContainers.getContainers());
+
+    return super.finally(err);
   }
 }
 
