@@ -59,7 +59,9 @@
     "dockerode": "^3.2.0",
     "hasbin": "^1.2.3",
     "listr": "^0.14.3",
-    "rxjs": "latest"
+    "node-graceful": "^3.0.0",
+    "rxjs": "latest",
+    "semver": "^7.3.2"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.22.2",

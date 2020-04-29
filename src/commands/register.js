@@ -3,6 +3,8 @@ const { Observable } = require('rxjs');
 
 const { PrivateKey } = require('@dashevo/dashcore-lib');
 
+const graceful = require('node-graceful');
+
 const BaseCommand = require('../oclif/command/BaseCommand');
 const UpdateRendererWithOutput = require('../oclif/renderer/UpdateRendererWithOutput');
 
@@ -25,6 +27,8 @@ class RegisterCommand extends BaseCommand {
    * @param {sendToAddress} sendToAddress
    * @param {waitForConfirmations} waitForConfirmations
    * @param {registerMasternode} registerMasternode
+   * @param {StartedContainers} startedContainers
+   * @param {stopAllContainers} stopAllContainers
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -43,6 +47,8 @@ class RegisterCommand extends BaseCommand {
     sendToAddress,
     waitForConfirmations,
     registerMasternode,
+    startedContainers,
+    stopAllContainers,
   ) {
     const network = 'testnet';
 
@@ -58,16 +64,10 @@ class RegisterCommand extends BaseCommand {
         title: `Register masternode using ${preset} preset`,
         task: () => (
           new Listr([
-
             {
               title: 'Start Core',
               task: async (ctx) => {
                 ctx.coreService = await startCore(preset, { wallet: true });
-
-                process.on('SIGINT', async () => {
-                  await ctx.coreService.stop();
-                  process.exit();
-                });
               },
             },
             {
@@ -211,21 +211,28 @@ class RegisterCommand extends BaseCommand {
     ],
     { collapse: false, renderer: UpdateRendererWithOutput });
 
-    let context;
+    graceful.exitOnDouble = false;
+    graceful.on('exit', async () => {
+      process.removeAllListeners('uncaughtException');
+      process.removeAllListeners('unhandledRejection');
+
+      process.on('unhandledRejection', () => {});
+      process.on('uncaughtException', () => {});
+
+      await stopAllContainers(startedContainers.getContainers());
+    });
 
     try {
-      context = await tasks.run({
+      await tasks.run({
         fundingAddress,
         fundingPrivateKeyString,
         externalIp,
         port,
       });
     } catch (e) {
-      context = e.context;
+      // do nothing
     } finally {
-      if (context && context.coreService) {
-        await context.coreService.stop();
-      }
+      await stopAllContainers(startedContainers.getContainers());
     }
   }
 }

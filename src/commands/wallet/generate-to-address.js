@@ -3,6 +3,8 @@ const { Observable } = require('rxjs');
 
 const { flags: flagTypes } = require('@oclif/command');
 
+const graceful = require('node-graceful');
+
 const BaseCommand = require('../../oclif/command/BaseCommand');
 const UpdateRendererWithOutput = require('../../oclif/renderer/UpdateRendererWithOutput');
 
@@ -18,6 +20,8 @@ class GenerateToAddressCommand extends BaseCommand {
    * @param {generateBlocks} generateBlocks
    * @param {waitForCoreSync} waitForCoreSync
    * @param {waitForBlocks} waitForBlocks
+   * @param {StartedContainers} startedContainers
+   * @param {stopAllContainers} stopAllContainers
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -29,6 +33,8 @@ class GenerateToAddressCommand extends BaseCommand {
     generateBlocks,
     waitForCoreSync,
     waitForBlocks,
+    startedContainers,
+    stopAllContainers,
   ) {
     const tasks = new Listr([
       {
@@ -39,11 +45,6 @@ class GenerateToAddressCommand extends BaseCommand {
               title: 'Start Core',
               task: async (ctx) => {
                 ctx.coreService = await startCore(preset, { wallet: true });
-
-                process.on('SIGINT', async () => {
-                  await ctx.coreService.stop();
-                  process.exit();
-                });
               },
             },
             {
@@ -131,18 +132,25 @@ class GenerateToAddressCommand extends BaseCommand {
     ],
     { collapse: false, renderer: UpdateRendererWithOutput });
 
-    let context;
+    graceful.exitOnDouble = false;
+    graceful.on('exit', async () => {
+      process.removeAllListeners('uncaughtException');
+      process.removeAllListeners('unhandledRejection');
+
+      process.on('unhandledRejection', () => {});
+      process.on('uncaughtException', () => {});
+
+      await stopAllContainers(startedContainers.getContainers());
+    });
 
     try {
-      context = await tasks.run({
+      await tasks.run({
         address,
       });
     } catch (e) {
-      context = e.context;
+      // do nothing
     } finally {
-      if (context && context.coreService) {
-        await context.coreService.stop();
-      }
+      await stopAllContainers(startedContainers.getContainers());
     }
   }
 }

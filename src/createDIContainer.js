@@ -9,6 +9,8 @@ const {
 const Docker = require('dockerode');
 
 const DockerCompose = require('./docker/DockerCompose');
+const StartedContainers = require('./docker/StartedContainers');
+const stopAllContainersFactory = require('./docker/stopAllContainersFactory');
 
 const startCoreFactory = require('./core/startCoreFactory');
 const createRpcClient = require('./core/createRpcClient');
@@ -39,6 +41,10 @@ async function createDIContainer() {
       new Docker()
     )).singleton(),
     dockerCompose: asClass(DockerCompose),
+    startedContainers: asFunction(() => (
+      new StartedContainers()
+    )).singleton(),
+    stopAllContainers: asFunction(stopAllContainersFactory).singleton(),
   });
 
   /**

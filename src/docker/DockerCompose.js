@@ -3,13 +3,22 @@ const path = require('path');
 const dockerCompose = require('docker-compose');
 
 const hasbin = require('hasbin');
+const semver = require('semver');
 
 const DockerComposeError = require('./errors/DockerComposeError');
 const ServiceAlreadyRunningError = require('./errors/ServiceAlreadyRunningError');
 
+const DOCKER_COMPOSE_MIN_VERSION = '1.25.0';
+
+
 class DockerCompose {
-  constructor(docker) {
+  /**
+   * @param {Docker} docker
+   * @param {StartedContainers} startedContainers
+   */
+  constructor(docker, startedContainers) {
     this.docker = docker;
+    this.startedContainers = startedContainers;
   }
 
   /**
@@ -42,7 +51,10 @@ class DockerCompose {
       throw new DockerComposeError(e);
     }
 
-    return this.docker.getContainer(containerName.trim());
+    containerName = containerName.trim();
+
+    this.startedContainers.addContainer(containerName);
+    return this.docker.getContainer(containerName);
   }
 
   /**
@@ -96,6 +108,11 @@ class DockerCompose {
 
     if (!hasbin.sync('docker-compose')) {
       throw new Error('Docker Compose is not installed');
+    }
+
+    const { out: version } = await dockerCompose.version();
+    if (semver.lt(version.trim(), DOCKER_COMPOSE_MIN_VERSION)) {
+      throw new Error(`Update Docker Compose to version ${DOCKER_COMPOSE_MIN_VERSION} or higher`);
     }
   }
 
