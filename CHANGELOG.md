@@ -1,3 +1,12 @@
+# [0.12.5](https://github.com/dashevo/mn-bootstrap/compare/v0.12.4...v0.12.5) (2020-05-01)
+
+
+### Bug Fixes
+
+* use updated sentinel image ([#41](https://github.com/dashevo/mn-bootstrap/issues/41))
+
+
+
 # [0.12.4](https://github.com/dashevo/mn-bootstrap/compare/v0.12.3...v0.12.4) (2020-04-30)
 
 
