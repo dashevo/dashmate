@@ -2,7 +2,7 @@
 
 > Distribution package for Dash masternode installation
 
-> Note: This Docker Compose project creates a full node. Additional steps are required to register a masternode, as described in the [setup instructions](https://docs.dash.org/en/stable/masternodes/setup.html#register-your-masternode). It is not currently necessary to complete these registration steps to test development with Dash Platform services or participate as a full node on Evonet.
+> Note: This Docker Compose project creates a full node. Additional steps are required to register a masternode, as described in the [setup instructions](https://docs.dash.org/en/stable/masternodes/setup.html#register-your-masternode). It is not currently necessary to complete these registration steps for local development with Dash Platform services or participate as a full node on Evonet.
 
 ## Table of Contents
 
