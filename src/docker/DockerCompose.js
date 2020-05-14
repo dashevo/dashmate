@@ -130,6 +130,44 @@ class DockerCompose {
   }
 
   /**
+   * List all docker compose containers
+   *
+   * @param {string} preset
+   * @return {Promise<void>}
+   */
+  async listContainerStatus(preset) {
+    await this.throwErrorIfNotInstalled();
+
+    let psOutput;
+
+    const envs = this.getPlaceholderEmptyEnvOptions();
+
+    try {
+      ({ out: psOutput } = await dockerCompose.ps({
+        ...this.getOptions(preset, envs),
+        commandOptions: ['-q'],
+      }));
+    } catch (e) {
+      throw new DockerComposeError(e);
+    }
+
+    const coreContainerData = psOutput
+      .trim()
+      .split('\n')
+      .filter((containerId) => containerId !== '')
+
+    let inspectResult = {};
+
+    await Promise.all(coreContainerData.map(async (containerId) => {
+      const container = this.docker.getContainer(containerId);
+      const { Name: name, State: {Status: status } } = await container.inspect();
+      inspectResult[containerId.slice(0,12)] = {'name': name, 'status': status};
+    }))
+
+    return inspectResult;
+  }
+
+  /**
    * Down docker compose
    *
    * @param {string} preset
