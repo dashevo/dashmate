@@ -14,7 +14,7 @@
 
 * [Docker](https://docs.docker.com/engine/installation/)
 * [Docker compose](https://docs.docker.com/compose/install/) (v1.25.0+)
-* [Node.js](https://nodejs.org/en/download/) (optional for CLI only)
+* [Node.js](https://nodejs.org/en/download/) (v8.6+, optional for CLI)
 
 ## Install
 
