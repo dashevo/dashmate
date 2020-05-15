@@ -30,9 +30,11 @@ Package contains several configuration presets:
  - Evonet - masternode with Evonet configuration
  - Testnet - masternode with testnet configuration
 
-There are two ways to apply a present:
+There are two ways to apply a preset:
  1. Rename corresponding dotenv file (i.e. `.env.local`) to `.env`
  2. Add `--env-file` option to `docker-compose` command
+
+Edit your chosen preset file to specify configuration variables before starting the masternode.
 
 ### Start
 
