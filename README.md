@@ -14,6 +14,7 @@
 
 * [Docker](https://docs.docker.com/engine/installation/)
 * [Docker compose](https://docs.docker.com/compose/install/) (v1.25.0+)
+* [Node.js](https://nodejs.org/en/download/) (optional for CLI only)
 
 ## Install
 
@@ -21,7 +22,7 @@ Download and unzip [package](https://github.com/dashevo/mn-bootstrap/archive/mas
 
 ## Usage
 
-Package contains Docker Compose file and configuration presets.
+Package contains Docker Compose file, configuration presets and CLI.
 
 ### Configure
 
