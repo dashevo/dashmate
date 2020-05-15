@@ -44,6 +44,31 @@ In order to run a masternode use Docker Compose:
 $ docker-compose up
 ```
 
+### CLI
+
+A CLI is available to perform routine tasks. It can be invoked in two ways:
+ 1. From the repository folder with `node bin/mn`
+ 2. By creating a global link with `sudo npm link`, then invoking with `mn`
+
+To list available commands, either run `mn` with no parameters or execute `mn help`. To list the help on any command just execute the command, followed by the `--help` option.
+
+USAGE
+  $ mn [COMMAND] [ARGS]
+
+COMMANDS
+  help      display help for mn
+  register  Register masternode
+  reset     Reset masternode data
+  start     Start masternode
+  status    Show masternode status
+  stop      Stop masternode
+  wallet    Wallet related commands
+
+PRESETS
+  local     Local regtest
+  evonet    Evonet public testnet
+  testnet   Dash testnet
+
 ## Contributing
 
 Feel free to dive in! [Open an issue](https://github.com/dashevo/mn-bootstrap/issues/new) or submit PRs.
