@@ -60,6 +60,9 @@
     "hasbin": "^1.2.3",
     "listr": "^0.14.3",
     "node-graceful": "^3.0.0",
+    "pretty-bytes": "^5.3.0",
+    "pretty-ms": "^7.0.0",
+    "public-ip": "^4.0.1",
     "rimraf": "^3.0.2",
     "rxjs": "latest",
     "semver": "^7.3.2"
