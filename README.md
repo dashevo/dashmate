@@ -53,6 +53,7 @@ A CLI is available to perform routine tasks. It can be invoked in two ways:
 
 To list available commands, either run `mn` with no parameters or execute `mn help`. To list the help on any command just execute the command, followed by the `--help` option.
 
+```
 USAGE
   $ mn [COMMAND] [ARGS]
 
@@ -69,6 +70,7 @@ PRESETS
   local     Local regtest
   evonet    Evonet public testnet
   testnet   Dash testnet
+```
 
 ## Contributing
 
