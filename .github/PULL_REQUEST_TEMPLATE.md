@@ -1,4 +1,5 @@
 <!--- Provide a general summary of your changes in the Title above -->
+<!--- Pull request titles must use the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/#summary) format -->
 
 ## Description
 <!--- Describe your changes in detail -->
