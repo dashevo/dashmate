@@ -47,9 +47,19 @@ $ docker-compose up
 
 ### CLI
 
-A CLI is available to perform routine tasks. It can be invoked in two ways:
+#### Setup
+
+A CLI is available to perform routine tasks. Install dependencies first:
+
+```bash
+npm install
+```
+
+Once dependencies are installed, it can be invoked in two ways:
  1. From the repository folder with `node bin/mn`
  2. By creating a global link with `sudo npm link`, then invoking with `mn`
+
+#### Usage
 
 To list available commands, either run `mn` with no parameters or execute `mn help`. To list the help on any command just execute the command, followed by the `--help` option.
 
@@ -70,6 +80,93 @@ PRESETS
   local     Local regtest
   evonet    Evonet public testnet
   testnet   Dash testnet
+```
+
+##### Start command
+
+The `start` command is used to start a node with a specified configuration.
+
+```
+USAGE
+  $ mn start PRESET EXTERNAL-IP CORE-P2P-PORT
+
+ARGUMENTS
+  PRESET         (local|testnet|evonet) preset to use
+  EXTERNAL-IP    masternode external IP
+  CORE-P2P-PORT  Core P2P port
+
+OPTIONS
+  -f, --full-node                                  start as full node
+  -p, --operator-private-key=operator-private-key  operator private key
+```
+
+To start a masternode for evonet:
+
+```bash
+mn start evonet 1.2.3.4 20001 -p 2058cd87116ee8492ae0db5d4f8050218588701636197cfcd124dcae8986d514
+```
+
+To start a full node for testnet:
+
+```bash
+mn start testnet 1.2.3.4 19999 -f
+```
+
+##### Stop command
+
+The `stop` command is used to stop a running node.
+
+```
+USAGE
+  $ mn stop PRESET
+
+ARGUMENTS
+  PRESET  (local|testnet|evonet) preset to use
+```
+
+To stop a node with evonet configuration:
+
+```bash
+mn stop evonet
+```
+
+##### Register command
+
+The `register` command takes a private key to a Dash address with balance and uses it to create a collateral funding transaction, generate the necessary keys and create a masternode registration transaction on the specified network. It does not configure or start a masternode on the host.
+
+```
+USAGE
+  $ mn register PRESET FUNDING-PRIVATE-KEY EXTERNAL-IP PORT
+
+ARGUMENTS
+  PRESET               (local|testnet|evonet) preset to use
+  FUNDING-PRIVATE-KEY  private key with more than 1000 dash for funding collateral
+  EXTERNAL-IP          masternode external IP
+  PORT                 masternode P2P port
+```
+
+To register a testnet masternode:
+
+```bash
+mn register testnet cVdEfkXLHqftgXzRYZW4EdwtcnJ8Mktw9L4vcEcqbVDs3e2qdzCf 1.2.3.4 19999
+```
+
+##### Reset command
+
+The `reset` command removes all Docker containers and volumes associated with a masternode, allowing you to start again fresh.
+
+```
+USAGE
+  $ mn reset PRESET
+
+ARGUMENTS
+  PRESET  (local|testnet|evonet) preset to use
+```
+
+To reset an evonet masternode:
+
+```bash
+mn reset evonet
 ```
 
 ## Contributing
