@@ -4,21 +4,22 @@
 ## Description
 <!--- Describe your changes in detail -->
 
+
 ## Motivation and Context
 <!--- Why is this change required? What problem does it solve? -->
 <!--- If it fixes an open issue, please link to the issue here. -->
+
 
 ## How Has This Been Tested?
 <!--- Please describe in detail how you tested your changes. -->
 <!--- Include details of your testing environment, and the tests you ran to -->
 <!--- see how your change affects other areas of the code, etc. -->
 
-## Types of changes
-<!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to change)
-- [ ] Documentation update (if none of the other choices apply)
+
+## Breaking Changes
+<!--- Please describe any breaking changes your code introduces and verify that -->
+<!--- the title includes "!" following the conventional commit type (e.g. "feat!: ..."-->
+
 
 ## Checklist:
 <!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
@@ -26,3 +27,6 @@
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have added or updated relevant unit/integration/functional/e2e tests
 - [ ] I have made corresponding changes to the documentation
+
+**For repository code-owners and collaborators only**
+- [ ] I have assigned this pull request to a milestone
