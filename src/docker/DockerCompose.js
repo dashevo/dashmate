@@ -135,7 +135,7 @@ class DockerCompose {
    * @param {string} preset
    * @return {Promise<void>}
    */
-  async listContainerStatus(preset) {
+  async listContainers(preset) {
     await this.throwErrorIfNotInstalled();
 
     let psOutput;
@@ -156,12 +156,20 @@ class DockerCompose {
       .split('\n')
       .filter((containerId) => containerId !== '')
 
-    let inspectResult = {};
+    let inspectResult = [];
 
+    /* Return array of statuses
     await Promise.all(coreContainerData.map(async (containerId) => {
       const container = this.docker.getContainer(containerId);
       const { Name: name, State: {Status: status } } = await container.inspect();
       inspectResult[containerId.slice(0,12)] = {'name': name, 'status': status};
+    }))
+    */
+
+    await Promise.all(coreContainerData.map(async (containerId) => {
+      const container = this.docker.getContainer(containerId);
+      const { Config: { Labels: { 'com.docker.compose.service': name } } } = await container.inspect();
+      inspectResult.push(name);
     }))
 
     return inspectResult;

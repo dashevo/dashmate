@@ -32,6 +32,7 @@ class StatusCommand extends BaseCommand {
       docker: {},
       masternode: {},
     };
+    let existingContainers = [];
     const tasks = new Listr([
       {
         title: 'Show host status',
@@ -85,9 +86,17 @@ class StatusCommand extends BaseCommand {
         task: () => (
           new Listr([
             {
-              title: 'Show running container states',
+              title: 'Fetch existing containers',
               task: async () => {
-                status.docker.containers = await dockerCompose.listContainerStatus(preset);
+                existingContainers = await dockerCompose.listContainers(preset);
+              }
+            },
+            {
+              title: 'Fetch container states',
+              task: async () => {
+                for (const container of existingContainers) {
+                  status.docker[container] = await dockerCompose.isServiceRunning(preset, container);
+                }
               }
             }
           ])
@@ -100,7 +109,7 @@ class StatusCommand extends BaseCommand {
       await tasks.run();
     } catch (e) {
       // we already output errors through listr
-      throw new MutedError(e);
+      throw new MuteOneLineError(e);
     }
     console.log(JSON.stringify(status, null, 2));
   }
