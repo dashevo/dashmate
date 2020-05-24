@@ -81,7 +81,7 @@ class StatusCommand extends BaseCommand {
         )
       },
       {
-        title: 'Show Docker status',
+        title: 'Show running services',
         task: () => (
           new Listr([
             {
