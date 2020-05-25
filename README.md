@@ -56,7 +56,7 @@ PRESETS
   testnet   Dash testnet
 ```
 
-##### Start command
+#### Start command
 
 The `start` command is used to start a node with a specified configuration.
 
