@@ -65,7 +65,8 @@
     "public-ip": "^4.0.1",
     "rimraf": "^3.0.2",
     "rxjs": "latest",
-    "semver": "^7.3.2"
+    "semver": "^7.3.2",
+    "table": "^5.4.6"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.22.2",
