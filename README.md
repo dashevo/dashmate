@@ -6,7 +6,6 @@ Distribution package for Dash Masternode installation
 
 ## Table of Contents
 
-- [Pre-requisites](#pre-requisites)
 - [Install](#install)
 - [Usage](#usage)
 - [Contributing](#contributing)
