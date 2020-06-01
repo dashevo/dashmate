@@ -10,7 +10,7 @@
 - [Usage](#usage)
   - [Start node](#start-node)
   - [Stop node](#stop-node)
-  - [Register masternode](#register-masternonde)
+  - [Register masternode](#register-masternode)
   - [Reset data](#reset-data)
 - [Contributing](#contributing)
 - [License](#license)
