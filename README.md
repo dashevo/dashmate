@@ -117,7 +117,7 @@ $ mn register testnet cVdEfkXLHqftgXzRYZW4EdwtcnJ8Mktw9L4vcEcqbVDs3e2qdzCf 1.2.3
 
 #### Reset data
 
-The `reset` command removes all data corresponding to specified preset and allow you to start node from the scratch.
+The `reset` command removes all data corresponding to the specified preset and allows you to start a node from scratch.
 
 ```
 USAGE
