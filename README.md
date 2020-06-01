@@ -85,7 +85,7 @@ ARGUMENTS
   PRESET  (local|testnet|evonet) preset to use
 ```
 
-To stop a an Evonet node:
+To stop an Evonet node:
 
 ```bash
 $ mn stop evonet
