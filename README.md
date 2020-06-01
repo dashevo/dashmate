@@ -8,7 +8,7 @@
 
 - [Install](#install)
 - [Usage](#usage)
-  - [Start nodee](#start-node)
+  - [Start node](#start-node)
   - [Stop node](#stop-node)
   - [Register masternode](#register-masternonde)
   - [Reset data](#reset-data)
