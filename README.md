@@ -93,11 +93,19 @@ $ mn stop evonet
 
 ### Register masternode
 
+The `register` command creates a collateral funding transaction and then uses it to register a masternode on the specified network. It does not configure or start a masternode on the host.
+
 #### Funding collateral
+
+Before registering the masternode, you must send more than 1000 Dash to an address on the network you intend to use. 1000 Dash is used for the collateral transaction, and the remainder will be used for transaction fees. Make sure you have access to the private key for this address, since you will need to provide it in the next step. If using Dash Core, you can get the private key for a given address using the following command:
+
+```
+dumpprivkey "address"
+```
 
 #### Masternode registration
 
-The `register` command takes a private key to a Dash address with balance and uses it to create a collateral funding transaction, generate the necessary keys and create a masternode registration transaction on the specified network. It does not configure or start a masternode on the host.
+Run the `register` command as described below. The command will first verify sufficient balance on the funding address from the previous step. It will then generate new addresses for the collateral, owner and operator and display the addresses and associated private keys as output. The collateral of exactly 1000 Dash will be sent from the funding address to the collateral address, and after 15 blocks have been mined, the registration transaction will be broadcast on the network. Assuming a properly configured and running masternode exists at the specified IP address and port, it should become active after the registration transaction has been mined to a block on the network.
 
 ```
 USAGE
