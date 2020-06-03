@@ -3,9 +3,11 @@ version: '3.7'
 services:
   drive_mongodb:
     image: mongo:${DRIVE_MONGODB_VERSION:-4.2}
-    restart: always
+    restart: unless-stopped
     volumes:
       - drive_mongodb:/data/db
+    extra_hosts:
+      - "drive_mongodb:127.0.0.1"
     command: mongod --replSet driveDocumentIndices --bind_ip_all
 
   drive_mongodb_replica_init:
@@ -18,7 +20,7 @@ services:
 
   drive_abci:
     image: dashpay/drive:${DRIVE_VERSION:-latest}
-    restart: always
+    restart: unless-stopped
     depends_on:
       - drive_mongodb_replica_init
       - core
@@ -29,14 +31,14 @@ services:
       - CORE_JSON_RPC_PASSWORD=password
       - CORE_JSON_RPC_HOST=core
       - CORE_JSON_RPC_PORT=20002
-      - DOCUMENT_MONGODB_URL=mongodb://drive_mongodb:27017
+      - DOCUMENT_MONGODB_URL=mongodb://drive_mongodb:27017?replicaSet=driveDocumentIndices
       - DPNS_CONTRACT_ID=${DPNS_CONTRACT_ID}
       - DPNS_TOP_LEVEL_IDENTITY=${DPNS_TOP_LEVEL_IDENTITY}
-    command: sh -c "sleep 15 && npm run abci"
+    command: npm run abci
 
   drive_tendermint:
     image: tendermint/tendermint:${TENDERMINT_VERSION:-v0.32.8}
-    restart: always
+    restart: unless-stopped
     depends_on:
       - drive_abci
     ports:
@@ -44,11 +46,11 @@ services:
     volumes:
       - ./configs/${PRESET:?err}/drive/tendermint:/tendermint
       - ./data/${PRESET:?err}/drive/tendermint:/data
-    entrypoint: sh -c "sleep 30 && /usr/bin/tendermint init && /usr/bin/tendermint node"
+    entrypoint: sh -c "/usr/bin/tendermint init && /usr/bin/tendermint node"
 
   dapi_insight:
     image: dashpay/insight-api:${DAPI_INSIGHT_VERSION:-latest}
-    restart: always
+    restart: unless-stopped
     depends_on:
       - core
     volumes:
@@ -56,7 +58,7 @@ services:
 
   dapi_api:
     image: dashpay/dapi:${DAPI_VERSION:-latest}
-    restart: always
+    restart: unless-stopped
     depends_on:
       - drive_tendermint
       - dapi_insight
@@ -81,7 +83,7 @@ services:
 
   dapi_tx_filter_stream:
     image: dashpay/dapi:${DAPI_VERSION:-latest}
-    restart: always
+    restart: unless-stopped
     depends_on:
       - core
       - dapi_insight
@@ -102,7 +104,7 @@ services:
 
   dapi_envoy:
     image: envoyproxy/envoy:${DAPI_ENVOY_VERSION:-latest}
-    restart: always
+    restart: unless-stopped
     depends_on:
       - dapi_api
       - dapi_tx_filter_stream
@@ -111,7 +113,7 @@ services:
 
   dapi_nginx:
     image: nginx:${DAPI_NGINX_VERSION:-latest}
-    restart: always
+    restart: unless-stopped
     depends_on:
       - dapi_api
       - dapi_tx_filter_stream

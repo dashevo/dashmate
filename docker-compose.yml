@@ -3,7 +3,7 @@ version: '3.7'
 services:
   core:
     image: dashpay/dashd:${CORE_VERSION:-latest}
-    restart: always
+    restart: unless-stopped
     ports:
       - ${CORE_P2P_PORT:?err}:${CORE_P2P_PORT:?err} # P2P
     volumes:
@@ -18,8 +18,8 @@ services:
       - -externalip=${CORE_EXTERNAL_IP:?err}
 
   sentinel:
-    image: ablock/sentinel
-    restart: always
+    image: strophy/sentinel
+    restart: unless-stopped
     depends_on:
       - core
     environment:
