@@ -97,7 +97,7 @@ The `register` command creates a collateral funding transaction and then uses it
 
 #### Funding collateral
 
-Before registering the masternode, you must have access to an an address on the network you intend to use with a balance of more than 1000 Dash. 1000 Dash is used for the collateral transaction, and the remainder will be used for transaction fees. Make sure you have access to the private key for this address, since you will need to provide it in the next step. If using Dash Core, you can get the private key for a given address using the following command:
+Before registering the masternode, you must have access to an address on the network you intend to use with a balance of more than 1000 Dash. 1000 Dash is used for the collateral transaction, and the remainder will be used for transaction fees. Make sure you have access to the private key for this address, since you will need to provide it in the next step. If using Dash Core, you can get the private key for a given address using the following command:
 
 ```
 dumpprivkey "address"
