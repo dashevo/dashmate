@@ -97,10 +97,28 @@ The `register` command creates a collateral funding transaction and then uses it
 
 #### Funding collateral
 
-Before registering the masternode, you must send more than 1000 Dash to an address on the network you intend to use. 1000 Dash is used for the collateral transaction, and the remainder will be used for transaction fees. Make sure you have access to the private key for this address, since you will need to provide it in the next step. If using Dash Core, you can get the private key for a given address using the following command:
+Before registering the masternode, you must have access to an an address on the network you intend to use with a balance of more than 1000 Dash. 1000 Dash is used for the collateral transaction, and the remainder will be used for transaction fees. Make sure you have access to the private key for this address, since you will need to provide it in the next step. If using Dash Core, you can get the private key for a given address using the following command:
 
 ```
 dumpprivkey "address"
+```
+
+If using the `local` or `evonet` presets, you can create and fund a new address using the `wallet` command as shown below.
+
+```
+USAGE
+  $ mn wallet:generate-to-address PRESET AMOUNT
+ARGUMENTS
+  PRESET  (evonet|local) preset to use
+  AMOUNT  amount of dash to be generated to address
+OPTIONS
+  -a, --address=address  recipient address instead of a new one
+```
+
+To generate 1001 Dash to a new address on evonet:
+
+```bash
+mn wallet:generate-to-address evonet 1001
 ```
 
 #### Masternode registration
