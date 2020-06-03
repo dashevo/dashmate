@@ -44,7 +44,7 @@ class MasternodeStatusCommand extends BaseCommand {
   }
 }
 
-MasternodeStatusCommand.description = 'Show Docker status';
+MasternodeStatusCommand.description = 'Show masternode status';
 
 MasternodeStatusCommand.args = [{
   name: 'preset',
