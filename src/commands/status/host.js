@@ -54,7 +54,7 @@ class HostStatusCommand extends BaseCommand {
   }
 }
 
-HostStatusCommand.description = 'Show host status';
+HostStatusCommand.description = 'Show host status details';
 
 HostStatusCommand.args = [{
   name: 'preset',

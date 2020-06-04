@@ -42,7 +42,7 @@ class DockerStatusCommand extends BaseCommand {
   }
 }
 
-DockerStatusCommand.description = 'Show Docker status';
+DockerStatusCommand.description = 'Show Docker status details';
 
 DockerStatusCommand.args = [{
   name: 'preset',

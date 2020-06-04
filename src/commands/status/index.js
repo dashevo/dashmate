@@ -1,3 +1,6 @@
+const os = require('os');
+const publicip = require('public-ip');
+const prettybyte = require('pretty-bytes');
 const {table} = require('table');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
@@ -6,7 +9,7 @@ const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 
 const PRESETS = require('../../presets');
 
-class MasternodeStatusCommand extends BaseCommand {
+class StatusCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
@@ -30,10 +33,13 @@ class MasternodeStatusCommand extends BaseCommand {
       }
     };
 
-    data.push(['Service', 'Status']);
+    data.push(['Property', 'Value']);
+    data.push(['Hostname', os.hostname()]);
+    data.push(['Memory', prettybyte(os.totalmem()) + ' / ' + prettybyte(os.freemem())]);
+    data.push(['CPUs', os.cpus().length]);
+    data.push(['IP', await publicip.v4()]);
     data.push(['Version', (await dockerCompose.execCommand(preset, 'core', 'dashd --version')).out.split('\n')[0]])
     data.push(['Blocks', (await dockerCompose.execCommand(preset, 'core', 'dash-cli getblockcount')).out.trim()]);
-    // ....
 
     try {
       output = table(data, tableConfig);
@@ -44,13 +50,13 @@ class MasternodeStatusCommand extends BaseCommand {
   }
 }
 
-MasternodeStatusCommand.description = 'Show masternode status details';
+StatusCommand.description = 'Show status information';
 
-MasternodeStatusCommand.args = [{
+StatusCommand.args = [{
   name: 'preset',
   required: true,
   description: 'preset to use',
   options: Object.values(PRESETS),
 }];
 
-module.exports = MasternodeStatusCommand;
+module.exports = StatusCommand;
