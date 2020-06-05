@@ -187,6 +187,9 @@ class DockerCompose {
       composeOptions: [
         '--env-file', `.env.${preset}`,
       ],
+      commandOptions: [
+        '--build',
+      ],
       env,
     };
   }

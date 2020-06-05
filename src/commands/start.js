@@ -1,4 +1,9 @@
+const fs = require('fs').promises;
+const path = require('path');
+
 const Listr = require('listr');
+
+const dotenv = require('dotenv');
 
 const { flags: flagTypes } = require('@oclif/command');
 
@@ -26,6 +31,8 @@ class StartCommand extends BaseCommand {
     {
       'full-node': isFullNode,
       'operator-private-key': operatorPrivateKey,
+      'drive-src-path': driveSrcPath,
+      'dapi-src-path': dapiSrcPath,
     },
     dockerCompose,
   ) {
@@ -43,10 +50,29 @@ class StartCommand extends BaseCommand {
             CORE_MASTERNODE_BLS_PRIV_KEY = '';
           }
 
+          let COMPOSE_FILE = '';
+
+          if (driveSrcPath || dapiSrcPath) {
+            const envFile = path.join(__dirname, '..', '..', `.env.${preset}`);
+            const envRawData = await fs.readFile(envFile);
+            ({ COMPOSE_FILE } = dotenv.parse(envRawData));
+
+            if (driveSrcPath) {
+              COMPOSE_FILE = `${COMPOSE_FILE}:docker-compose.evo.drive.yml`;
+            }
+
+            if (dapiSrcPath) {
+              COMPOSE_FILE = `${COMPOSE_FILE}:docker-compose.evo.dapi.yml`;
+            }
+          }
+
           await dockerCompose.up(preset, {
             CORE_MASTERNODE_BLS_PRIV_KEY,
             CORE_P2P_PORT: coreP2pPort,
             CORE_EXTERNAL_IP: externalIp,
+            DRIVE_SRC_PATH: driveSrcPath,
+            DAPI_SRC_PATH: dapiSrcPath,
+            COMPOSE_FILE,
           });
         },
       },
@@ -84,6 +110,8 @@ StartCommand.args = [{
 StartCommand.flags = {
   'full-node': flagTypes.boolean({ char: 'f', description: 'start as full node', default: false }),
   'operator-private-key': flagTypes.string({ char: 'p', description: 'operator private key', default: null }),
+  'drive-src-path': flagTypes.string({ char: 'r', description: 'drive source code path', default: null }),
+  'dapi-src-path': flagTypes.string({ char: 'a', description: 'dapi source code path', default: null }),
 };
 
 module.exports = StartCommand;
