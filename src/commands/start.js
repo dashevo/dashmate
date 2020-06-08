@@ -50,30 +50,32 @@ class StartCommand extends BaseCommand {
             CORE_MASTERNODE_BLS_PRIV_KEY = '';
           }
 
-          let COMPOSE_FILE = '';
-
-          if (driveSrcPath || dapiSrcPath) {
-            const envFile = path.join(__dirname, '..', '..', `.env.${preset}`);
-            const envRawData = await fs.readFile(envFile);
-            ({ COMPOSE_FILE } = dotenv.parse(envRawData));
-
-            if (driveSrcPath) {
-              COMPOSE_FILE = `${COMPOSE_FILE}:docker-compose.evo.drive.yml`;
-            }
-
-            if (dapiSrcPath) {
-              COMPOSE_FILE = `${COMPOSE_FILE}:docker-compose.evo.dapi.yml`;
-            }
-          }
-
-          await dockerCompose.up(preset, {
+          const envs = {
             CORE_MASTERNODE_BLS_PRIV_KEY,
             CORE_P2P_PORT: coreP2pPort,
             CORE_EXTERNAL_IP: externalIp,
             DRIVE_SRC_PATH: driveSrcPath,
             DAPI_SRC_PATH: dapiSrcPath,
-            COMPOSE_FILE,
-          });
+          };
+
+
+          if (driveSrcPath || dapiSrcPath) {
+            const envFile = path.join(__dirname, '..', '..', `.env.${preset}`);
+            const envRawData = await fs.readFile(envFile);
+            let { composeFile } = dotenv.parse(envRawData);
+
+            if (driveSrcPath) {
+              composeFile = `${composeFile}:docker-compose.evo.drive.yml`;
+            }
+
+            if (dapiSrcPath) {
+              composeFile = `${composeFile}:docker-compose.evo.dapi.yml`;
+            }
+
+            envs.COMPOSE_FILE = composeFile;
+          }
+
+          await dockerCompose.up(preset, envs);
         },
       },
     ],
