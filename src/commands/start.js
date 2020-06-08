@@ -31,8 +31,8 @@ class StartCommand extends BaseCommand {
     {
       'full-node': isFullNode,
       'operator-private-key': operatorPrivateKey,
-      'drive-src-path': driveSrcPath,
-      'dapi-src-path': dapiSrcPath,
+      'drive-image-build-path': driveImageBuildPath,
+      'dapi-image-build-path': dapiImageBuildPath,
     },
     dockerCompose,
   ) {
@@ -54,24 +54,24 @@ class StartCommand extends BaseCommand {
             CORE_MASTERNODE_BLS_PRIV_KEY,
             CORE_P2P_PORT: coreP2pPort,
             CORE_EXTERNAL_IP: externalIp,
-            DRIVE_SRC_PATH: driveSrcPath,
-            DAPI_SRC_PATH: dapiSrcPath,
+            DRIVE_SRC_PATH: driveImageBuildPath,
+            DAPI_SRC_PATH: dapiImageBuildPath,
           };
 
-          if (driveSrcPath || dapiSrcPath) {
+          if (driveImageBuildPath || dapiImageBuildPath) {
             if (preset === 'testnet') {
-              throw new Error('You can\' use drive-src-path and dapi-src-path options with testnet preset');
+              throw new Error('You can\' use drive-image-build-path and dapi-image-build-path options with testnet preset');
             }
 
             const envFile = path.join(__dirname, '..', '..', `.env.${preset}`);
             const envRawData = await fs.readFile(envFile);
             let { composeFile } = dotenv.parse(envRawData);
 
-            if (driveSrcPath) {
+            if (driveImageBuildPath) {
               composeFile = `${composeFile}:docker-compose.platform.build-drive.yml`;
             }
 
-            if (dapiSrcPath) {
+            if (dapiImageBuildPath) {
               composeFile = `${composeFile}:docker-compose.platform.build-dapi.yml`;
             }
 
@@ -115,8 +115,8 @@ StartCommand.args = [{
 StartCommand.flags = {
   'full-node': flagTypes.boolean({ char: 'f', description: 'start as full node', default: false }),
   'operator-private-key': flagTypes.string({ char: 'p', description: 'operator private key', default: null }),
-  'drive-src-path': flagTypes.string({ description: 'drive source code path', default: null }),
-  'dapi-src-path': flagTypes.string({ description: 'dapi source code path', default: null }),
+  'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
+  'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),
 };
 
 module.exports = StartCommand;
