@@ -31,7 +31,7 @@ class DockerStatusCommand extends BaseCommand {
       }
     };
 
-    data.push(...(await dockerCompose.listContainerStatus(preset)));
+    data.push(...(await dockerCompose.inspectService(preset)));
     data.forEach(e => e[2] === 'running' ? e[2] = chalk.green(e[2]) : e[2] = chalk.red(e[2]))
     data.unshift(['Container', 'ID', 'Status']);
 

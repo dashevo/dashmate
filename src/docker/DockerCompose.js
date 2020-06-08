@@ -120,13 +120,13 @@ class DockerCompose {
    * @param {string} preset
    * @return {Promise<void>}
    */
-  async listContainerStatus(preset) {
+  async inspectService(preset, serviceName = undefined) {
     await this.throwErrorIfNotInstalled();
 
     let inspectResult = [];
-    const coreContainerData = await this.getDockerPs(preset);
+    const coreContainerIds = await this.getDockerPs(preset, serviceName);
 
-    await Promise.all(coreContainerData.map(async (containerId) => {
+    await Promise.all(coreContainerIds.map(async (containerId) => {
       const container = this.docker.getContainer(containerId);
       const { 
         Config: { Labels: { 'com.docker.compose.service': name } }, 
