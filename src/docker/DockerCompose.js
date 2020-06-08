@@ -104,7 +104,7 @@ class DockerCompose {
   async up(preset, envs = {}) {
     await this.throwErrorIfNotInstalled();
     const options = this.getOptions(preset, envs);
-    if (Array.isArray(options.commandOptions)) {
+    if (!Array.isArray(options.commandOptions)) {
       options.commandOptions = [];
     }
 
