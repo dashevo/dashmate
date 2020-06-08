@@ -1,12 +1,12 @@
 const AbstractError = require('../../errors/AbstractError');
 
-class ServiceIsNotRunningError extends AbstractError {
+class ContainerIsNotPresentError extends AbstractError {
   /**
    * @param {string} preset
    * @param {string} serviceName
    */
   constructor(preset, serviceName) {
-    super(`Service ${serviceName} for ${preset} is not running. Please run the service first.`);
+    super(`Container ${serviceName} for ${preset} is not present`);
 
     this.preset = preset;
     this.serviceName = serviceName;
@@ -31,4 +31,4 @@ class ServiceIsNotRunningError extends AbstractError {
   }
 }
 
-module.exports = ServiceIsNotRunningError;
+module.exports = ContainerIsNotPresentError;
