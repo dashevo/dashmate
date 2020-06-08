@@ -58,18 +58,21 @@ class StartCommand extends BaseCommand {
             DAPI_SRC_PATH: dapiSrcPath,
           };
 
-
           if (driveSrcPath || dapiSrcPath) {
+            if (preset === 'testnet') {
+              throw new Error('You can\' use drive-src-path and dapi-src-path options with testnet preset');
+            }
+
             const envFile = path.join(__dirname, '..', '..', `.env.${preset}`);
             const envRawData = await fs.readFile(envFile);
             let { composeFile } = dotenv.parse(envRawData);
 
             if (driveSrcPath) {
-              composeFile = `${composeFile}:docker-compose.evo.drive.yml`;
+              composeFile = `${composeFile}:docker-compose.platform.build-drive.yml`;
             }
 
             if (dapiSrcPath) {
-              composeFile = `${composeFile}:docker-compose.evo.dapi.yml`;
+              composeFile = `${composeFile}:docker-compose.platform.build-dapi.yml`;
             }
 
             envs.COMPOSE_FILE = composeFile;
@@ -112,8 +115,8 @@ StartCommand.args = [{
 StartCommand.flags = {
   'full-node': flagTypes.boolean({ char: 'f', description: 'start as full node', default: false }),
   'operator-private-key': flagTypes.string({ char: 'p', description: 'operator private key', default: null }),
-  'drive-src-path': flagTypes.string({ char: 'r', description: 'drive source code path', default: null }),
-  'dapi-src-path': flagTypes.string({ char: 'a', description: 'dapi source code path', default: null }),
+  'drive-src-path': flagTypes.string({ description: 'drive source code path', default: null }),
+  'dapi-src-path': flagTypes.string({ description: 'dapi source code path', default: null }),
 };
 
 module.exports = StartCommand;
