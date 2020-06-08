@@ -1,4 +1,5 @@
 const {table} = require('table');
+const chalk = require('chalk');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
 
@@ -30,8 +31,9 @@ class DockerStatusCommand extends BaseCommand {
       }
     };
 
-    data.push(['Container', 'ID', 'Status']);
     data.push(...(await dockerCompose.listContainerStatus(preset)));
+    data.forEach(e => e[2] === 'running' ? e[2] = chalk.green(e[2]) : e[2] = chalk.red(e[2]))
+    data.unshift(['Container', 'ID', 'Status']);
 
     try {
       output = table(data, tableConfig);
