@@ -31,9 +31,25 @@ class DockerStatusCommand extends BaseCommand {
       }
     };
 
-    data.push(...(await dockerCompose.inspectService(preset)));
-    data.forEach(e => e[2] === 'running' ? e[2] = chalk.green(e[2]) : e[2] = chalk.red(e[2]))
-    data.unshift(['Container', 'ID', 'Status']);
+    const serviceNames = {
+      core: 'Dash Core daemon',
+      dapi_api: 'DAPI',
+      dapi_envoy: 'Envoy proxy',
+      drive_mongodb: 'MongoDB',
+      drive_mongodb_replica_init: 'Initiate MongoDB replica',
+      dapi_tx_filter_stream: 'DAPI transaction filter stream',
+      drive_abci: 'Tendermint ABCI',
+      dapi_nginx: 'DAPI nginx',
+      dapi_insight: 'DAPI Insight',
+      drive_tendermint: 'Tendermint',
+      sentinel: 'Dash Sentinel'
+    }
+
+    data.push(...(await dockerCompose.inspectService(preset))
+      .filter(e => e[0] != 'drive_mongodb_replica_init'));
+    data.forEach(e => e[0] = serviceNames[e[0]])
+    data.forEach(e => e[2] === 'running' ? e[2] = chalk.green(e[2]) : e[2] = chalk.red(e[2]));
+    data.unshift(['Service', 'ID', 'Status']);
 
     try {
       output = table(data, tableConfig);
