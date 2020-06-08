@@ -64,22 +64,7 @@ class DockerCompose {
   async isServiceRunning(preset, serviceName = undefined) {
     await this.throwErrorIfNotInstalled();
 
-    let psOutput;
-
-    const env = this.getPlaceholderEmptyEnvOptions();
-
-    try {
-      ({ out: psOutput } = await dockerCompose.ps({
-        ...this.getOptions(preset, env),
-        commandOptions: ['-q', serviceName],
-      }));
-    } catch (e) {
-      throw new DockerComposeError(e);
-    }
-
-    const coreContainerIds = psOutput.trim()
-      .split('\n')
-      .filter((containerId) => containerId !== '');
+    const coreContainerIds = await this.getDockerPs(preset, serviceName);
 
     for (const containerId of coreContainerIds) {
       const container = this.docker.getContainer(containerId);
@@ -138,25 +123,8 @@ class DockerCompose {
   async listContainerStatus(preset) {
     await this.throwErrorIfNotInstalled();
 
-    let psOutput;
-
-    const envs = this.getPlaceholderEmptyEnvOptions();
-
-    try {
-      ({ out: psOutput } = await dockerCompose.ps({
-        ...this.getOptions(preset, envs),
-        commandOptions: ['-q'],
-      }));
-    } catch (e) {
-      throw new DockerComposeError(e);
-    }
-
-    const coreContainerData = psOutput
-      .trim()
-      .split('\n')
-      .filter((containerId) => containerId !== '')
-
     let inspectResult = [];
+    const coreContainerData = await this.getDockerPs(preset);
 
     await Promise.all(coreContainerData.map(async (containerId) => {
       const container = this.docker.getContainer(containerId);
@@ -272,6 +240,32 @@ class DockerCompose {
     return {
       CORE_EXTERNAL_IP: '127.0.0.1',
     };
+  }
+
+  /**
+   * @private
+   * @param {string} preset
+   * @param {string} [serviceName]
+   * @return {array}
+   */
+  async getDockerPs(preset, serviceName = undefined) {
+    let psOutput;
+
+    const env = this.getPlaceholderEmptyEnvOptions();
+  
+    try {
+      ({ out: psOutput } = await dockerCompose.ps({
+        ...this.getOptions(preset, env),
+        commandOptions: ['-q', serviceName],
+      }));
+    } catch (e) {
+      throw new DockerComposeError(e);
+    }
+
+    return psOutput      
+      .trim()
+      .split('\n')
+      .filter((containerId) => containerId !== '');;
   }
 }
 
