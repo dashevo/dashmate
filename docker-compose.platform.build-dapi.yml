@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   dapi_api:
-    build: ${DAPI_SRC_PATH:?err}
+    build: ${DAPI_IMAGE_BUILD_PATH:?err}
     image: dapi:local
 
   dapi_tx_filter_stream:

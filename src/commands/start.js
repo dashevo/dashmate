@@ -54,8 +54,8 @@ class StartCommand extends BaseCommand {
             CORE_MASTERNODE_BLS_PRIV_KEY,
             CORE_P2P_PORT: coreP2pPort,
             CORE_EXTERNAL_IP: externalIp,
-            DRIVE_SRC_PATH: driveImageBuildPath,
-            DAPI_SRC_PATH: dapiImageBuildPath,
+            DRIVE_IMAGE_BUILD_PATH: driveImageBuildPath,
+            DAPI_IMAGE_BUILD_PATH: dapiImageBuildPath,
           };
 
           if (driveImageBuildPath || dapiImageBuildPath) {
