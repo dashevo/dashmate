@@ -14,6 +14,7 @@
 * masternode registration commands ([#30](https://github.com/dashevo/mn-bootstrap/issues/30), [#44](https://github.com/dashevo/mn-bootstrap/issues/44), [#54](https://github.com/dashevo/mn-bootstrap/issues/54))
 * remove sleep from docker compose ([#57](https://github.com/dashevo/mn-bootstrap/issues/57))
 * allow to start full node ([#42](https://github.com/dashevo/mn-bootstrap/issues/42))
+* update configs and docker images ([#64](https://github.com/dashevo/mn-bootstrap/issues/42))
 
 
 ### Documentation
