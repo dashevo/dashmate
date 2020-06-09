@@ -1,3 +1,24 @@
+# [0.13.0](https://github.com/dashevo/mn-bootstrap/compare/v0.12.6...v0.13.0) (2020-06-09)
+
+
+### Bug Fixes
+
+* better fee calculation ([#44](https://github.com/dashevo/mn-bootstrap/issues/44))
+* do not start stopped services on the docker deamon restart ([#55](https://github.com/dashevo/mn-bootstrap/issues/55))
+* unavailable balance info during testnet registration ([#54](https://github.com/dashevo/mn-bootstrap/issues/54))
+* switch to dashpay org for sentinel ([#62](https://github.com/dashevo/mn-bootstrap/issues/62))
+
+
+### Features
+
+* allow to start full node ([#42](https://github.com/dashevo/mn-bootstrap/issues/42))
+* start/stop node commands ([#45](https://github.com/dashevo/mn-bootstrap/issues/45), [#48](https://github.com/dashevo/mn-bootstrap/issues/48))
+* data reset command ([#43](https://github.com/dashevo/mn-bootstrap/issues/43), [#60](https://github.com/dashevo/mn-bootstrap/issues/60))
+* masternode registration scripts ([#30](https://github.com/dashevo/mn-bootstrap/issues/30))
+* remove sleep from docker compose ([#57](https://github.com/dashevo/mn-bootstrap/issues/57))
+
+
+
 # [0.12.6](https://github.com/dashevo/mn-bootstrap/compare/v0.12.5...v0.12.6) (2020-05-23)
 
 
