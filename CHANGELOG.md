@@ -18,6 +18,11 @@
 * remove sleep from docker compose ([#57](https://github.com/dashevo/mn-bootstrap/issues/57))
 
 
+### BREAKING CHANGES
+
+* Dash Platform v0.12 data in incompatible with 0.13, so you need to reset data before you start the node
+
+
 
 # [0.12.6](https://github.com/dashevo/mn-bootstrap/compare/v0.12.5...v0.12.6) (2020-05-23)
 
