@@ -18,7 +18,7 @@
 
 ### Documentation
 
-* update README.md to clarify install instructions ([#33](https://github.com/dashevo/mn-bootstrap/issues/33))
+* update README.md to clarify install instructions ([#33](https://github.com/dashevo/mn-bootstrap/issues/33), [#65](https://github.com/dashevo/mn-bootstrap/issues/65))
 
 
 ### BREAKING CHANGES
