@@ -8,6 +8,8 @@ Distribution package for Dash Masternode installation
 
 - [Install](#install)
 - [Usage](#usage)
+  - [Configuration presets](#configuration-presets)
+  - [Command line interface](#cli)
   - [Start node](#start-node)
   - [Stop node](#stop-node)
   - [Register masternode](#register-masternode)
