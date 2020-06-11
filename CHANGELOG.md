@@ -1,3 +1,33 @@
+# [0.13.0](https://github.com/dashevo/mn-bootstrap/compare/v0.12.6...v0.13.0) (2020-06-09)
+
+
+### Bug Fixes
+
+* do not start stopped services on the docker deamon restart ([#55](https://github.com/dashevo/mn-bootstrap/issues/55))
+* switch to dashpay org for sentinel ([#62](https://github.com/dashevo/mn-bootstrap/issues/62))
+
+
+### Features
+
+* start/stop node commands ([#45](https://github.com/dashevo/mn-bootstrap/issues/45), [#48](https://github.com/dashevo/mn-bootstrap/issues/48))
+* data reset command ([#43](https://github.com/dashevo/mn-bootstrap/issues/43), [#60](https://github.com/dashevo/mn-bootstrap/issues/60))
+* masternode registration commands ([#30](https://github.com/dashevo/mn-bootstrap/issues/30), [#44](https://github.com/dashevo/mn-bootstrap/issues/44), [#54](https://github.com/dashevo/mn-bootstrap/issues/54), [#69](https://github.com/dashevo/mn-bootstrap/issues/69))
+* remove sleep from docker compose ([#57](https://github.com/dashevo/mn-bootstrap/issues/57))
+* allow to start full node ([#42](https://github.com/dashevo/mn-bootstrap/issues/42))
+* update configs and docker images ([#64](https://github.com/dashevo/mn-bootstrap/issues/42))
+
+
+### Documentation
+
+* update README.md to clarify install instructions ([#33](https://github.com/dashevo/mn-bootstrap/issues/33), [#65](https://github.com/dashevo/mn-bootstrap/issues/65))
+
+
+### BREAKING CHANGES
+
+* Dash Platform v0.12 data in incompatible with 0.13, so you need to reset data before you start the node
+
+
+
 # [0.12.6](https://github.com/dashevo/mn-bootstrap/compare/v0.12.5...v0.12.6) (2020-05-23)
 
 
