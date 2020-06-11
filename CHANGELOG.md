@@ -11,7 +11,7 @@
 
 * start/stop node commands ([#45](https://github.com/dashevo/mn-bootstrap/issues/45), [#48](https://github.com/dashevo/mn-bootstrap/issues/48))
 * data reset command ([#43](https://github.com/dashevo/mn-bootstrap/issues/43), [#60](https://github.com/dashevo/mn-bootstrap/issues/60))
-* masternode registration commands ([#30](https://github.com/dashevo/mn-bootstrap/issues/30), [#44](https://github.com/dashevo/mn-bootstrap/issues/44), [#54](https://github.com/dashevo/mn-bootstrap/issues/54))
+* masternode registration commands ([#30](https://github.com/dashevo/mn-bootstrap/issues/30), [#44](https://github.com/dashevo/mn-bootstrap/issues/44), [#54](https://github.com/dashevo/mn-bootstrap/issues/54), [#69](https://github.com/dashevo/mn-bootstrap/issues/69))
 * remove sleep from docker compose ([#57](https://github.com/dashevo/mn-bootstrap/issues/57))
 * allow to start full node ([#42](https://github.com/dashevo/mn-bootstrap/issues/42))
 * update configs and docker images ([#64](https://github.com/dashevo/mn-bootstrap/issues/42))
