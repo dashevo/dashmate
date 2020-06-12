@@ -1,3 +1,12 @@
+## [0.13.1](https://github.com/dashevo/mn-bootstrap/compare/v0.12.6...v0.13.1) (2020-06-12)
+
+
+### Features
+
+* update Evonet configs ([fd0158a](https://github.com/dashevo/mn-bootstrap/commit/fd0158a45f1c624628fe7a2735124db1c9f20338))
+
+
+
 # [0.13.0](https://github.com/dashevo/mn-bootstrap/compare/v0.12.6...v0.13.0) (2020-06-09)
 
 
