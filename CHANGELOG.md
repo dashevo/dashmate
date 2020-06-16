@@ -1,3 +1,12 @@
+## [0.13.2](https://github.com/dashevo/mn-bootstrap/compare/v0.13.1...v0.13.2) (2020-06-16)
+
+
+### Bug Fixes
+
+* DAPI rate limits disabled for evonet for some reason ([#73](https://github.com/dashevo/mn-bootstrap/issues/73))
+
+
+
 ## [0.13.1](https://github.com/dashevo/mn-bootstrap/compare/v0.12.6...v0.13.1) (2020-06-12)
 
 
