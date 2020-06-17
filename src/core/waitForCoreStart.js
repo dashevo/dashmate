@@ -19,6 +19,7 @@ async function waitForCoreStart(coreService) {
 
       isReady = true;
     } catch (e) {
+      console.log(e);
       // just wait 1 second before next try
       await wait(1000);
       ++retires;
