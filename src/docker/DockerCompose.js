@@ -44,15 +44,16 @@ class DockerCompose {
           commandOptions: options,
         },
       );
-console.log(output);
-console.log('\n\n\n\n\n');
+      console.log(output);
+      console.log(output.out);
+      console.log('\n\n\n\n\n');
       containerName = output.out;
     } catch (e) {
       throw new DockerComposeError(e);
     }
 
-    containerName = containerName.trim();
-console.log('containerName=', containerName);
+    containerName = containerName.trim().split('\n').pop();
+    console.log('containerName=', containerName);
     this.startedContainers.addContainer(containerName);
     return this.docker.getContainer(containerName);
   }
