@@ -10,7 +10,7 @@ const wait = require('../util/wait');
 async function waitForCoreStart(coreService) {
   let retires = 0;
   let isReady = false;
-  const maxRetries = 120; // ~2 minutes
+  const maxRetries = 1200; // ~2 minutes
 
   do {
     try {
@@ -26,7 +26,7 @@ async function waitForCoreStart(coreService) {
   } while (!isReady && retires < maxRetries);
 
   if (!isReady) {
-    throw new Error('Could not connect to to Dash core RPC');
+    throw new Error('Could not connect to Dash core RPC');
   }
 }
 
