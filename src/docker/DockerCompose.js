@@ -36,14 +36,17 @@ class DockerCompose {
     const env = this.getPlaceholderEmptyEnvOptions();
 
     try {
-      ({ out: containerName } = await dockerCompose.run(
+      const output = await dockerCompose.run(
         serviceName,
         command,
         {
           ...this.getOptions(preset, env),
           commandOptions: options,
         },
-      ));
+      );
+console.log(output);
+console.log('\n\n\n\n\n');
+      containerName = output.out;
     } catch (e) {
       throw new DockerComposeError(e);
     }
