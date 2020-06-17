@@ -52,7 +52,7 @@ console.log('\n\n\n\n\n');
     }
 
     containerName = containerName.trim();
-
+console.log('containerName=', containerName);
     this.startedContainers.addContainer(containerName);
     return this.docker.getContainer(containerName);
   }
