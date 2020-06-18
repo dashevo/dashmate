@@ -72,9 +72,9 @@
     "globby": "^10.0.2"
   },
   "files": [
-    "/bin",
-    "/oclif.manifest.json",
-    "/src"
+    "bin",
+    "oclif.manifest.json",
+    "src"
   ],
   "oclif": {
     "commands": "./src/commands",
