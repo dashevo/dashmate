@@ -50,7 +50,7 @@ function startCoreFactory(
         '--detach',
       ],
     );
-console.log('coreContainer', coreContainer);
+
     const rpcClient = createRpcClient();
 
     const coreService = new CoreService(

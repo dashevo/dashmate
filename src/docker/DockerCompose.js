@@ -36,24 +36,20 @@ class DockerCompose {
     const env = this.getPlaceholderEmptyEnvOptions();
 
     try {
-      const output = await dockerCompose.run(
+      ({ out: containerName } = await dockerCompose.run(
         serviceName,
         command,
         {
           ...this.getOptions(preset, env),
           commandOptions: options,
         },
-      );
-      console.log(output);
-      console.log(output.out);
-      console.log('\n\n\n\n\n');
-      containerName = output.out;
+      ));
     } catch (e) {
       throw new DockerComposeError(e);
     }
 
     containerName = containerName.trim().split('\n').pop();
-    console.log('containerName=', containerName);
+
     this.startedContainers.addContainer(containerName);
     return this.docker.getContainer(containerName);
   }
