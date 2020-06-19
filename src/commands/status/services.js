@@ -7,7 +7,7 @@ const BaseCommand = require('../../oclif/command/BaseCommand');
 
 const PRESETS = require('../../presets');
 
-class DockerStatusCommand extends BaseCommand {
+class ServicesStatusCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
@@ -41,13 +41,14 @@ class DockerStatusCommand extends BaseCommand {
     }
 
     const tableRows = [
-      ['Service', 'ID', 'Status'],
+      ['ID', 'Service', 'Version', 'Status'],
     ];
 
     for (const [serviceName, serviceDescription] of Object.entries(serviceHumanNames)) {
       let containerId;
       let status;
       let exitCode;
+      let version;
 
       try {
         ({
@@ -56,6 +57,11 @@ class DockerStatusCommand extends BaseCommand {
             Status: status,
             ExitCode: exitCode,
           },
+          Config: {
+            Labels: {
+              'org.dash.version': version
+            }
+          }
         } = await dockerCompose.inspectService(preset, serviceName));
       } catch (e) {
         if (e instanceof ContainerIsNotPresentError) {
@@ -69,8 +75,9 @@ class DockerStatusCommand extends BaseCommand {
       }
 
       tableRows.push([
+        containerId.slice(0,12),
         serviceDescription,
-        containerId,
+        version,
         chalk.keyword(status === 'running' ? 'green' : 'red')(status),
       ]);
     }
@@ -87,13 +94,13 @@ class DockerStatusCommand extends BaseCommand {
   }
 }
 
-DockerStatusCommand.description = 'Show Docker status details';
+ServicesStatusCommand.description = 'Show service status details';
 
-DockerStatusCommand.args = [{
+ServicesStatusCommand.args = [{
   name: 'preset',
   required: true,
   description: 'preset to use',
   options: Object.values(PRESETS),
 }];
 
-module.exports = DockerStatusCommand;
+module.exports = ServicesStatusCommand;
