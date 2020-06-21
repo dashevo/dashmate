@@ -66,6 +66,7 @@ ARGUMENTS
 OPTIONS
   -f, --full-node                                  start as full node
   -p, --operator-private-key=operator-private-key  operator private key
+  -u, --update                                     pull updated Docker images
 ```
 
 To start a masternode for Evonet:
