@@ -120,7 +120,7 @@ StartCommand.args = [{
 
 StartCommand.flags = {
   'full-node': flagTypes.boolean({ char: 'f', description: 'start as full node', default: false }),
-  'update': flagTypes.boolean({ char: 'u', description: 'pull updated Docker images', default: false }),
+  'update': flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
   'operator-private-key': flagTypes.string({ char: 'p', description: 'operator private key', default: null }),
   'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
   'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),
