@@ -1,66 +1,37 @@
 const os = require('os');
-const publicip = require('public-ip');
-const prettyms = require('pretty-ms');
-const prettybyte = require('pretty-bytes');
-const {table} = require('table');
+const publicIp = require('public-ip');
+const prettyMs = require('pretty-ms');
+const prettyByte = require('pretty-bytes');
+const { table } = require('table');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
 
-const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
-
-const PRESETS = require('../../presets');
-
 class HostStatusCommand extends BaseCommand {
   /**
-   * @param {Object} args
-   * @param {Object} flags
-   * @param {DockerCompose} dockerCompose
    * @return {Promise<void>}
    */
-  async runWithDependencies(
-    {
-      preset,
-    },
-    flags,
-    dockerCompose,
-  ) {
-    const data = [];
-    let output;
+  async runWithDependencies() {
+    const rows = [];
 
-    const tableConfig = {
-      //singleLine: true,
-      drawHorizontalLine: (index, size) => {
-        return index === 0 || index === 1 || index === size;
-      }
-    };
+    rows.push(['Hostname', os.hostname()]);
+    rows.push(['Uptime', prettyMs(os.uptime() * 1000)]);
+    rows.push(['Platform', os.platform()]);
+    rows.push(['Username', os.userInfo().username]);
+    rows.push(['Loadavg', os.loadavg()]);
+    rows.push(['Diskfree', 0]); // Waiting for feature: https://github.com/nodejs/node/pull/31351
+    rows.push(['Memory', `${prettyByte(os.totalmem())} / ${prettyByte(os.freemem())}`]);
+    rows.push(['CPUs', os.cpus().length]);
+    rows.push(['IP', await publicIp.v4()]);
 
-    data.push(['Property', 'Value']);
-    data.push(['Hostname', os.hostname()]);
-    data.push(['Uptime', prettyms(os.uptime() * 1000)]);
-    data.push(['Platform', os.platform()]);
-    data.push(['Username', os.userInfo().username]);
-    data.push(['Loadavg', os.loadavg()]);
-    data.push(['Diskfree', 0]); // Waiting for feature: https://github.com/nodejs/node/pull/31351
-    data.push(['Memory', prettybyte(os.totalmem()) + ' / ' + prettybyte(os.freemem())]);
-    data.push(['CPUs', os.cpus().length]);
-    data.push(['IP', await publicip.v4()]);
+    const output = table(rows, {
+      drawHorizontalLine: (index, size) => index === 0 || index === 1 || index === size,
+    });
 
-    try {
-      output = table(data, tableConfig);
-      console.log(output);
-    } catch (e) {
-      throw new MuteOneLineError(e);
-    }
+    // eslint-disable-next-line no-console
+    console.log(output);
   }
 }
 
 HostStatusCommand.description = 'Show host status details';
-
-HostStatusCommand.args = [{
-  name: 'preset',
-  required: true,
-  description: 'preset to use',
-  options: Object.values(PRESETS),
-}];
 
 module.exports = HostStatusCommand;

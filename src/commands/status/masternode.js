@@ -1,8 +1,6 @@
-const {table} = require('table');
+const { table } = require('table');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
-
-const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 
 const PRESETS = require('../../presets');
 
@@ -20,27 +18,32 @@ class MasternodeStatusCommand extends BaseCommand {
     flags,
     dockerCompose,
   ) {
-    const data = [];
-    let output;
+    const rows = [];
 
-    const tableConfig = {
-      //singleLine: true,
-      drawHorizontalLine: (index, size) => {
-        return index === 0 || index === 1 || index === size;
-      }
-    };
+    // Version
+    const versionOutput = await dockerCompose.execCommand(
+      preset,
+      'core',
+      'dashd --version',
+    );
 
-    data.push(['Service', 'Status']);
-    data.push(['Version', (await dockerCompose.execCommand(preset, 'core', 'dashd --version')).out.split('\n')[0]])
-    data.push(['Blocks', (await dockerCompose.execCommand(preset, 'core', 'dash-cli getblockcount')).out.trim()]);
-    // ....
+    rows.push(['Version', versionOutput.out.split('\n')[0]]);
 
-    try {
-      output = table(data, tableConfig);
-      console.log(output);
-    } catch (e) {
-      throw new MuteOneLineError(e);
-    }
+    // Block count
+    const blockCountOutput = await dockerCompose.execCommand(
+      preset,
+      'core',
+      'dash-cli getblockcount',
+    );
+
+    rows.push(['Blocks', blockCountOutput.out.trim()]);
+
+    const output = table(rows, {
+      drawHorizontalLine: (index, size) => index === 0 || index === 1 || index === size,
+    });
+
+    // eslint-disable-next-line no-console
+    console.log(output);
   }
 }
 

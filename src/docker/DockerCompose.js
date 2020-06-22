@@ -143,7 +143,7 @@ class DockerCompose {
    * @param {string} preset
    * @param {string} serviceName
    * @param {string} command
-   * @return {Promise<void>}
+   * @return {Promise<object>}
    */
   async execCommand(preset, serviceName, command) {
     await this.throwErrorIfNotInstalled();

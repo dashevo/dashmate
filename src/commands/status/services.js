@@ -41,7 +41,7 @@ class ServicesStatusCommand extends BaseCommand {
     }
 
     const tableRows = [
-      ['ID', 'Service', 'Version', 'Status'],
+      ['Service', 'Container ID', 'Version', 'Status'],
     ];
 
     for (const [serviceName, serviceDescription] of Object.entries(serviceHumanNames)) {
@@ -59,9 +59,9 @@ class ServicesStatusCommand extends BaseCommand {
           },
           Config: {
             Labels: {
-              'org.dash.version': version
-            }
-          }
+              'org.dash.version': version,
+            },
+          },
         } = await dockerCompose.inspectService(preset, serviceName));
       } catch (e) {
         if (e instanceof ContainerIsNotPresentError) {
@@ -75,8 +75,8 @@ class ServicesStatusCommand extends BaseCommand {
       }
 
       tableRows.push([
-        containerId.slice(0,12),
         serviceDescription,
+        containerId.slice(0, 12),
         version,
         chalk.keyword(status === 'running' ? 'green' : 'red')(status),
       ]);
