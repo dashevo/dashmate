@@ -28,6 +28,9 @@ const getAddressBalance = require('./core/wallet/getAddressBalance');
 const sendToAddress = require('./core/wallet/sendToAddress');
 const registerMasternode = require('./core/wallet/registerMasternode');
 
+const createClientWithFundedWallet = require('./dash/createClientWithFundedWallet');
+const startNodeFactory = require('./dash/startNodeFactory');
+
 async function createDIContainer() {
   const container = createAwilixContainer({
     injectionMode: InjectionMode.CLASSIC,
@@ -71,6 +74,14 @@ async function createDIContainer() {
     getAddressBalance: asValue(getAddressBalance),
     sendToAddress: asValue(sendToAddress),
     registerMasternode: asValue(registerMasternode),
+  });
+
+  /**
+   * Dash SDK
+   */
+  container.register({
+    createClientWithFundedWallet: asValue(createClientWithFundedWallet),
+    startNode: asFunction(startNodeFactory),
   });
 
   return container;

@@ -79,7 +79,7 @@ class RegisterCommand extends BaseCommand {
               task: async (ctx) => {
                 const balance = await getAddressBalance(ctx.coreService, ctx.fundingAddress);
                 if (balance <= MASTERNODE_DASH_AMOUNT) {
-                  throw new Error('You need to have more than 1000 Dash on your funding address');
+                  throw new Error(`You need to have more than ${MASTERNODE_DASH_AMOUNT} Dash on your funding address`);
                 }
               },
             },
@@ -267,7 +267,7 @@ RegisterCommand.args = [{
 }, {
   name: 'funding-private-key',
   required: true,
-  description: 'private key with more than 1000 dash for funding collateral',
+  description: `private key with more than ${MASTERNODE_DASH_AMOUNT} dash for funding collateral`,
 }, {
   name: 'external-ip',
   required: true,

@@ -95,6 +95,36 @@ class DockerCompose {
   }
 
   /**
+   * Get container by it's name
+   *
+   * @param {string} preset
+   * @param {string} serviceName
+   * @return {Promise<Container>}
+   */
+  async getContainer(preset, serviceName) {
+    await this.throwErrorIfNotInstalled();
+
+    let psOutput;
+
+    const env = this.getPlaceholderEmptyEnvOptions();
+
+    try {
+      ({ out: psOutput } = await dockerCompose.ps({
+        ...this.getOptions(preset, env),
+        commandOptions: ['-q', serviceName],
+      }));
+    } catch (e) {
+      throw new DockerComposeError(e);
+    }
+
+    const [container] = psOutput.trim()
+      .split('\n')
+      .filter((containerId) => containerId !== '');
+
+    return this.docker.getContainer(container);
+  }
+
+  /**
    * Up docker compose
    *
    * @param {string} preset
