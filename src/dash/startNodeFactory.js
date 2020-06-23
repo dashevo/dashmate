@@ -14,9 +14,11 @@ function startNodeFactory(dockerCompose) {
    * @param {string} externalIp
    * @param {number} coreP2pPort
    * @param {boolean} isFullNode
-   * @param {string} operatorPrivateKey
-   * @param {string} driveImageBuildPath
-   * @param {string} dapiImageBuildPath
+   * @param {string} [operatorPrivateKey]
+   * @param {string} [dpnsContractId]
+   * @param {string} [dpnsTopLevelIdentity]
+   * @param {string} [driveImageBuildPath]
+   * @param {string} [dapiImageBuildPath]
    * @return {Promise<void>}
    */
   async function startNode(
@@ -24,9 +26,11 @@ function startNodeFactory(dockerCompose) {
     externalIp,
     coreP2pPort,
     isFullNode,
-    operatorPrivateKey,
-    driveImageBuildPath,
-    dapiImageBuildPath,
+    operatorPrivateKey = undefined,
+    dpnsContractId = undefined,
+    dpnsTopLevelIdentity = undefined,
+    driveImageBuildPath = undefined,
+    dapiImageBuildPath = undefined,
   ) {
     let CORE_MASTERNODE_BLS_PRIV_KEY;
 
@@ -45,6 +49,14 @@ function startNodeFactory(dockerCompose) {
       DRIVE_IMAGE_BUILD_PATH: driveImageBuildPath,
       DAPI_IMAGE_BUILD_PATH: dapiImageBuildPath,
     };
+
+    if (dpnsContractId) {
+      envs.DPNS_CONTRACT_ID = dpnsContractId;
+    }
+
+    if (dpnsTopLevelIdentity) {
+      envs.DPNS_TOP_LEVEL_IDENTITY = dpnsTopLevelIdentity;
+    }
 
     if (driveImageBuildPath || dapiImageBuildPath) {
       if (preset === 'testnet') {
