@@ -27,6 +27,8 @@ class StartCommand extends BaseCommand {
     {
       'full-node': isFullNode,
       'operator-private-key': operatorPrivateKey,
+      'dpns-contract-id': dpnsContractId,
+      'dpns-top-level-identity': dpnsTopLevelIdentity,
       'drive-image-build-path': driveImageBuildPath,
       'dapi-image-build-path': dapiImageBuildPath,
     },
@@ -42,6 +44,8 @@ class StartCommand extends BaseCommand {
           coreP2pPort,
           isFullNode,
           operatorPrivateKey,
+          dpnsContractId,
+          dpnsTopLevelIdentity,
           driveImageBuildPath,
           dapiImageBuildPath,
         ),
@@ -80,6 +84,8 @@ StartCommand.args = [{
 StartCommand.flags = {
   'full-node': flagTypes.boolean({ char: 'f', description: 'start as full node', default: false }),
   'operator-private-key': flagTypes.string({ char: 'p', description: 'operator private key', default: null }),
+  'dpns-contract-id': flagTypes.string({ description: 'DPNS contract ID', default: null }),
+  'dpns-top-level-identity': flagTypes.string({ description: 'DPNS top level identity', default: null }),
   'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
   'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),
 };
