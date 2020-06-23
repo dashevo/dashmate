@@ -38,6 +38,8 @@ function initTaskFactory(
           ctx.coreP2pPort,
           false,
           ctx.operator.privateKey,
+          undefined,
+          undefined,
           driveImageBuildPath,
           dapiImageBuildPath,
         ),
