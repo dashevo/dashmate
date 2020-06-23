@@ -50,6 +50,8 @@ class InitCommand extends BaseCommand {
               coreP2pPort,
               false,
               operatorPrivateKey,
+              undefined,
+              undefined,
               driveImageBuildPath,
               dapiImageBuildPath,
             ),
