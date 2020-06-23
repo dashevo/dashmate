@@ -39,7 +39,7 @@ class StartCommand extends BaseCommand {
   ) {
     const tasks = new Listr([
       {
-        title: 'Pull updated images',
+        title: 'Download updated services',
         enabled: () => isUpdate === true,
         task: async (ctx) => await dockerCompose.pull(preset),
       },
