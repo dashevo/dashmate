@@ -10,12 +10,10 @@ const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 const PRESETS = require('../../presets');
 const wait = require('../../util/wait');
 
-const MIN_DASH_AMOUNT = 10;
-
 class InitCommand extends BaseCommand {
   /**
    *
-     @param {Object} args
+   * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
    * @param {startNode} startNode
@@ -129,7 +127,7 @@ InitCommand.args = [{
 }, {
   name: 'funding-private-key',
   required: true,
-  description: `private key with more than ${MIN_DASH_AMOUNT} dash for funding account`,
+  description: 'private key with dash for funding account',
 }, {
   name: 'operator-private-key',
   required: true,
