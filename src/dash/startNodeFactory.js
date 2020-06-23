@@ -8,7 +8,6 @@ const dotenv = require('dotenv');
  * @return {startNode}
  */
 function startNodeFactory(dockerCompose) {
-
   /**
    * @typedef {startNode}
    * @param {string} preset

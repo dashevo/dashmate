@@ -8,7 +8,6 @@ const wait = require('../util/wait');
 
 /**
  *
- * @typedef {waitForBlocks}
  * @param {DAPIClient} dapiClient
  * @param {string} preset
  * @param {string} network

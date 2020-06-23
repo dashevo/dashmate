@@ -1,25 +1,20 @@
 const Listr = require('listr');
 
 const { flags: flagTypes } = require('@oclif/command');
-const dpnsDocumentSchema = require('@dashevo/dpns-contract/src/schema/dpns-documents.json');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
 const UpdateRendererWithOutput = require('../../oclif/renderer/UpdateRendererWithOutput');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 
 const PRESETS = require('../../presets');
-const wait = require('../../util/wait');
-
-const MIN_DASH_AMOUNT = 10;
 
 class InitCommand extends BaseCommand {
   /**
    *
-     @param {Object} args
+   * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
-   * @param {startNode} startNode
-   * @param {createClientWithFundedWallet} createClientWithFundedWallet
+   * @param {initTask} initTask
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -35,70 +30,19 @@ class InitCommand extends BaseCommand {
       'dapi-image-build-path': dapiImageBuildPath,
     },
     dockerCompose,
-    startNode,
-    createClientWithFundedWallet,
+    initTask,
   ) {
     const network = 'testnet';
 
     const tasks = new Listr([{
       title: `Register DPNS Contract ID and Top Level Identity using ${preset} preset`,
       task: () => (
-        new Listr([
-          {
-            title: `Start masternode with ${preset} preset`,
-            task: async () => startNode(
-              preset,
-              externalIp,
-              coreP2pPort,
-              false,
-              operatorPrivateKey,
-              driveImageBuildPath,
-              dapiImageBuildPath,
-            ),
-          },
-          {
-            title: 'Initialize SDK',
-            task: async (ctx) => {
-              // wait 5 seconds to ensure everything were initialized
-              await wait(5000);
-
-              ctx.client = await createClientWithFundedWallet(
-                preset,
-                network,
-                ctx.fundingPrivateKeyString,
-              );
-            },
-          },
-          {
-            title: 'Register DPNS top level identity',
-            task: async (ctx, task) => {
-              ctx.identity = await ctx.client.platform.identities.register(2);
-
-              // eslint-disable-next-line no-param-reassign
-              task.output = `Top level identity: ${ctx.identity.getId()}`;
-            },
-          },
-          {
-            title: 'Register DPNS contract',
-            task: async (ctx, task) => {
-              const dataContract = await ctx.client.platform.contracts.create(
-                dpnsDocumentSchema, ctx.identity,
-              );
-
-              await ctx.client.platform.contracts.broadcast(
-                dataContract,
-                ctx.identity,
-              );
-
-              // eslint-disable-next-line no-param-reassign
-              task.output = `Contract id: ${dataContract.getId()}`;
-            },
-          },
-          {
-            title: 'Close SDK',
-            task: async (ctx) => ctx.client.disconnect(),
-          },
-        ])
+        initTask(
+          preset,
+          network,
+          driveImageBuildPath,
+          dapiImageBuildPath,
+        )
       ),
     },
     ],
@@ -107,6 +51,11 @@ class InitCommand extends BaseCommand {
     try {
       await tasks.run({
         fundingPrivateKeyString,
+        externalIp,
+        coreP2pPort,
+        operator: {
+          privateKey: operatorPrivateKey,
+        },
       });
     } catch (e) {
       throw new MuteOneLineError(e);
@@ -129,7 +78,7 @@ InitCommand.args = [{
 }, {
   name: 'funding-private-key',
   required: true,
-  description: `private key with more than ${MIN_DASH_AMOUNT} dash for funding account`,
+  description: 'private key with dash for funding account',
 }, {
   name: 'operator-private-key',
   required: true,
