@@ -57,7 +57,7 @@ function generateToAddressTaskFactory(
           } = await createNewAddress(ctx.coreService));
 
           // eslint-disable-next-line no-param-reassign
-          task.output = `Address: ${ctx.fundingAddress}\nPrivate key: ${ctx.privateKey}`;
+          task.output = `Address: ${ctx.fundingAddress}\nPrivate key: ${ctx.fundingPrivateKeyString}`;
         },
       },
       {
