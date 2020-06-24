@@ -28,7 +28,7 @@ const getAddressBalance = require('./core/wallet/getAddressBalance');
 const sendToAddress = require('./core/wallet/sendToAddress');
 const registerMasternode = require('./core/wallet/registerMasternode');
 
-const createClientWithFundedWallet = require('./dash/createClientWithFundedWallet');
+const createClientWithFundedWallet = require('./sdk/createClientWithFundedWallet');
 
 const generateToAddressTaskFactory = require('./tasks/generateToAddressTaskFactory');
 const registerMasternodeTaskFactory = require('./tasks/registerMasternodeTaskFactory');

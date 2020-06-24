@@ -34,14 +34,13 @@ function initTaskFactory(
         title: `Start masternode with ${preset} preset`,
         task: async (ctx) => startNodeTask(
           preset,
-          ctx.externalIp,
-          ctx.coreP2pPort,
-          false,
-          ctx.operator.privateKey,
-          undefined,
-          undefined,
-          driveImageBuildPath,
-          dapiImageBuildPath,
+          {
+            externalIp: ctx.externalIp,
+            coreP2pPort: ctx.coreP2pPort,
+            privateKey: ctx.operator.privateKey,
+            driveImageBuildPath,
+            dapiImageBuildPath,
+          },
         ),
       },
       {

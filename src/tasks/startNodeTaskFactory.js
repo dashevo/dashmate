@@ -5,12 +5,12 @@ const dotenv = require('dotenv');
 /**
  *
  * @param {DockerCompose} dockerCompose
- * @return {startNode}
+ * @return {startNodeTask}
  */
-function startNodeFactory(dockerCompose) {
+function startNodeTaskFactory(dockerCompose) {
 
   /**
-   * @typedef {startNode}
+   * @typedef {startNodeTask}
    * @param {string} preset
    * @param {Object} options
    * @param {string} options.externalIp
@@ -23,7 +23,7 @@ function startNodeFactory(dockerCompose) {
    * @param {string} options.dapiImageBuildPath
    * @return {Promise<void>}
    */
-  async function startNode(
+  async function startNodeTask(
     preset,
     {
       externalIp,
@@ -85,7 +85,7 @@ function startNodeFactory(dockerCompose) {
     return dockerCompose.up(preset, envs);
   }
 
-  return startNode;
+  return startNodeTask;
 }
 
-module.exports = startNodeFactory;
+module.exports = startNodeTaskFactory;
