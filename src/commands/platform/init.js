@@ -39,9 +39,6 @@ class InitCommand extends BaseCommand {
       task: () => (
         initTask(
           preset,
-          network,
-          driveImageBuildPath,
-          dapiImageBuildPath,
         )
       ),
     },
@@ -56,6 +53,9 @@ class InitCommand extends BaseCommand {
         operator: {
           privateKey: operatorPrivateKey,
         },
+        network,
+        driveImageBuildPath,
+        dapiImageBuildPath,
       });
     } catch (e) {
       throw new MuteOneLineError(e);

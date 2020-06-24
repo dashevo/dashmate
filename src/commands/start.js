@@ -35,28 +35,24 @@ class StartCommand extends BaseCommand {
     dockerCompose,
     startNodeTask,
   ) {
-    const tasks = new Listr([
+    const tasks = startNodeTask(
+      preset,
       {
-        title: `Start ${isFullNode ? 'full node' : 'masternode'} with ${preset} preset`,
-        task: async () => startNodeTask(
-          preset,
-          {
-            externalIp,
-            coreP2pPort,
-            isFullNode,
-            operatorPrivateKey,
-            dpnsContractId,
-            dpnsTopLevelIdentity,
-            driveImageBuildPath,
-            dapiImageBuildPath,
-          },
-        ),
+        externalIp,
+        coreP2pPort,
+        isFullNode,
+        operatorPrivateKey,
+        dpnsContractId,
+        dpnsTopLevelIdentity,
+        driveImageBuildPath,
+        dapiImageBuildPath,
       },
-    ],
-    { collapse: false, renderer: UpdateRendererWithOutput });
+    );
 
     try {
-      await tasks.run();
+      await tasks.run({
+        preset,
+      });
     } catch (e) {
       throw new MuteOneLineError(e);
     }

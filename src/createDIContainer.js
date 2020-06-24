@@ -30,10 +30,10 @@ const registerMasternode = require('./core/wallet/registerMasternode');
 
 const createClientWithFundedWallet = require('./sdk/createClientWithFundedWallet');
 
-const generateToAddressTaskFactory = require('./tasks/generateToAddressTaskFactory');
-const registerMasternodeTaskFactory = require('./tasks/registerMasternodeTaskFactory');
-const initTaskFactory = require('./tasks/initTaskFactory');
-const startNodeTaskFactory = require('./tasks/startNodeTaskFactory');
+const generateToAddressTaskFactory = require('./listr/tasks/wallet/generateToAddressTaskFactory');
+const registerMasternodeTaskFactory = require('./listr/tasks/registerMasternodeTaskFactory');
+const initTaskFactory = require('./listr/tasks/platform/initTaskFactory');
+const startNodeTaskFactory = require('./listr/tasks/startNodeTaskFactory');
 
 async function createDIContainer() {
   const container = createAwilixContainer({

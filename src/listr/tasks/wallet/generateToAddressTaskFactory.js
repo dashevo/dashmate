@@ -2,7 +2,7 @@ const Listr = require('listr');
 
 const { Observable } = require('rxjs');
 
-const PRESETS = require('../presets');
+const PRESETS = require('../../../presets');
 
 /**
  *
@@ -24,21 +24,20 @@ function generateToAddressTaskFactory(
 ) {
   /**
    * @typedef {generateToAddressTask}
-   * @param {string} preset
    * @param {number} amount
    * @return {Listr}
    */
-  function generateToAddressTask(preset, amount) {
+  function generateToAddressTask(amount) {
     return new Listr([
       {
         title: 'Start Core',
         task: async (ctx) => {
-          ctx.coreService = await startCore(preset, { wallet: true });
+          ctx.coreService = await startCore(ctx.preset, { wallet: true });
         },
       },
       {
         title: 'Sync Core with network',
-        enabled: () => preset !== PRESETS.LOCAL,
+        enabled: (ctx) => ctx.preset !== PRESETS.LOCAL,
         task: async (ctx) => waitForCoreSync(ctx.coreService),
       },
       {
@@ -83,7 +82,7 @@ function generateToAddressTaskFactory(
       },
       {
         title: 'Mine 100 blocks to confirm',
-        enabled: () => preset === PRESETS.LOCAL,
+        enabled: (ctx) => ctx.preset === PRESETS.LOCAL,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await generateBlocks(
@@ -100,7 +99,7 @@ function generateToAddressTaskFactory(
       },
       {
         title: 'Wait 100 blocks to be mined',
-        enabled: () => preset === PRESETS.EVONET,
+        enabled: (ctx) => ctx.preset === PRESETS.EVONET,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await waitForBlocks(

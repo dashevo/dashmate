@@ -2,9 +2,9 @@ const Listr = require('listr');
 
 const { Observable } = require('rxjs');
 
-const PRESETS = require('../presets');
+const PRESETS = require('../../presets');
 
-const masternodeDashAmount = require('../core/masternodeDashAmount');
+const masternodeDashAmount = require('../../core/masternodeDashAmount');
 
 /**
  *
@@ -37,12 +37,12 @@ function registerMasternodeTaskFactory(
   /**
    * @typedef {registerMasternodeTask}
    */
-  function registerMasternodeTask(preset) {
+  function registerMasternodeTask() {
     return new Listr([
       {
         title: 'Start Core',
         task: async (ctx) => {
-          ctx.coreService = await startCore(preset, { wallet: true, addressindex: true });
+          ctx.coreService = await startCore(ctx.preset, { wallet: true, addressindex: true });
         },
       },
       {
@@ -51,7 +51,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Sync Core with network',
-        enabled: () => preset !== PRESETS.LOCAL,
+        enabled: (ctx) => ctx.preset !== PRESETS.LOCAL,
         task: async (ctx) => waitForCoreSync(ctx.coreService),
       },
       {
@@ -107,7 +107,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Wait for 15 confirmations',
-        enabled: () => preset !== PRESETS.LOCAL,
+        enabled: (ctx) => ctx.preset !== PRESETS.LOCAL,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await waitForConfirmations(
@@ -125,7 +125,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Mine 15 blocks to confirm',
-        enabled: () => preset === PRESETS.LOCAL,
+        enabled: (ctx) => ctx.preset === PRESETS.LOCAL,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await generateBlocks(
@@ -142,7 +142,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Reach 1000 blocks to enable DML',
-        enabled: () => preset === PRESETS.LOCAL,
+        enabled: (ctx) => ctx.preset === PRESETS.LOCAL,
         // eslint-disable-next-line consistent-return
         task: async (ctx) => {
           const { result: height } = await ctx.coreService.getRpcClient().getBlockCount();
@@ -182,7 +182,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Wait for 1 confirmation',
-        enabled: () => preset !== PRESETS.LOCAL,
+        enabled: (ctx) => ctx.preset !== PRESETS.LOCAL,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await waitForConfirmations(
@@ -200,7 +200,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Mine 1 block to confirm',
-        enabled: () => preset === PRESETS.LOCAL,
+        enabled: (ctx) => ctx.preset === PRESETS.LOCAL,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await generateBlocks(

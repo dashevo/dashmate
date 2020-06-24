@@ -7,7 +7,6 @@ const UpdateRendererWithOutput = require('../oclif/renderer/UpdateRendererWithOu
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
 
 const PRESETS = require('../presets');
-const wait = require('../util/wait');
 
 class SetupForLocalDevelopmentCommand extends BaseCommand {
   /**
@@ -42,10 +41,7 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
           {
             title: `Generate ${amount} dash to address`,
             task: () => (
-              generateToAddressTask(
-                preset,
-                amount,
-              )
+              generateToAddressTask(amount)
             ),
           },
           {
@@ -60,7 +56,7 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
           {
             title: 'Register masternode',
             task: () => (
-              registerMasternodeTask(preset)
+              registerMasternodeTask()
             ),
           },
           {
@@ -77,9 +73,6 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
             task: () => (
               initTask(
                 preset,
-                network,
-                driveImageBuildPath,
-                dapiImageBuildPath,
               )
             ),
           },
@@ -91,8 +84,12 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
 
     try {
       await tasks.run({
+        preset,
         externalIp,
         coreP2pPort,
+        network,
+        driveImageBuildPath,
+        dapiImageBuildPath,
       });
     } catch (e) {
       throw new MuteOneLineError(e);

@@ -37,7 +37,7 @@ class RegisterCommand extends BaseCommand {
       {
         title: `Register masternode using ${preset} preset`,
         task: () => (
-          registerMasternodeTask(preset)
+          registerMasternodeTask()
         ),
       },
     ],
@@ -45,6 +45,7 @@ class RegisterCommand extends BaseCommand {
 
     try {
       await tasks.run({
+        preset,
         fundingAddress,
         fundingPrivateKeyString,
         externalIp,

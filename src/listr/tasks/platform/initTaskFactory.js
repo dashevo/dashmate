@@ -2,7 +2,7 @@ const Listr = require('listr');
 
 const dpnsDocumentSchema = require('@dashevo/dpns-contract/src/schema/dpns-documents.json');
 
-const wait = require('../util/wait');
+const wait = require('../../../util/wait');
 
 /**
  *
@@ -19,15 +19,9 @@ function initTaskFactory(
   /**
    * @typedef {initTask}
    * @param {string} preset
-   * @param {string} network
-   * @param {string} driveImageBuildPath
-   * @param {string} dapiImageBuildPath
    */
   function initTask(
     preset,
-    network,
-    driveImageBuildPath,
-    dapiImageBuildPath,
   ) {
     return new Listr([
       {
@@ -38,8 +32,8 @@ function initTaskFactory(
             externalIp: ctx.externalIp,
             coreP2pPort: ctx.coreP2pPort,
             privateKey: ctx.operator.privateKey,
-            driveImageBuildPath,
-            dapiImageBuildPath,
+            driveImageBuildPath: ctx.driveImageBuildPath,
+            dapiImageBuildPath: ctx.dapiImageBuildPath,
           },
         ),
       },
@@ -51,18 +45,18 @@ function initTaskFactory(
 
           ctx.client = await createClientWithFundedWallet(
             preset,
-            network,
+            ctx.network,
             ctx.fundingPrivateKeyString,
           );
         },
       },
       {
-        title: 'Register DPNS top level identity',
+        title: 'Register DPNS identity',
         task: async (ctx, task) => {
           ctx.identity = await ctx.client.platform.identities.register(2);
 
           // eslint-disable-next-line no-param-reassign
-          task.output = `Top level identity: ${ctx.identity.getId()}`;
+          task.output = `DPNS identity: ${ctx.identity.getId()}`;
         },
       },
       {
@@ -78,11 +72,11 @@ function initTaskFactory(
           );
 
           // eslint-disable-next-line no-param-reassign
-          task.output = `Contract id: ${dataContract.getId()}`;
+          task.output = `DPNS contract ID: ${dataContract.getId()}`;
         },
       },
       {
-        title: 'Close SDK',
+        title: 'Disconnect SDK',
         task: async (ctx) => ctx.client.disconnect(),
       },
     ]);

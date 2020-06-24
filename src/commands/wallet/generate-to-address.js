@@ -24,10 +24,7 @@ class GenerateToAddressCommand extends BaseCommand {
       {
         title: `Generate ${amount} dash to address using ${preset} preset`,
         task: () => (
-          generateToAddressTask(
-            preset,
-            amount,
-          )
+          generateToAddressTask(amount)
         ),
       },
     ],
@@ -35,6 +32,7 @@ class GenerateToAddressCommand extends BaseCommand {
 
     try {
       await tasks.run({
+        preset,
         fundingAddress: address,
       });
     } catch (e) {
