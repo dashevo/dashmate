@@ -29,11 +29,11 @@ const sendToAddress = require('./core/wallet/sendToAddress');
 const registerMasternode = require('./core/wallet/registerMasternode');
 
 const createClientWithFundedWallet = require('./dash/createClientWithFundedWallet');
-const startNodeFactory = require('./dash/startNodeFactory');
 
 const generateToAddressTaskFactory = require('./tasks/generateToAddressTaskFactory');
 const registerMasternodeTaskFactory = require('./tasks/registerMasternodeTaskFactory');
 const initTaskFactory = require('./tasks/initTaskFactory');
+const startNodeTaskFactory = require('./tasks/startNodeTaskFactory');
 
 async function createDIContainer() {
   const container = createAwilixContainer({
@@ -85,7 +85,6 @@ async function createDIContainer() {
    */
   container.register({
     createClientWithFundedWallet: asValue(createClientWithFundedWallet),
-    startNode: asFunction(startNodeFactory),
   });
 
   /**
@@ -95,6 +94,7 @@ async function createDIContainer() {
     generateToAddressTask: asFunction(generateToAddressTaskFactory),
     registerMasternodeTask: asFunction(registerMasternodeTaskFactory),
     initTask: asFunction(initTaskFactory),
+    startNodeTask: asFunction(startNodeTaskFactory),
   });
 
   return container;

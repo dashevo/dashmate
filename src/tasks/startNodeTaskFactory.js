@@ -5,11 +5,11 @@ const dotenv = require('dotenv');
 /**
  *
  * @param {DockerCompose} dockerCompose
- * @return {startNode}
+ * @return {startNodeTask}
  */
-function startNodeFactory(dockerCompose) {
+function startNodeTaskFactory(dockerCompose) {
   /**
-   * @typedef {startNode}
+   * @typedef {startNodeTask}
    * @param {string} preset
    * @param {string} externalIp
    * @param {number} coreP2pPort
@@ -21,7 +21,7 @@ function startNodeFactory(dockerCompose) {
    * @param {string} [dapiImageBuildPath]
    * @return {Promise<void>}
    */
-  async function startNode(
+  async function startNodeTask(
     preset,
     externalIp,
     coreP2pPort,
@@ -81,7 +81,7 @@ function startNodeFactory(dockerCompose) {
     return dockerCompose.up(preset, envs);
   }
 
-  return startNode;
+  return startNodeTask;
 }
 
-module.exports = startNodeFactory;
+module.exports = startNodeTaskFactory;

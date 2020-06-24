@@ -15,7 +15,7 @@ class StartCommand extends BaseCommand {
    * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
-   * @param {startNode} startNode
+   * @param {startNodeTask} startNodeTask
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -33,12 +33,12 @@ class StartCommand extends BaseCommand {
       'dapi-image-build-path': dapiImageBuildPath,
     },
     dockerCompose,
-    startNode,
+    startNodeTask,
   ) {
     const tasks = new Listr([
       {
         title: `Start ${isFullNode ? 'full node' : 'masternode'} with ${preset} preset`,
-        task: async () => startNode(
+        task: async () => startNodeTask(
           preset,
           externalIp,
           coreP2pPort,

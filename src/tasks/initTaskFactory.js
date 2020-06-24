@@ -7,13 +7,13 @@ const wait = require('../util/wait');
 /**
  *
  * @param {DockerCompose} dockerCompose
- * @param {startNode} startNode
+ * @param {startNodeTask} startNodeTask
  * @param {createClientWithFundedWallet} createClientWithFundedWallet
  * @return {initTask}
  */
 function initTaskFactory(
   dockerCompose,
-  startNode,
+  startNodeTask,
   createClientWithFundedWallet,
 ) {
   /**
@@ -32,7 +32,7 @@ function initTaskFactory(
     return new Listr([
       {
         title: `Start masternode with ${preset} preset`,
-        task: async (ctx) => startNode(
+        task: async (ctx) => startNodeTask(
           preset,
           ctx.externalIp,
           ctx.coreP2pPort,
