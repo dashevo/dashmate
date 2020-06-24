@@ -29,7 +29,7 @@ const sendToAddress = require('./core/wallet/sendToAddress');
 const registerMasternode = require('./core/wallet/registerMasternode');
 
 const createClientWithFundedWallet = require('./dash/createClientWithFundedWallet');
-const startNodeFactory = require('./dash/startNodeFactory');
+const startNodeFactory = require('./startNodeFactory');
 
 async function createDIContainer() {
   const container = createAwilixContainer({

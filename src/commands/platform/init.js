@@ -46,14 +46,13 @@ class InitCommand extends BaseCommand {
             title: `Start masternode with ${preset} preset`,
             task: async () => startNode(
               preset,
-              externalIp,
-              coreP2pPort,
-              false,
-              operatorPrivateKey,
-              undefined,
-              undefined,
-              driveImageBuildPath,
-              dapiImageBuildPath,
+              {
+                externalIp,
+                coreP2pPort,
+                operatorPrivateKey,
+                driveImageBuildPath,
+                dapiImageBuildPath,
+              },
             ),
           },
           {
@@ -70,12 +69,12 @@ class InitCommand extends BaseCommand {
             },
           },
           {
-            title: 'Register DPNS top level identity',
+            title: 'Register DPNS identity',
             task: async (ctx, task) => {
-              ctx.identity = await ctx.client.platform.identities.register(2);
+              ctx.identity = await ctx.client.platform.identities.register(10000);
 
               // eslint-disable-next-line no-param-reassign
-              task.output = `Top level identity: ${ctx.identity.getId()}`;
+              task.output = `DPNS identity: ${ctx.identity.getId()}`;
             },
           },
           {
@@ -91,11 +90,11 @@ class InitCommand extends BaseCommand {
               );
 
               // eslint-disable-next-line no-param-reassign
-              task.output = `Contract id: ${dataContract.getId()}`;
+              task.output = `DPNS contract ID: ${dataContract.getId()}`;
             },
           },
           {
-            title: 'Close SDK',
+            title: 'Disconnect SDK',
             task: async (ctx) => ctx.client.disconnect(),
           },
         ])
@@ -118,7 +117,7 @@ class InitCommand extends BaseCommand {
 
 InitCommand.description = `Initialize platform
 ...
-Register DPNS Contract ID and Top Level Identity
+Register DPNS Contract and "dash" top-level domain
 `;
 
 InitCommand.args = [{

@@ -12,26 +12,29 @@ function startNodeFactory(dockerCompose) {
   /**
    * @typedef {startNode}
    * @param {string} preset
-   * @param {string} externalIp
-   * @param {number} coreP2pPort
-   * @param {boolean} isFullNode
-   * @param {string} [operatorPrivateKey]
-   * @param {string} [dpnsContractId]
-   * @param {string} [dpnsTopLevelIdentity]
-   * @param {string} [driveImageBuildPath]
-   * @param {string} [dapiImageBuildPath]
+   * @param {Object} options
+   * @param {string} options.externalIp
+   * @param {number} options.coreP2pPort
+   * @param {boolean} options.isFullNode
+   * @param {string} options.operatorPrivateKey
+   * @param {string} options.dpnsContractId
+   * @param {string} options.dpnsTopLevelIdentity
+   * @param {string} options.driveImageBuildPath
+   * @param {string} options.dapiImageBuildPath
    * @return {Promise<void>}
    */
   async function startNode(
     preset,
-    externalIp,
-    coreP2pPort,
-    isFullNode,
-    operatorPrivateKey = undefined,
-    dpnsContractId = undefined,
-    dpnsTopLevelIdentity = undefined,
-    driveImageBuildPath = undefined,
-    dapiImageBuildPath = undefined,
+    {
+      externalIp,
+      coreP2pPort,
+      isFullNode,
+      operatorPrivateKey = undefined,
+      dpnsContractId = undefined,
+      dpnsTopLevelIdentity = undefined,
+      driveImageBuildPath = undefined,
+      dapiImageBuildPath = undefined,
+    },
   ) {
     let CORE_MASTERNODE_BLS_PRIV_KEY;
 
