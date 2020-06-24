@@ -67,7 +67,7 @@ class InitCommand extends BaseCommand {
 
 InitCommand.description = `Initialize platform
 ...
-Register DPNS Contract ID and Top Level Identity
+Register DPNS Contract and "dash" top-level domain
 `;
 
 InitCommand.args = [{

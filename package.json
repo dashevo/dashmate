@@ -48,8 +48,9 @@
   },
   "homepage": "https://github.com/dashevo/mn-bootstrap#readme",
   "dependencies": {
+    "@dashevo/dashcore-lib": "~0.18.4",
     "@dashevo/dashd-rpc": "dashevo/dashd-rpc",
-    "@dashevo/dpns-contract": "^0.2.0-dev.4",
+    "@dashevo/dpns-contract": "~0.2.0-dev.4",
     "@oclif/command": "^1.5.19",
     "@oclif/config": "^1.15.1",
     "@oclif/plugin-help": "^2.2.3",
@@ -72,9 +73,6 @@
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",
     "globby": "^10.0.2"
-  },
-  "peerDependencies": {
-    "@dashevo/dashcore-lib": "^0.18.4"
   },
   "files": [
     "bin",
