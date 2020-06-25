@@ -1,10 +1,10 @@
 {
   "name": "@dashevo/mn-bootstrap",
-  "version": "0.13.0-dev.1",
+  "version": "0.13.4",
   "description": "Distribution package for Dash Masternode installation",
   "main": "src/index.js",
   "scripts": {
-    "lint": "eslint src/**",
+    "lint": "eslint .",
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint .",
     "prepack": "oclif-dev manifest && oclif-dev readme",
@@ -58,6 +58,7 @@
     "chalk": "^4.0.0",
     "docker-compose": "^0.23.3",
     "dockerode": "^3.2.0",
+    "dotenv": "^8.2.0",
     "hasbin": "^1.2.3",
     "listr": "^0.14.3",
     "node-graceful": "^3.0.0",
@@ -77,9 +78,9 @@
     "globby": "^10.0.2"
   },
   "files": [
-    "/bin",
-    "/oclif.manifest.json",
-    "/src"
+    "bin",
+    "oclif.manifest.json",
+    "src"
   ],
   "oclif": {
     "commands": "./src/commands",

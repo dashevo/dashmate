@@ -1,3 +1,78 @@
+## [0.13.4](https://github.com/dashevo/mn-bootstrap/compare/v0.13.3...v0.13.4) (2020-06-18)
+
+
+### Bug Fixes
+
+* tendermint throw fatal error on start in linux environment ([#76](https://github.com/dashevo/mn-bootstrap/issues/76))
+
+
+
+## [0.13.3](https://github.com/dashevo/mn-bootstrap/compare/v0.13.2...v0.13.3) (2020-06-18)
+
+
+### Bug Fixes
+
+* parsing docker container name on first start ([#75](https://github.com/dashevo/mn-bootstrap/issues/75))
+
+
+
+## [0.13.2](https://github.com/dashevo/mn-bootstrap/compare/v0.13.1...v0.13.2) (2020-06-16)
+
+
+### Bug Fixes
+
+* DAPI rate limits disabled for evonet for some reason ([#73](https://github.com/dashevo/mn-bootstrap/issues/73))
+
+
+
+## [0.13.1](https://github.com/dashevo/mn-bootstrap/compare/v0.12.6...v0.13.1) (2020-06-12)
+
+
+### Features
+
+* update Evonet configs ([fd0158a](https://github.com/dashevo/mn-bootstrap/commit/fd0158a45f1c624628fe7a2735124db1c9f20338))
+
+
+
+# [0.13.0](https://github.com/dashevo/mn-bootstrap/compare/v0.12.6...v0.13.0) (2020-06-09)
+
+
+### Bug Fixes
+
+* do not start stopped services on the docker deamon restart ([#55](https://github.com/dashevo/mn-bootstrap/issues/55))
+* switch to dashpay org for sentinel ([#62](https://github.com/dashevo/mn-bootstrap/issues/62))
+
+
+### Features
+
+* start/stop node commands ([#45](https://github.com/dashevo/mn-bootstrap/issues/45), [#48](https://github.com/dashevo/mn-bootstrap/issues/48))
+* data reset command ([#43](https://github.com/dashevo/mn-bootstrap/issues/43), [#60](https://github.com/dashevo/mn-bootstrap/issues/60))
+* masternode registration commands ([#30](https://github.com/dashevo/mn-bootstrap/issues/30), [#44](https://github.com/dashevo/mn-bootstrap/issues/44), [#54](https://github.com/dashevo/mn-bootstrap/issues/54), [#69](https://github.com/dashevo/mn-bootstrap/issues/69))
+* remove sleep from docker compose ([#57](https://github.com/dashevo/mn-bootstrap/issues/57))
+* allow to start full node ([#42](https://github.com/dashevo/mn-bootstrap/issues/42))
+* update configs and docker images ([#64](https://github.com/dashevo/mn-bootstrap/issues/42))
+
+
+### Documentation
+
+* update README.md to clarify install instructions ([#33](https://github.com/dashevo/mn-bootstrap/issues/33), [#65](https://github.com/dashevo/mn-bootstrap/issues/65))
+
+
+### BREAKING CHANGES
+
+* Dash Platform v0.12 data in incompatible with 0.13, so you need to reset data before you start the node
+
+
+
+# [0.12.6](https://github.com/dashevo/mn-bootstrap/compare/v0.12.5...v0.12.6) (2020-05-23)
+
+
+### Features
+
+* update Evonet configs ([#56](https://github.com/dashevo/mn-bootstrap/issues/56))
+
+
+
 # [0.12.5](https://github.com/dashevo/mn-bootstrap/compare/v0.12.4...v0.12.5) (2020-05-01)
 
 

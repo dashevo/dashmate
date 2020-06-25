@@ -50,7 +50,7 @@ class DockerCompose {
       throw new DockerComposeError(e);
     }
 
-    containerName = containerName.trim();
+    containerName = containerName.trim().split('\n').pop();
 
     this.startedContainers.addContainer(containerName);
     return this.docker.getContainer(containerName);
@@ -90,9 +90,17 @@ class DockerCompose {
    */
   async up(preset, envs = {}) {
     await this.throwErrorIfNotInstalled();
+    const options = this.getOptions(preset, envs);
+    if (!Array.isArray(options.commandOptions)) {
+      options.commandOptions = [];
+    }
+
+    if (!options.commandOptions.includes('--build')) {
+      options.commandOptions.push('--build');
+    }
 
     try {
-      await dockerCompose.upAll(this.getOptions(preset, envs));
+      await dockerCompose.upAll(options);
     } catch (e) {
       throw new DockerComposeError(e);
     }
@@ -211,6 +219,27 @@ class DockerCompose {
       await dockerCompose.down({
         ...this.getOptions(preset, env),
         commandOptions: ['-v'],
+      });
+    } catch (e) {
+      throw new DockerComposeError(e);
+    }
+  }
+
+  /**
+   * Pull docker compose
+   *
+   * @param {string} preset
+   * @return {Promise<void>}
+   */
+  async pull(preset) {
+    await this.throwErrorIfNotInstalled();
+
+    const env = this.getPlaceholderEmptyEnvOptions();
+
+    try {
+      await dockerCompose.pullAll({
+        ...this.getOptions(preset, env),
+        commandOptions: ['-q'],
       });
     } catch (e) {
       throw new DockerComposeError(e);
