@@ -59,8 +59,6 @@ class InitCommand extends BaseCommand {
       });
     } catch (e) {
       throw new MuteOneLineError(e);
-    } finally {
-      await dockerCompose.down(preset);
     }
   }
 }

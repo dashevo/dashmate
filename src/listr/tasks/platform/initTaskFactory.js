@@ -79,6 +79,10 @@ function initTaskFactory(
         title: 'Disconnect SDK',
         task: async (ctx) => ctx.client.disconnect(),
       },
+      {
+        title: `Stop masternode with ${preset} preset`,
+        task: async () => dockerCompose.stop(preset),
+      },
     ]);
   }
 
