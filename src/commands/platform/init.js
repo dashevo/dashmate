@@ -39,7 +39,7 @@ class InitCommand extends BaseCommand {
     const network = 'testnet';
 
     const tasks = new Listr([{
-      title: `Register DPNS Contract ID and Top Level Identity using ${preset} preset`,
+      title: `Initialize Platform for ${preset} preset`,
       task: () => (
         new Listr([
           {

@@ -15,12 +15,12 @@ function startNodeFactory(dockerCompose) {
    * @param {Object} options
    * @param {string} options.externalIp
    * @param {number} options.coreP2pPort
-   * @param {boolean} options.isFullNode
-   * @param {string} options.operatorPrivateKey
-   * @param {string} options.dpnsContractId
-   * @param {string} options.dpnsTopLevelIdentity
-   * @param {string} options.driveImageBuildPath
-   * @param {string} options.dapiImageBuildPath
+   * @param {boolean} [options.isFullNode]
+   * @param {string} [options.operatorPrivateKey]
+   * @param {string} [options.dpnsContractId]
+   * @param {string} [options.dpnsTopLevelIdentity]
+   * @param {string} [options.driveImageBuildPath]
+   * @param {string} [options.dapiImageBuildPath]
    * @return {Promise<void>}
    */
   async function startNode(
