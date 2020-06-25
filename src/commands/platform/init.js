@@ -97,6 +97,10 @@ class InitCommand extends BaseCommand {
             title: 'Disconnect SDK',
             task: async (ctx) => ctx.client.disconnect(),
           },
+          {
+            title: `Stop masternode with ${preset} preset`,
+            task: async () => dockerCompose.stop(preset),
+          },
         ])
       ),
     },
@@ -109,8 +113,6 @@ class InitCommand extends BaseCommand {
       });
     } catch (e) {
       throw new MuteOneLineError(e);
-    } finally {
-      await dockerCompose.down(preset);
     }
   }
 }
