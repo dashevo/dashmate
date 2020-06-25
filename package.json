@@ -56,7 +56,7 @@
     "@oclif/plugin-help": "^2.2.3",
     "awilix": "^4.2.6",
     "bls-signatures": "^0.1.9",
-    "dash": "^3.13.3",
+    "dash": "dashevo/DashJS#feat/dpns-methods",
     "docker-compose": "^0.23.3",
     "dockerode": "^3.2.0",
     "dotenv": "^8.2.0",
