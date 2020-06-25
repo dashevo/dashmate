@@ -71,7 +71,7 @@ class InitCommand extends BaseCommand {
           {
             title: 'Register DPNS identity',
             task: async (ctx, task) => {
-              ctx.identity = await ctx.client.platform.identities.register(10000);
+              ctx.identity = await ctx.client.platform.identities.register(5);
 
               // eslint-disable-next-line no-param-reassign
               task.output = `DPNS identity: ${ctx.identity.getId()}`;
@@ -80,17 +80,27 @@ class InitCommand extends BaseCommand {
           {
             title: 'Register DPNS contract',
             task: async (ctx, task) => {
-              const dataContract = await ctx.client.platform.contracts.create(
+              ctx.dataContract = await ctx.client.platform.contracts.create(
                 dpnsDocumentSchema, ctx.identity,
               );
 
               await ctx.client.platform.contracts.broadcast(
-                dataContract,
+                ctx.dataContract,
                 ctx.identity,
               );
 
               // eslint-disable-next-line no-param-reassign
-              task.output = `DPNS contract ID: ${dataContract.getId()}`;
+              task.output = `DPNS contract ID: ${ctx.dataContract.getId()}`;
+            },
+          },
+          {
+            title: 'Register top level domain "dash"',
+            task: async (ctx) => {
+              ctx.client.apps.dpns = {
+                contractId: ctx.dataContract.getId(),
+              };
+
+              await ctx.client.platform.names.register('dash', ctx.identity);
             },
           },
           {
