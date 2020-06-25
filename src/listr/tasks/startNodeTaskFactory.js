@@ -56,8 +56,6 @@ function startNodeTaskFactory(dockerCompose) {
           CORE_MASTERNODE_BLS_PRIV_KEY,
           CORE_P2P_PORT: coreP2pPort,
           CORE_EXTERNAL_IP: externalIp,
-          DRIVE_IMAGE_BUILD_PATH: driveImageBuildPath,
-          DAPI_IMAGE_BUILD_PATH: dapiImageBuildPath,
         };
 
         if (dpnsContractId) {
@@ -79,10 +77,12 @@ function startNodeTaskFactory(dockerCompose) {
 
           if (driveImageBuildPath) {
             composeFile = `${composeFile}:docker-compose.platform.build-drive.yml`;
+            envs.DRIVE_IMAGE_BUILD_PATH = driveImageBuildPath;
           }
 
           if (dapiImageBuildPath) {
             composeFile = `${composeFile}:docker-compose.platform.build-dapi.yml`;
+            envs.DAPI_IMAGE_BUILD_PATH = dapiImageBuildPath;
           }
 
           envs.COMPOSE_FILE = composeFile;

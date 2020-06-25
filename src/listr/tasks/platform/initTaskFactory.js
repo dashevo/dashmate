@@ -31,7 +31,7 @@ function initTaskFactory(
           {
             externalIp: ctx.externalIp,
             coreP2pPort: ctx.coreP2pPort,
-            privateKey: ctx.operator.privateKey,
+            operatorPrivateKey: ctx.operator.privateKey,
             driveImageBuildPath: ctx.driveImageBuildPath,
             dapiImageBuildPath: ctx.dapiImageBuildPath,
           },
