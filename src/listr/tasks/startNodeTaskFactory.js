@@ -4,8 +4,6 @@ const fs = require('fs').promises;
 const path = require('path');
 const dotenv = require('dotenv');
 
-const UpdateRendererWithOutput = require('../../oclif/renderer/UpdateRendererWithOutput');
-
 /**
  *
  * @param {DockerCompose} dockerCompose
@@ -90,8 +88,7 @@ function startNodeTaskFactory(dockerCompose) {
 
         await dockerCompose.up(preset, envs);
       },
-    }],
-    { collapse: false, renderer: UpdateRendererWithOutput });
+    }]);
   }
 
   return startNodeTask;

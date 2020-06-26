@@ -1,6 +1,10 @@
+const Listr = require('listr');
+
 const { flags: flagTypes } = require('@oclif/command');
 
 const BaseCommand = require('../oclif/command/BaseCommand');
+
+const UpdateRendererWithOutput = require('../oclif/renderer/UpdateRendererWithOutput');
 
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
 
@@ -22,7 +26,7 @@ class StartCommand extends BaseCommand {
     },
     {
       'full-node': isFullNode,
-      'update': isUpdate,
+      update: isUpdate,
       'operator-private-key': operatorPrivateKey,
       'dpns-contract-id': dpnsContractId,
       'dpns-top-level-identity': dpnsTopLevelIdentity,
@@ -32,19 +36,30 @@ class StartCommand extends BaseCommand {
     dockerCompose,
     startNodeTask,
   ) {
-    const tasks = startNodeTask(
-      preset,
+    const tasks = new Listr([
       {
-        externalIp,
-        coreP2pPort,
-        isFullNode,
-        operatorPrivateKey,
-        dpnsContractId,
-        dpnsTopLevelIdentity,
-        driveImageBuildPath,
-        dapiImageBuildPath,
+        title: 'Download updated services',
+        enabled: () => isUpdate === true,
+        task: async () => dockerCompose.pull(preset),
       },
-    );
+      {
+        title: `Start ${isFullNode ? 'full node' : 'masternode'} with ${preset} preset`,
+        task: async () => startNodeTask(
+          preset,
+          {
+            externalIp,
+            coreP2pPort,
+            isFullNode,
+            operatorPrivateKey,
+            dpnsContractId,
+            dpnsTopLevelIdentity,
+            driveImageBuildPath,
+            dapiImageBuildPath,
+          },
+        ),
+      },
+    ],
+    { collapse: false, renderer: UpdateRendererWithOutput });
 
     try {
       await tasks.run({
@@ -78,7 +93,7 @@ StartCommand.args = [{
 
 StartCommand.flags = {
   'full-node': flagTypes.boolean({ char: 'f', description: 'start as full node', default: false }),
-  'update': flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
+  update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
   'operator-private-key': flagTypes.string({ char: 'p', description: 'operator private key', default: null }),
   'dpns-contract-id': flagTypes.string({ description: 'DPNS contract ID', default: null }),
   'dpns-top-level-identity': flagTypes.string({ description: 'DPNS top level identity', default: null }),
