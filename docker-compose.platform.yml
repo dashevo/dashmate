@@ -121,12 +121,16 @@ services:
       - dapi_tx_filter_stream
       - dapi_envoy
     ports:
+      - 443:443 # JSON RPC and gRPC Web
       - 3000:80 # JSON RPC and gRPC Web
+      - 1443:1443 # gRPC Native
       - 3010:50051 # gRPC Native
     volumes:
       - ./configs/${PRESET:?err}/dapi/nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./configs/${PRESET:?err}/dapi/nginx/grpc.conf:/etc/nginx/conf.d/grpc.conf
       - ./configs/${PRESET:?err}/dapi/nginx/errors.grpc_conf:/etc/nginx/conf.d/errors.grpc_conf
+      - ./configs/${PRESET:?err}/dapi/nginx/bundle.crt:/etc/ssl/bundle.crt
+      - ./configs/${PRESET:?err}/dapi/nginx/private.key:/etc/ssl/private.key
 
 volumes:
   drive_mongodb:
