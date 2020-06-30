@@ -39,8 +39,8 @@ function initTaskFactory(
       },
       {
         title: 'Initialize SDK',
-        task: async (ctx) => {
-          // wait 5 seconds to ensure everything were initialized
+        task: async (ctx, task) => {
+          // wait 5 seconds to ensure everything was initialized
           await wait(5000);
 
           ctx.client = await createClientWithFundedWallet(
@@ -48,6 +48,9 @@ function initTaskFactory(
             ctx.network,
             ctx.fundingPrivateKeyString,
           );
+
+          // eslint-disable-next-line no-param-reassign
+          task.output = `Mnemonic: ${ctx.client.wallet.exportWallet()}`;
         },
       },
       {
