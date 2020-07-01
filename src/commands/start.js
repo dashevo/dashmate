@@ -36,22 +36,27 @@ class StartCommand extends BaseCommand {
     dockerCompose,
     startNodeTask,
   ) {
-    const tasks = new Listr([
-      startNodeTask(
-        preset,
-        {
-          externalIp,
-          coreP2pPort,
-          isFullNode,
-          operatorPrivateKey,
-          dpnsContractId,
-          dpnsTopLevelIdentity,
-          driveImageBuildPath,
-          dapiImageBuildPath,
-        },
-      ),
-    ],
-    { collapse: false, renderer: UpdateRendererWithOutput });
+    const tasks = new Listr(
+      [
+        startNodeTask(
+          preset,
+          {
+            externalIp,
+            coreP2pPort,
+            isFullNode,
+            operatorPrivateKey,
+            dpnsContractId,
+            dpnsTopLevelIdentity,
+            driveImageBuildPath,
+            dapiImageBuildPath,
+          },
+        ),
+      ],
+      {
+        collapse: false,
+        renderer: UpdateRendererWithOutput,
+      }
+    );
 
     try {
       await tasks.run({
