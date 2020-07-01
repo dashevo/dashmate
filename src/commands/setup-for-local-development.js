@@ -34,18 +34,24 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
     const network = 'local';
     const amount = 2000;
 
-    const tasks = new Listr([{
-      title: 'Setup masternode for local development',
-      task: () => (
-        new Listr([
-          generateToAddressTask(preset, amount),
-          registerMasternodeTask(preset),
-          initTask(preset),
-        ])
-      ),
-    },
-    ],
-    { collapse: false, renderer: UpdateRendererWithOutput });
+    const tasks = new Listr(
+      [
+        {
+          title: 'Setup masternode for local development',
+          task: () => (
+            new Listr([
+              generateToAddressTask(preset, amount),
+              registerMasternodeTask(preset),
+              initTask(preset),
+            ])
+          ),
+        },
+      ],
+      {
+        collapse: false,
+        renderer: UpdateRendererWithOutput
+      },
+    );
 
     try {
       await tasks.run({
@@ -57,9 +63,6 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
       });
     } catch (e) {
       throw new MuteOneLineError(e);
-    } finally {
-      await dockerCompose.down(preset);
-    }
   }
 }
 
