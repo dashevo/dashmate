@@ -215,6 +215,15 @@ function registerMasternodeTaskFactory(
           })
         ),
       },
+      {
+        title: 'Wait core to stop',
+        task: async () => {
+          const stopAllContainers = this.container.resolve('stopAllContainers');
+          const startedContainers = this.container.resolve('startedContainers');
+
+          await stopAllContainers(startedContainers.getContainers());
+        },
+      },
     ]);
   }
 

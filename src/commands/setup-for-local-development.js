@@ -45,28 +45,10 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
             ),
           },
           {
-            title: 'Wait core to stop',
-            task: async () => {
-              const stopAllContainers = this.container.resolve('stopAllContainers');
-              const startedContainers = this.container.resolve('startedContainers');
-
-              await stopAllContainers(startedContainers.getContainers());
-            },
-          },
-          {
             title: 'Register masternode',
             task: () => (
               registerMasternodeTask()
             ),
-          },
-          {
-            title: 'Wait core to stop',
-            task: async () => {
-              const stopAllContainers = this.container.resolve('stopAllContainers');
-              const startedContainers = this.container.resolve('startedContainers');
-
-              await stopAllContainers(startedContainers.getContainers());
-            },
           },
           {
             title: 'Initialize platform',
