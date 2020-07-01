@@ -31,33 +31,16 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
     dockerCompose,
   ) {
     const preset = PRESETS.LOCAL;
-    const network = 'testnet';
+    const network = 'local';
     const amount = 2000;
 
     const tasks = new Listr([{
       title: 'Setup masternode for local development',
       task: () => (
         new Listr([
-          {
-            title: `Generate ${amount} dash to address`,
-            task: () => (
-              generateToAddressTask(amount)
-            ),
-          },
-          {
-            title: 'Register masternode',
-            task: () => (
-              registerMasternodeTask()
-            ),
-          },
-          {
-            title: 'Initialize platform',
-            task: () => (
-              initTask(
-                preset,
-              )
-            ),
-          },
+          generateToAddressTask(preset, amount),
+          registerMasternodeTask(preset),
+          initTask(preset),
         ])
       ),
     },
@@ -66,7 +49,6 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
 
     try {
       await tasks.run({
-        preset,
         externalIp,
         coreP2pPort,
         network,
@@ -83,7 +65,7 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
 
 SetupForLocalDevelopmentCommand.description = `Setup for development
 ...
-Setup masternode for local development
+Populate node with data required for local development
 `;
 
 SetupForLocalDevelopmentCommand.args = [{

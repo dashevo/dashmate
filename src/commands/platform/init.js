@@ -34,16 +34,8 @@ class InitCommand extends BaseCommand {
   ) {
     const network = 'testnet';
 
-    const tasks = new Listr([{
-      title: `Initialize Platform for ${preset} preset`,
-      task: () => (
-        initTask(
-          preset,
-        )
-      ),
-    },
-    ],
-    { collapse: false, renderer: UpdateRendererWithOutput });
+    const tasks = new Listr([initTask(preset)],
+      { collapse: false, renderer: UpdateRendererWithOutput });
 
     try {
       await tasks.run({

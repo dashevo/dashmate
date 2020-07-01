@@ -37,32 +37,25 @@ class StartCommand extends BaseCommand {
     startNodeTask,
   ) {
     const tasks = new Listr([
-      {
-        title: 'Download updated services',
-        enabled: () => isUpdate === true,
-        task: async () => dockerCompose.pull(preset),
-      },
-      {
-        title: `Start ${isFullNode ? 'full node' : 'masternode'} with ${preset} preset`,
-        task: async () => startNodeTask(
-          preset,
-          {
-            externalIp,
-            coreP2pPort,
-            isFullNode,
-            operatorPrivateKey,
-            dpnsContractId,
-            dpnsTopLevelIdentity,
-            driveImageBuildPath,
-            dapiImageBuildPath,
-          },
-        ),
-      },
+      startNodeTask(
+        preset,
+        {
+          externalIp,
+          coreP2pPort,
+          isFullNode,
+          operatorPrivateKey,
+          dpnsContractId,
+          dpnsTopLevelIdentity,
+          driveImageBuildPath,
+          dapiImageBuildPath,
+        },
+      ),
     ],
     { collapse: false, renderer: UpdateRendererWithOutput });
 
     try {
       await tasks.run({
+        isUpdate,
         preset,
       });
     } catch (e) {

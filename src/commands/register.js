@@ -34,16 +34,12 @@ class RegisterCommand extends BaseCommand {
     const fundingAddress = fundingPrivateKey.toAddress(network).toString();
 
     const tasks = new Listr([
-      {
-        title: `Register masternode using ${preset} preset`,
-        task: () => registerMasternodeTask(),
-      },
+      registerMasternodeTask(preset),
     ],
     { collapse: false, renderer: UpdateRendererWithOutput });
 
     try {
       await tasks.run({
-        preset,
         fundingAddress,
         fundingPrivateKeyString,
         externalIp,
