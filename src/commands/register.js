@@ -36,9 +36,7 @@ class RegisterCommand extends BaseCommand {
     const tasks = new Listr([
       {
         title: `Register masternode using ${preset} preset`,
-        task: () => (
-          registerMasternodeTask()
-        ),
+        task: () => registerMasternodeTask(),
       },
     ],
     { collapse: false, renderer: UpdateRendererWithOutput });
