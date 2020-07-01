@@ -24,7 +24,7 @@ class RegisterCommand extends BaseCommand {
     flags,
     registerMasternodeTask,
   ) {
-    const network = 'testnet';
+    const network = preset;
 
     const fundingPrivateKey = new PrivateKey(
       fundingPrivateKeyString,
@@ -33,10 +33,15 @@ class RegisterCommand extends BaseCommand {
 
     const fundingAddress = fundingPrivateKey.toAddress(network).toString();
 
-    const tasks = new Listr([
-      registerMasternodeTask(preset),
-    ],
-    { collapse: false, renderer: UpdateRendererWithOutput });
+    const tasks = new Listr(
+      [
+        registerMasternodeTask(preset),
+      ],
+      {
+        collapse: false,
+        renderer: UpdateRendererWithOutput,
+      },
+    );
 
     try {
       await tasks.run({
