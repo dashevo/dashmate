@@ -32,10 +32,17 @@ class InitCommand extends BaseCommand {
     dockerCompose,
     initTask,
   ) {
-    const network = 'testnet';
+    const network = 'local';
 
-    const tasks = new Listr([initTask(preset)],
-      { collapse: false, renderer: UpdateRendererWithOutput });
+    const tasks = new Listr(
+      [
+        initTask(preset),
+      ],
+      {
+        collapse: false,
+        renderer: UpdateRendererWithOutput,
+      },
+    );
 
     try {
       await tasks.run({
