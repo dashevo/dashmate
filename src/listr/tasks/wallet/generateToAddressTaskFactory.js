@@ -118,7 +118,7 @@ function generateToAddressTaskFactory(
           ),
         },
         {
-          title: 'Wait core to stop',
+          title: 'Stop Core',
           task: async (ctx) => ctx.coreService.stop(),
         },
       ]),
