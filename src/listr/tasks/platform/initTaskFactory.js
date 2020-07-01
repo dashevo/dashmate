@@ -96,7 +96,7 @@ function initTaskFactory(
           task: async (ctx) => ctx.client.disconnect(),
         },
         {
-          title: `Stop masternode with ${preset} preset`,
+          title: `Stop node`,
           task: async () => dockerCompose.stop(preset),
         },
       ]),
