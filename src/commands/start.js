@@ -38,24 +38,27 @@ class StartCommand extends BaseCommand {
   ) {
     const tasks = new Listr(
       [
-        startNodeTask(
-          preset,
-          {
-            externalIp,
-            coreP2pPort,
-            isFullNode,
-            operatorPrivateKey,
-            dpnsContractId,
-            dpnsTopLevelIdentity,
-            driveImageBuildPath,
-            dapiImageBuildPath,
-          },
-        ),
+        {
+          title: `Start ${isFullNode ? 'full node' : 'masternode'} with ${preset} preset`,
+          task: () => startNodeTask(
+            preset,
+            {
+              externalIp,
+              coreP2pPort,
+              isFullNode,
+              operatorPrivateKey,
+              dpnsContractId,
+              dpnsTopLevelIdentity,
+              driveImageBuildPath,
+              dapiImageBuildPath,
+            },
+          ),
+        },
       ],
       {
         collapse: false,
         renderer: UpdateRendererWithOutput,
-      }
+      },
     );
 
     try {

@@ -2,6 +2,8 @@ const Listr = require('listr');
 
 const dpnsDocumentSchema = require('@dashevo/dpns-contract/src/schema/dpns-documents.json');
 
+const UpdateRendererWithOutput = require('../../../oclif/renderer/UpdateRendererWithOutput');
+
 const wait = require('../../../util/wait');
 
 /**
@@ -19,88 +21,89 @@ function initTaskFactory(
   /**
    * @typedef {initTask}
    * @param {string} preset
-   * @return {Object}
+   * @return {Listr}
    */
   function initTask(
     preset,
   ) {
-    return {
-      title: `Initialize Platform for ${preset} preset`,
-      task: new Listr([
-        {
-          title: `Start masternode with ${preset} preset`,
-          task: async (ctx) => startNodeTask(
+    return new Listr([
+      {
+        title: `Start masternode with ${preset} preset`,
+        task: async (ctx) => startNodeTask(
+          preset,
+          {
+            externalIp: ctx.externalIp,
+            coreP2pPort: ctx.coreP2pPort,
+            operatorPrivateKey: ctx.operator.privateKey,
+            driveImageBuildPath: ctx.driveImageBuildPath,
+            dapiImageBuildPath: ctx.dapiImageBuildPath,
+          },
+        ),
+      },
+      {
+        title: 'Initialize SDK',
+        task: async (ctx, task) => {
+          // wait 5 seconds to ensure everything was initialized
+          await wait(5000);
+
+          ctx.client = await createClientWithFundedWallet(
             preset,
-            {
-              externalIp: ctx.externalIp,
-              coreP2pPort: ctx.coreP2pPort,
-              operatorPrivateKey: ctx.operator.privateKey,
-              driveImageBuildPath: ctx.driveImageBuildPath,
-              dapiImageBuildPath: ctx.dapiImageBuildPath,
-            },
-          ),
-        },
-        {
-          title: 'Initialize SDK',
-          task: async (ctx, task) => {
-            // wait 5 seconds to ensure everything was initialized
-            await wait(5000);
+            ctx.network,
+            ctx.fundingPrivateKeyString,
+          );
 
-            ctx.client = await createClientWithFundedWallet(
-              preset,
-              ctx.network,
-              ctx.fundingPrivateKeyString,
-            );
+          // eslint-disable-next-line no-param-reassign
+          task.output = `HD private key: ${ctx.client.wallet.exportWallet('HDPrivateKey')}`;
+        },
+      },
+      {
+        title: 'Register DPNS identity',
+        task: async (ctx, task) => {
+          ctx.identity = await ctx.client.platform.identities.register(5);
 
-            // eslint-disable-next-line no-param-reassign
-            task.output = `Mnemonic: ${ctx.client.wallet.exportWallet()}`;
-          },
+          // eslint-disable-next-line no-param-reassign
+          task.output = `DPNS identity: ${ctx.identity.getId()}`;
         },
-        {
-          title: 'Register DPNS identity',
-          task: async (ctx, task) => {
-            ctx.identity = await ctx.client.platform.identities.register(5);
+      },
+      {
+        title: 'Register DPNS contract',
+        task: async (ctx, task) => {
+          ctx.dataContract = await ctx.client.platform.contracts.create(
+            dpnsDocumentSchema, ctx.identity,
+          );
 
-            // eslint-disable-next-line no-param-reassign
-            task.output = `DPNS identity: ${ctx.identity.getId()}`;
-          },
-        },
-        {
-          title: 'Register DPNS contract',
-          task: async (ctx, task) => {
-            ctx.dataContract = await ctx.client.platform.contracts.create(
-              dpnsDocumentSchema, ctx.identity,
-            );
+          await ctx.client.platform.contracts.broadcast(
+            ctx.dataContract,
+            ctx.identity,
+          );
 
-            await ctx.client.platform.contracts.broadcast(
-              ctx.dataContract,
-              ctx.identity,
-            );
+          // eslint-disable-next-line no-param-reassign
+          task.output = `DPNS contract ID: ${ctx.dataContract.getId()}`;
+        },
+      },
+      {
+        title: 'Register top level domain "dash"',
+        task: async (ctx) => {
+          ctx.client.apps.dpns = {
+            contractId: ctx.dataContract.getId(),
+          };
 
-            // eslint-disable-next-line no-param-reassign
-            task.output = `DPNS contract ID: ${ctx.dataContract.getId()}`;
-          },
+          await ctx.client.platform.names.register('dash', ctx.identity);
         },
-        {
-          title: 'Register top level domain "dash"',
-          task: async (ctx) => {
-            ctx.client.apps.dpns = {
-              contractId: ctx.dataContract.getId(),
-            };
-
-            await ctx.client.platform.names.register('dash', ctx.identity);
-          },
-        },
-        {
-          title: 'Disconnect SDK',
-          task: async (ctx) => ctx.client.disconnect(),
-        },
-        {
-          title: `Stop node`,
-          task: async () => dockerCompose.stop(preset),
-        },
-      ]),
-    };
+      },
+      {
+        title: 'Disconnect SDK',
+        task: async (ctx) => ctx.client.disconnect(),
+      },
+      {
+        title: 'Stop node',
+        task: async () => dockerCompose.stop(preset),
+      },
+    ],
+    {
+      collapse: false,
+      renderer: UpdateRendererWithOutput,
+    });
   }
 
   return initTask;
