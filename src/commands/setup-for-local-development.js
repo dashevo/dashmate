@@ -49,7 +49,11 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
               title: 'Initialize Platform',
               task: () => initTask(preset),
             },
-          ]),
+          ],
+          {
+            collapse: false,
+            renderer: UpdateRendererWithOutput,
+          }),
         },
       ],
       {
