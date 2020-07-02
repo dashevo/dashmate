@@ -23,9 +23,7 @@ class GenerateToAddressCommand extends BaseCommand {
     const tasks = new Listr([
       {
         title: `Generate ${amount} dash to address using ${preset} preset`,
-        task: () => (
-          generateToAddressTask(preset, amount)
-        ),
+        task: () => generateToAddressTask(preset, amount),
       },
     ],
     {

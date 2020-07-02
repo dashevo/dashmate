@@ -36,11 +36,7 @@ class InitCommand extends BaseCommand {
 
     const tasks = new Listr([{
       title: `Initialize Platform for ${preset} preset`,
-      task: () => (
-        initTask(
-          preset,
-        )
-      ),
+      task: () => initTask(preset),
     },
     ],
     {
