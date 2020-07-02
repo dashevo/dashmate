@@ -168,7 +168,7 @@ $ mn reset evonet
 ### Development
 
 When developing on a standalone node (the `local` preset), `setup-for-local-development` can be used
-to generate some dash, register masternode and populate node with data required for local development.
+to generate some dash, register a masternode and populate the node with the data required for local development.
 
 To allow developers quickly test changes to DAPI and Drive, a local path for DAPI or Drive may be specified
 via the `--drive-image-build-path` and `--dapi-image-build-path` options of the `start` command.
