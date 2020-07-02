@@ -51,6 +51,7 @@ class StartCommand extends BaseCommand {
               dpnsTopLevelIdentity,
               driveImageBuildPath,
               dapiImageBuildPath,
+              isUpdate,
             },
           ),
         },
@@ -62,10 +63,7 @@ class StartCommand extends BaseCommand {
     );
 
     try {
-      await tasks.run({
-        isUpdate,
-        preset,
-      });
+      await tasks.run();
     } catch (e) {
       throw new MuteOneLineError(e);
     }

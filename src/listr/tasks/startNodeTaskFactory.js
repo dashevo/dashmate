@@ -26,6 +26,7 @@ function startNodeTaskFactory(dockerCompose) {
    * @param {string} [options.dpnsTopLevelIdentity]
    * @param {string} [options.driveImageBuildPath]
    * @param {string} [options.dapiImageBuildPath]
+   * @param {boolean} [options.isUpdate]
    * @return {Object}
    */
   function startNodeTask(
@@ -39,12 +40,13 @@ function startNodeTaskFactory(dockerCompose) {
       dpnsTopLevelIdentity = undefined,
       driveImageBuildPath = undefined,
       dapiImageBuildPath = undefined,
+      isUpdate = undefined,
     },
   ) {
     return new Listr([
       {
         title: 'Download updated services',
-        enabled: (ctx) => ctx.isUpdate === true,
+        enabled: () => isUpdate === true,
         task: async () => dockerCompose.pull(preset),
       },
       {
