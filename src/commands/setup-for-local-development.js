@@ -16,7 +16,6 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
    * @param {generateToAddressTask} generateToAddressTask
    * @param {registerMasternodeTask} registerMasternodeTask
    * @param {initTask} initTask
-   * @param {DockerCompose} dockerCompose
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -75,7 +74,7 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
 
 SetupForLocalDevelopmentCommand.description = `Setup for development
 ...
-Populate node with data required for local development
+Generate some dash, register masternode and populate node with data required for local development
 `;
 
 SetupForLocalDevelopmentCommand.args = [{
