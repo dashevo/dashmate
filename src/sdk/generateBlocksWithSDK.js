@@ -28,8 +28,6 @@ async function generateBlocksWithSDK(
       address,
     );
 
-    console.log(blockHashes);
-
     generatedBlocks += blockHashes.length;
 
     if (blockHashes.length > 0) {
