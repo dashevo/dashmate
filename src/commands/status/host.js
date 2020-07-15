@@ -11,7 +11,9 @@ class HostStatusCommand extends BaseCommand {
    * @return {Promise<void>}
    */
   async runWithDependencies() {
-    const rows = [];
+    const rows = [
+      ['Key', 'Value'],
+    ];
 
     rows.push(['Hostname', os.hostname()]);
     rows.push(['Uptime', prettyMs(os.uptime() * 1000)]);

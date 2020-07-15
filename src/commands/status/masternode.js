@@ -18,7 +18,9 @@ class MasternodeStatusCommand extends BaseCommand {
     flags,
     dockerCompose,
   ) {
-    const rows = [];
+    const rows = [
+      ['Key', 'Value'],
+    ];
 
     // Version
     const versionOutput = await dockerCompose.execCommand(
