@@ -11,9 +11,7 @@ class HostStatusCommand extends BaseCommand {
    * @return {Promise<void>}
    */
   async runWithDependencies() {
-    const rows = [
-      ['Key', 'Value'],
-    ];
+    const rows = [];
 
     rows.push(['Hostname', os.hostname()]);
     rows.push(['Uptime', prettyMs(os.uptime() * 1000)]);
@@ -25,9 +23,7 @@ class HostStatusCommand extends BaseCommand {
     rows.push(['CPUs', os.cpus().length]);
     rows.push(['IP', await publicIp.v4()]);
 
-    const output = table(rows, {
-      drawHorizontalLine: (index, size) => index === 0 || index === 1 || index === size,
-    });
+    const output = table(rows, { singleLine: true });
 
     // eslint-disable-next-line no-console
     console.log(output);
