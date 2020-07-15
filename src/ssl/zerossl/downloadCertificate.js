@@ -1,5 +1,11 @@
 var axios = require('axios');
 
+/**
+ * Download the certificate specified by id
+ * 
+ * @param {string} id 
+ * @param {string} apiKey 
+ */
 function downloadCertificate(id, apiKey) {
     var config = {
         method: 'get',

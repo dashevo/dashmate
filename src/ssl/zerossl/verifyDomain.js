@@ -1,6 +1,12 @@
 var axios = require('axios');
 var qs = require('qs');
 
+/**
+ * Verify the domain/ip specified by certificate id
+ * 
+ * @param {string} id 
+ * @param {string} apiKey 
+ */
 function verifyDomain(id,apiKey) {
     var data = qs.stringify({
         'validation_method': 'HTTP_CSR_HASH' 
