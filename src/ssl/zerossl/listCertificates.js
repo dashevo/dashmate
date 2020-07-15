@@ -1,5 +1,10 @@
 var axios = require('axios');
 
+/**
+ * List ZeroSSL certificates
+ * 
+ * @param {string} apiKey 
+ */
 function listCertificates(apiKey) {
   var config = {
     method: 'get',

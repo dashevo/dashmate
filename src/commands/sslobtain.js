@@ -1,14 +1,10 @@
 const Listr = require('listr');
 
-const { flags: flagTypes } = require('@oclif/command');
-
 const BaseCommand = require('../oclif/command/BaseCommand');
-
 const UpdateRendererWithOutput = require('../oclif/renderer/UpdateRendererWithOutput');
-
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
 
-class SSLRenewCommand extends BaseCommand {
+class SSLObtainCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
@@ -18,13 +14,21 @@ class SSLRenewCommand extends BaseCommand {
     {
       'external-ip': externalIp,
       'zerossl-apikey': zerosslAPIKey,
-    },    
+    },
+    createCertificate,    
   ) {
     const tasks = new Listr([
       {
         title: `Obtain ZeroSSL cert for ip ${externalIp}`,
         task: async () => {
-          
+          new Listr([
+            {
+              title: 'Create Certificate',
+              task: async (ctx) => {
+                await createCertificate(zerosslAPIKey, externalIp);
+              },
+            },
+          ])        
         },
       },
     ],
@@ -38,12 +42,12 @@ class SSLRenewCommand extends BaseCommand {
   }
 }
 
-SSLRenewCommand.description = `Renew SSL Cert
+SSLObtainCommand.description = `Obtain SSL Cert
 ...
-Renew SSL Cert using ZeroSLL API Key
+Obtain SSL Cert using ZeroSLL API Key
 `;
 
-SSLRenewCommand.args = [{
+SSLObtainCommand.args = [{
   name: 'external-ip',
   required: true,
   description: 'masternode external IP',
@@ -53,4 +57,4 @@ SSLRenewCommand.args = [{
   description: 'ZeroSSL API Key - https://app.zerossl.com/developer',
 }];
 
-module.exports = SSLRenewCommand;
+module.exports = SSLObtainCommand;

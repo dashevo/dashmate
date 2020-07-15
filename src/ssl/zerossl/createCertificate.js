@@ -1,7 +1,14 @@
 var axios = require('axios');
 var qs = require('qs');
 
-function createCertificate(apiKey, domain) {
+/**
+ * Create a ZeroSSL Certificate
+ * 
+ * @typedef {createNewAddress}
+ * @param {string} apiKey 
+ * @param {string} domain 
+ */
+async function createCertificate(apiKey, domain) {
     var data = qs.stringify({
         'certificate_domains': domain,
         'certificate_validity_days': '90',
