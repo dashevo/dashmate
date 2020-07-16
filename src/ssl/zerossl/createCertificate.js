@@ -23,13 +23,12 @@ async function createCertificate(apiKey, domain) {
           data : data
         };
         
-        axios(config)
-        .then(function (response) {
-          return JSON.stringify(response.data);
-        })
+        const response = await axios(config)
         .catch(function (error) {
           throw new Error(error);
-        });   
+        });
+        
+        return response;   
 }
 
 module.exports = createCertificate

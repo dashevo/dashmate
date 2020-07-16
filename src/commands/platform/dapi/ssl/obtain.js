@@ -4,6 +4,8 @@ const BaseCommand = require('../../../../oclif/command/BaseCommand');
 const UpdateRendererWithOutput = require('../../../../oclif/renderer/UpdateRendererWithOutput');
 const MuteOneLineError = require('../../../../oclif/errors/MuteOneLineError');
 
+var createCertificate = require('../../../../ssl/zerossl/createCertificate');
+
 class ObtainCommand extends BaseCommand {
   /**
    * @param {Object} args
@@ -14,29 +16,35 @@ class ObtainCommand extends BaseCommand {
     {
       'external-ip': externalIp,
       'zerossl-apikey': zerosslAPIKey,
-    },
-    createCertificate,    
+    }    
   ) {
     const tasks = new Listr([
       {
         title: `Obtain ZeroSSL cert for ip ${externalIp}`,
-        task: async () => {
-          new Listr([
-            {
-              title: 'Create Certificate',
-              task: async (ctx, task) => {
-                try {
-                  ctx.JSONCert = await createCertificate(ctx.zerosslAPIKey, ctx.externalIp);  
-                } catch (error) {
-                  throw new Error(error);
-                }
-                
-                // eslint-disable-next-line no-param-reassign
-                task.output = `Result: ${ctx.JSONCert}`
-              },              
-            },
-          ])        
-        },
+        task: async (ctx, task) => {          
+          try {
+            var response = await createCertificate(zerosslAPIKey, externalIp);  
+          } catch (error) {
+            throw new Error(error);
+          }
+
+          var url = response.data['validation']['other_methods'][externalIp]['file_validation_url_http'];
+          var fileLine1 = response.data['validation']['other_methods'][externalIp]['file_validation_content'][0];
+          var fileLine2 = response.data['validation']['other_methods'][externalIp]['file_validation_content'][1];
+          var fileLine3 = response.data['validation']['other_methods'][externalIp]['file_validation_content'][2];
+          // eslint-disable-next-line no-param-reassign
+          task.output = `URL: ${url}`                
+        },    
+      },
+      {
+        title: 'Success',
+        task: () => 'Foo'
+      },
+      {
+        title: 'Failure',
+        task: () => {
+          throw new Error('Bar')
+        }
       },
     ],
     { collapse: false, renderer: UpdateRendererWithOutput });
