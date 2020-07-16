@@ -16,7 +16,7 @@ async function createCertificate(apiKey, domain) {
         });
         var config = {
           method: 'post',
-          url: 'api.zerossl.com/certificates?access_key=' + apiKey,
+          url: 'https://api.zerossl.com/certificates?access_key=' + apiKey,
           headers: { 
             'Content-Type': 'application/x-www-form-urlencoded'
           },
@@ -25,10 +25,10 @@ async function createCertificate(apiKey, domain) {
         
         axios(config)
         .then(function (response) {
-          console.log(JSON.stringify(response.data));
+          return JSON.stringify(response.data);
         })
         .catch(function (error) {
-          console.log(error);
+          throw new Error(error);
         });   
 }
 

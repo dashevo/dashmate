@@ -1,10 +1,10 @@
 const Listr = require('listr');
 
-const BaseCommand = require('../oclif/command/BaseCommand');
-const UpdateRendererWithOutput = require('../oclif/renderer/UpdateRendererWithOutput');
-const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
+const BaseCommand = require('../../../../oclif/command/BaseCommand');
+const UpdateRendererWithOutput = require('../../../../oclif/renderer/UpdateRendererWithOutput');
+const MuteOneLineError = require('../../../../oclif/errors/MuteOneLineError');
 
-class SSLObtainCommand extends BaseCommand {
+class ObtainCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
@@ -24,9 +24,16 @@ class SSLObtainCommand extends BaseCommand {
           new Listr([
             {
               title: 'Create Certificate',
-              task: async (ctx) => {
-                await createCertificate(zerosslAPIKey, externalIp);
-              },
+              task: async (ctx, task) => {
+                try {
+                  ctx.JSONCert = await createCertificate(ctx.zerosslAPIKey, ctx.externalIp);  
+                } catch (error) {
+                  throw new Error(error);
+                }
+                
+                // eslint-disable-next-line no-param-reassign
+                task.output = `Result: ${ctx.JSONCert}`
+              },              
             },
           ])        
         },
@@ -35,19 +42,22 @@ class SSLObtainCommand extends BaseCommand {
     { collapse: false, renderer: UpdateRendererWithOutput });
 
     try {
-      await tasks.run();
+      await tasks.run(
+        externalIp,
+        zerosslAPIKey
+      );
     } catch (e) {
       throw new MuteOneLineError(e);
     }
   }
 }
 
-SSLObtainCommand.description = `Obtain SSL Cert
+ObtainCommand.description = `Obtain SSL Cert
 ...
 Obtain SSL Cert using ZeroSLL API Key
 `;
 
-SSLObtainCommand.args = [{
+ObtainCommand.args = [{
   name: 'external-ip',
   required: true,
   description: 'masternode external IP',
@@ -57,4 +67,4 @@ SSLObtainCommand.args = [{
   description: 'ZeroSSL API Key - https://app.zerossl.com/developer',
 }];
 
-module.exports = SSLObtainCommand;
+module.exports = ObtainCommand;
