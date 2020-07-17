@@ -5,6 +5,10 @@ const UpdateRendererWithOutput = require('../../../../oclif/renderer/UpdateRende
 const MuteOneLineError = require('../../../../oclif/errors/MuteOneLineError');
 
 var createCertificate = require('../../../../ssl/zerossl/createCertificate');
+var downloadCertificate = require('../../../../ssl/zerossl/downloadCertificate');
+var listCertificate = require('../../../../ssl/zerossl/listCertificates');
+var verifyDomain = require('../../../../ssl/zerossl/verifyDomain');
+var fs = require('fs')
 
 class ObtainCommand extends BaseCommand {
   /**
@@ -20,7 +24,7 @@ class ObtainCommand extends BaseCommand {
   ) {
     const tasks = new Listr([
       {
-        title: `Obtain ZeroSSL cert for ip ${externalIp}`,
+        title: `Create ZeroSSL cert for ip ${externalIp}`,
         task: async (ctx, task) => {          
           try {
             var response = await createCertificate(zerosslAPIKey, externalIp);  
@@ -29,21 +33,40 @@ class ObtainCommand extends BaseCommand {
           }
 
           var url = response.data['validation']['other_methods'][externalIp]['file_validation_url_http'];
-          var fileLine1 = response.data['validation']['other_methods'][externalIp]['file_validation_content'][0];
-          var fileLine2 = response.data['validation']['other_methods'][externalIp]['file_validation_content'][1];
-          var fileLine3 = response.data['validation']['other_methods'][externalIp]['file_validation_content'][2];
+          var fileName = url.replace('http://' + externalIp + '/.well-known/pki-validation/', '');
+          var fileContent = '';
+
+          for (let index = 0; index < 3; index++) {
+            fileContent = fileContent + response.data['validation']['other_methods'][externalIp]['file_validation_content'][index];
+            if(index < 2){
+              fileContent = fileContent + '\n';
+            }
+          }          
+
+          fs.writeFile('./src/commands/platform/dapi/ssl/' + fileName,fileContent,(err) => {
+            if (err) throw err;        
+          });
+
           // eslint-disable-next-line no-param-reassign
-          task.output = `URL: ${url}`                
+          task.output = `Challenge saved: /src/commands/platform/dapi/ssl/${fileName}`                
         },    
       },
       {
-        title: 'Success',
+        title: 'Validate IP',
         task: () => 'Foo'
+        //TODO: setup a server with file challenge
       },
       {
-        title: 'Failure',
-        task: () => {
-          throw new Error('Bar')
+        title: 'Download Certificate',
+        task: async (ctx, task) => {
+          try {
+            //TODO: download zip file
+            //TODO: extract zip file
+            //TODO: setup bundle file
+            //TODO: save file in config folder
+          } catch (error) {
+            throw new Error(error);
+          }
         }
       },
     ],
