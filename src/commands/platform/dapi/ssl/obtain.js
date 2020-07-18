@@ -50,7 +50,7 @@ class ObtainCommand extends BaseCommand {
 
           var validationPath = './src/commands/platform/dapi/ssl/.well-known/pki-validation/';
           if (!fs.existsSync(validationPath)) {
-            fs.mkdir(validationPath);
+            fs.mkdirSync(validationPath);
           }
           
           fs.writeFileSync(validationPath + fileName,fileContent,(err) => {
