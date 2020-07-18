@@ -7,26 +7,25 @@ var qs = require('qs');
  * @param {string} id 
  * @param {string} apiKey 
  */
-function verifyDomain(id,apiKey) {
-    var data = qs.stringify({
-        'validation_method': 'HTTP_CSR_HASH' 
-       });
-       var config = {
-         method: 'post',
-         url: 'api.zerossl.com/certificates/' + id + '/challenges?access_key=' + apiKey,
-         headers: { 
-           'Content-Type': 'application/x-www-form-urlencoded'
-         },
-         data : data
-       };
+async function verifyDomain(id,apiKey) {
+  var data = qs.stringify({
+  'validation_method': 'HTTP_CSR_HASH' 
+  });
+  
+  var config = {
+    method: 'post',
+    url: 'https://api.zerossl.com/certificates/' + id + '/challenges?access_key=' + apiKey,
+    headers: { 
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    data : data
+  };
        
-       axios(config)
-       .then(function (response) {
-         console.log(JSON.stringify(response.data));
-       })
-       .catch(function (error) {
-         console.log(error);
-       });   
+  const response = await axios(config)
+  .catch(function (error) {
+    console.log(error);
+  });
+  return response;  
 }
 
 module.exports = verifyDomain

@@ -6,20 +6,18 @@ var axios = require('axios');
  * @param {string} id 
  * @param {string} apiKey 
  */
-function downloadCertificate(id, apiKey) {
-    var config = {
-        method: 'get',
-        url: 'api.zerossl.com/certificates/' + id + '/download/return?access_key=' + apiKey,
-        headers: { }
-      };
-      
-      axios(config)
-      .then(function (response) {
-        console.log(JSON.stringify(response.data));
-      })
-      .catch(function (error) {
-        console.log(error);
-      });   
+async function downloadCertificate(id, apiKey) {
+  var config = {
+      method: 'get',
+      url: 'https://api.zerossl.com/certificates/' + id + '/download/return?access_key=' + apiKey,
+      headers: { },
+    };
+    
+  const response = await axios(config)
+  .catch(function (error) {
+    console.log(error);
+  });
+  return response;   
 }
 
 module.exports = downloadCertificate
