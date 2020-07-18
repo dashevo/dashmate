@@ -5,20 +5,18 @@ var axios = require('axios');
  * 
  * @param {string} apiKey 
  */
-function listCertificates(apiKey) {
+async function listCertificates(apiKey) {
   var config = {
     method: 'get',
-    url: 'api.zerossl.com/certificates?access_key=' + apiKey,
+    url: 'https://api.zerossl.com/certificates?access_key=' + apiKey,
     headers: { }
   };
   
-  axios(config)
-  .then(function (response) {
-    console.log(JSON.stringify(response.data));
-  })
+  const response = await axios(config)
   .catch(function (error) {
     console.log(error);
-  }); 
+  });
+  return response; 
 }
 
 module.exports = listCertificates

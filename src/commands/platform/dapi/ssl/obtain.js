@@ -60,10 +60,11 @@ class ObtainCommand extends BaseCommand {
         title: 'Download Certificate',
         task: async (ctx, task) => {
           try {
-            //TODO: download zip file
-            //TODO: extract zip file
-            //TODO: setup bundle file
-            //TODO: save file in config folder
+            var response = await downloadCertificate('895f4b26cd87a851f7748a39b486b5be',zerosslAPIKey);
+            fs.writeFile('./configs/evonet/dapi/nginx/bundle.crt',response.data['certificate.crt'] + '\n' + response.data['ca_bundle.crt'],(err) => {
+              if (err) throw err;        
+            });  
+
           } catch (error) {
             throw new Error(error);
           }
