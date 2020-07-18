@@ -75,6 +75,9 @@ class ObtainCommand extends BaseCommand {
         task: async (ctx, task) => {
           var serverURL = 'http://' + externalIp + '/.well-known/pki-validation/' + ctx.fileName;
           var response = verifyTempServer(serverURL);
+          while(typeof response.data === 'undefined'){
+            response = verifyTempServer(serverURL);
+          }
           task.output = `Server response: ${response.data}`;
         }
       },
