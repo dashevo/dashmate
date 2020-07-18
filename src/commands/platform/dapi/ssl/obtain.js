@@ -1,3 +1,4 @@
+const execa = require('execa');
 const Listr = require('listr');
 
 const BaseCommand = require('../../../../oclif/command/BaseCommand');
@@ -47,7 +48,7 @@ class ObtainCommand extends BaseCommand {
             }
           }          
 
-          fs.writeFile('./src/commands/platform/dapi/ssl/' + fileName,fileContent,(err) => {
+          fs.writeFileSync('./src/commands/platform/dapi/ssl/.well-known/pki-validation/' + fileName,fileContent,(err) => {
             if (err) throw err;        
           });
 
@@ -56,9 +57,22 @@ class ObtainCommand extends BaseCommand {
         },    
       },
       {
-        title: 'Validate IP',
+        title: 'Verify IP',
         task: (ctx, task) => {
-          task.output = `Cert id ${ctx.certId}`
+          const subprocess = execa('http-server');
+
+          setTimeout(() => {
+            subprocess.kill('SIGTERM', {
+              forceKillAfterTimeout: 10000
+            });
+          }, 10000);
+
+          try {
+            await verifyDomain(ctx.certId,zerosslAPIKey);
+          } catch (error) {
+            throw new Error(error);
+          }
+
         }
       },
       {
