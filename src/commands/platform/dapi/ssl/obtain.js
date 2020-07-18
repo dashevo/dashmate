@@ -75,21 +75,22 @@ class ObtainCommand extends BaseCommand {
         task: async (ctx, task) => {
           var serverURL = 'http://' + externalIp + '/.well-known/pki-validation/' + ctx.fileName;
           var response = verifyTempServer(serverURL);
-          task.output = `Server is up at ${serverURL} response: ${response}`;
+          task.output = `Server response: ${response.data}`;
         }
       },
       {
         title: 'Verify IP',
-        task: async (ctx) => {
+        task: async (ctx, task) => {
           try {
-            await verifyDomain(ctx.certId,zerosslAPIKey);
+            var response = await verifyDomain(ctx.certId,zerosslAPIKey);
           } catch (error) {
             throw new Error(error);
           }
 
           ctx.server.kill('SIGTERM', {
             forceKillAfterTimeout: 10000
-          });          
+          });
+          task.output = `Verify response: ${response.data}`          
         }
       },
       {
