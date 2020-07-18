@@ -48,7 +48,12 @@ class ObtainCommand extends BaseCommand {
             }
           }          
 
-          fs.writeFileSync('./src/commands/platform/dapi/ssl/.well-known/pki-validation/' + fileName,fileContent,(err) => {
+          var validationPath = './src/commands/platform/dapi/ssl/.well-known/pki-validation/';
+          if (!fs.existsSync(path)) {
+            fs.mkdir(validationPath);
+          }
+          
+          fs.writeFileSync(validationPath + fileName,fileContent,(err) => {
             if (err) throw err;        
           });
 
