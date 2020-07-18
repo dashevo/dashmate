@@ -64,19 +64,17 @@ class ObtainCommand extends BaseCommand {
       {
         title: 'Verify IP',
         task: async (ctx) => {
-          const subprocess = execa('http-server', '-p 80');
-
-          setTimeout(() => {
-            subprocess.kill('SIGTERM', {
-              forceKillAfterTimeout: 10000
-            });
-          }, 10000);
+          const subprocess = execa.sync('http-server', '-p 80');
 
           try {
             await verifyDomain(ctx.certId,zerosslAPIKey);
           } catch (error) {
             throw new Error(error);
           }
+
+          subprocess.kill('SIGTERM', {
+            forceKillAfterTimeout: 10000
+          });
 
         }
       },
