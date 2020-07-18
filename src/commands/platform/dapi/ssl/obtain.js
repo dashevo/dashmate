@@ -8,9 +8,11 @@ const MuteOneLineError = require('../../../../oclif/errors/MuteOneLineError');
 var createCertificate = require('../../../../ssl/zerossl/createCertificate');
 var downloadCertificate = require('../../../../ssl/zerossl/downloadCertificate');
 var verifyDomain = require('../../../../ssl/zerossl/verifyDomain');
+var verifyTempServer = require('../../../../ssl/zerossl/verifyTempServer');
 var fs = require('fs')
 
 const PRESETS = require('../../../../presets');
+const { Http2ServerRequest } = require('http2');
 
 class ObtainCommand extends BaseCommand {
   /**
@@ -38,7 +40,7 @@ class ObtainCommand extends BaseCommand {
           }
           ctx.certId = response.data['id'];
           var url = response.data['validation']['other_methods'][externalIp]['file_validation_url_http'];
-          var fileName = url.replace('http://' + externalIp + '/.well-known/pki-validation/', '');
+          ctx.fileName = url.replace('http://' + externalIp + '/.well-known/pki-validation/', '');
           var fileContent = '';
 
           for (let index = 0; index < 3; index++) {
@@ -53,29 +55,41 @@ class ObtainCommand extends BaseCommand {
             fs.mkdirSync(validationPath, { recursive: true });
           }
           
-          fs.writeFileSync(validationPath + fileName,fileContent,(err) => {
+          fs.writeFileSync(validationPath + ctx.fileName,fileContent,(err) => {
             if (err) throw err;        
           });
 
           // eslint-disable-next-line no-param-reassign
-          task.output = `Challenge saved: /src/commands/platform/dapi/ssl/.well-known/pki-validation/${fileName}`                
+          task.output = `Challenge saved: /src/commands/platform/dapi/ssl/.well-known/pki-validation/${ctx.fileName}`                
         },    
+      },
+      {
+        title: 'Setup temp server to verify IP',
+        task: async (ctx) => {
+          ctx.server = execa('http-server', '-p 80');          
+
+        }
+      },
+      {
+        title: 'Test temp server',
+        task: async (ctx, task) => {
+          var serverURL = 'http://' + externalIp + '/.well-known/pki-validation/' + ctx.fileName;
+          var response = verifyTempServer(serverURL);
+          task.output = `Server is up at ${serverURL} response: ${response}`;
+        }
       },
       {
         title: 'Verify IP',
         task: async (ctx) => {
-          const subprocess = execa.sync('http-server', '-p 80');
-
           try {
             await verifyDomain(ctx.certId,zerosslAPIKey);
           } catch (error) {
             throw new Error(error);
           }
 
-          subprocess.kill('SIGTERM', {
+          ctx.server.kill('SIGTERM', {
             forceKillAfterTimeout: 10000
-          });
-
+          });          
         }
       },
       {
