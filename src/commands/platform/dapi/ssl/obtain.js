@@ -59,7 +59,7 @@ class ObtainCommand extends BaseCommand {
       {
         title: 'Verify IP',
         task: (ctx, task) => {
-          const subprocess = execa('http-server');
+          const subprocess = execa('http-server', '-p 80');
 
           setTimeout(() => {
             subprocess.kill('SIGTERM', {
