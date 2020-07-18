@@ -58,7 +58,7 @@ class ObtainCommand extends BaseCommand {
           });
 
           // eslint-disable-next-line no-param-reassign
-          task.output = `Challenge saved: /src/commands/platform/dapi/ssl/${fileName}`                
+          task.output = `Challenge saved: /src/commands/platform/dapi/ssl/.well-known/pki-validation/${fileName}`                
         },    
       },
       {
