@@ -87,10 +87,7 @@ class ObtainCommand extends BaseCommand {
             throw new Error(error);
           }
 
-          ctx.server.kill('SIGTERM', {
-            forceKillAfterTimeout: 10000
-          });
-          task.output = `Verify response: ${response.data}`          
+          task.output = `Verify response: ${response.data['status']}`          
         }
       },
       {
