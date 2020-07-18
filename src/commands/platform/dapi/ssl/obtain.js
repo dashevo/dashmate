@@ -6,9 +6,10 @@ const MuteOneLineError = require('../../../../oclif/errors/MuteOneLineError');
 
 var createCertificate = require('../../../../ssl/zerossl/createCertificate');
 var downloadCertificate = require('../../../../ssl/zerossl/downloadCertificate');
-var listCertificate = require('../../../../ssl/zerossl/listCertificates');
 var verifyDomain = require('../../../../ssl/zerossl/verifyDomain');
 var fs = require('fs')
+
+const PRESETS = require('../../../../presets');
 
 class ObtainCommand extends BaseCommand {
   /**
@@ -18,6 +19,7 @@ class ObtainCommand extends BaseCommand {
    */
   async runWithDependencies(
     {
+      preset,
       'external-ip': externalIp,
       'zerossl-apikey': zerosslAPIKey,
     }    
@@ -27,11 +29,13 @@ class ObtainCommand extends BaseCommand {
         title: `Create ZeroSSL cert for ip ${externalIp}`,
         task: async (ctx, task) => {          
           try {
-            var response = await createCertificate(zerosslAPIKey, externalIp);  
+            var csr = '';
+            csr = fs.readFileSync('./configs/' + preset + '/dapi/nginx/domain.csr', 'utf8'); 
+            var response = await createCertificate(zerosslAPIKey, externalIp, csr);  
           } catch (error) {
             throw new Error(error);
           }
-
+          ctx.certId = response.data['id'];
           var url = response.data['validation']['other_methods'][externalIp]['file_validation_url_http'];
           var fileName = url.replace('http://' + externalIp + '/.well-known/pki-validation/', '');
           var fileContent = '';
@@ -53,17 +57,28 @@ class ObtainCommand extends BaseCommand {
       },
       {
         title: 'Validate IP',
-        task: () => 'Foo'
-        //TODO: setup a server with file challenge
+        task: (ctx, task) => {
+          task.output = `Cert id ${ctx.certId}`
+        }
       },
       {
         title: 'Download Certificate',
         task: async (ctx, task) => {
           try {
-            var response = await downloadCertificate('895f4b26cd87a851f7748a39b486b5be',zerosslAPIKey);
-            fs.writeFile('./configs/evonet/dapi/nginx/bundle.crt',response.data['certificate.crt'] + '\n' + response.data['ca_bundle.crt'],(err) => {
+            var response = await downloadCertificate(ctx.certId,zerosslAPIKey);
+            var bundleFile = './configs/' + preset + '/dapi/nginx/bundle.crt';
+            fs.writeFile(bundleFile,response.data['certificate.crt'] + '\n' + response.data['ca_bundle.crt'],(err) => {
               if (err) throw err;        
-            });  
+            });
+            
+            var privateKeyFile = './configs/' + preset + '/dapi/nginx/private.key';
+            try {
+              if (fs.existsSync(bundleFile) && fs.existsSync(privateKeyFile)) {
+                task.output = `Cert files generated: \n ${bundleFile} \n ${privateKeyFile}`;
+              }
+            } catch(err) {
+              throw new Error(err);
+            }
 
           } catch (error) {
             throw new Error(error);
@@ -74,10 +89,10 @@ class ObtainCommand extends BaseCommand {
     { collapse: false, renderer: UpdateRendererWithOutput });
 
     try {
-      await tasks.run(
+      await tasks.run({
         externalIp,
         zerosslAPIKey
-      );
+      });
     } catch (e) {
       throw new MuteOneLineError(e);
     }
@@ -89,7 +104,11 @@ ObtainCommand.description = `Obtain SSL Cert
 Obtain SSL Cert using ZeroSLL API Key
 `;
 
-ObtainCommand.args = [{
+ObtainCommand.args = [{name: 'preset',
+required: true,
+description: 'preset to use',
+options: Object.values(PRESETS),
+}, {
   name: 'external-ip',
   required: true,
   description: 'masternode external IP',
