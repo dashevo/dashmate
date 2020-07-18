@@ -65,14 +65,14 @@ class ObtainCommand extends BaseCommand {
       },
       {
         title: 'Setup temp server to verify IP',
-        task: async (ctx) => {
+        task: (ctx) => {
           ctx.server = execa('http-server', '-p 80');          
 
         }
       },
       {
         title: 'Test temp server',
-        task: async (ctx, task) => {
+        task: (ctx, task) => {
           var serverURL = 'http://' + externalIp + '/.well-known/pki-validation/' + ctx.fileName;
           var response = verifyTempServer(serverURL);
           while(typeof response.data === 'undefined'){
