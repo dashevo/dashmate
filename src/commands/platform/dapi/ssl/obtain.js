@@ -90,7 +90,7 @@ class ObtainCommand extends BaseCommand {
         title: 'Verify IP',
         task: async (ctx, task) => {
           try {
-            var response = await verifyDomain(ctx.certId,zerosslAPIKey);
+            await verifyDomain(ctx.certId,zerosslAPIKey);
           } catch (error) {
             throw new Error(error);
           }
@@ -104,12 +104,16 @@ class ObtainCommand extends BaseCommand {
             var response = await downloadCertificate(ctx.certId,zerosslAPIKey);
             var bundleFile = './configs/' + preset + '/dapi/nginx/bundle.crt';
             
-            while (response.data['certificate.crt'] === 'undefined'){
+            while ('error' in response.data){
               response = await downloadCertificate(ctx.certId,zerosslAPIKey);
             }
-            
+
             fs.writeFile(bundleFile,response.data['certificate.crt'] + '\n' + response.data['ca_bundle.crt'],(err) => {
               if (err) throw err;        
+            });
+
+            ctx.server.kill('SIGTERM', {
+              forceKillAfterTimeout: 2000
             });
             
             var privateKeyFile = './configs/' + preset + '/dapi/nginx/private.key';
