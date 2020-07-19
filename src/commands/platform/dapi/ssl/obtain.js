@@ -1,5 +1,6 @@
 const execa = require('execa');
 const Listr = require('listr');
+const { Observable } = require('rxjs');
 
 const BaseCommand = require('../../../../oclif/command/BaseCommand');
 const UpdateRendererWithOutput = require('../../../../oclif/renderer/UpdateRendererWithOutput');
@@ -60,25 +61,29 @@ class ObtainCommand extends BaseCommand {
           });
 
           // eslint-disable-next-line no-param-reassign
-          task.output = `Challenge saved: /src/commands/platform/dapi/ssl/.well-known/pki-validation/${ctx.fileName}`                
+          task.output = `Challenge saved: /src/commands/platform/dapi/ssl/.well-known/pki-validation/${ctx.fileName}`;                
         },    
       },
       {
         title: 'Setup temp server to verify IP',
-        task: (ctx) => {
-          ctx.server = execa('http-server', '-p 80');          
-
+        task: async (ctx, task) => {
+          ctx.server = execa('http-server', ['src/commands/platform/dapi/ssl/', '-p 80']);          
+          task.output = `Server ${ctx.server.stdout}`;
         }
       },
       {
         title: 'Test temp server',
-        task: (ctx, task) => {
-          var serverURL = 'http://' + externalIp + '/.well-known/pki-validation/' + ctx.fileName;
-          var response = verifyTempServer(serverURL);
-          while(typeof response.data === 'undefined'){
-            response = verifyTempServer(serverURL);
-          }
-          task.output = `Server response: ${response.data}`;
+        task: async (ctx) => {
+          return new Observable(async (observer) => {
+            var serverURL = 'http://' + externalIp + '/.well-known/pki-validation/' + ctx.fileName;            
+    
+            setTimeout( async () => {
+              observer.next('Wait for server');
+              await verifyTempServer(serverURL);
+              observer.complete();
+            }, 2000);
+
+          });
         }
       },
       {
@@ -89,8 +94,7 @@ class ObtainCommand extends BaseCommand {
           } catch (error) {
             throw new Error(error);
           }
-
-          task.output = `Verify response: ${response.data['status']}`          
+          
         }
       },
       {
@@ -99,6 +103,11 @@ class ObtainCommand extends BaseCommand {
           try {
             var response = await downloadCertificate(ctx.certId,zerosslAPIKey);
             var bundleFile = './configs/' + preset + '/dapi/nginx/bundle.crt';
+            
+            while (response.data['certificate.crt'] === 'undefined'){
+              response = await downloadCertificate(ctx.certId,zerosslAPIKey);
+            }
+            
             fs.writeFile(bundleFile,response.data['certificate.crt'] + '\n' + response.data['ca_bundle.crt'],(err) => {
               if (err) throw err;        
             });
