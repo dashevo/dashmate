@@ -62,6 +62,7 @@
     "docker-compose": "^0.23.3",
     "dockerode": "^3.2.0",
     "dotenv": "^8.2.0",
+    "execa": "^4.0.3",
     "hasbin": "^1.2.3",
     "listr2": "^2.1.9",
     "node-graceful": "^3.0.0",
