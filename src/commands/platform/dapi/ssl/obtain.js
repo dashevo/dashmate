@@ -1,19 +1,17 @@
 const execa = require('execa');
-const Listr = require('listr');
+const fs = require('fs');
+const { Listr } = require('listr2');
 const { Observable } = require('rxjs');
 
 const BaseCommand = require('../../../../oclif/command/BaseCommand');
-const UpdateRendererWithOutput = require('../../../../oclif/renderer/UpdateRendererWithOutput');
 const MuteOneLineError = require('../../../../oclif/errors/MuteOneLineError');
 
-var createCertificate = require('../../../../ssl/zerossl/createCertificate');
-var downloadCertificate = require('../../../../ssl/zerossl/downloadCertificate');
-var verifyDomain = require('../../../../ssl/zerossl/verifyDomain');
-var verifyTempServer = require('../../../../ssl/zerossl/verifyTempServer');
-var fs = require('fs')
+const createCertificate = require('../../../../ssl/zerossl/createCertificate');
+const downloadCertificate = require('../../../../ssl/zerossl/downloadCertificate');
+const verifyDomain = require('../../../../ssl/zerossl/verifyDomain');
+const verifyTempServer = require('../../../../ssl/zerossl/verifyTempServer');
 
 const PRESETS = require('../../../../presets');
-const { Http2ServerRequest } = require('http2');
 
 class ObtainCommand extends BaseCommand {
   /**
@@ -26,76 +24,78 @@ class ObtainCommand extends BaseCommand {
       preset,
       'external-ip': externalIp,
       'zerossl-apikey': zerosslAPIKey,
-    }    
+    },
   ) {
     const tasks = new Listr([
       {
         title: `Create ZeroSSL cert for ip ${externalIp}`,
-        task: async (ctx, task) => {          
+        task: async (ctx, task) => {
           try {
-            var csr = '';
-            csr = fs.readFileSync('./configs/' + preset + '/dapi/nginx/domain.csr', 'utf8'); 
-            var response = await createCertificate(zerosslAPIKey, externalIp, csr);  
+            const csr = fs.readFileSync(`./configs/${preset}/dapi/nginx/domain.csr`, 'utf8');
+            const response = await createCertificate(zerosslAPIKey, externalIp, csr);
+
+            if ('error' in response.data) {
+              throw new Error(error);
+            } else {
+              ctx.certId = response.data.id;
+              // eslint-disable-next-line max-len
+              const url = response.data.validation.other_methods[externalIp].file_validation_url_http;
+              ctx.fileName = url.replace(`http://${externalIp}/.well-known/pki-validation/`, '');
+              let fileContent = '';
+
+              for (let index = 0; index < 3; index++) {
+                // eslint-disable-next-line max-len
+                fileContent += response.data.validation.other_methods[externalIp].file_validation_content[index];
+                if (index < 2) {
+                  fileContent += '\n';
+                }
+              }
+
+              const validationPath = './src/commands/platform/dapi/ssl/.well-known/pki-validation/';
+              if (!fs.existsSync(validationPath)) {
+                fs.mkdirSync(validationPath, { recursive: true });
+              }
+
+              fs.writeFileSync(validationPath + ctx.fileName,fileContent,(err) => {
+                if (err) { throw err; }
+              });
+
+              // eslint-disable-next-line no-param-reassign
+              task.output = `Challenge saved: /src/commands/platform/dapi/ssl/.well-known/pki-validation/${ctx.fileName}`;
+            }
           } catch (error) {
             throw new Error(error);
           }
-          ctx.certId = response.data['id'];
-          var url = response.data['validation']['other_methods'][externalIp]['file_validation_url_http'];
-          ctx.fileName = url.replace('http://' + externalIp + '/.well-known/pki-validation/', '');
-          var fileContent = '';
-
-          for (let index = 0; index < 3; index++) {
-            fileContent = fileContent + response.data['validation']['other_methods'][externalIp]['file_validation_content'][index];
-            if(index < 2){
-              fileContent = fileContent + '\n';
-            }
-          }          
-
-          var validationPath = './src/commands/platform/dapi/ssl/.well-known/pki-validation/';
-          if (!fs.existsSync(validationPath)) {
-            fs.mkdirSync(validationPath, { recursive: true });
-          }
-          
-          fs.writeFileSync(validationPath + ctx.fileName,fileContent,(err) => {
-            if (err) throw err;        
-          });
-
-          // eslint-disable-next-line no-param-reassign
-          task.output = `Challenge saved: /src/commands/platform/dapi/ssl/.well-known/pki-validation/${ctx.fileName}`;                
-        },    
+        },
       },
       {
         title: 'Setup temp server to verify IP',
         task: async (ctx, task) => {
-          ctx.server = execa('http-server', ['src/commands/platform/dapi/ssl/', '-p 80']);          
+          ctx.server = execa('http-server', ['src/commands/platform/dapi/ssl/', '-p 80']);
+          // eslint-disable-next-line no-param-reassign
           task.output = `Server ${ctx.server.stdout}`;
-        }
+        },
       },
       {
         title: 'Test temp server',
-        task: async (ctx) => {
-          return new Observable(async (observer) => {
-            var serverURL = 'http://' + externalIp + '/.well-known/pki-validation/' + ctx.fileName;            
-    
-            setTimeout( async () => {
-              observer.next('Wait for server');
-              await verifyTempServer(serverURL);
-              observer.complete();
-            }, 2000);
-
-          });
-        }
+        task: async (ctx) => new Observable(async (observer) => {
+          const serverURL = `http://${externalIp}/.well-known/pki-validation/${ctx.fileName}`;
+          setTimeout(async () => {
+            observer.next('Wait for server');
+            await verifyTempServer(serverURL);
+            observer.complete();
+          }, 2000);
+        }),
       },
       {
         title: 'Verify IP',
-        task: async (ctx, task) => {
+        task: async (ctx) => {
           try {
-            await verifyDomain(ctx.certId,zerosslAPIKey);
+            await verifyDomain(ctx.certId, zerosslAPIKey);
           } catch (error) {
             throw new Error(error);
           }
-          
-        }
+        },
       },
       {
         title: 'Download Certificate',
@@ -131,7 +131,13 @@ class ObtainCommand extends BaseCommand {
         }
       },
     ],
-    { collapse: false, renderer: UpdateRendererWithOutput });
+    {
+      rendererOptions: {
+        clearOutput: false,
+        collapse: false,
+        showSubtasks: true,
+      },
+    });
 
     try {
       await tasks.run({
