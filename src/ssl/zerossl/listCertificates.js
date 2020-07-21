@@ -1,22 +1,22 @@
-var axios = require('axios');
+const axios = require('axios');
 
 /**
  * List ZeroSSL certificates
- * 
- * @param {string} apiKey 
+ *
+ * @param {string} apiKey
  */
 async function listCertificates(apiKey) {
-  var config = {
+  const config = {
     method: 'get',
-    url: 'https://api.zerossl.com/certificates?access_key=' + apiKey,
-    headers: { }
+    url: `https://api.zerossl.com/certificates?access_key=${apiKey}`,
+    headers: { },
   };
-  
+
   const response = await axios(config)
-  .catch(function (error) {
-    console.log(error);
-  });
-  return response; 
+    .catch((error) => {
+      throw new Error(error);
+    });
+  return response;
 }
 
-module.exports = listCertificates
+module.exports = listCertificates;

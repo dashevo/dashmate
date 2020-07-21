@@ -1,22 +1,22 @@
-var axios = require('axios');
+const axios = require('axios');
 
 /**
  * Verify if the temp server is up
- * 
- * @param {string} serverURL 
+ *
+ * @param {string} serverURL
  */
 async function verifyTempServer(serverURL) {
-  var config = {
+  const config = {
     method: 'get',
     url: serverURL,
-    headers: { }
+    headers: { },
   };
-  
+
   const response = await axios(config)
-  .catch(function (error) {
-    console.log(error);
-  });
-  return response; 
+    .catch((error) => {
+      throw new Error(error);
+    });
+  return response;
 }
 
-module.exports = verifyTempServer
+module.exports = verifyTempServer;

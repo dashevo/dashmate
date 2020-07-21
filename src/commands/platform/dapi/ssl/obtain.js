@@ -35,7 +35,7 @@ class ObtainCommand extends BaseCommand {
             const response = await createCertificate(zerosslAPIKey, externalIp, csr);
 
             if ('error' in response.data) {
-              throw new Error(error);
+              throw new Error(response.data.error.type);
             } else {
               ctx.certId = response.data.id;
               // eslint-disable-next-line max-len
@@ -56,7 +56,7 @@ class ObtainCommand extends BaseCommand {
                 fs.mkdirSync(validationPath, { recursive: true });
               }
 
-              fs.writeFileSync(validationPath + ctx.fileName,fileContent,(err) => {
+              fs.writeFileSync(validationPath + ctx.fileName, fileContent, (err) => {
                 if (err) { throw err; }
               });
 
@@ -101,34 +101,34 @@ class ObtainCommand extends BaseCommand {
         title: 'Download Certificate',
         task: async (ctx, task) => {
           try {
-            var response = await downloadCertificate(ctx.certId,zerosslAPIKey);
-            var bundleFile = './configs/' + preset + '/dapi/nginx/bundle.crt';
-            
-            while ('error' in response.data){
-              response = await downloadCertificate(ctx.certId,zerosslAPIKey);
+            let response = await downloadCertificate(ctx.certId, zerosslAPIKey);
+            const bundleFile = `./configs/${preset}/dapi/nginx/bundle.crt`;
+
+            while ('error' in response.data) {
+              response = await downloadCertificate(ctx.certId, zerosslAPIKey);
             }
 
-            fs.writeFile(bundleFile,response.data['certificate.crt'] + '\n' + response.data['ca_bundle.crt'],(err) => {
-              if (err) throw err;        
+            fs.writeFile(bundleFile, `${response.data['certificate.crt']}\n${response.data['ca_bundle.crt']}`, (err) => {
+              if (err) { throw err; }
             });
 
             ctx.server.kill('SIGTERM', {
-              forceKillAfterTimeout: 2000
+              forceKillAfterTimeout: 2000,
             });
-            
-            var privateKeyFile = './configs/' + preset + '/dapi/nginx/private.key';
+
+            const privateKeyFile = `./configs/${preset}/dapi/nginx/private.key`;
             try {
               if (fs.existsSync(bundleFile) && fs.existsSync(privateKeyFile)) {
+                // eslint-disable-next-line no-param-reassign
                 task.output = `Cert files generated: \n ${bundleFile} \n ${privateKeyFile}`;
               }
-            } catch(err) {
+            } catch (err) {
               throw new Error(err);
             }
-
           } catch (error) {
             throw new Error(error);
           }
-        }
+        },
       },
     ],
     {
@@ -142,7 +142,7 @@ class ObtainCommand extends BaseCommand {
     try {
       await tasks.run({
         externalIp,
-        zerosslAPIKey
+        zerosslAPIKey,
       });
     } catch (e) {
       throw new MuteOneLineError(e);
@@ -155,10 +155,11 @@ ObtainCommand.description = `Obtain SSL Cert
 Obtain SSL Cert using ZeroSLL API Key
 `;
 
-ObtainCommand.args = [{name: 'preset',
-required: true,
-description: 'preset to use',
-options: Object.values(PRESETS),
+ObtainCommand.args = [{
+  name: 'preset',
+  required: true,
+  description: 'preset to use',
+  options: Object.values(PRESETS),
 }, {
   name: 'external-ip',
   required: true,
