@@ -14,22 +14,22 @@ async function createCertificate(apiKey, domain, csr) {
     certificate_validity_days: '90',
     certificate_csr: csr,
   });
-  
-  var config = {
+
+  const config = {
     method: 'post',
-    url: 'https://api.zerossl.com/certificates?access_key=' + apiKey,
-    headers: { 
-      'Content-Type': 'application/x-www-form-urlencoded'
+    url: `https://api.zerossl.com/certificates?access_key=${apiKey}`,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
-    data : data
+    data,
   };
-  
+
   const response = await axios(config)
-  .catch(function (error) {
-    throw new Error(error);
-  });
-  
-  return response;   
+    .catch((error) => {
+      throw new Error(error);
+    });
+
+  return response;
 }
 
-module.exports = createCertificate
+module.exports = createCertificate;
