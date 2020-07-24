@@ -1,6 +1,7 @@
 # MN Bootstrap
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/dashevo/mn-bootstrap)](https://github.com/dashevo/mn-bootstrap/releases)
+[![Release Date](https://img.shields.io/github/release-date/dashevo/mn-bootstrap)](https://github.com/dashevo/mn-bootstrap/releases/latest)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 
 Distribution package for Dash Masternode installation
@@ -9,10 +10,14 @@ Distribution package for Dash Masternode installation
 
 - [Install](#install)
 - [Usage](#usage)
+  - [Configuration presets](#configuration-presets)
+  - [Command line interface](#cli)
   - [Start node](#start-node)
   - [Stop node](#stop-node)
   - [Register masternode](#register-masternode)
   - [Reset data](#reset-data)
+  - [Development](#development)
+  - [Docker Compose](#docker-compose)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -26,7 +31,7 @@ Distribution package for Dash Masternode installation
 
 For Linux installations you may optionally wish to follow the [post-installation steps](https://docs.docker.com/engine/install/linux-postinstall/) to manage Docker as a non-root user, otherwise you will have to run CLI and Docker commands with `sudo`.
 
-### Distribution package 
+### Distribution package
 
 ```bash
 $ git clone -b master https://github.com/dashevo/mn-bootstrap.git
@@ -63,6 +68,7 @@ ARGUMENTS
 OPTIONS
   -f, --full-node                                  start as full node
   -p, --operator-private-key=operator-private-key  operator private key
+  -u, --update                                     download updated services before start
 ```
 
 To start a masternode for Evonet:
@@ -160,6 +166,37 @@ To reset an Evonet node:
 ```bash
 $ mn reset evonet
 ```
+
+### Show status
+
+The `status` command outputs status information relating to either the host, masternode or services.
+
+```
+Show status details
+
+USAGE
+  $ mn status:COMMAND
+
+COMMANDS
+  status:host        Show host status details
+  status:masternode  Show masternode status details
+  status:services    Show service status details
+```
+
+To show the host status:
+
+```bash
+$ mn status:host
+```
+
+### Development
+
+When developing on a standalone node (the `local` preset), `setup-for-local-development` can be used
+to generate some dash, register a masternode and populate the node with the data required for local development.
+
+To allow developers quickly test changes to DAPI and Drive, a local path for DAPI or Drive may be specified
+via the `--drive-image-build-path` and `--dapi-image-build-path` options of the `start` command.
+A Docker image will be built from the provided path and then used by mn-bootstrap.
 
 ### Docker Compose
 

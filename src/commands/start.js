@@ -1,10 +1,8 @@
-const Listr = require('listr');
+const { Listr } = require('listr2');
 
 const { flags: flagTypes } = require('@oclif/command');
 
 const BaseCommand = require('../oclif/command/BaseCommand');
-
-const UpdateRendererWithOutput = require('../oclif/renderer/UpdateRendererWithOutput');
 
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
 
@@ -15,6 +13,7 @@ class StartCommand extends BaseCommand {
    * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
+   * @param {startNodeTask} startNodeTask
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -25,33 +24,44 @@ class StartCommand extends BaseCommand {
     },
     {
       'full-node': isFullNode,
+      update: isUpdate,
       'operator-private-key': operatorPrivateKey,
+      'dpns-contract-id': dpnsContractId,
+      'dpns-top-level-identity': dpnsTopLevelIdentity,
+      'drive-image-build-path': driveImageBuildPath,
+      'dapi-image-build-path': dapiImageBuildPath,
     },
     dockerCompose,
+    startNodeTask,
   ) {
-    const tasks = new Listr([
+    const tasks = new Listr(
+      [
+        {
+          title: `Start ${isFullNode ? 'full node' : 'masternode'} with ${preset} preset`,
+          task: () => startNodeTask(
+            preset,
+            {
+              externalIp,
+              coreP2pPort,
+              isFullNode,
+              operatorPrivateKey,
+              dpnsContractId,
+              dpnsTopLevelIdentity,
+              driveImageBuildPath,
+              dapiImageBuildPath,
+              isUpdate,
+            },
+          ),
+        },
+      ],
       {
-        title: `Start ${isFullNode ? 'full node' : 'masternode'} with ${preset} preset`,
-        task: async () => {
-          let CORE_MASTERNODE_BLS_PRIV_KEY;
-
-          if (operatorPrivateKey) {
-            CORE_MASTERNODE_BLS_PRIV_KEY = operatorPrivateKey;
-          }
-
-          if (isFullNode) {
-            CORE_MASTERNODE_BLS_PRIV_KEY = '';
-          }
-
-          await dockerCompose.up(preset, {
-            CORE_MASTERNODE_BLS_PRIV_KEY,
-            CORE_P2P_PORT: coreP2pPort,
-            CORE_EXTERNAL_IP: externalIp,
-          });
+        rendererOptions: {
+          clearOutput: false,
+          collapse: false,
+          showSubtasks: true,
         },
       },
-    ],
-    { collapse: false, renderer: UpdateRendererWithOutput });
+    );
 
     try {
       await tasks.run();
@@ -83,7 +93,12 @@ StartCommand.args = [{
 
 StartCommand.flags = {
   'full-node': flagTypes.boolean({ char: 'f', description: 'start as full node', default: false }),
+  update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
   'operator-private-key': flagTypes.string({ char: 'p', description: 'operator private key', default: null }),
+  'dpns-contract-id': flagTypes.string({ description: 'DPNS contract ID', default: null }),
+  'dpns-top-level-identity': flagTypes.string({ description: 'DPNS top level identity', default: null }),
+  'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
+  'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),
 };
 
 module.exports = StartCommand;

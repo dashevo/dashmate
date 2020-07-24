@@ -37,7 +37,7 @@ services:
     command: npm run abci
 
   drive_tendermint:
-    image: tendermint/tendermint:${TENDERMINT_VERSION:-v0.32.8}
+    image: dashpay/tendermint:${TENDERMINT_VERSION:-v0.32.12}
     restart: unless-stopped
     depends_on:
       - drive_abci
@@ -100,10 +100,12 @@ services:
       - DASHCORE_P2P_PORT=20001
       - DASHCORE_P2P_NETWORK=devnet
       - NETWORK=devnet
+      - TENDERMINT_RPC_HOST=drive_tendermint
+      - TENDERMINT_RPC_PORT=26657
     command: npm run tx-filter-stream
 
   dapi_envoy:
-    image: envoyproxy/envoy:${DAPI_ENVOY_VERSION:-latest}
+    image: envoyproxy/envoy:${DAPI_ENVOY_VERSION:-v1.14-latest}
     restart: unless-stopped
     depends_on:
       - dapi_api
