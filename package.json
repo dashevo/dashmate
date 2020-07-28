@@ -93,6 +93,9 @@
     "topics": {
       "wallet": {
         "description": "Wallet related commands"
+      },
+      "status": {
+        "description": "Show status details"
       }
     }
   }
