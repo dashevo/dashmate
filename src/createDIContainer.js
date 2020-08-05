@@ -8,6 +8,9 @@ const {
 
 const Docker = require('dockerode');
 
+const Config = require('./config/Config');
+const ConfigManager = require('./config/ConfigManager');
+
 const DockerCompose = require('./docker/DockerCompose');
 const StartedContainers = require('./docker/StartedContainers');
 const stopAllContainersFactory = require('./docker/stopAllContainersFactory');
@@ -40,6 +43,16 @@ const startNodeTaskFactory = require('./listr/tasks/startNodeTaskFactory');
 async function createDIContainer() {
   const container = createAwilixContainer({
     injectionMode: InjectionMode.CLASSIC,
+  });
+
+  /**
+   * Config
+   */
+  container.register({
+    config: asFunction(() => (
+      new Config()
+    )).singleton(),
+    configManager: asClass(ConfigManager)
   });
 
   /**

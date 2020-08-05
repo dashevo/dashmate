@@ -86,6 +86,9 @@
   ],
   "oclif": {
     "commands": "./src/commands",
+    "hooks": {
+      "init": "./src/hooks/init/set-global-config"
+    },
     "bin": "mn",
     "plugins": [
       "@oclif/plugin-help"
