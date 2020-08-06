@@ -1,30 +1,26 @@
+const { table } = require('table');
+
 const BaseCommand = require('../../oclif/command/BaseCommand');
 
 class ConfigListCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
-   * @param {ConfigManager} configManager
+   * @param {ConfigCollection} configCollection
    * @return {Promise<void>}
    */
   async runWithDependencies(
-    {
-      preset,
-    },
-    flags, 
-    configManager,
+    args,
+    flags,
+    configCollection,
   ) {
-    try {
-      const configList = await configManager.getAllConfigs();
+    const rows = configCollection.getAllConfigs()
+      .map((config) => [config.getName(), config.get('description')]);
 
-      configList.forEach(e => console.log(e));
+    const output = table(rows);
 
-      //console.log('trying new stuff');
-      //const configObject = await configManager.getConfig('locals');
-
-    } catch (e) {
-      console.log(e);
-    }
+    // eslint-disable-next-line no-console
+    console.log(output);
   }
 }
 

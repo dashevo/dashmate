@@ -1,5 +1,5 @@
 const BaseCommand = require('../../oclif/command/BaseCommand');
-const ConfigManager = require('../../config/ConfigManager');
+const ConfigCollection = require('../../config/ConfigCollection');
 
 class ConfigCommand extends BaseCommand {
   /**
@@ -12,13 +12,13 @@ class ConfigCommand extends BaseCommand {
     {
       preset,
     },
-    flags, 
+    flags,
     configManager,
   ) {
     try {
       const currentConfigName = await configManager.getCurrentConfigName();
       console.log('current config: ', currentConfigName);
-      
+
       console.log(await configManager.getConfig(currentConfigName));
 
     } catch (e) {

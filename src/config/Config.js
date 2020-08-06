@@ -1,38 +1,59 @@
-/**
- * Store loaded config data
- */
+const lodashGet = require('lodash.get');
+const lodashSet = require('lodash.set');
+
 class Config {
-  constructor() {
-    this.config = new Object();
+  /**
+   * @param {string} name
+   * @param {Object} options
+   */
+  constructor(name, options = {}) {
+    this.name = name;
+    this.options = options;
   }
 
   /**
-   * Get name of config set
+   * Get name
    */
   getName() {
-    //console.log(this.config);
-    return this.config;
+    return this.name;
   }
 
   /**
-   * Get named property of config set
+   * Get config option
    */
   get(path) {
-    return this.config[path];
+    return lodashGet(this.options, path);
   }
 
   /**
-   * Set named property of config set
+   * Set config option
    */
   set(path, value) {
-    this.config[path] = value;
+    lodashSet(this.options, path, value);
+
+    return this;
   }
 
-  reset() {
-
+  /**
+   * Get options
+   *
+   * @returns {Object}
+   */
+  getOptions() {
+    return this.options;
   }
 
+  /**
+   * Set options
+   *
+   * @param {Object} options
+   * @returns {Config}
+   */
+  setOptions(options) {
+    this.options = options;
 
+    return this;
+  }
 }
 
 module.exports = Config;

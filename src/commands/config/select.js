@@ -1,5 +1,5 @@
 const BaseCommand = require('../../oclif/command/BaseCommand');
-const ConfigManager = require('../../config/ConfigManager');
+const ConfigManager = require('../../config/ConfigCollection');
 
 class ConfigSelectCommand extends BaseCommand {
   /**

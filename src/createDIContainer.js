@@ -8,8 +8,12 @@ const {
 
 const Docker = require('dockerode');
 
-const Config = require('./config/Config');
-const ConfigManager = require('./config/ConfigManager');
+const path = require('path');
+
+const ConfigJsonFileRepository = require('./config/ConfigJsonFileRepository');
+const createDefaultConfigsFactory = require('./config/default/createDefaultConfigsFactory');
+const resetDefaultConfigFactory = require('./config/default/resetDefaultConfigFactory');
+const defaultConfigs = require('./config/default/defaultConfigs');
 
 const DockerCompose = require('./docker/DockerCompose');
 const StartedContainers = require('./docker/StartedContainers');
@@ -49,10 +53,12 @@ async function createDIContainer() {
    * Config
    */
   container.register({
-    config: asFunction(() => (
-      new Config()
-    )).singleton(),
-    configManager: asClass(ConfigManager)
+    configFilePath: asValue(path.resolve(__dirname, '../data/config.json')),
+    configRepository: asClass(ConfigJsonFileRepository),
+    defaultConfigs: asValue(defaultConfigs),
+    createDefaultConfigs: asFunction(createDefaultConfigsFactory),
+    resetDefaultConfig: asFunction(resetDefaultConfigFactory),
+    // configCollection is registering on command init
   });
 
   /**

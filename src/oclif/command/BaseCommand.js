@@ -1,10 +1,14 @@
 const { Command } = require('@oclif/command');
 
+const { asValue } = require('awilix');
+
 const graceful = require('node-graceful');
 
 const getFunctionParams = require('../../util/getFunctionParams');
 
 const createDIContainer = require('../../createDIContainer');
+
+const ConfigFileNotFoundError = require('../../config/errors/ConfigFileNotFoundError');
 
 /**
  * @abstract
@@ -13,16 +17,38 @@ class BaseCommand extends Command {
   async init() {
     this.container = await createDIContainer();
 
-    // init config object
-    const config = this.container.resolve('config');
-    
-    console.log('config init done: ', config);
+    // Load configs
+    /**
+     * @type {ConfigJsonFileRepository}
+     */
+    const configManager = this.container.resolve('configRepository');
 
+    let configCollection;
+    try {
+      // Load config collection from config file
+      configCollection = await configManager.read();
+    } catch (e) {
+      // Create default config collection if config file is not present
+      // on the first start for example
+      if (e instanceof ConfigFileNotFoundError) {
+        /**
+         * @type {createDefaultConfigs}
+         */
+        const createDefaultConfigs = this.container.resolve('createDefaultConfigs');
 
+        configCollection = createDefaultConfigs();
+      }
+    }
+
+    // Register configs collection is the container
+    this.container.register({
+      configCollection: asValue(configCollection),
+    });
+
+    // Graceful exit
     const stopAllContainers = this.container.resolve('stopAllContainers');
     const startedContainers = this.container.resolve('startedContainers');
 
-    // graceful exit
     graceful.exitOnDouble = false;
     graceful.on('exit', async () => {
       // remove all attached listeners from other libraries to mute there output
@@ -52,6 +78,13 @@ class BaseCommand extends Command {
   }
 
   async finally(err) {
+    // Save configs collection
+    const configCollection = this.container.resolve('configCollection');
+    const configRepository = this.container.resolve('configRepository');
+
+    await configRepository.write(configCollection);
+
+    // Stop all running containers
     const stopAllContainers = this.container.resolve('stopAllContainers');
     const startedContainers = this.container.resolve('startedContainers');
 
