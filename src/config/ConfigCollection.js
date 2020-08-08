@@ -35,7 +35,7 @@ class ConfigCollection {
    * @returns {ConfigCollection}
    */
   setCurrentConfigName(name) {
-    if (name !== null && this.isConfigExists(name)) {
+    if (name !== null && !this.isConfigExists(name)) {
       throw new ConfigIsNotPresentError(name);
     }
 

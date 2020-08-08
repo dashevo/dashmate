@@ -1,24 +1,27 @@
 const BaseCommand = require('../../oclif/command/BaseCommand');
-const ConfigManager = require('../../config/ConfigCollection');
 
 class ConfigSelectCommand extends BaseCommand {
   /**
-   * @param {ConfigManager} config
+   * @param {Object} args
+   * @param {Object} flags
+   * @param {ConfigCollection} configCollection
    * @return {Promise<void>}
    */
-  async runWithDependencies(config) {
-    try {
-      console.log('Entering select command');
-
-      async () => ConfigManager.loadConfigs();
-      console.log(Config);
-      this.exit();
-    } catch (e) {
-      console.log(e);
-    }
+  async runWithDependencies(
+    args,
+    flags,
+    configCollection,
+  ) {
+    configCollection.setCurrentConfigName(args.config);
   }
 }
 
 ConfigSelectCommand.description = 'Selects a configuration';
+
+ConfigSelectCommand.args = [{
+  name: 'config',
+  required: true,
+  description: 'config to select',
+}]
 
 module.exports = ConfigSelectCommand;
