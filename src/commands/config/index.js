@@ -1,29 +1,22 @@
 const BaseCommand = require('../../oclif/command/BaseCommand');
-const ConfigCollection = require('../../config/ConfigCollection');
 
 class ConfigCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
-   * @param {ConfigManager} configManager
+   * @param {ConfigCollection} configCollection
    * @return {Promise<void>}
    */
   async runWithDependencies(
-    {
-      preset,
-    },
+    args,
     flags,
-    configManager,
+    configCollection,
   ) {
-    try {
-      const currentConfigName = await configManager.getCurrentConfigName();
-      console.log('current config: ', currentConfigName);
+    const currentConfigName = await configCollection.getCurrentConfigName();
 
-      console.log(await configManager.getConfig(currentConfigName));
+    const currentConfig = await configCollection.getConfig(currentConfigName)
 
-    } catch (e) {
-      console.log(e);
-    }
+    console.log(require('util').inspect(currentConfig, {colors:true, depth:null}));
   }
 }
 
