@@ -8,26 +8,33 @@ class ConfigGetCommand extends BaseCommand {
    * @return {Promise<void>}
    */
   async runWithDependencies(
-    args,
+    {
+      config: configName,
+      option: optionPath,
+    },
     flags,
     configCollection,
   ) {
-    const currentConfig = configCollection.getCurrentConfig();
-    const option = currentConfig.get(args.option);
-    if (option) {
-      console.log(option)
-    } else {
-      console.log('option not found');
-    }
+    const config = configCollection.getConfig(configName);
+
+    // eslint-disable-next-line no-console
+    console.log(config.get(optionPath));
   }
 }
 
-ConfigGetCommand.description = 'Gets a configuration option';
+ConfigGetCommand.description = `Set config option
+
+Gets a configuration option from the specified config
+`;
 
 ConfigGetCommand.args = [{
+  name: 'config',
+  required: true,
+  description: 'config name',
+}, {
   name: 'option',
   required: true,
-  description: 'option to get',
-}]
+  description: 'option path',
+}];
 
 module.exports = ConfigGetCommand;

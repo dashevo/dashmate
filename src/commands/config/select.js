@@ -8,20 +8,28 @@ class ConfigSelectCommand extends BaseCommand {
    * @return {Promise<void>}
    */
   async runWithDependencies(
-    args,
+    {
+      config: configName,
+    },
     flags,
     configCollection,
   ) {
-    configCollection.setCurrentConfigName(args.config);
+    configCollection.setCurrentConfigName(configName);
+
+    // eslint-disable-next-line no-console
+    console.log(`${configName} config selected as a default`);
   }
 }
 
-ConfigSelectCommand.description = 'Selects a configuration';
+ConfigSelectCommand.description = `Set config as default
+
+Selects a configuration as a default one
+`;
 
 ConfigSelectCommand.args = [{
   name: 'config',
   required: true,
-  description: 'config to select',
-}]
+  description: 'config name',
+}];
 
 module.exports = ConfigSelectCommand;

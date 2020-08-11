@@ -1,5 +1,7 @@
 const BaseCommand = require('../../oclif/command/BaseCommand');
 
+const systemConfigs = require('../../config/systemConfigs/systemConfigs');
+
 class ConfigRemoveCommand extends BaseCommand {
   /**
    * @param {Object} args
@@ -8,20 +10,32 @@ class ConfigRemoveCommand extends BaseCommand {
    * @return {Promise<void>}
    */
   async runWithDependencies(
-    args,
+    {
+      config: configName,
+    },
     flags,
     configCollection,
   ) {
-    configCollection.removeConfig(args.config);
+    if (Object.keys(systemConfigs).includes(configName)) {
+      throw new Error(`System config ${configName} can't be removed`);
+    }
+
+    configCollection.removeConfig(configName);
+
+    // eslint-disable-next-line no-console
+    console.log(`${configName} is removed`);
   }
 }
 
-ConfigRemoveCommand.description = 'Removes a configuration';
+ConfigRemoveCommand.description = `Remove config
+
+Removes a configuration
+`;
 
 ConfigRemoveCommand.args = [{
   name: 'config',
   required: true,
-  description: 'config to remove',
-}]
+  description: 'config name',
+}];
 
 module.exports = ConfigRemoveCommand;

@@ -2,33 +2,46 @@ const BaseCommand = require('../../oclif/command/BaseCommand');
 
 class ConfigSetCommand extends BaseCommand {
   /**
-   * @param {Object} args
-   * @param {Object} flags
+   * @param args
+   * @param flags
    * @param {ConfigCollection} configCollection
    * @return {Promise<void>}
    */
   async runWithDependencies(
-    args,
+    {
+      config: configName,
+      option: optionPath,
+      value: optionValue,
+    },
     flags,
     configCollection,
   ) {
-    const currentConfig = configCollection.getCurrentConfig();
-    currentConfig.set(args.option, args.value);
+    const config = configCollection.getConfig(configName);
+
+    config.set(optionPath, optionValue);
+
+    // eslint-disable-next-line no-console
+    console.log(`${optionPath} set to ${config.get(optionPath)}`);
   }
 }
 
-ConfigSetCommand.description = 'Sets a configuration option';
+ConfigSetCommand.description = `Set config option
+
+Sets a configuration option to the specified config
+`;
 
 ConfigSetCommand.args = [{
+  name: 'config',
+  required: true,
+  description: 'config name',
+}, {
   name: 'option',
   required: true,
-  description: 'option to set',
+  description: 'option path',
 }, {
   name: 'value',
   required: true,
-  description: 'value for option'
-}]
-
-
+  description: 'the option value',
+}];
 
 module.exports = ConfigSetCommand;

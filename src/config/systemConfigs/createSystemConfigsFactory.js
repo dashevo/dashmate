@@ -3,23 +3,23 @@ const Config = require('../Config');
 const ConfigCollection = require('../ConfigCollection');
 
 /**
- * @param {Object} defaultConfigs
+ * @param {Object} systemConfigs
  * @return {createDefaultConfigs}
  */
-function createDefaultConfigsFactory(defaultConfigs) {
+function createSystemConfigsFactory(systemConfigs) {
   /**
    * @typedef {createDefaultConfigs}
    * @returns {ConfigCollection}
    */
   function createDefaultConfigs() {
-    const configs = Object.entries(defaultConfigs).map(([name, options]) => (
+    const configs = Object.entries(systemConfigs).map(([name, options]) => (
       new Config(name, options)
     ));
 
-    return new ConfigCollection(configs);
+    return new ConfigCollection(configs, 'default');
   }
 
   return createDefaultConfigs;
 }
 
-module.exports = createDefaultConfigsFactory;
+module.exports = createSystemConfigsFactory;

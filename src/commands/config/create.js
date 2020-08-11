@@ -8,28 +8,34 @@ class ConfigCreateCommand extends BaseCommand {
    * @return {Promise<void>}
    */
   async runWithDependencies(
-    args,
+    {
+      config: configName,
+      from: fromConfigName,
+    },
     flags,
     configCollection,
   ) {
-    if (args.from) {
-      configCollection.createConfig(args.config, args.from);
-    } else {
-      configCollection.createConfig(args.config);
-    }
+    configCollection.createConfig(configName, fromConfigName);
+
+    // eslint-disable-next-line no-console
+    console.log(`${configName} is created`);
   }
 }
 
-ConfigCreateCommand.description = 'Creates a new configuration';
+ConfigCreateCommand.description = `Create config
+
+Creates a new configuration
+`;
 
 ConfigCreateCommand.args = [{
   name: 'config',
   required: true,
-  description: 'name of config to create',
+  description: 'config name',
 }, {
   name: 'from',
   required: false,
-  description: 'base new config on existing config'
-}]
+  description: 'base new config on existing config',
+  default: 'default',
+}];
 
 module.exports = ConfigCreateCommand;

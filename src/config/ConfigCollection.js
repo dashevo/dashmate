@@ -1,10 +1,7 @@
 const Config = require('./Config');
-const protectedConfigs = require('./default/protectedConfigs');
 
 const ConfigAlreadyPresentError = require('./errors/ConfigAlreadyPresentError');
 const ConfigIsNotPresentError = require('./errors/ConfigIsNotPresentError');
-const NoConfigSelectedError = require('./errors/NoConfigSelectedError');
-const ConfigIsProtectedError = require('./errors/ConfigIsProtectedError');
 
 class ConfigCollection {
   /**
@@ -50,15 +47,10 @@ class ConfigCollection {
   /**
    * Get current config name if set
    *
-   * @returns {string}
+   * @returns {string|null}
    */
   getCurrentConfigName() {
-    if(this.currentConfigName === null) {
-      throw new NoConfigSelectedError();
-    } else {
-      return this.currentConfigName;
-    };
-
+    return this.currentConfigName;
   }
 
   /**
@@ -67,6 +59,10 @@ class ConfigCollection {
    * @returns {Config|null}
    */
   getCurrentConfig() {
+    if (this.getCurrentConfigName() === null) {
+      return null;
+    }
+
     return this.getConfig(
       this.getCurrentConfigName(),
     );
@@ -99,22 +95,17 @@ class ConfigCollection {
    * Create a new config
    *
    * @param {string} name
-   * @param {string} [fromConfigName] - Set options from another config
+   * @param {string} fromConfigName - Set options from another config
    * @returns {ConfigCollection}
    */
-  createConfig(name, fromConfigName = undefined) {
+  createConfig(name, fromConfigName) {
     if (this.isConfigExists(name)) {
       throw new ConfigAlreadyPresentError(name);
     }
 
-    let options;
-    if (fromConfigName) {
-      const fromConfig = this.getConfig(fromConfigName);
+    const fromConfig = this.getConfig(fromConfigName);
 
-      options = fromConfig.getOptions();
-    }
-
-    this.configsMap[name] = new Config(name, options);
+    this.configsMap[name] = new Config(name, fromConfig.getOptions());
 
     return this.configsMap[name];
   }
@@ -128,8 +119,6 @@ class ConfigCollection {
   removeConfig(name) {
     if (!this.isConfigExists(name)) {
       throw new ConfigIsNotPresentError(name);
-    } else if (protectedConfigs.includes(name)) {
-      throw new ConfigIsProtectedError(name);
     }
 
     if (this.getCurrentConfigName() === name) {

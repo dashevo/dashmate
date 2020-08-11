@@ -1,10 +1,14 @@
 const fs = require('fs');
 
-const Config = require('./Config');
-const ConfigCollection = require('./ConfigCollection');
+const Ajv = require('ajv');
 
-const ConfigFileNotFoundError = require('./errors/ConfigFileNotFoundError');
-const InvalidConfigFileFormatError = require('./errors/InvalidConfigFileFormatError');
+const Config = require('../Config');
+const ConfigCollection = require('../ConfigCollection');
+
+const configFileJsonSchema = require('./configFileJsonSchema');
+
+const ConfigFileNotFoundError = require('../errors/ConfigFileNotFoundError');
+const InvalidConfigFileFormatError = require('../errors/InvalidConfigFileFormatError');
 
 class ConfigJsonFileRepository {
   /**
@@ -12,6 +16,7 @@ class ConfigJsonFileRepository {
    */
   constructor(configFilePath) {
     this.configFilePath = configFilePath;
+    this.ajv = new Ajv();
   }
 
   /**
@@ -33,8 +38,21 @@ class ConfigJsonFileRepository {
       throw new InvalidConfigFileFormatError(this.configFilePath, e);
     }
 
-    const configs = Object.entries(configFileData.configs)
-      .map(([name, options]) => new Config(name, options));
+    const isValid = this.ajv.validate(configFileJsonSchema, configFileData);
+
+    if (!isValid) {
+      const error = new Error(this.ajv.errorsText(undefined, { dataVar: 'configFile' }));
+
+      throw new InvalidConfigFileFormatError(this.configFilePath, error);
+    }
+
+    let configs;
+    try {
+      configs = Object.entries(configFileData.configs)
+        .map(([name, options]) => new Config(name, options));
+    } catch (e) {
+      throw new InvalidConfigFileFormatError(this.configFilePath, e);
+    }
 
     return new ConfigCollection(configs, configFileData.currentConfigName);
   }

@@ -30,14 +30,17 @@ class BaseCommand extends Command {
     } catch (e) {
       // Create default config collection if config file is not present
       // on the first start for example
-      if (e instanceof ConfigFileNotFoundError) {
-        /**
-         * @type {createDefaultConfigs}
-         */
-        const createDefaultConfigs = this.container.resolve('createDefaultConfigs');
 
-        configCollection = createDefaultConfigs();
+      if (!(e instanceof ConfigFileNotFoundError)) {
+        throw e;
       }
+
+      /**
+       * @type {createDefaultConfigs}
+       */
+      const createDefaultConfigs = this.container.resolve('createDefaultConfigs');
+
+      configCollection = createDefaultConfigs();
     }
 
     // Register configs collection is the container
@@ -79,10 +82,13 @@ class BaseCommand extends Command {
 
   async finally(err) {
     // Save configs collection
-    const configCollection = this.container.resolve('configCollection');
     const configRepository = this.container.resolve('configRepository');
 
-    await configRepository.write(configCollection);
+    if (this.container.has('configCollection')) {
+      const configCollection = this.container.resolve('configCollection');
+
+      await configRepository.write(configCollection);
+    }
 
     // Stop all running containers
     const stopAllContainers = this.container.resolve('stopAllContainers');

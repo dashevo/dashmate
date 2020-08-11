@@ -61,7 +61,7 @@ class RegisterCommand extends BaseCommand {
 }
 
 RegisterCommand.description = `Register masternode
-...
+
 Register masternode using predefined presets
 `;
 
