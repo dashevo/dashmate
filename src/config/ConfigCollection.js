@@ -1,7 +1,10 @@
 const Config = require('./Config');
+const protectedConfigs = require('./default/protectedConfigs');
 
 const ConfigAlreadyPresentError = require('./errors/ConfigAlreadyPresentError');
 const ConfigIsNotPresentError = require('./errors/ConfigIsNotPresentError');
+const NoConfigSelectedError = require('./errors/NoConfigSelectedError');
+const ConfigIsProtectedError = require('./errors/ConfigIsProtectedError');
 
 class ConfigCollection {
   /**
@@ -50,7 +53,12 @@ class ConfigCollection {
    * @returns {string}
    */
   getCurrentConfigName() {
-    return this.currentConfigName;
+    if(this.currentConfigName === null) {
+      throw new NoConfigSelectedError();
+    } else {
+      return this.currentConfigName;
+    };
+
   }
 
   /**
@@ -120,6 +128,8 @@ class ConfigCollection {
   removeConfig(name) {
     if (!this.isConfigExists(name)) {
       throw new ConfigIsNotPresentError(name);
+    } else if (protectedConfigs.includes(name)) {
+      throw new ConfigIsProtectedError(name);
     }
 
     if (this.getCurrentConfigName() === name) {

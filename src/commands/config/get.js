@@ -1,24 +1,33 @@
 const BaseCommand = require('../../oclif/command/BaseCommand');
-const ConfigManager = require('../../config/ConfigCollection');
 
 class ConfigGetCommand extends BaseCommand {
   /**
-   * @param {ConfigManager} config
+   * @param {Object} args
+   * @param {Object} flags
+   * @param {ConfigCollection} configCollection
    * @return {Promise<void>}
    */
-  async runWithDependencies(config) {
-    try {
-      console.log('Entering get command');
-
-      async () => ConfigManager.loadConfigs();
-      console.log(Config);
-      this.exit();
-    } catch (e) {
-      console.log(e);
+  async runWithDependencies(
+    args,
+    flags,
+    configCollection,
+  ) {
+    const currentConfig = configCollection.getCurrentConfig();
+    const option = currentConfig.get(args.option);
+    if (option) {
+      console.log(option)
+    } else {
+      console.log('option not found');
     }
   }
 }
 
 ConfigGetCommand.description = 'Gets a configuration option';
+
+ConfigGetCommand.args = [{
+  name: 'option',
+  required: true,
+  description: 'option to get',
+}]
 
 module.exports = ConfigGetCommand;

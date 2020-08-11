@@ -1,24 +1,27 @@
 const BaseCommand = require('../../oclif/command/BaseCommand');
-const ConfigManager = require('../../config/ConfigCollection');
 
 class ConfigRemoveCommand extends BaseCommand {
   /**
-   * @param {ConfigManager} config
+   * @param {Object} args
+   * @param {Object} flags
+   * @param {ConfigCollection} configCollection
    * @return {Promise<void>}
    */
-  async runWithDependencies(config) {
-    try {
-      console.log('Entering remove command');
-
-      async () => ConfigManager.loadConfigs();
-      console.log(Config);
-      this.exit();
-    } catch (e) {
-      console.log(e);
-    }
+  async runWithDependencies(
+    args,
+    flags,
+    configCollection,
+  ) {
+    configCollection.removeConfig(args.config);
   }
 }
 
 ConfigRemoveCommand.description = 'Removes a configuration';
+
+ConfigRemoveCommand.args = [{
+  name: 'config',
+  required: true,
+  description: 'config to remove',
+}]
 
 module.exports = ConfigRemoveCommand;

@@ -1,24 +1,35 @@
 const BaseCommand = require('../../oclif/command/BaseCommand');
-const ConfigManager = require('../../config/ConfigCollection');
 
 class ConfigCreateCommand extends BaseCommand {
   /**
-   * @param {ConfigManager} config
+   * @param {Object} args
+   * @param {Object} flags
+   * @param {ConfigCollection} configCollection
    * @return {Promise<void>}
    */
-  async runWithDependencies(config) {
-    try {
-      console.log('Entering create command');
-
-      async () => ConfigManager.loadConfigs();
-      console.log(Config);
-      this.exit();
-    } catch (e) {
-      console.log(e);
+  async runWithDependencies(
+    args,
+    flags,
+    configCollection,
+  ) {
+    if (args.from) {
+      configCollection.createConfig(args.config, args.from);
+    } else {
+      configCollection.createConfig(args.config);
     }
   }
 }
 
 ConfigCreateCommand.description = 'Creates a new configuration';
+
+ConfigCreateCommand.args = [{
+  name: 'config',
+  required: true,
+  description: 'name of config to create',
+}, {
+  name: 'from',
+  required: false,
+  description: 'base new config on existing config'
+}]
 
 module.exports = ConfigCreateCommand;
