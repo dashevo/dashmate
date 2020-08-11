@@ -6,6 +6,8 @@ const lodashCloneDeep = require('lodash.clonedeep');
 
 const configJsonSchema = require('./configJsonSchema');
 
+const convertObjectToEnvs = require('./convertObjectToEnvs');
+
 const InvalidOptionPathError = require('./errors/InvalidOptionPathError');
 const InvalidOptionError = require('./errors/InvalidOptionError');
 const InvalidOptionsError = require('./errors/InvalidOptionsError');
@@ -112,6 +114,10 @@ class Config {
     this.options = clonedOptions;
 
     return this;
+  }
+
+  toEnvs() {
+    return convertObjectToEnvs(this.getOptions());
   }
 }
 
