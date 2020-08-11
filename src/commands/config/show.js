@@ -1,6 +1,8 @@
+const { inspect } = require('util');
+
 const BaseCommand = require('../../oclif/command/BaseCommand');
 
-class ConfigSelectCommand extends BaseCommand {
+class ConfigShowCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
@@ -14,22 +16,27 @@ class ConfigSelectCommand extends BaseCommand {
     flags,
     configCollection,
   ) {
-    configCollection.setDefaultConfigName(configName);
+    const config = configCollection.getConfig(configName);
 
     // eslint-disable-next-line no-console
-    console.log(`${configName} config selected as a default`);
+    console.log(
+      inspect(
+        config.getOptions(),
+        { colors: true, depth: null },
+      ),
+    );
   }
 }
 
-ConfigSelectCommand.description = `Set config as default
+ConfigShowCommand.description = `Show config options
 
-Selects a configuration as a default one
+Display configuration options for the specified config
 `;
 
-ConfigSelectCommand.args = [{
+ConfigShowCommand.args = [{
   name: 'config',
   required: true,
   description: 'config name',
 }];
 
-module.exports = ConfigSelectCommand;
+module.exports = ConfigShowCommand;

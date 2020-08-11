@@ -1,3 +1,5 @@
+const NETWORKS = require('../networks');
+
 module.exports = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   type: 'object',
@@ -43,10 +45,6 @@ module.exports = {
         version: {
           type: 'string',
         },
-        externalIp: {
-          type: ['string', 'null'],
-          format: 'ipv4',
-        },
         p2p: {
           type: 'object',
           properties: {
@@ -76,7 +74,7 @@ module.exports = {
           additionalProperties: false,
         },
       },
-      required: ['docker', 'version', 'externalIp', 'p2p', 'masternode'],
+      required: ['docker', 'version', 'p2p', 'masternode'],
       additionalProperties: false,
     },
     platform: {
@@ -134,7 +132,15 @@ module.exports = {
       required: ['dapi', 'drive', 'dpns'],
       additionalProperties: false,
     },
+    externalIp: {
+      type: ['string', 'null'],
+      format: 'ipv4',
+    },
+    network: {
+      type: 'string',
+      enum: Object.values(NETWORKS),
+    },
   },
-  required: ['description', 'core', 'platform'],
+  required: ['description', 'core', 'platform', 'externalIp', 'network'],
   additionalProperties: false,
 };

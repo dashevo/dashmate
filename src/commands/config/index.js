@@ -12,14 +12,20 @@ class ConfigCommand extends BaseCommand {
     flags,
     configCollection,
   ) {
-    const currentConfigName = await configCollection.getCurrentConfigName();
+    const defaultConfigName = await configCollection.getDefaultConfigName();
 
-    const currentConfig = await configCollection.getConfig(currentConfigName)
+    const message = defaultConfigName === null
+      ? 'Default config is not selected'
+      : `${defaultConfigName} config is selected as default`;
 
-    console.log(require('util').inspect(currentConfig, {colors:true, depth:null}));
+    // eslint-disable-next-line no-console
+    console.log(message);
   }
 }
 
-ConfigCommand.description = 'Shows current configuration and options';
+ConfigCommand.description = `Show default config
+
+Shows current default configuration name
+`;
 
 module.exports = ConfigCommand;

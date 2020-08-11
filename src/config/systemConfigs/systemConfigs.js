@@ -1,5 +1,7 @@
 const lodashMerge = require('lodash.merge');
 
+const NETWORKS = require('../../networks');
+
 const defaultConfig = {
   description: null,
   core: {
@@ -7,7 +9,6 @@ const defaultConfig = {
       image: 'dashpay/dashd',
     },
     version: '0.15',
-    externalIp: null,
     p2p: {
       port: 20001,
     },
@@ -69,15 +70,16 @@ const defaultConfig = {
       ownerId: null,
     },
   },
+  externalIp: null,
+  network: NETWORKS.TESTNET,
 };
 
 module.exports = {
   default: defaultConfig,
   local: lodashMerge({}, defaultConfig, {
     description: 'standalone node for local development',
-    core: {
-      externalIp: '127.0.0.1',
-    },
+    externalIp: '127.0.0.1',
+    network: NETWORKS.LOCAL,
   }),
   evonet: lodashMerge({}, defaultConfig, {
     description: 'node with Evonet configuration',
@@ -87,6 +89,7 @@ module.exports = {
         ownerId: 'UZ9jAodWiFxRg82HuA1Lf3mTh4fTGSiughxqkZX5kUA',
       },
     },
+    network: NETWORKS.EVONET,
   }),
   testnet: lodashMerge({}, defaultConfig, {
     description: 'node with testnet configuration',
@@ -95,5 +98,6 @@ module.exports = {
         port: 19999,
       },
     },
+    network: NETWORKS.TESTNET,
   }),
 };

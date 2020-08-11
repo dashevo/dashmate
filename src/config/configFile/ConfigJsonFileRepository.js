@@ -54,7 +54,7 @@ class ConfigJsonFileRepository {
       throw new InvalidConfigFileFormatError(this.configFilePath, e);
     }
 
-    return new ConfigCollection(configs, configFileData.currentConfigName);
+    return new ConfigCollection(configs, configFileData.defaultConfigName);
   }
 
   /**
@@ -65,7 +65,7 @@ class ConfigJsonFileRepository {
    */
   async write(configCollection) {
     const configFileData = {
-      currentConfigName: configCollection.getCurrentConfigName(),
+      defaultConfigName: configCollection.getDefaultConfigName(),
     };
 
     configFileData.configs = configCollection.getAllConfigs().reduce((configsMap, config) => {

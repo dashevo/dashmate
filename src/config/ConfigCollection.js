@@ -16,7 +16,7 @@ class ConfigCollection {
       return configsMap;
     }, {});
 
-    this.setCurrentConfigName(currentConfigName);
+    this.setDefaultConfigName(currentConfigName);
   }
 
   /**
@@ -34,12 +34,12 @@ class ConfigCollection {
    * @param {string|null} name
    * @returns {ConfigCollection}
    */
-  setCurrentConfigName(name) {
+  setDefaultConfigName(name) {
     if (name !== null && !this.isConfigExists(name)) {
       throw new ConfigIsNotPresentError(name);
     }
 
-    this.currentConfigName = name;
+    this.defaultConfigName = name;
 
     return this;
   }
@@ -49,8 +49,8 @@ class ConfigCollection {
    *
    * @returns {string|null}
    */
-  getCurrentConfigName() {
-    return this.currentConfigName;
+  getDefaultConfigName() {
+    return this.defaultConfigName;
   }
 
   /**
@@ -58,13 +58,13 @@ class ConfigCollection {
    *
    * @returns {Config|null}
    */
-  getCurrentConfig() {
-    if (this.getCurrentConfigName() === null) {
+  getDefaultConfig() {
+    if (this.getDefaultConfigName() === null) {
       return null;
     }
 
     return this.getConfig(
-      this.getCurrentConfigName(),
+      this.getDefaultConfigName(),
     );
   }
 
@@ -121,8 +121,8 @@ class ConfigCollection {
       throw new ConfigIsNotPresentError(name);
     }
 
-    if (this.getCurrentConfigName() === name) {
-      this.setCurrentConfigName(null);
+    if (this.getDefaultConfigName() === name) {
+      this.setDefaultConfigName(null);
     }
 
     delete this.configsMap[name];

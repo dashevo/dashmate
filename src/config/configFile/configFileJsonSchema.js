@@ -2,13 +2,13 @@ module.exports = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   type: 'object',
   properties: {
-    currentConfigName: {
+    defaultConfigName: {
       type: ['string', 'null'],
     },
     configs: {
       type: 'object',
     },
   },
-  required: ['currentConfigName', 'configs'],
+  required: ['defaultConfigName', 'configs'],
   additionalProperties: false,
 };

@@ -9,6 +9,7 @@ const configJsonSchema = require('./configJsonSchema');
 const InvalidOptionPathError = require('./errors/InvalidOptionPathError');
 const InvalidOptionError = require('./errors/InvalidOptionError');
 const InvalidOptionsError = require('./errors/InvalidOptionsError');
+const OptionIsNotSetError = require('./errors/OptionIsNotSetError');
 
 class Config {
   /**
@@ -30,12 +31,19 @@ class Config {
 
   /**
    * Get config option
+   *
+   * @param {string} path
+   * @param {boolean} [isRequired=false]
    */
-  get(path) {
+  get(path, isRequired = false) {
     const value = lodashGet(this.options, path);
 
     if (value === undefined) {
       throw new InvalidOptionPathError(path);
+    }
+
+    if (isRequired && value === null) {
+      throw new OptionIsNotSetError(this, path);
     }
 
     return value;
