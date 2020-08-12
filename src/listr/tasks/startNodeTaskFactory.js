@@ -49,12 +49,12 @@ function startNodeTaskFactory(dockerCompose) {
 
             if (driveImageBuildPath) {
               envs.COMPOSE_FILE += ':docker-compose.platform.build-drive.yml';
-              envs.DRIVE_IMAGE_BUILD_PATH = driveImageBuildPath;
+              envs.PLATFORM_DRIVE_DOCKER_IMAGE_BUILD_PATH = driveImageBuildPath;
             }
 
             if (dapiImageBuildPath) {
               envs.COMPOSE_FILE += ':docker-compose.platform.build-dapi.yml';
-              envs.DAPI_IMAGE_BUILD_PATH = dapiImageBuildPath;
+              envs.PLATFORM_DAPI_DOCKER_IMAGE_BUILD_PATH = dapiImageBuildPath;
             }
           }
 
