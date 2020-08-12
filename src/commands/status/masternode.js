@@ -57,6 +57,6 @@ MasternodeStatusCommand.flags = {
     description: 'configuration name to use',
     default: null,
   }),
-}
+};
 
 module.exports = MasternodeStatusCommand;

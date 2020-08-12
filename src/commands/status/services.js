@@ -5,7 +5,6 @@ const chalk = require('chalk');
 const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
-const ConfigCollection = require('../../config/ConfigCollection');
 
 class ServicesStatusCommand extends BaseCommand {
   /**
@@ -112,6 +111,6 @@ ServicesStatusCommand.flags = {
     description: 'configuration name to use',
     default: null,
   }),
-}
+};
 
 module.exports = ServicesStatusCommand;
