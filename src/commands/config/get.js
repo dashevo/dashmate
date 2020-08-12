@@ -22,7 +22,7 @@ class ConfigGetCommand extends BaseCommand {
   }
 }
 
-ConfigGetCommand.description = `Set config option
+ConfigGetCommand.description = `Get config option
 
 Gets a configuration option from the specified config
 `;
