@@ -36,7 +36,7 @@ const defaultConfig = {
         docker: {
           image: 'dashpay/dapi',
         },
-        version: '0.14',
+        version: '0.15-dev',
       },
       insight: {
         docker: {

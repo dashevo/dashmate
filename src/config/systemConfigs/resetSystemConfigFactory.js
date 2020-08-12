@@ -1,24 +1,24 @@
 /**
  * @param {Object} systemConfigs
- * @return {resetDefaultConfig}
+ * @return {resetSystemConfig}
  */
 function resetSystemConfigFactory(systemConfigs) {
   /**
-   * @typedef {resetDefaultConfig}
+   * @typedef {resetSystemConfig}
    *
    * @param {ConfigCollection} configCollection
    * @param {string} name
    */
-  function resetDefaultConfig(configCollection, name) {
+  function resetSystemConfig(configCollection, name) {
     const systemConfigNames = Object.keys(systemConfigs);
-    if (!systemConfigNames.contains(name)) {
+    if (!systemConfigNames.includes(name)) {
       throw new Error(`Only system configs can be reset: ${systemConfigNames.join(', ')}`);
     }
 
     configCollection.getConfig(name).setOptions(systemConfigs[name]);
   }
 
-  return resetDefaultConfig;
+  return resetSystemConfig;
 }
 
 module.exports = resetSystemConfigFactory;

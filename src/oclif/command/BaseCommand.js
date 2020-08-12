@@ -36,11 +36,11 @@ class BaseCommand extends Command {
       }
 
       /**
-       * @type {createDefaultConfigs}
+       * @type {createSystemConfigs}
        */
-      const createDefaultConfigs = this.container.resolve('createDefaultConfigs');
+      const createSystemConfigs = this.container.resolve('createSystemConfigs');
 
-      configCollection = createDefaultConfigs();
+      configCollection = createSystemConfigs();
     }
 
     // Register configs collection is the container

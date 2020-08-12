@@ -4,14 +4,14 @@ const ConfigCollection = require('../ConfigCollection');
 
 /**
  * @param {Object} systemConfigs
- * @return {createDefaultConfigs}
+ * @return {createSystemConfigs}
  */
 function createSystemConfigsFactory(systemConfigs) {
   /**
-   * @typedef {createDefaultConfigs}
+   * @typedef {createSystemConfigs}
    * @returns {ConfigCollection}
    */
-  function createDefaultConfigs() {
+  function createSystemConfigs() {
     const configs = Object.entries(systemConfigs).map(([name, options]) => (
       new Config(name, options)
     ));
@@ -19,7 +19,7 @@ function createSystemConfigsFactory(systemConfigs) {
     return new ConfigCollection(configs, 'default');
   }
 
-  return createDefaultConfigs;
+  return createSystemConfigs;
 }
 
 module.exports = createSystemConfigsFactory;
