@@ -1,32 +1,38 @@
 const { table } = require('table');
+const { flags: flagTypes } = require('@oclif/command');
 const chalk = require('chalk');
 
 const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
-
-const PRESETS = require('../../presets');
+const ConfigCollection = require('../../config/ConfigCollection');
 
 class ServicesStatusCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
+   * @param {ConfigCollection} configCollection
    * @return {Promise<void>}
    */
   async runWithDependencies(
+    args,
     {
-      preset,
+      config: configName,
     },
-    flags,
     dockerCompose,
+    configCollection,
   ) {
+    const config = configName === null
+      ? configCollection.getDefaultConfig()
+      : configCollection.getConfig(configName);
+
     const serviceHumanNames = {
       core: 'Core',
       sentinel: 'Sentinel',
     };
 
-    if (preset !== 'testnet') {
+    if (config.name !== 'testnet') {
       Object.assign(serviceHumanNames, {
         drive_mongodb_replica_init: 'Initiate Drive MongoDB replica',
         drive_mongodb: 'Drive MongoDB',
@@ -62,7 +68,7 @@ class ServicesStatusCommand extends BaseCommand {
               'org.dash.version': version,
             },
           },
-        } = await dockerCompose.inspectService(preset, serviceName));
+        } = await dockerCompose.inspectService(config.toEnvs(), serviceName));
       } catch (e) {
         if (e instanceof ContainerIsNotPresentError) {
           status = 'not started';
@@ -101,11 +107,11 @@ class ServicesStatusCommand extends BaseCommand {
 
 ServicesStatusCommand.description = 'Show service status details';
 
-ServicesStatusCommand.args = [{
-  name: 'preset',
-  required: true,
-  description: 'preset to use',
-  options: Object.values(PRESETS),
-}];
+ServicesStatusCommand.flags = {
+  config: flagTypes.string({
+    description: 'configuration name to use',
+    default: null,
+  }),
+}
 
 module.exports = ServicesStatusCommand;

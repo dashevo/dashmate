@@ -1,28 +1,33 @@
 const { table } = require('table');
+const { flags: flagTypes } = require('@oclif/command');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
-
-const PRESETS = require('../../presets');
 
 class MasternodeStatusCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
+   * @param {ConfigCollection} configCollection
    * @return {Promise<void>}
    */
   async runWithDependencies(
+    args,
     {
-      preset,
+      config: configName,
     },
-    flags,
     dockerCompose,
+    configCollection,
   ) {
+    const config = configName === null
+      ? configCollection.getDefaultConfig()
+      : configCollection.getConfig(configName);
+
     const rows = [];
 
     // Version
     const versionOutput = await dockerCompose.execCommand(
-      preset,
+      config.toEnvs(),
       'core',
       'dashd --version',
     );
@@ -31,7 +36,7 @@ class MasternodeStatusCommand extends BaseCommand {
 
     // Block count
     const blockCountOutput = await dockerCompose.execCommand(
-      preset,
+      config.toEnvs(),
       'core',
       'dash-cli getblockcount',
     );
@@ -47,11 +52,11 @@ class MasternodeStatusCommand extends BaseCommand {
 
 MasternodeStatusCommand.description = 'Show masternode status details';
 
-MasternodeStatusCommand.args = [{
-  name: 'preset',
-  required: true,
-  description: 'preset to use',
-  options: Object.values(PRESETS),
-}];
+MasternodeStatusCommand.flags = {
+  config: flagTypes.string({
+    description: 'configuration name to use',
+    default: null,
+  }),
+}
 
 module.exports = MasternodeStatusCommand;
