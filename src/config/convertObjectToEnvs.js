@@ -11,7 +11,6 @@ function camelToSnakeCase(str) {
 }
 
 /**
- *
  * @param {Object} envs
  * @param {*} value
  * @param {string} [key='']

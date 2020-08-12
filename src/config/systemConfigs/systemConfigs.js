@@ -72,6 +72,9 @@ const defaultConfig = {
   },
   externalIp: null,
   network: NETWORKS.TESTNET,
+  compose: {
+    file: 'docker-compose.yml:docker-compose.platform.yml',
+  },
 };
 
 module.exports = {
@@ -99,5 +102,8 @@ module.exports = {
       },
     },
     network: NETWORKS.TESTNET,
+    compose: {
+      file: 'docker-compose.yml',
+    },
   }),
 };

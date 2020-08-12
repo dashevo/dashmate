@@ -75,7 +75,7 @@ class ConfigJsonFileRepository {
       return configsMap;
     }, {});
 
-    const configFileJSON = JSON.stringify(configFileData);
+    const configFileJSON = JSON.stringify(configFileData, undefined, 2);
 
     fs.writeFileSync(this.configFilePath, configFileJSON, 'utf8');
   }

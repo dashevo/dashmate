@@ -117,7 +117,10 @@ class Config {
   }
 
   toEnvs() {
-    return convertObjectToEnvs(this.getOptions());
+    return {
+      COMPOSE_PROJECT_NAME: `dash_masternode_${this.getName()}`,
+      ...convertObjectToEnvs(this.getOptions()),
+    };
   }
 }
 

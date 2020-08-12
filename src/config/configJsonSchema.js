@@ -140,7 +140,17 @@ module.exports = {
       type: 'string',
       enum: Object.values(NETWORKS),
     },
+    compose: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+        },
+      },
+      required: ['file'],
+      additionalProperties: false,
+    },
   },
-  required: ['description', 'core', 'platform', 'externalIp', 'network'],
+  required: ['description', 'core', 'platform', 'externalIp', 'network', 'compose'],
   additionalProperties: false,
 };

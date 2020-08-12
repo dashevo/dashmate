@@ -1,29 +1,35 @@
+const { flags: flagTypes } = require('@oclif/command');
+
 const { Listr } = require('listr2');
 
 const BaseCommand = require('../oclif/command/BaseCommand');
 
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
 
-const PRESETS = require('../presets');
-
 class StopCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
+   * @param {ConfigCollection} configCollection
    * @return {Promise<void>}
    */
   async runWithDependencies(
+    args,
     {
-      preset,
+      config: configName,
     },
-    flags,
     dockerCompose,
+    configCollection,
   ) {
+    const config = configName === null
+      ? configCollection.getDefaultConfig()
+      : configCollection.getConfig(configName);
+
     const tasks = new Listr([
       {
-        title: `Stop masternode with ${preset} preset`,
-        task: async () => dockerCompose.stop(preset),
+        title: 'Stop node',
+        task: async () => dockerCompose.stop(config.toEnvs()),
       },
     ],
     {
@@ -42,16 +48,16 @@ class StopCommand extends BaseCommand {
   }
 }
 
-StopCommand.description = `Stop masternode
-...
-Stop masternode with specific preset
+StopCommand.description = `Stop node
+
+Stop node
 `;
 
-StopCommand.args = [{
-  name: 'preset',
-  required: true,
-  description: 'preset to use',
-  options: Object.values(PRESETS),
-}];
+StopCommand.flags = {
+  config: flagTypes.string({
+    description: 'configuration name to use',
+    default: null,
+  }),
+};
 
 module.exports = StopCommand;

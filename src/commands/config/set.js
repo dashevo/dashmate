@@ -18,6 +18,11 @@ class ConfigSetCommand extends BaseCommand {
   ) {
     const config = configCollection.getConfig(configName);
 
+    if (optionValue === 'null') {
+      // eslint-disable-next-line no-param-reassign
+      optionValue = null;
+    }
+
     config.set(optionPath, optionValue);
 
     // eslint-disable-next-line no-console
