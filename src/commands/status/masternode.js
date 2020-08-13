@@ -1,5 +1,4 @@
 const { table } = require('table');
-const { flags: flagTypes } = require('@oclif/command');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
 
@@ -8,21 +7,15 @@ class MasternodeStatusCommand extends BaseCommand {
    * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
-   * @param {ConfigCollection} configCollection
+   * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
     args,
-    {
-      config: configName,
-    },
+    flags,
     dockerCompose,
-    configCollection,
+    config,
   ) {
-    const config = configName === null
-      ? configCollection.getDefaultConfig()
-      : configCollection.getConfig(configName);
-
     const rows = [];
 
     // Version
@@ -53,10 +46,7 @@ class MasternodeStatusCommand extends BaseCommand {
 MasternodeStatusCommand.description = 'Show masternode status details';
 
 MasternodeStatusCommand.flags = {
-  config: flagTypes.string({
-    description: 'configuration name to use',
-    default: null,
-  }),
+  ...BaseCommand.flags,
 };
 
 module.exports = MasternodeStatusCommand;

@@ -1,5 +1,3 @@
-const { flags: flagTypes } = require('@oclif/command');
-
 const { Listr } = require('listr2');
 
 const BaseCommand = require('../oclif/command/BaseCommand');
@@ -11,21 +9,15 @@ class StopCommand extends BaseCommand {
    * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
-   * @param {ConfigCollection} configCollection
+   * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
     args,
-    {
-      config: configName,
-    },
+    flags,
     dockerCompose,
-    configCollection,
+    config,
   ) {
-    const config = configName === null
-      ? configCollection.getDefaultConfig()
-      : configCollection.getConfig(configName);
-
     const tasks = new Listr([
       {
         title: 'Stop node',
@@ -54,10 +46,7 @@ Stop node
 `;
 
 StopCommand.flags = {
-  config: flagTypes.string({
-    description: 'configuration name to use',
-    default: null,
-  }),
+  ...BaseCommand.flags,
 };
 
 module.exports = StopCommand;

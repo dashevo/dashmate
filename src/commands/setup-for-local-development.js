@@ -19,13 +19,12 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
    * @param {generateBlocksWithSDK} generateBlocksWithSDK
    * @param {startNodeTask} startNodeTask
    * @param {DockerCompose} dockerCompose
-   * @param {ConfigCollection} configCollection
+   * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
     args,
     {
-      config: configName,
       update: isUpdate,
       'drive-image-build-path': driveImageBuildPath,
       'dapi-image-build-path': dapiImageBuildPath,
@@ -36,12 +35,8 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
     generateBlocksWithSDK,
     startNodeTask,
     dockerCompose,
-    configCollection,
+    config,
   ) {
-    const config = configName === null
-      ? configCollection.getDefaultConfig()
-      : configCollection.getConfig(configName);
-
     if (config.get('network') !== NETWORKS.LOCAL) {
       throw new Error(`This command supposed to work only with local network. Your network is ${config.get('network')}`);
     }
@@ -126,7 +121,7 @@ Generate some dash, register masternode and populate node with data required for
 `;
 
 SetupForLocalDevelopmentCommand.flags = {
-  config: flagTypes.string({ description: 'configuration name to use', default: null }),
+  ...BaseCommand.flags,
   update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
   'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
   'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),

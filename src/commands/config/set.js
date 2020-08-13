@@ -4,20 +4,17 @@ class ConfigSetCommand extends BaseCommand {
   /**
    * @param args
    * @param flags
-   * @param {ConfigCollection} configCollection
+   * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
     {
-      config: configName,
       option: optionPath,
       value: optionValue,
     },
     flags,
-    configCollection,
+    config,
   ) {
-    const config = configCollection.getConfig(configName);
-
     if (optionValue === 'null') {
       // eslint-disable-next-line no-param-reassign
       optionValue = null;
@@ -36,10 +33,6 @@ Sets a configuration option to the specified config
 `;
 
 ConfigSetCommand.args = [{
-  name: 'config',
-  required: true,
-  description: 'config name',
-}, {
   name: 'option',
   required: true,
   description: 'option path',
@@ -48,5 +41,9 @@ ConfigSetCommand.args = [{
   required: true,
   description: 'the option value',
 }];
+
+ConfigSetCommand.flags = {
+  ...BaseCommand.flags,
+};
 
 module.exports = ConfigSetCommand;

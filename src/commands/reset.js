@@ -1,5 +1,3 @@
-const { flags: flagTypes } = require('@oclif/command');
-
 const { Listr } = require('listr2');
 
 const rimraf = require('rimraf');
@@ -15,21 +13,15 @@ class ResetCommand extends BaseCommand {
    * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
-   * @param {ConfigCollection} configCollection
+   * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
     args,
-    {
-      config: configName,
-    },
+    flags,
     dockerCompose,
-    configCollection,
+    config,
   ) {
-    const config = configName === null
-      ? configCollection.getDefaultConfig()
-      : configCollection.getConfig(configName);
-
     const tasks = new Listr([
       {
         title: 'Reset node data',
@@ -86,10 +78,7 @@ Reset node data
 `;
 
 ResetCommand.flags = {
-  config: flagTypes.string({
-    description: 'configuration name to use',
-    default: null,
-  }),
+  ...BaseCommand.flags,
 };
 
 module.exports = ResetCommand;

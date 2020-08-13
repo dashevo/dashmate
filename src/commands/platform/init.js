@@ -12,7 +12,7 @@ class InitCommand extends BaseCommand {
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
    * @param {initTask} initTask
-   * @param {ConfigCollection} configCollection
+   * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -21,18 +21,13 @@ class InitCommand extends BaseCommand {
       'funding-private-key': fundingPrivateKeyString,
     },
     {
-      config: configName,
       'drive-image-build-path': driveImageBuildPath,
       'dapi-image-build-path': dapiImageBuildPath,
     },
     dockerCompose,
     initTask,
-    configCollection,
+    config,
   ) {
-    const config = configName === null
-      ? configCollection.getDefaultConfig()
-      : configCollection.getConfig(configName);
-
     const tasks = new Listr([
       {
         title: 'Initialize Platform',
@@ -76,10 +71,7 @@ InitCommand.args = [{
 }];
 
 InitCommand.flags = {
-  config: flagTypes.string({
-    description: 'configuration name to use',
-    default: null,
-  }),
+  ...BaseCommand.flags,
   'drive-image-build-path': flagTypes.string({
     description: 'drive\'s docker image build path',
     default: null,

@@ -6,18 +6,14 @@ class ConfigShowCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
-   * @param {ConfigCollection} configCollection
+   * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
-    {
-      config: configName,
-    },
+    args,
     flags,
-    configCollection,
+    config,
   ) {
-    const config = configCollection.getConfig(configName);
-
     // eslint-disable-next-line no-console
     console.log(
       inspect(
@@ -33,10 +29,8 @@ ConfigShowCommand.description = `Show config options
 Display configuration options for the specified config
 `;
 
-ConfigShowCommand.args = [{
-  name: 'config',
-  required: true,
-  description: 'config name',
-}];
+ConfigShowCommand.flags = {
+  ...BaseCommand.flags,
+};
 
 module.exports = ConfigShowCommand;

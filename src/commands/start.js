@@ -12,7 +12,7 @@ class StartCommand extends BaseCommand {
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
    * @param {startNodeTask} startNodeTask
-   * @param {ConfigCollection} configCollection
+   * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -22,16 +22,11 @@ class StartCommand extends BaseCommand {
       update: isUpdate,
       'drive-image-build-path': driveImageBuildPath,
       'dapi-image-build-path': dapiImageBuildPath,
-      config: configName,
     },
     dockerCompose,
     startNodeTask,
-    configCollection,
+    config,
   ) {
-    const config = configName === null
-      ? configCollection.getDefaultConfig()
-      : configCollection.getConfig(configName);
-
     const tasks = new Listr(
       [
         {
@@ -70,10 +65,7 @@ Start masternode with specific preset
 `;
 
 StartCommand.flags = {
-  config: flagTypes.string({
-    description: 'configuration name to use',
-    default: null,
-  }),
+  ...BaseCommand.flags,
   'full-node': flagTypes.boolean({ char: 'f', description: 'start as full node', default: false }),
   update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
   'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),

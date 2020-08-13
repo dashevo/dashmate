@@ -4,18 +4,14 @@ class ConfigEnvsCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
-   * @param {ConfigCollection} configCollection
+   * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
-    {
-      config: configName,
-    },
+    args,
     flags,
-    configCollection,
+    config,
   ) {
-    const config = configCollection.getConfig(configName);
-
     for (const [key, value] of Object.entries(config.toEnvs())) {
       // eslint-disable-next-line no-console
       console.log(`${key}="${value}"`);
@@ -28,10 +24,8 @@ ConfigEnvsCommand.description = `Export config to envs
 Export configuration options as Docker Compose envs
 `;
 
-ConfigEnvsCommand.args = [{
-  name: 'config',
-  required: true,
-  description: 'config name',
-}];
+ConfigEnvsCommand.flags = {
+  ...BaseCommand.flags,
+};
 
 module.exports = ConfigEnvsCommand;

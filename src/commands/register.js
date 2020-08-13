@@ -1,5 +1,3 @@
-const { flags: flagTypes } = require('@oclif/command');
-
 const { Listr } = require('listr2');
 
 const { PrivateKey } = require('@dashevo/dashcore-lib');
@@ -14,7 +12,7 @@ class RegisterCommand extends BaseCommand {
    * @param {Object} args
    * @param {Object} flags
    * @param {registerMasternodeTask} registerMasternodeTask
-   * @param {ConfigCollection} configCollection
+   * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -22,16 +20,11 @@ class RegisterCommand extends BaseCommand {
       'funding-private-key': fundingPrivateKeyString,
     },
     {
-      config: configName,
       saveOperatorPrivateKey,
     },
     registerMasternodeTask,
-    configCollection,
+    config,
   ) {
-    const config = configName === null
-      ? configCollection.getDefaultConfig()
-      : configCollection.getConfig(configName);
-
     const network = config.get('network');
 
     const fundingPrivateKey = new PrivateKey(
@@ -79,10 +72,7 @@ RegisterCommand.args = [{
 }];
 
 RegisterCommand.flags = {
-  config: flagTypes.string({
-    description: 'configuration name to use',
-    default: null,
-  }),
+  ...BaseCommand.flags,
 };
 
 module.exports = RegisterCommand;

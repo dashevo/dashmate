@@ -1,4 +1,4 @@
-const { Command } = require('@oclif/command');
+const { Command, flags: flagTypes } = require('@oclif/command');
 
 const { asValue } = require('awilix');
 
@@ -71,11 +71,22 @@ class BaseCommand extends Command {
       throw new Error('`run` or `runWithDependencies` must be implemented');
     }
 
+    const { args, flags } = this.parse(this.constructor);
+
+    if (Object.prototype.hasOwnProperty.call(flags, 'config')) {
+      const configCollection = this.container.resolve('configCollection');
+      const config = flags.config === null
+        ? configCollection.getDefaultConfig()
+        : configCollection.getConfig(flags.config);
+
+      this.container.register({
+        config: asValue(config),
+      });
+    }
+
     const params = getFunctionParams(this.runWithDependencies, 2);
 
     const dependencies = params.map((paramName) => this.container.resolve(paramName));
-
-    const { args, flags } = this.parse(this.constructor);
 
     return this.runWithDependencies(args, flags, ...dependencies);
   }
@@ -99,5 +110,12 @@ class BaseCommand extends Command {
     return super.finally(err);
   }
 }
+
+BaseCommand.flags = {
+  config: flagTypes.string({
+    description: 'configuration name to use',
+    default: null,
+  }),
+};
 
 module.exports = BaseCommand;

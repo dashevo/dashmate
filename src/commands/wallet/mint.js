@@ -12,7 +12,7 @@ class MintCommand extends BaseCommand {
    * @param {Object} args
    * @param {Object} flags
    * @param {generateToAddressTask} generateToAddressTask
-   * @param {ConfigCollection} configCollection
+   * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -20,16 +20,11 @@ class MintCommand extends BaseCommand {
       amount,
     },
     {
-      config: configName,
       address,
     },
     generateToAddressTask,
-    configCollection,
+    config,
   ) {
-    const config = configName === null
-      ? configCollection.getDefaultConfig()
-      : configCollection.getConfig(configName);
-
     const network = config.get('network');
 
     if (network !== NETWORKS.LOCAL) {
@@ -67,8 +62,8 @@ Mint specified amount of dash to a new address or specified one
 `;
 
 MintCommand.flags = {
+  ...BaseCommand.flags,
   address: flagTypes.string({ char: 'a', description: 'recipient address instead of a new one', default: null }),
-  config: flagTypes.string({ description: 'configuration name to use', default: null }),
 };
 
 MintCommand.args = [{
