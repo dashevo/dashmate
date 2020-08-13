@@ -32,8 +32,8 @@ services:
       - CORE_JSON_RPC_HOST=core
       - CORE_JSON_RPC_PORT=20002
       - DOCUMENT_MONGODB_URL=mongodb://drive_mongodb:27017?replicaSet=driveDocumentIndices
-      - DPNS_CONTRACT_ID=${DPNS_CONTRACT_ID}
-      - DPNS_TOP_LEVEL_IDENTITY=${DPNS_TOP_LEVEL_IDENTITY}
+      - DPNS_CONTRACT_ID=${PLATFORM_DPNS_CONTRACT_ID}
+      - DPNS_TOP_LEVEL_IDENTITY=${PLATFORM_DPNS_OWNER_ID}
     command: npm run abci
 
   drive_tendermint:
