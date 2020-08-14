@@ -19,9 +19,7 @@ class RegisterCommand extends BaseCommand {
     {
       'funding-private-key': fundingPrivateKeyString,
     },
-    {
-      saveOperatorPrivateKey,
-    },
+    flags,
     registerMasternodeTask,
     config,
   ) {
@@ -52,7 +50,6 @@ class RegisterCommand extends BaseCommand {
       await tasks.run({
         fundingAddress,
         fundingPrivateKeyString,
-        saveOperatorPrivateKey,
       });
     } catch (e) {
       throw new MuteOneLineError(e);
@@ -62,7 +59,7 @@ class RegisterCommand extends BaseCommand {
 
 RegisterCommand.description = `Register masternode
 
-Register masternode
+Register masternode and set operator private key in config
 `;
 
 RegisterCommand.args = [{
