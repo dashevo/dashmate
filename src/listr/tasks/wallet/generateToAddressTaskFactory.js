@@ -67,7 +67,7 @@ function generateToAddressTaskFactory(
             // eslint-disable-next-line no-param-reassign
             task.output = `Generated ${ctx.balance} dash`;
 
-            // Set for further commands
+            // Set for further tasks
             ctx.fundingAddress = ctx.address;
             ctx.fundingPrivateKeyString = ctx.privateKey;
 
