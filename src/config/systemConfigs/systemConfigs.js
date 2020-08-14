@@ -2,8 +2,8 @@ const lodashMerge = require('lodash.merge');
 
 const NETWORKS = require('../../networks');
 
-const defaultConfig = {
-  description: 'basic config for use as template',
+const baseConfig = {
+  description: 'base config for use as template',
   core: {
     docker: {
       image: 'dashpay/dashd',
@@ -78,13 +78,13 @@ const defaultConfig = {
 };
 
 module.exports = {
-  default: defaultConfig,
-  local: lodashMerge({}, defaultConfig, {
+  base: baseConfig,
+  local: lodashMerge({}, baseConfig, {
     description: 'standalone node for local development',
     externalIp: '127.0.0.1',
     network: NETWORKS.LOCAL,
   }),
-  evonet: lodashMerge({}, defaultConfig, {
+  evonet: lodashMerge({}, baseConfig, {
     description: 'node with Evonet configuration',
     platform: {
       dpns: {
@@ -94,7 +94,7 @@ module.exports = {
     },
     network: NETWORKS.EVONET,
   }),
-  testnet: lodashMerge({}, defaultConfig, {
+  testnet: lodashMerge({}, baseConfig, {
     description: 'node with testnet configuration',
     core: {
       p2p: {

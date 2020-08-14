@@ -18,7 +18,7 @@ class ConfigCreateCommand extends BaseCommand {
     configCollection.createConfig(configName, fromConfigName);
 
     // eslint-disable-next-line no-console
-    console.log(`${configName} is created`);
+    console.log(`${configName} created`);
   }
 }
 

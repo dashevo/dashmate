@@ -24,6 +24,6 @@ class ConfigListCommand extends BaseCommand {
   }
 }
 
-ConfigListCommand.description = 'Lists available configurations';
+ConfigListCommand.description = 'List available configs';
 
 module.exports = ConfigListCommand;

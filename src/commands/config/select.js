@@ -17,14 +17,11 @@ class ConfigSelectCommand extends BaseCommand {
     configCollection.setDefaultConfigName(configName);
 
     // eslint-disable-next-line no-console
-    console.log(`${configName} config selected as a default`);
+    console.log(`${configName} config selected as default`);
   }
 }
 
-ConfigSelectCommand.description = `Set config as default
-
-Selects a configuration as a default one
-`;
+ConfigSelectCommand.description = `Select config as default`;
 
 ConfigSelectCommand.args = [{
   name: 'config',
