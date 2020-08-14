@@ -26,7 +26,7 @@ class ConfigShowCommand extends BaseCommand {
 
 ConfigShowCommand.description = `Show config options
 
-Display configuration options for the specified config
+Display configuration options for the selected config
 `;
 
 ConfigShowCommand.flags = {

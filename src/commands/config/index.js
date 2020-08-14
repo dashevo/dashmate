@@ -15,8 +15,8 @@ class ConfigCommand extends BaseCommand {
     const defaultConfigName = await configCollection.getDefaultConfigName();
 
     const message = defaultConfigName === null
-      ? 'Default config is not selected'
-      : `${defaultConfigName} config is selected as default`;
+      ? 'no default config selected'
+      : `${defaultConfigName} config selected as default`;
 
     // eslint-disable-next-line no-console
     console.log(message);

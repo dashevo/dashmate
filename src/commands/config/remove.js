@@ -18,13 +18,13 @@ class ConfigRemoveCommand extends BaseCommand {
     configCollection,
   ) {
     if (Object.keys(systemConfigs).includes(configName)) {
-      throw new Error(`System config ${configName} can't be removed`);
+      throw new Error(`system config ${configName} can't be removed`);
     }
 
     configCollection.removeConfig(configName);
 
     // eslint-disable-next-line no-console
-    console.log(`${configName} is removed`);
+    console.log(`${configName} removed`);
   }
 }
 
