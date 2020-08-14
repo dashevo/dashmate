@@ -79,6 +79,10 @@ class BaseCommand extends Command {
         ? configCollection.getDefaultConfig()
         : configCollection.getConfig(flags.config);
 
+      if (!config) {
+        throw new Error('Default config is not set. Please use `--config` option or set default config');
+      }
+
       this.container.register({
         config: asValue(config),
       });
