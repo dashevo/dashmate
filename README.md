@@ -94,7 +94,7 @@ To create a config based on an existing config:
 $ mn config:create mn1 testnet
 ```
 
-To select a config:
+To select a config as default:
 ```bash
 $ mn config:select mn1
 ```
@@ -124,9 +124,9 @@ To remove a selected non-system config:
 $ mn config:remove mn1
 ```
 
-To output the currently selected config to a file as envs for Docker Compose:
+To output the currently selected config as Docker Compose envs to stdout:
 ```bash
-$ mn config:envs -o
+$ mn config:envs
 ```
 
 ### Start node
@@ -146,12 +146,12 @@ OPTIONS
 
 To start a masternode:
 ```bash
-$ mn start 1.2.3.4 20001 -p 2058cd87116ee8492ae0db5d4f8050218588701636197cfcd124dcae8986d514
+$ mn start
 ```
 
 To start a full node:
 ```bash
-$ mn start 1.2.3.4 19999 -f
+$ mn start -f
 ```
 
 ### Stop node
@@ -182,7 +182,7 @@ Before registering the masternode, you must have access to an address on the net
 dumpprivkey "address"
 ```
 
-If using a config based on `local` or `evonet`, you can create and fund a new address using the `wallet` command as shown below.
+If using a config specifying the `local` or `evonet` network, you can create and fund a new address using the `wallet` command as shown below.
 
 ```
 USAGE
@@ -256,24 +256,23 @@ $ mn status:host
 
 ### Development
 
-When developing on a standalone node (the `local` config), `setup-for-local-development` can be used
-to generate some dash, register a masternode and populate the node with the data required for local development.
+When developing on a standalone node (a config specifying the `local` network), `setup-for-local-development` can be used to generate some dash, register a masternode and populate the node with the data required for local development.
 
-To allow developers quickly test changes to DAPI and Drive, a local path for DAPI or Drive may be specified
-via the `--drive-image-build-path` and `--dapi-image-build-path` options of the `start` command.
-A Docker image will be built from the provided path and then used by mn-bootstrap.
+To allow developers quickly test changes to DAPI and Drive, a local path for DAPI or Drive may be specified via the `--drive-image-build-path` and `--dapi-image-build-path` options of the `start` command. A Docker image will be built from the provided path and then used by mn-bootstrap.
 
 ### Docker Compose
 
-In case if you need to use Docker Compose directly you need to pass a configuration as a dotenv file. You can output the currently selected config as a dotenv file for Docker Compose as follows:
+If you want to use Docker Compose directly, you will need to pass a configuration as a dotenv file. You can output the currently selected config to a dotenv file for Docker Compose as follows:
 
 ```bash
-$ mn config:envs -o
+$ mn config:envs > .env
 ```
 
-There are two ways to pass the dotenv file to Docker Compose:
- 1. Rename corresponding dotenv file to `.env` (i.e. `mv .env.evonet .env`) 
- 2. Add `--env-file` option to `docker-compose` command (i.e. `docker-compose --env-file=.env.evonet ps`)
+Docker Compose will attempt to read a file named `.env` by default. You can optionally specify a dotenv file with a different filename for Docker Compose by adding `--env-file` option to the `docker-compose` command as follows: 
+
+```bash
+$ docker-compose --env-file=<filename>
+```
 
 ## Contributing
 
