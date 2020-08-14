@@ -3,7 +3,7 @@ const lodashMerge = require('lodash.merge');
 const NETWORKS = require('../../networks');
 
 const defaultConfig = {
-  description: null,
+  description: 'basic config for use as template',
   core: {
     docker: {
       image: 'dashpay/dashd',
