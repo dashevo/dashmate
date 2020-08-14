@@ -11,21 +11,15 @@ class ServicesStatusCommand extends BaseCommand {
    * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
-   * @param {ConfigCollection} configCollection
+   * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
     args,
-    {
-      config: configName,
-    },
+    flags,
     dockerCompose,
-    configCollection,
+    config,
   ) {
-    const config = configName === null
-      ? configCollection.getDefaultConfig()
-      : configCollection.getConfig(configName);
-
     const serviceHumanNames = {
       core: 'Core',
       sentinel: 'Sentinel',
