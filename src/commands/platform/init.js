@@ -67,6 +67,7 @@ InitCommand.args = [{
 },
 {
   name: 'seed',
+  required: false,
   description: 'DAPI seed to connect',
 }];
 
