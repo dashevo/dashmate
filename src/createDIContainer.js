@@ -58,7 +58,7 @@ async function createDIContainer() {
     systemConfigs: asValue(systemConfigs),
     createSystemConfigs: asFunction(createSystemConfigsFactory),
     resetSystemConfig: asFunction(resetSystemConfigFactory),
-    // configCollection is registering on command init
+    // `configCollection` and `config` are registering on command init
   });
 
   /**
