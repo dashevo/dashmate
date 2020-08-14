@@ -42,7 +42,7 @@ $ sudo npm link # optional: link CLI for system-wide execution
 
 ## Usage
 
-The package contains a CLI, Docker Compose files and system configurations.
+The package contains a CLI, Docker Compose and configuration files.
 
 ### CLI
 
@@ -52,7 +52,7 @@ The CLI can be used to perform routine tasks. Invoke the CLI with `mn` if linked
 
 The `config` command is used to describe your node configuration before starting the node. Several system configurations are provided as a starting point:
 
- - Default - basic config for use as template
+ - Base - basic config for use as template
  - Local - standalone node for local development
  - Evonet - node with Evonet configuration
  - Testnet - node with testnet configuration
@@ -265,10 +265,10 @@ To allow developers quickly test changes to DAPI and Drive, a local path for DAP
 If you want to use Docker Compose directly, you will need to pass a configuration as a dotenv file. You can output the currently selected config to a dotenv file for Docker Compose as follows:
 
 ```bash
-$ mn config:envs > .env
+$ mn config:envs --output-file .env
 ```
 
-Docker Compose will attempt to read a file named `.env` by default. You can optionally specify a dotenv file with a different filename for Docker Compose by adding `--env-file` option to the `docker-compose` command as follows: 
+Docker Compose will attempt to read a file named `.env` by default. You can optionally specify a dotenv file with a different filename for Docker Compose by adding `--env-file` option to the `docker-compose` command as follows:
 
 ```bash
 $ docker-compose --env-file=<filename>

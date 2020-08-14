@@ -35,7 +35,7 @@ ConfigCreateCommand.args = [{
   name: 'from',
   required: false,
   description: 'base new config on existing config',
-  default: 'default',
+  default: 'base',
 }];
 
 module.exports = ConfigCreateCommand;
