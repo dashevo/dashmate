@@ -31,7 +31,7 @@ class ServicesStatusCommand extends BaseCommand {
       sentinel: 'Sentinel',
     };
 
-    if (config.name !== 'testnet') {
+    if (config.options.network !== 'testnet') {
       Object.assign(serviceHumanNames, {
         drive_mongodb_replica_init: 'Initiate Drive MongoDB replica',
         drive_mongodb: 'Drive MongoDB',
