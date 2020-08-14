@@ -82,7 +82,7 @@ COMMANDS
 
 ### Start node
 
-The `start` command is used to start a node with the currently selected config.
+The `start` command is used to start a node with the default or specified config.
 
 ```
 USAGE
