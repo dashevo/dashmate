@@ -3,6 +3,7 @@ const { table } = require('table');
 const BaseCommand = require('../../oclif/command/BaseCommand');
 
 class ConfigListCommand extends BaseCommand {
+  static aliases = ['config:list', 'config:ls']
   /**
    * @param {Object} args
    * @param {Object} flags
