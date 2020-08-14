@@ -21,14 +21,14 @@ class ConfigDefaultCommand extends BaseCommand {
       configCollection.setDefaultConfigName(configName);
 
       // eslint-disable-next-line no-console
-      console.log(`${configName} config will be used as default`);
+      console.log(`${configName} config set as default`);
     }
   }
 }
 
-ConfigDefaultCommand.description = `Default config
+ConfigDefaultCommand.description = `Manage default config
 
-Displays default config name. Sets config as default if CONFIG argument is specified
+Shows default config name or sets another config as default
 `;
 
 ConfigDefaultCommand.args = [{

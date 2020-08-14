@@ -50,14 +50,14 @@ The CLI can be used to perform routine tasks. Invoke the CLI with `mn` if linked
 
 ### Configure node
 
-The `config` command is used to describe your node configuration before starting the node. Several system configurations are provided as a starting point:
+The `config` command is used to manage your node configuration before starting the node. Several system configurations are provided as a starting point:
 
  - base - basic config for use as template
  - local - standalone node for local development
  - evonet - node with Evonet configuration
  - testnet - node with testnet configuration
 
-You can modify and use the system configs directly, or create your own. You can base your own configs on one of the system configs using the `mn config:create CONFIG [FROM]` command. You must select a config (or specify it with the `--config=<config>` option) before running other commands. The `base` config is selected by default.
+You can modify and use the system configs directly, or create your own. You can base your own configs on one of the system configs using the `mn config:create CONFIG [FROM]` command. You must set a default config with `mn config:default CONFIG` or specify a config with the `--config=<config>` option when running commands. The `base` config is initially set as default.
 
 ```
 USAGE
@@ -67,18 +67,17 @@ OPTIONS
   --config=config  configuration name to use
 
 DESCRIPTION
-  Shows current default configuration name
+  Display configuration options for default config
 
 COMMANDS
-  config:create  Create config
-  config:envs    Export config to envs
-  config:get     Get config option
-  config:list    List available configs
-  config:remove  Remove config
-  config:reset   Reset config
-  config:select  Select config as default
-  config:set     Set config option
-  config:show    Show config options
+  config:create   Create config
+  config:default  Manage default config
+  config:envs     Export config to envs
+  config:get      Get config option
+  config:list     List available configs
+  config:remove   Remove config
+  config:reset    Reset config
+  config:set      Set config option
 ```
 
 ### Start node
@@ -190,8 +189,6 @@ $ mn reset
 The `status` command outputs status information relating to either the host, masternode or services.
 
 ```
-Show status details
-
 USAGE
   $ mn status:COMMAND
 
