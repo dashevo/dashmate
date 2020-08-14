@@ -211,7 +211,7 @@ To allow developers quickly test changes to DAPI and Drive, a local path for DAP
 
 ### Docker Compose
 
-If you want to use Docker Compose directly, you will need to pass a configuration as a dotenv file. You can output the currently selected config to a dotenv file for Docker Compose as follows:
+If you want to use Docker Compose directly, you will need to pass a configuration as a dotenv file. You can output a config to a dotenv file for Docker Compose as follows:
 
 ```bash
 $ mn config:envs --output-file .env
