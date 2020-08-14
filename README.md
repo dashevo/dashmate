@@ -52,10 +52,12 @@ The CLI can be used to perform routine tasks. Invoke the CLI with `mn` if linked
 
 The `config` command is used to describe your node configuration before starting the node. Several system configurations are provided as a starting point:
 
- - Base - basic config for use as template
- - Local - standalone node for local development
- - Evonet - node with Evonet configuration
- - Testnet - node with testnet configuration
+ - base - basic config for use as template
+ - local - standalone node for local development
+ - evonet - node with Evonet configuration
+ - testnet - node with testnet configuration
+
+You can modify and use the system configs directly, or create your own. You can base your own configs on one of the system configs using the `mn config:create CONFIG [FROM]` command. You must select a config (or specify it with the `--config=<config>` option) before running other commands. The `base` config is selected by default.
 
 ```
 USAGE
@@ -71,62 +73,12 @@ COMMANDS
   config:create  Create config
   config:envs    Export config to envs
   config:get     Get config option
-  config:list    Lists available configurations
+  config:list    List available configs
   config:remove  Remove config
   config:reset   Reset config
-  config:select  Set config as default
+  config:select  Select config as default
   config:set     Set config option
   config:show    Show config options
-```
-
-To show the currently selected config:
-```bash
-$ mn config
-```
-
-To list existing configs:
-```bash
-$ mn config:list
-```
-
-To create a config based on an existing config:
-```bash
-$ mn config:create mn1 testnet
-```
-
-To select a config as default:
-```bash
-$ mn config:select mn1
-```
-
-To show the options in the currently selected config:
-```bash
-$ mn config:show
-```
-
-To get an option from the currently selected config:
-```bash
-$ mn config:get core.p2p.port
-```
-
-To set an option in the currently selected config:
-```bash
-$ mn config:set externalIp 1.2.3.4
-```
-
-To reset a selected and modified system config to the default:
-```bash
-$ mn config:reset
-```
-
-To remove a selected non-system config:
-```bash
-$ mn config:remove mn1
-```
-
-To output the currently selected config as Docker Compose envs to stdout:
-```bash
-$ mn config:envs
 ```
 
 ### Start node
