@@ -1,8 +1,9 @@
 const fs = require('fs');
+const path = require('path');
+
 const { flags: flagTypes } = require('@oclif/command');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
-const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 
 class ConfigEnvsCommand extends BaseCommand {
   /**
@@ -14,24 +15,20 @@ class ConfigEnvsCommand extends BaseCommand {
   async runWithDependencies(
     args,
     {
-      output: fileOutput,
+      'output-file': outputFile,
     },
     config,
   ) {
     let envOutput = '';
 
     for (const [key, value] of Object.entries(config.toEnvs())) {
-      envOutput = envOutput + (`${key}="${value}"`) + '\n';
+      envOutput += `${key}="${value}"\n`;
     }
 
-    const envFilePath = '.env.' + config.name;
+    if (outputFile !== null) {
+      const outputFilePath = path.resolve(process.cwd(), outputFile);
 
-    if (fileOutput === true) {
-      try {
-        fs.writeFileSync(envFilePath, envOutput, 'utf8');
-      } catch (e) {
-        throw new MuteOneLineError(e);
-      }
+      fs.writeFileSync(outputFilePath, envOutput, 'utf8');
     } else {
       // eslint-disable-next-line no-console
       console.log(envOutput);
@@ -46,7 +43,11 @@ Export configuration options as Docker Compose envs
 
 ConfigEnvsCommand.flags = {
   ...BaseCommand.flags,
-  'output': flagTypes.boolean({ char: 'o', description: 'output to file', default: false }),
+  'output-file': flagTypes.string({
+    char: 'o',
+    description: 'output to file',
+    default: null,
+  }),
 };
 
 module.exports = ConfigEnvsCommand;
