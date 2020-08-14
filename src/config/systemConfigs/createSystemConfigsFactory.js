@@ -16,7 +16,7 @@ function createSystemConfigsFactory(systemConfigs) {
       new Config(name, options)
     ));
 
-    return new ConfigCollection(configs, 'default');
+    return new ConfigCollection(configs, 'base');
   }
 
   return createSystemConfigs;
