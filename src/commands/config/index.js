@@ -1,31 +1,36 @@
+const { inspect } = require('util');
+
 const BaseCommand = require('../../oclif/command/BaseCommand');
 
 class ConfigCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
-   * @param {ConfigCollection} configCollection
+   * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
     args,
     flags,
-    configCollection,
+    config,
   ) {
-    const defaultConfigName = await configCollection.getDefaultConfigName();
-
-    const message = defaultConfigName === null
-      ? 'no default config selected'
-      : `${defaultConfigName} config selected as default`;
+    const output = `${config.getName()} config:\n\n${inspect(
+      config.getOptions(),
+      { colors: true, depth: null },
+    )}`;
 
     // eslint-disable-next-line no-console
-    console.log(message);
+    console.log(output);
   }
 }
 
-ConfigCommand.description = `Show default config
+ConfigCommand.description = `Show config options
 
-Shows current default configuration name
+Display configuration options for the default config
 `;
+
+ConfigCommand.flags = {
+  ...BaseCommand.flags,
+};
 
 module.exports = ConfigCommand;

@@ -29,7 +29,7 @@ class ConfigSetCommand extends BaseCommand {
 
 ConfigSetCommand.description = `Set config option
 
-Sets a configuration option in the selected config
+Sets a configuration option in the default config
 `;
 
 ConfigSetCommand.args = [{
