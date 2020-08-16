@@ -48,6 +48,11 @@ class BaseCommand extends Command {
       configCollection: asValue(configCollection),
     });
 
+    // Set up datadir
+    const dataDirManager = this.container.resolve('dataDirRepository');
+    await dataDirManager.ensureDataDir();
+    await dataDirManager.ensureDataSubDirFor(configCollection.defaultConfigName);
+
     // Graceful exit
     const stopAllContainers = this.container.resolve('stopAllContainers');
     const startedContainers = this.container.resolve('startedContainers');

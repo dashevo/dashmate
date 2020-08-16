@@ -9,7 +9,9 @@ const {
 const Docker = require('dockerode');
 
 const path = require('path');
+const os = require('os');
 
+const dataDirRepository = require('./config/configFile/dataDirRepository');
 const ConfigJsonFileRepository = require('./config/configFile/ConfigJsonFileRepository');
 const createSystemConfigsFactory = require('./config/systemConfigs/createSystemConfigsFactory');
 const resetSystemConfigFactory = require('./config/systemConfigs/resetSystemConfigFactory');
@@ -53,7 +55,8 @@ async function createDIContainer() {
    * Config
    */
   container.register({
-    configFilePath: asValue(path.resolve(__dirname, '../data/config.json')),
+    dataDirRepository: asClass(dataDirRepository),
+    configFilePath: asValue(path.resolve(os.homedir(), '.mn/config.json')),
     configRepository: asClass(ConfigJsonFileRepository),
     systemConfigs: asValue(systemConfigs),
     createSystemConfigs: asFunction(createSystemConfigsFactory),

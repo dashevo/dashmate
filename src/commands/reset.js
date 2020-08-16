@@ -46,6 +46,7 @@ class ResetCommand extends BaseCommand {
             {
               title: 'Cleanup Core data dir',
               task: () => rimraf.sync(`${__dirname}/../../data/${config.get('network')}/core/!(.gitignore)`),
+              // Should we implement a function in dataDirRepository to clean up?
             },
             {
               title: 'Remove Docker containers and associated data',
