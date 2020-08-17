@@ -73,7 +73,9 @@ function initTaskFactory(
             contractId: ctx.dataContract.getId(),
           };
 
-          await ctx.client.platform.names.register('dash', ctx.identity);
+          await ctx.client.platform.names.register('dash', ctx.identity, {
+            dashUniqueIdentityId: ctx.identity.getId(),
+          });
         },
       },
       {
