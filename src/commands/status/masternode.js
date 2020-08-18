@@ -46,6 +46,15 @@ class MasternodeStatusCommand extends BaseCommand {
     rows.push(['Blocks', JSON.parse(blockchaininfoOutput.out).blocks]);
     rows.push(['Headers', JSON.parse(blockchaininfoOutput.out).headers]);
 
+    // Header and block count
+    const masternodeStatusOutput = await dockerCompose.execCommand(
+      config.toEnvs(),
+      'core',
+      'dash-cli masternode status',
+    );
+
+    rows.push(['Masternode', JSON.parse(masternodeStatusOutput.out).status]);
+
     // Sentinel
     const sentinelOutput = await dockerCompose.execCommand(
       config.toEnvs(),
