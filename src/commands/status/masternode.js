@@ -27,14 +27,33 @@ class MasternodeStatusCommand extends BaseCommand {
 
     rows.push(['Version', versionOutput.out.split('\n')[0]]);
 
-    // Block count
-    const blockCountOutput = await dockerCompose.execCommand(
+    // Sync status
+    const syncStatusOutput = await dockerCompose.execCommand(
       config.toEnvs(),
       'core',
-      'dash-cli getblockcount',
+      'dash-cli mnsync status'
     );
 
-    rows.push(['Blocks', blockCountOutput.out.trim()]);
+    rows.push(['Sync Status', JSON.parse(syncStatusOutput.out).AssetName]);
+
+    // Header and block count
+    const blockchaininfoOutput = await dockerCompose.execCommand(
+      config.toEnvs(),
+      'core',
+      'dash-cli getblockchaininfo',
+    );
+
+    rows.push(['Blocks', JSON.parse(blockchaininfoOutput.out).blocks]);
+    rows.push(['Headers', JSON.parse(blockchaininfoOutput.out).headers]);
+
+    // Sentinel
+    const sentinelOutput = await dockerCompose.execCommand(
+      config.toEnvs(),
+      'sentinel',
+      'python bin/sentinel.py',
+    );
+
+    rows.push(['Sentinel', sentinelOutput.out.split('\n')[0]])
 
     const output = table(rows, { singleLine: true });
 
