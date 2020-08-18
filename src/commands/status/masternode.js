@@ -61,8 +61,10 @@ class MasternodeStatusCommand extends BaseCommand {
       'sentinel',
       'python bin/sentinel.py',
     );
+    
+    const sentinelState = sentinelOutput.out.split('\n')[0];
 
-    rows.push(['Sentinel', sentinelOutput.out.split('\n')[0]])
+    rows.push(['Sentinel', (sentinelState !== '' ? sentinelState : 'No errors' )]);
 
     const output = table(rows, { singleLine: true });
 
