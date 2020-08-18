@@ -51,7 +51,7 @@ class BaseCommand extends Command {
     // Set up datadir
     const dataDirManager = this.container.resolve('dataDirRepository');
     await dataDirManager.ensureDataDir();
-    await dataDirManager.ensureDataSubDirFor(configCollection.defaultConfigName);
+    //await dataDirManager.ensureDataSubDirFor(configCollection.defaultConfigName);
 
     // Graceful exit
     const stopAllContainers = this.container.resolve('stopAllContainers');
