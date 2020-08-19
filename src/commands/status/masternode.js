@@ -1,4 +1,5 @@
 const { table } = require('table');
+const fetch = require('node-fetch');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
 
@@ -65,6 +66,15 @@ class MasternodeStatusCommand extends BaseCommand {
     const sentinelState = sentinelOutput.out.split('\n')[0];
 
     rows.push(['Sentinel', (sentinelState !== '' ? sentinelState : 'No errors' )]);
+
+    // protx
+
+    rows.push(['ProTx',''])
+
+    // port check
+    const portState = await fetch('https://mnowatch.org/' + config.options.core.p2p.port + '/').then(res => res.text());
+    
+    rows.push(['Port Check', config.options.core.p2p.port + ' ' + portState]);
 
     const output = table(rows, { singleLine: true });
 
