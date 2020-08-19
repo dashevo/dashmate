@@ -45,7 +45,7 @@ services:
       - 26656:26656 # P2P
     volumes:
       - ./configs/${NETWORK:?err}/drive/tendermint:/tendermint/config
-      - ~/.mn/${CONFIG_NAME:?err}/:/data
+      - drive_tendermint:/tendermint
     entrypoint: sh -c "/usr/bin/tendermint init && /usr/bin/tendermint node"
 
   dapi_insight:
@@ -131,3 +131,4 @@ services:
 volumes:
   drive_mongodb:
   drive_leveldb:
+  drive_tendermint:
