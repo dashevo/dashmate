@@ -20,62 +20,56 @@ class MasternodeStatusCommand extends BaseCommand {
     const rows = [];
 
     // Version
-    const versionOutput = await dockerCompose.execCommand(
+    const dashdVersion = (await dockerCompose.execCommand(
       config.toEnvs(),
       'core',
       'dashd --version',
-    );
-
-    rows.push(['Version', versionOutput.out.split('\n')[0]]);
+    )).out.split('\n')[0];
 
     // Sync status
-    const syncStatusOutput = await dockerCompose.execCommand(
+    const mnsyncStatus = JSON.parse((await dockerCompose.execCommand(
       config.toEnvs(),
       'core',
       'dash-cli mnsync status'
-    );
+    )).out);
 
-    rows.push(['Sync Status', JSON.parse(syncStatusOutput.out).AssetName]);
-
+    
     // Header and block count
-    const blockchaininfoOutput = await dockerCompose.execCommand(
+    const blockchaininfo = JSON.parse((await dockerCompose.execCommand(
       config.toEnvs(),
       'core',
       'dash-cli getblockchaininfo',
-    );
+    )).out);
 
-    rows.push(['Blocks', JSON.parse(blockchaininfoOutput.out).blocks]);
-    rows.push(['Headers', JSON.parse(blockchaininfoOutput.out).headers]);
-
-    // Header and block count
-    const masternodeStatusOutput = await dockerCompose.execCommand(
+    // Masternode data
+    const masternodeStatus = JSON.parse((await dockerCompose.execCommand(
       config.toEnvs(),
       'core',
       'dash-cli masternode status',
-    );
-
-    rows.push(['Masternode', JSON.parse(masternodeStatusOutput.out).status]);
+    )).out);
 
     // Sentinel
-    const sentinelOutput = await dockerCompose.execCommand(
+    const sentinelState = (await dockerCompose.execCommand(
       config.toEnvs(),
       'sentinel',
       'python bin/sentinel.py',
-    );
-    
-    const sentinelState = sentinelOutput.out.split('\n')[0];
+    )).out.split('\n')[0];
 
-    rows.push(['Sentinel', (sentinelState !== '' ? sentinelState : 'No errors' )]);
-
-    // protx
-
-    rows.push(['ProTx',''])
-
-    // port check
+    // Port check
     const portState = await fetch('https://mnowatch.org/' + config.options.core.p2p.port + '/').then(res => res.text());
-    
-    rows.push(['Port Check', config.options.core.p2p.port + ' ' + portState]);
 
+    // Build table*/
+    rows.push(['Version', dashdVersion]);
+    rows.push(['Sync Status', mnsyncStatus.AssetName]);
+    rows.push(['Headers', blockchaininfo.headers]);
+    rows.push(['Blocks', blockchaininfo.blocks]);
+    rows.push(['Masternode Status', masternodeStatus.state]);
+    if (masternodeStatus.state === 'READY') {
+      rows.push(['Service', masternodeStatus.dmnState.service]);
+      rows.push(['ProTx','']);
+    }
+    rows.push(['Sentinel', (sentinelState !== '' ? sentinelState : 'No errors' )]);
+    rows.push(['Port Check', config.options.core.p2p.port + ' ' + portState]);
     const output = table(rows, { singleLine: true });
 
     // eslint-disable-next-line no-console
