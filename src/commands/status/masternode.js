@@ -65,11 +65,13 @@ class MasternodeStatusCommand extends BaseCommand {
     rows.push(['Blocks', blockchaininfo.blocks]);
     rows.push(['Masternode Status', masternodeStatus.state]);
     if (masternodeStatus.state === 'READY') {
+      rows.push(['ProTx Hash', masternodeStatus.proTxHash]);
       rows.push(['Service', masternodeStatus.dmnState.service]);
-      rows.push(['ProTx','']);
+      rows.push(['PoSe Penalty', masternodeStatus.dmnState.PoSePenalty]);
     }
     rows.push(['Sentinel', (sentinelState !== '' ? sentinelState : 'No errors' )]);
     rows.push(['Port Check', config.options.core.p2p.port + ' ' + portState]);
+    
     const output = table(rows, { singleLine: true });
 
     // eslint-disable-next-line no-console
