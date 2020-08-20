@@ -33,7 +33,6 @@ class MasternodeStatusCommand extends BaseCommand {
       'dash-cli mnsync status'
     )).out);
 
-    
     // Header and block count
     const blockchaininfo = JSON.parse((await dockerCompose.execCommand(
       config.toEnvs(),
@@ -58,7 +57,7 @@ class MasternodeStatusCommand extends BaseCommand {
     // Port check
     const portState = await fetch('https://mnowatch.org/' + config.options.core.p2p.port + '/').then(res => res.text());
 
-    // Build table*/
+    // Build table
     rows.push(['Version', dashdVersion]);
     rows.push(['Sync Status', mnsyncStatus.AssetName]);
     rows.push(['Headers', blockchaininfo.headers]);
