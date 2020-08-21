@@ -90,7 +90,7 @@ function initTaskFactory(
           };
 
           await ctx.client.platform.names.register('dash', {
-            dashUniqueIdentityId: ctx.identity.getId(),
+            dashAliasIdentityId: ctx.identity.getId(),
           }, ctx.identity);
         },
       },
