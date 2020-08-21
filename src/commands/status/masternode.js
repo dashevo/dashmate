@@ -54,11 +54,23 @@ class MasternodeStatusCommand extends BaseCommand {
       'python bin/sentinel.py',
     )).out.split('\n')[0];
 
+    const tendermintVersion = (await dockerCompose.execCommand(
+      config.toEnvs(),
+      'drive_tendermint',
+      'tendermint version',
+    )).out.split('\n')[0];
+
+    const tendermintStatus = JSON.parse((await dockerCompose.execCommand(
+      config.toEnvs(),
+      'drive_tendermint',
+      'curl localhost:26657/status',
+    )).out);
+
     // Port check
     const portState = await fetch('https://mnowatch.org/' + config.options.core.p2p.port + '/').then(res => res.text());
 
     // Build table
-    rows.push(['Version', dashdVersion]);
+    rows.push(['Dashd Version', dashdVersion]);
     rows.push(['Sync Status', mnsyncStatus.AssetName]);
     rows.push(['Headers', blockchaininfo.headers]);
     rows.push(['Blocks', blockchaininfo.blocks]);
@@ -70,6 +82,11 @@ class MasternodeStatusCommand extends BaseCommand {
     }
     rows.push(['Sentinel', (sentinelState !== '' ? sentinelState : 'No errors' )]);
     rows.push(['Port Check', config.options.core.p2p.port + ' ' + portState]);
+    if (config.network !== 'testnet') {
+      rows.push(['Tendermint Version', tendermintVersion]);
+      rows.push(['Tendermint Blocks', tendermintStatus.result.sync_info.latest_block_height]);
+      rows.push(['Tendermint Sync', !tendermintStatus.result.sync_info.catching_up]);
+    }
     
     const output = table(rows, { singleLine: true });
 
