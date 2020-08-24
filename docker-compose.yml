@@ -6,6 +6,7 @@ services:
     restart: unless-stopped
     ports:
       - ${CORE_P2P_PORT:?err}:${CORE_P2P_PORT:?err} # P2P
+      - 20002:20002
     volumes:
       - ./configs/${NETWORK:?err}/core/dashd.conf:/dash/.dashcore/dash.conf
       - ./data/${NETWORK:?err}/core:/dash/data
