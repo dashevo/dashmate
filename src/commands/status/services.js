@@ -39,14 +39,13 @@ class ServicesStatusCommand extends BaseCommand {
     }
 
     const tableRows = [
-      ['Service', 'Container ID', 'Version', 'Status'],
+      ['Service', 'Container ID', 'Image', 'Version', 'Status'],
     ];
 
     for (const [serviceName, serviceDescription] of Object.entries(serviceHumanNames)) {
       let containerId;
       let status;
       let exitCode;
-      let version;
 
       try {
         ({
@@ -54,11 +53,6 @@ class ServicesStatusCommand extends BaseCommand {
           State: {
             Status: status,
             ExitCode: exitCode,
-          },
-          Config: {
-            Labels: {
-              'org.dash.version': version,
-            },
           },
         } = await dockerCompose.inspectService(config.toEnvs(), serviceName));
       } catch (e) {
@@ -77,9 +71,26 @@ class ServicesStatusCommand extends BaseCommand {
         statusText = chalk.keyword(status === 'running' ? 'green' : 'red')(status);
       }
 
+      let path;
+      let image;
+      let version;
+
+      if (serviceName === 'sentinel') { continue };
+      if (serviceName === 'dapi_tx_filter_stream') { continue };      
+      if (serviceName === 'core') { 
+        path = serviceName
+      } else { 
+        path = 'platform.' + serviceName.replace('_', '.'); 
+      }
+      image = config.get(path + '.docker.image')
+      version = config.get(path + '.version');
+
+      
+
       tableRows.push([
         serviceDescription,
         containerId ? containerId.slice(0, 12) : undefined,
+        image,
         version,
         statusText,
       ]);
