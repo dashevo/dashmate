@@ -46,6 +46,8 @@ class ServicesStatusCommand extends BaseCommand {
       let containerId;
       let status;
       let exitCode;
+      let image;
+      let version;
 
       try {
         ({
@@ -54,6 +56,9 @@ class ServicesStatusCommand extends BaseCommand {
             Status: status,
             ExitCode: exitCode,
           },
+          Config: {
+            Image: image,
+          }
         } = await dockerCompose.inspectService(config.toEnvs(), serviceName));
       } catch (e) {
         if (e instanceof ContainerIsNotPresentError) {
@@ -71,21 +76,7 @@ class ServicesStatusCommand extends BaseCommand {
         statusText = chalk.keyword(status === 'running' ? 'green' : 'red')(status);
       }
 
-      let path;
-      let image;
-      let version;
-
-      if (serviceName === 'sentinel') { continue };
-      if (serviceName === 'dapi_tx_filter_stream') { continue };      
-      if (serviceName === 'core') { 
-        path = serviceName
-      } else { 
-        path = 'platform.' + serviceName.replace('_', '.'); 
-      }
-      image = config.get(path + '.docker.image')
-      version = config.get(path + '.version');
-
-      
+      [image, version] = image.split(':');
 
       tableRows.push([
         serviceDescription,
