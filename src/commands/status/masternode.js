@@ -77,7 +77,7 @@ class MasternodeStatusCommand extends BaseCommand {
 
     // Port check
     const corePort = await fetch('https://mnowatch.org/' + config.options.core.p2p.port + '/').then(res => res.text());
-    //const tendermintPort = await fetch('https://mnowatch.org/' + config.options.core.p2p.port + '/').then(res => res.text());
+    const tendermintPort = await fetch('https://mnowatch.org/26656/').then(res => res.text());
 
     // Build table
     rows.push(['Dashd Version', dashdVersion]);
@@ -95,7 +95,7 @@ class MasternodeStatusCommand extends BaseCommand {
     rows.push(['Sentinel', (sentinelState !== '' ? sentinelState : 'No errors')]);
     if (config.network !== 'testnet') {
       rows.push(['Tendermint Version', tendermintVersion]);
-      //rows.push(['Tendermint Port', config.options.core.p2p.port + ' ' + tendermintPort]);
+      rows.push(['Tendermint Port', '26656 ' + tendermintPort]);
       if (mnsyncStatus.IsSynced === true) {
         rows.push(['Tendermint Blocks', tendermintStatus.result.sync_info.latest_block_height]);
         rows.push(['Tendermint Sync', !tendermintStatus.result.sync_info.catching_up]);
