@@ -34,6 +34,9 @@ async function createClientWithFundedWallet(network, faucetPrivateKeyString, see
     options.seeds = [seed];
   }
 
+  // Wait for Tendermint to start
+  await wait(5000);
+
   const dashClient = new Dash.Client(options);
 
   const account = await dashClient.getWalletAccount();
