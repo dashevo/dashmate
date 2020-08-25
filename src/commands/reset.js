@@ -1,7 +1,5 @@
 const { Listr } = require('listr2');
 
-const rimraf = require('rimraf');
-
 const BaseCommand = require('../oclif/command/BaseCommand');
 
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
@@ -42,11 +40,6 @@ class ResetCommand extends BaseCommand {
                   ['--entrypoint=""'],
                 );
               },
-            },
-            {
-              title: 'Cleanup Core data dir',
-              task: () => rimraf.sync(`${__dirname}/../../data/${config.get('network')}/core/!(.gitignore)`),
-              // Should we implement a function in dataDirRepository to clean up?
             },
             {
               title: 'Remove Docker containers and associated data',
