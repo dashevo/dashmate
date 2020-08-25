@@ -8,7 +8,7 @@ services:
       - ${CORE_P2P_PORT:?err}:${CORE_P2P_PORT:?err} # P2P
     volumes:
       - ./configs/${NETWORK:?err}/core/dashd.conf:/dash/.dashcore/dash.conf
-      - core:/dash
+      - core_data:/dash
     command:
       - dashd
       - -port=${CORE_P2P_PORT:?err}
@@ -30,4 +30,4 @@ services:
       - SENTINEL_ARGS=-b
 
 volumes: 
-  core:
+  core_data:
