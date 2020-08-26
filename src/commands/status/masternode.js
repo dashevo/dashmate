@@ -76,13 +76,19 @@ class MasternodeStatusCommand extends BaseCommand {
     }
 
     // Port check
-    const corePort = await fetch('https://mnowatch.org/' + config.options.core.p2p.port + '/').then(res => res.text());
-    const tendermintPort = await fetch('https://mnowatch.org/26656/').then(res => res.text());
+    const corePortState = await fetch('https://mnowatch.org/' + config.options.core.p2p.port + '/').then(res => res.text());
+    
+    const tendermintPortNum = (await dockerCompose.inspectService(
+      config.toEnvs(), 
+      'drive_tendermint'
+    )).NetworkSettings.Ports['26656/tcp'][0].HostPort;
+
+    const tendermintPortState = await fetch('https://mnowatch.org/' + tendermintPortNum + '/').then(res => res.text());
 
     // Build table
     rows.push(['Dashd Version', dashdVersion]);
     rows.push(['Sync Status', mnsyncStatus.AssetName]);
-    rows.push(['Core Port', config.options.core.p2p.port + ' ' + corePort]);
+    rows.push(['Core Port', config.options.core.p2p.port + ' ' + corePortState]);
     rows.push(['Headers', blockchainInfo.headers]);
     rows.push(['Blocks', blockchainInfo.blocks]);
     rows.push(['Core Sync', mnsyncStatus.IsSynced]);
@@ -95,7 +101,7 @@ class MasternodeStatusCommand extends BaseCommand {
     rows.push(['Sentinel', (sentinelState !== '' ? sentinelState : 'No errors')]);
     if (config.network !== 'testnet') {
       rows.push(['Tendermint Version', tendermintVersion]);
-      rows.push(['Tendermint Port', '26656 ' + tendermintPort]);
+      rows.push(['Tendermint Port', tendermintPortNum + ' ' + tendermintPortState]);
       if (mnsyncStatus.IsSynced === true) {
         rows.push(['Tendermint Blocks', tendermintStatus.result.sync_info.latest_block_height]);
         rows.push(['Tendermint Sync', !tendermintStatus.result.sync_info.catching_up]);
