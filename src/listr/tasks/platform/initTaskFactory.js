@@ -37,7 +37,7 @@ function initTaskFactory(
         title: 'Initialize SDK',
         task: async (ctx, task) => {
           // wait 5 seconds to ensure all services are running
-          await wait(5000);
+          await wait(10000);
 
           ctx.client = await createClientWithFundedWallet(
             config.get('network'),
