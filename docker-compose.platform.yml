@@ -25,7 +25,7 @@ services:
       - drive_mongodb_replica_init
       - core
     volumes:
-      - drive_leveldb_data:/usr/src/app/db
+      - drive_abci_leveldb:/usr/src/app/db
     environment:
       - CORE_JSON_RPC_USERNAME=dashrpc
       - CORE_JSON_RPC_PASSWORD=password
@@ -129,6 +129,6 @@ services:
       - ./configs/${NETWORK:?err}/dapi/nginx/errors.grpc_conf:/etc/nginx/conf.d/errors.grpc_conf
 
 volumes:
+  drive_abci_leveldb:
   drive_mongodb_data:
-  drive_leveldb_data:
   drive_tendermint_data:
