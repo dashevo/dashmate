@@ -1,11 +1,6 @@
-const {
-  PrivateKey,
-} = require('@dashevo/dashcore-lib');
-
 const Dash = require('dash');
 
-const fundAddress = require('./fundAddress');
-const wait = require('../util/wait');
+const fundAccount = require('./fundAccount');
 
 /**
  *  * Create and fund DashJS client
@@ -18,44 +13,37 @@ const wait = require('../util/wait');
  */
 async function createClientWithFundedWallet(network, faucetPrivateKeyString, seed = undefined) {
   // Prepare to fund wallet
-  const faucetPrivateKey = PrivateKey.fromString(faucetPrivateKeyString);
-  const faucetAddress = faucetPrivateKey
-    .toAddress(network)
-    .toString();
+  const faucetPrivateKey = faucetPrivateKeyString;
 
-  const options = {
-    wallet: {
-      mnemonic: null,
-    },
-    network,
+  const clientOpts = {
+    network: process.env.NETWORK,
   };
 
   if (seed) {
-    options.seeds = [seed];
+    clientOpts.seeds = [seed];
   }
 
-  const dashClient = new Dash.Client(options);
+  const faucetWallet = new Dash.Client({
+    ...clientOpts,
+    wallet: {
+      privateKey: faucetPrivateKey,
+    },
+  });
+  const faucetAccount = await faucetWallet.getWalletAccount();
 
-  const account = await dashClient.getWalletAccount();
-
-  const { address: addressToFund } = account.getAddress();
+  const walletToFund = new Dash.Client({
+    ...clientOpts,
+    wallet: {
+      mnemonic: null,
+    },
+  });
+  const accountToFund = await walletToFund.getWalletAccount();
 
   const amount = 40000;
 
-  await fundAddress(
-    dashClient.getDAPIClient(),
-    network,
-    faucetAddress,
-    faucetPrivateKey,
-    addressToFund,
-    amount,
-  );
+  await fundAccount(faucetAccount, accountToFund, amount);
 
-  do {
-    await wait(500);
-  } while (account.getTotalBalance() < amount);
-
-  return dashClient;
+  return walletToFund;
 }
 
 module.exports = createClientWithFundedWallet;
