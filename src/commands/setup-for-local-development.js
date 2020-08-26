@@ -7,6 +7,7 @@ const BaseCommand = require('../oclif/command/BaseCommand');
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
 
 const NETWORKS = require('../networks');
+const wait = require('../util/wait');
 
 class SetupForLocalDevelopmentCommand extends BaseCommand {
   /**
@@ -58,14 +59,19 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
             },
             {
               title: 'Start masternode',
-              task: async (ctx) => startNodeTask(
-                config,
-                {
-                  driveImageBuildPath: ctx.driveImageBuildPath,
-                  dapiImageBuildPath: ctx.dapiImageBuildPath,
-                  isUpdate,
-                },
-              ),
+              task: async (ctx) => {
+                await startNodeTask(
+                  config,
+                  {
+                    driveImageBuildPath: ctx.driveImageBuildPath,
+                    dapiImageBuildPath: ctx.dapiImageBuildPath,
+                    isUpdate,
+                  },
+                );
+
+                // wait 10 seconds to ensure all services are running
+                await wait(10000);
+              },
             },
             {
               title: 'Initialize Platform',
