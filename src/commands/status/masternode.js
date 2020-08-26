@@ -99,6 +99,7 @@ class MasternodeStatusCommand extends BaseCommand {
       if (mnsyncStatus.IsSynced === true) {
         rows.push(['Tendermint Blocks', tendermintStatus.result.sync_info.latest_block_height]);
         rows.push(['Tendermint Sync', !tendermintStatus.result.sync_info.catching_up]);
+        rows.push(['Tendermint App Hash', tendermintStatus.result.sync_info.latest_app_hash]);
       }
     }
 
