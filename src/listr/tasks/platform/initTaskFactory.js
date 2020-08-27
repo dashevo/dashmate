@@ -2,8 +2,6 @@ const { Listr } = require('listr2');
 
 const dpnsDocumentSchema = require('@dashevo/dpns-contract/schema/dpns-contract-documents.json');
 
-const wait = require('../../../util/wait');
-
 /**
  *
  * @param {createClientWithFundedWallet} createClientWithFundedWallet
@@ -36,9 +34,6 @@ function initTaskFactory(
       {
         title: 'Initialize SDK',
         task: async (ctx, task) => {
-          // wait 5 seconds to ensure all services are running
-          await wait(5000);
-
           ctx.client = await createClientWithFundedWallet(
             config.get('network'),
             ctx.fundingPrivateKeyString,
@@ -84,11 +79,14 @@ function initTaskFactory(
       {
         title: 'Register top level domain "dash"',
         task: async (ctx) => {
+          // noinspection JSAccessibilityCheck
           ctx.client.apps.dpns = {
             contractId: ctx.dataContract.getId(),
           };
 
-          await ctx.client.platform.names.register('dash', ctx.identity);
+          await ctx.client.platform.names.register('dash', {
+            dashAliasIdentityId: ctx.identity.getId(),
+          }, ctx.identity);
         },
       },
       {
