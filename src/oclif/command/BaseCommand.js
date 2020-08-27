@@ -17,15 +17,13 @@ class BaseCommand extends Command {
   async init() {
     this.container = await createDIContainer();
 
-    // Set up config dir
+    // Set up home dir
     /**
      * @type {ensureHomeDir}
      */
     const ensureHomeDir = this.container.resolve('ensureHomeDir');
-    const homeDirPath = ensureHomeDir();
-    this.container.register({
-      configFilePath: asValue(homeDirPath + '/config.json'),
-    });
+
+    ensureHomeDir();
 
     // Load configs
     /**

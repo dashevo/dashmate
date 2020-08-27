@@ -1,29 +1,38 @@
 const fs = require('fs');
-const path = require('path');
-const os = require('os');
 
-const CouldNotCreateHomeDirError = require('../errors/CouldNotCreateHomeDirError')
+const CouldNotCreateHomeDirError = require('../errors/CouldNotCreateHomeDirError');
+const HomeDirIsNotWritableError = require('../errors/HomeDirIsNotWritableError');
 
 /**
  * @param {string} homeDirPath
  * @return {ensureHomeDir}
  */
-function ensureHomeDirFactory(homeDirPath = path.resolve(os.homedir(), '.mn')) {
+function ensureHomeDirFactory(homeDirPath) {
   /**
    * @typedef {ensureHomeDir}
    * @return {string} homeDirPath
    */
   function ensureHomeDir() {
-    if (!fs.existsSync(homeDirPath)) {
+    if (fs.existsSync(homeDirPath)) {
       try {
-        fs.mkdirSync(homeDirPath);
+        // eslint-disable-next-line no-bitwise
+        fs.accessSync(__dirname, fs.constants.R_OK | fs.constants.W_OK);
       } catch (e) {
-        throw new CouldNotCreateHomeDirError(homeDirPath);
+        throw new HomeDirIsNotWritableError(homeDirPath);
       }
-      // Should also test for proper owner and write permission of the dir?
+
+      return homeDirPath;
     }
+
+    try {
+      fs.mkdirSync(homeDirPath);
+    } catch (e) {
+      throw new CouldNotCreateHomeDirError(homeDirPath);
+    }
+
     return homeDirPath;
   }
+
   return ensureHomeDir;
 }
 

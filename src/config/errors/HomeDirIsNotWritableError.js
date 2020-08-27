@@ -1,11 +1,11 @@
 const AbstractError = require('../../errors/AbstractError');
 
-class CouldNotCreateHomeDirError extends AbstractError {
+class HomeDirIsNotWritableError extends AbstractError {
   /**
    * @param {string} homeDirPath
    */
   constructor(homeDirPath) {
-    super(`Could not create home dir at '${homeDirPath}'`);
+    super(`Home dir '${homeDirPath}' is not writeable`);
 
     this.homeDirPath = homeDirPath;
   }
@@ -18,4 +18,4 @@ class CouldNotCreateHomeDirError extends AbstractError {
   }
 }
 
-module.exports = CouldNotCreateHomeDirError;
+module.exports = HomeDirIsNotWritableError;
