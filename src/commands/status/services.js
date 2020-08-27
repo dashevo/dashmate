@@ -39,7 +39,7 @@ class ServicesStatusCommand extends BaseCommand {
     }
 
     const tableRows = [
-      ['Service', 'Container ID', 'Image', 'Version', 'Status'],
+      ['Service', 'Container ID', 'Image', 'Status'],
     ];
 
     for (const [serviceName, serviceDescription] of Object.entries(serviceHumanNames)) {
@@ -47,7 +47,6 @@ class ServicesStatusCommand extends BaseCommand {
       let status;
       let exitCode;
       let image;
-      let version;
 
       try {
         ({
@@ -76,13 +75,10 @@ class ServicesStatusCommand extends BaseCommand {
         statusText = chalk.keyword(status === 'running' ? 'green' : 'red')(status);
       }
 
-      [image, version] = image.split(':');
-
       tableRows.push([
         serviceDescription,
         containerId ? containerId.slice(0, 12) : undefined,
         image,
-        version,
         statusText,
       ]);
     }
