@@ -22,7 +22,9 @@ function ensureHomeDirFactory(homeDirPath = path.resolve(os.homedir(), '.mn')) {
       }
       // Should also test for proper owner and write permission of the dir?
     }
-    return homeDirPath;
+    if (fs.existsSync(homeDirPath)) {
+      return homeDirPath;
+    }
   }
   return ensureHomeDir;
 }
