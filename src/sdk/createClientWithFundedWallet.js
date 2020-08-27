@@ -1,6 +1,6 @@
 const Dash = require('dash');
 
-const fundAccount = require('./fundAccount');
+const fundWallet = require('@dashevo/wallet-lib/src/utils/fundWallet');
 
 /**
  *  * Create and fund DashJS client
@@ -23,27 +23,27 @@ async function createClientWithFundedWallet(network, faucetPrivateKeyString, see
     clientOpts.seeds = [seed];
   }
 
-  const faucetWallet = new Dash.Client({
+  const faucetClient = new Dash.Client({
     ...clientOpts,
     wallet: {
       privateKey: faucetPrivateKey,
     },
   });
-  const faucetAccount = await faucetWallet.getWalletAccount();
+  const { wallet: faucetWallet } = faucetClient;
 
-  const walletToFund = new Dash.Client({
+  const clientToFund = new Dash.Client({
     ...clientOpts,
     wallet: {
       mnemonic: null,
     },
   });
-  const accountToFund = await walletToFund.getWalletAccount();
+  const { wallet: walletToFund } = clientToFund;
 
   const amount = 40000;
 
-  await fundAccount(faucetAccount, accountToFund, amount);
+  await fundWallet(faucetWallet, walletToFund, amount);
 
-  return walletToFund;
+  return clientToFund;
 }
 
 module.exports = createClientWithFundedWallet;
