@@ -16,34 +16,33 @@ async function createClientWithFundedWallet(network, faucetPrivateKeyString, see
   const faucetPrivateKey = faucetPrivateKeyString;
 
   const clientOpts = {
-    network: process.env.NETWORK,
+    network: process.env.NETWORK || network,
+  };
+  const walletOpts = {
+    network: process.env.NETWORK || network,
+    privateKey: faucetPrivateKey,
+
   };
 
   if (seed) {
     clientOpts.seeds = [seed];
+    walletOpts.seeds = [seed];
   }
 
-  const faucetClient = new Dash.Client({
-    ...clientOpts,
-    wallet: {
-      privateKey: faucetPrivateKey,
-    },
-  });
-  const { wallet: faucetWallet } = faucetClient;
+  const faucetWallet = new Dash.Wallet(walletOpts);
 
-  const clientToFund = new Dash.Client({
+  const client = new Dash.Client({
     ...clientOpts,
     wallet: {
       mnemonic: null,
     },
   });
-  const { wallet: walletToFund } = clientToFund;
 
   const amount = 40000;
 
-  await fundWallet(faucetWallet, walletToFund, amount);
+  await fundWallet(faucetWallet, client.wallet, amount);
 
-  return clientToFund;
+  return client;
 }
 
 module.exports = createClientWithFundedWallet;
