@@ -6,14 +6,14 @@ const { Observable } = require('rxjs');
 const BaseCommand = require('../../../../oclif/command/BaseCommand');
 const MuteOneLineError = require('../../../../oclif/errors/MuteOneLineError');
 
-const createCertificate = require('../../../../ssl/zerossl/createCertificate');
+const listCertificate = require('../../../../ssl/zerossl/listCertificates');
 const downloadCertificate = require('../../../../ssl/zerossl/downloadCertificate');
 const verifyDomain = require('../../../../ssl/zerossl/verifyDomain');
 const verifyTempServer = require('../../../../ssl/zerossl/verifyTempServer');
 
 const PRESETS = require('../../../../presets');
 
-class ObtainCommand extends BaseCommand {
+class RenewCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
@@ -28,40 +28,22 @@ class ObtainCommand extends BaseCommand {
   ) {
     const tasks = new Listr([
       {
-        title: `Create ZeroSSL cert for ip ${externalIp}`,
+        title: `Search ZeroSSL cert for ip ${externalIp}`,
         task: async (ctx, task) => {
           try {
-            const csr = fs.readFileSync(`./configs/${preset}/dapi/nginx/domain.csr`, 'utf8');
-            const response = await createCertificate(zerosslAPIKey, externalIp, csr);
+            const response = await listCertificate(zerosslAPIKey);
 
             if ('error' in response.data) {
               throw new Error(response.data.error.type);
             } else {
-              ctx.certId = response.data.id;
-              // eslint-disable-next-line max-len
-              const url = response.data.validation.other_methods[externalIp].file_validation_url_http;
-              ctx.fileName = url.replace(`http://${externalIp}/.well-known/pki-validation/`, '');
-              let fileContent = '';
-
-              for (let index = 0; index < 3; index++) {
-                // eslint-disable-next-line max-len
-                fileContent += response.data.validation.other_methods[externalIp].file_validation_content[index];
-                if (index < 2) {
-                  fileContent += '\n';
+              for (const result in response.data.results) {
+                if (response.data.results[result].common_name === externalIp) {
+                  ctx.certId = response.data.results[result].id;
                 }
               }
 
-              const validationPath = './src/commands/platform/dapi/ssl/.well-known/pki-validation/';
-              if (!fs.existsSync(validationPath)) {
-                fs.mkdirSync(validationPath, { recursive: true });
-              }
-
-              fs.writeFileSync(validationPath + ctx.fileName, fileContent, (err) => {
-                if (err) { throw err; }
-              });
-
               // eslint-disable-next-line no-param-reassign
-              task.output = `Challenge saved: /src/commands/platform/dapi/ssl/.well-known/pki-validation/${ctx.fileName}`;
+              task.output = `Cert found: ${ctx.certId}`;
             }
           } catch (error) {
             throw new Error(error);
@@ -122,7 +104,7 @@ class ObtainCommand extends BaseCommand {
             try {
               if (fs.existsSync(bundleFile) && fs.existsSync(privateKeyFile)) {
                 // eslint-disable-next-line no-param-reassign
-                task.output = `Cert files generated: \n ${bundleFile} \n ${privateKeyFile}`;
+                task.output = `Cert files updated: \n ${bundleFile} \n ${privateKeyFile}`;
               }
             } catch (err) {
               throw new Error(err);
@@ -153,12 +135,12 @@ class ObtainCommand extends BaseCommand {
   }
 }
 
-ObtainCommand.description = `Obtain SSL Cert
+RenewCommand.description = `Renew SSL Cert
 ...
-Obtain SSL Cert using ZeroSLL API Key
+Renew SSL Cert using ZeroSLL API Key
 `;
 
-ObtainCommand.args = [{
+RenewCommand.args = [{
   name: 'preset',
   required: true,
   description: 'preset to use',
@@ -173,4 +155,4 @@ ObtainCommand.args = [{
   description: 'ZeroSSL API Key - https://app.zerossl.com/developer',
 }];
 
-module.exports = ObtainCommand;
+module.exports = RenewCommand;
