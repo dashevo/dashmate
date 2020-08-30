@@ -39,11 +39,14 @@ class RenewCommand extends BaseCommand {
               for (const result in response.data.results) {
                 if (response.data.results[result].common_name === externalIp) {
                   ctx.certId = response.data.results[result].id;
+                  // eslint-disable-next-line max-len
+                  const url = response.data.results[result].validation.other_methods[externalIp].file_validation_url_http;
+                  ctx.fileName = url.replace(`http://${externalIp}/.well-known/pki-validation/`, '');
                 }
               }
 
               // eslint-disable-next-line no-param-reassign
-              task.output = `Cert found: ${ctx.certId}`;
+              task.output = `Cert found: ${ctx.certId} file name: ${ctx.fileName}`;
             }
           } catch (error) {
             throw new Error(error);
