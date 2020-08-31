@@ -17,6 +17,11 @@ const baseConfig = {
         privateKey: null,
       },
     },
+    miner: {
+      enable: false,
+      interval: '2.5m',
+      address: null,
+    },
   },
   platform: {
     dapi: {
@@ -83,13 +88,6 @@ module.exports = {
     description: 'standalone node for local development',
     externalIp: '127.0.0.1',
     network: NETWORKS.LOCAL,
-    core: {
-      miner: {
-        enable: false,
-        interval: '2.5m',
-        address: null,
-      },
-    },
   }),
   evonet: lodashMerge({}, baseConfig, {
     description: 'node with Evonet configuration',

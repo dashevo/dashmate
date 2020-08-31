@@ -91,7 +91,7 @@ module.exports = {
           additionalProperties: false,
         },
       },
-      required: ['docker', 'version', 'p2p', 'masternode'],
+      required: ['docker', 'version', 'p2p', 'masternode', 'miner'],
       additionalProperties: false,
     },
     platform: {
