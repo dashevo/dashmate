@@ -28,7 +28,6 @@ class StartCommand extends BaseCommand {
       update: isUpdate,
       'drive-image-build-path': driveImageBuildPath,
       'dapi-image-build-path': dapiImageBuildPath,
-      'mine-blocks': mineBlocks,
     },
     dockerCompose,
     startNodeTask,
@@ -36,14 +35,17 @@ class StartCommand extends BaseCommand {
   ) {
     let blockTimeMs;
 
-    if (mineBlocks !== null) {
+    const mineBlocks = config.get('core.miner.enable');
+
+    if (mineBlocks !== false) {
       if (config.get('network') !== NETWORKS.LOCAL) {
-        throw new Error(`mine-blocks option supposed to work only with local network. Your network is ${config.get('network')}`);
+        this.error(`mine-blocks option supposed to work only with local network. Your network is ${config.get('network')}`, { exit: true });
       }
 
-      blockTimeMs = ms(mineBlocks);
+      const mineInterval = config.get('core.miner.interval');
+      blockTimeMs = ms(mineInterval);
       if (blockTimeMs === undefined || blockTimeMs < 0) {
-        throw new Error(`Invalid mine-blocks value ${mineBlocks}`);
+        this.error(`Invalid mine-blocks value ${mineInterval}`, { exit: true });
       }
     }
 
@@ -62,11 +64,17 @@ class StartCommand extends BaseCommand {
           ),
         },
         {
-          title: 'Start mining',
-          enabled: () => mineBlocks !== null,
+          title: 'Start a miner',
+          enabled: () => mineBlocks !== false,
           task: async () => {
-            const privateKey = new PrivateKey();
-            const address = privateKey.toAddress('regtest').toString();
+            let minerAddress = config.get('core.miner.address');
+
+            if (minerAddress === null) {
+              const privateKey = new PrivateKey();
+              minerAddress = privateKey.toAddress('regtest').toString();
+
+              config.set('core.miner.address', minerAddress);
+            }
 
             await dockerCompose.execCommand(
               config.toEnvs(),
@@ -74,7 +82,7 @@ class StartCommand extends BaseCommand {
               [
                 'bash',
                 '-c',
-                `while true; do dash-cli generatetoaddress 1 ${address}; sleep ${blockTimeMs / 1000}; done`,
+                `while true; do dash-cli generatetoaddress 1 ${minerAddress}; sleep ${blockTimeMs / 1000}; done`,
               ],
               ['--detach'],
             );
@@ -109,7 +117,6 @@ StartCommand.flags = {
   update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
   'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
   'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),
-  'mine-blocks': flagTypes.string({ description: 'new blocks mining interval for local node e.g. 5s', default: null }),
 };
 
 module.exports = StartCommand;

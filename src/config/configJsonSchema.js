@@ -73,6 +73,22 @@ module.exports = {
           required: ['operator'],
           additionalProperties: false,
         },
+        miner: {
+          type: 'object',
+          properties: {
+            enable: {
+              type: 'boolean',
+            },
+            interval: {
+              type: 'string',
+            },
+            address: {
+              type: ['string', 'null'],
+            },
+          },
+          required: ['enable', 'interval', 'address'],
+          additionalProperties: false,
+        },
       },
       required: ['docker', 'version', 'p2p', 'masternode'],
       additionalProperties: false,
