@@ -35,17 +35,19 @@ class StartCommand extends BaseCommand {
   ) {
     let blockTimeMs;
 
-    const mineBlocks = config.get('core.miner.enable');
+    const isMinerEnabled = config.get('core.miner.enable');
 
-    if (mineBlocks !== false) {
+    if (isMinerEnabled === true) {
       if (config.get('network') !== NETWORKS.LOCAL) {
-        this.error(`mine-blocks option supposed to work only with local network. Your network is ${config.get('network')}`, { exit: true });
+        this.error(`'core.miner.interval' option supposed to work only with local network. Your network is ${config.get('network')}`, { exit: true });
       }
 
       const mineInterval = config.get('core.miner.interval');
+      
       blockTimeMs = ms(mineInterval);
+
       if (blockTimeMs === undefined || blockTimeMs < 0) {
-        this.error(`Invalid mine-blocks value ${mineInterval}`, { exit: true });
+        this.error(`Invalid 'core.miner.interval' value '${mineInterval}'`, { exit: true });
       }
     }
 
@@ -65,7 +67,7 @@ class StartCommand extends BaseCommand {
         },
         {
           title: 'Start a miner',
-          enabled: () => mineBlocks !== false,
+          enabled: () => isMinerEnabled === true,
           task: async () => {
             let minerAddress = config.get('core.miner.address');
 
