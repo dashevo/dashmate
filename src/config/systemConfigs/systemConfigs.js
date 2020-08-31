@@ -6,7 +6,7 @@ const baseConfig = {
   description: 'base config for use as template',
   core: {
     docker: {
-      image: 'dashpay/dashd:latest',
+      image: 'dashpay/dashd:0.15',
     },
     p2p: {
       port: 20001,
