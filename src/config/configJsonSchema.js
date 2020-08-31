@@ -81,6 +81,7 @@ module.exports = {
             },
             interval: {
               type: 'string',
+              pattern: '^[0-9]+(.[0-9]+)?(m|s|h)?$',
             },
             address: {
               type: ['string', 'null'],

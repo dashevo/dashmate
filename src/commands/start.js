@@ -4,8 +4,6 @@ const { flags: flagTypes } = require('@oclif/command');
 
 const { PrivateKey } = require('@dashevo/dashcore-lib');
 
-const ms = require('ms');
-
 const BaseCommand = require('../oclif/command/BaseCommand');
 
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
@@ -33,22 +31,10 @@ class StartCommand extends BaseCommand {
     startNodeTask,
     config,
   ) {
-    let blockTimeMs;
-
     const isMinerEnabled = config.get('core.miner.enable');
 
-    if (isMinerEnabled === true) {
-      if (config.get('network') !== NETWORKS.LOCAL) {
-        this.error(`'core.miner.interval' option supposed to work only with local network. Your network is ${config.get('network')}`, { exit: true });
-      }
-
-      const mineInterval = config.get('core.miner.interval');
-      
-      blockTimeMs = ms(mineInterval);
-
-      if (blockTimeMs === undefined || blockTimeMs < 0) {
-        this.error(`Invalid 'core.miner.interval' value '${mineInterval}'`, { exit: true });
-      }
+    if (isMinerEnabled === true && config.get('network') !== NETWORKS.LOCAL) {
+      this.error(`'core.miner.interval' option supposed to work only with local network. Your network is ${config.get('network')}`, { exit: true });
     }
 
     const tasks = new Listr(
@@ -78,13 +64,15 @@ class StartCommand extends BaseCommand {
               config.set('core.miner.address', minerAddress);
             }
 
+            const minerInterval = config.get('core.miner.interval');
+
             await dockerCompose.execCommand(
               config.toEnvs(),
               'core',
               [
                 'bash',
                 '-c',
-                `while true; do dash-cli generatetoaddress 1 ${minerAddress}; sleep ${blockTimeMs / 1000}; done`,
+                `while true; do dash-cli generatetoaddress 1 ${minerAddress}; sleep ${minerInterval}; done`,
               ],
               ['--detach'],
             );
