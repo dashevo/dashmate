@@ -27,6 +27,8 @@ class StartCommand extends BaseCommand {
     startNodeTask,
     config,
   ) {
+    const isMinerEnabled = config.get('core.miner.enable');
+
     const tasks = new Listr(
       [
         {
@@ -38,6 +40,7 @@ class StartCommand extends BaseCommand {
               driveImageBuildPath,
               dapiImageBuildPath,
               isUpdate,
+              isMinerEnabled,
             },
           ),
         },

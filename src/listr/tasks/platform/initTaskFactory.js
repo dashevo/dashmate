@@ -1,16 +1,16 @@
 const { Listr } = require('listr2');
 
-const dpnsDocumentSchema = require('@dashevo/dpns-contract/schema/dpns-contract-documents.json');
+const Dash = require('dash');
 
-const wait = require('../../../util/wait');
+const fundWallet = require('@dashevo/wallet-lib/src/utils/fundWallet');
+
+const dpnsDocumentSchema = require('@dashevo/dpns-contract/schema/dpns-contract-documents.json');
 
 /**
  *
- * @param {createClientWithFundedWallet} createClientWithFundedWallet
  * @return {initTask}
  */
 function initTaskFactory(
-  createClientWithFundedWallet,
 ) {
   /**
    * @typedef {initTask}
@@ -36,14 +36,33 @@ function initTaskFactory(
       {
         title: 'Initialize SDK',
         task: async (ctx, task) => {
-          // wait 5 seconds to ensure all services are running
-          await wait(5000);
+          const clientOpts = {
+            network: config.get('network'),
+          };
 
-          ctx.client = await createClientWithFundedWallet(
-            config.get('network'),
-            ctx.fundingPrivateKeyString,
-            ctx.seed,
-          );
+          if (ctx.seed) {
+            clientOpts.seeds = [ctx.seed];
+          }
+
+          const faucetClient = new Dash.Client({
+            ...clientOpts,
+            wallet: {
+              privateKey: ctx.fundingPrivateKeyString,
+            },
+          });
+
+          ctx.client = new Dash.Client({
+            ...clientOpts,
+            wallet: {
+              mnemonic: null,
+            },
+          });
+
+          const amount = 40000;
+
+          await fundWallet(faucetClient.wallet, ctx.client.wallet, amount);
+
+          await faucetClient.disconnect();
 
           // eslint-disable-next-line no-param-reassign
           task.output = `HD private key: ${ctx.client.wallet.exportWallet('HDPrivateKey')}`;
@@ -84,11 +103,14 @@ function initTaskFactory(
       {
         title: 'Register top level domain "dash"',
         task: async (ctx) => {
+          // noinspection JSAccessibilityCheck
           ctx.client.apps.dpns = {
             contractId: ctx.dataContract.getId(),
           };
 
-          await ctx.client.platform.names.register('dash', ctx.identity);
+          await ctx.client.platform.names.register('dash', {
+            dashAliasIdentityId: ctx.identity.getId(),
+          }, ctx.identity);
         },
       },
       {

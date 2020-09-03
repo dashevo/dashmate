@@ -1,5 +1,4 @@
 const { Listr } = require('listr2');
-const { Observable } = require('rxjs');
 
 const { flags: flagTypes } = require('@oclif/command');
 
@@ -16,7 +15,6 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
    * @param {generateToAddressTask} generateToAddressTask
    * @param {registerMasternodeTask} registerMasternodeTask
    * @param {initTask} initTask
-   * @param {generateBlocksWithSDK} generateBlocksWithSDK
    * @param {startNodeTask} startNodeTask
    * @param {DockerCompose} dockerCompose
    * @param {Config} config
@@ -32,7 +30,6 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
     generateToAddressTask,
     registerMasternodeTask,
     initTask,
-    generateBlocksWithSDK,
     startNodeTask,
     dockerCompose,
     config,
@@ -64,29 +61,13 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
                   driveImageBuildPath: ctx.driveImageBuildPath,
                   dapiImageBuildPath: ctx.dapiImageBuildPath,
                   isUpdate,
+                  isMinerEnabled: true,
                 },
               ),
             },
             {
               title: 'Initialize Platform',
               task: () => initTask(config),
-            },
-            {
-              title: 'Mine 100 blocks',
-              task: async (ctx) => (
-                new Observable(async (observer) => {
-                  await generateBlocksWithSDK(
-                    ctx.client.getDAPIClient(),
-                    config.get('network'),
-                    100,
-                    (blocks) => {
-                      observer.next(`${blocks} ${blocks > 1 ? 'blocks' : 'block'} mined`);
-                    },
-                  );
-
-                  observer.complete();
-                })
-              ),
             },
             {
               title: 'Stop node',

@@ -9,7 +9,9 @@ const {
 const Docker = require('dockerode');
 
 const path = require('path');
+const os = require('os');
 
+const ensureHomeDirFactory = require('./config/configFile/ensureHomeDirFactory');
 const ConfigJsonFileRepository = require('./config/configFile/ConfigJsonFileRepository');
 const createSystemConfigsFactory = require('./config/systemConfigs/createSystemConfigsFactory');
 const resetSystemConfigFactory = require('./config/systemConfigs/resetSystemConfigFactory');
@@ -35,10 +37,6 @@ const getAddressBalance = require('./core/wallet/getAddressBalance');
 const sendToAddress = require('./core/wallet/sendToAddress');
 const registerMasternode = require('./core/wallet/registerMasternode');
 
-const createClientWithFundedWallet = require('./sdk/createClientWithFundedWallet');
-const generateBlocksWithSDK = require('./sdk/generateBlocksWithSDK');
-const waitForBlocksWithSDK = require('./sdk/waitForBlocksWithSDK');
-
 const generateToAddressTaskFactory = require('./listr/tasks/wallet/generateToAddressTaskFactory');
 const registerMasternodeTaskFactory = require('./listr/tasks/registerMasternodeTaskFactory');
 const initTaskFactory = require('./listr/tasks/platform/initTaskFactory');
@@ -52,8 +50,12 @@ async function createDIContainer() {
   /**
    * Config
    */
+  const homeDirPath = path.resolve(os.homedir(), '.mn');
+
   container.register({
-    configFilePath: asValue(path.resolve(__dirname, '../data/config.json')),
+    homeDirPath: asValue(homeDirPath),
+    configFilePath: asValue(path.join(homeDirPath, 'config.json')),
+    ensureHomeDir: asFunction(ensureHomeDirFactory),
     configRepository: asClass(ConfigJsonFileRepository),
     systemConfigs: asValue(systemConfigs),
     createSystemConfigs: asFunction(createSystemConfigsFactory),
@@ -99,15 +101,6 @@ async function createDIContainer() {
     getAddressBalance: asValue(getAddressBalance),
     sendToAddress: asValue(sendToAddress),
     registerMasternode: asValue(registerMasternode),
-  });
-
-  /**
-   * Dash SDK
-   */
-  container.register({
-    createClientWithFundedWallet: asValue(createClientWithFundedWallet),
-    waitForBlocksWithSDK: asValue(waitForBlocksWithSDK),
-    generateBlocksWithSDK: asValue(generateBlocksWithSDK),
   });
 
   /**
