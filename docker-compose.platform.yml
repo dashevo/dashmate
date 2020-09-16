@@ -23,7 +23,7 @@ services:
       - CORE_JSON_RPC_USERNAME=dashrpc
       - CORE_JSON_RPC_PASSWORD=password
       - CORE_JSON_RPC_HOST=core
-      - CORE_JSON_RPC_PORT=20002
+      - CORE_JSON_RPC_PORT=${CORE_RPC_PORT:?err}
       - DOCUMENT_MONGODB_URL=mongodb://drive_mongodb:27017?replicaSet=driveDocumentIndices
       - DPNS_CONTRACT_ID=${PLATFORM_DPNS_CONTRACT_ID}
       - DPNS_TOP_LEVEL_IDENTITY=${PLATFORM_DPNS_OWNER_ID}
@@ -61,13 +61,13 @@ services:
       - API_JSON_RPC_PORT=3004
       - API_GRPC_PORT=3005
       - DASHCORE_RPC_HOST=core
-      - DASHCORE_RPC_PORT=20002
+      - DASHCORE_RPC_PORT=${CORE_RPC_PORT:?err}
       - DASHCORE_RPC_USER=dashrpc
       - DASHCORE_RPC_PASS=password
       - DASHCORE_ZMQ_HOST=core
       - DASHCORE_ZMQ_PORT=29998
       - DASHCORE_P2P_HOST=core
-      - DASHCORE_P2P_PORT=20001
+      - DASHCORE_P2P_PORT=${CORE_P2P_PORT:?err}
       - DASHCORE_P2P_NETWORK=devnet
       - NETWORK=devnet
       - TENDERMINT_RPC_HOST=drive_tendermint
@@ -84,13 +84,13 @@ services:
       - INSIGHT_URI=http://dapi_insight:3001/insight-api
       - TX_FILTER_STREAM_GRPC_PORT=3006
       - DASHCORE_RPC_HOST=core
-      - DASHCORE_RPC_PORT=20002
+      - DASHCORE_RPC_PORT=${CORE_RPC_PORT:?err}
       - DASHCORE_RPC_USER=dashrpc
       - DASHCORE_RPC_PASS=password
       - DASHCORE_ZMQ_HOST=core
       - DASHCORE_ZMQ_PORT=29998
       - DASHCORE_P2P_HOST=core
-      - DASHCORE_P2P_PORT=20001
+      - DASHCORE_P2P_PORT=${CORE_P2P_PORT:?err}
       - DASHCORE_P2P_NETWORK=devnet
       - NETWORK=devnet
       - TENDERMINT_RPC_HOST=drive_tendermint

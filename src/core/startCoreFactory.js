@@ -35,6 +35,7 @@ function startCoreFactory(
       'dashd',
       '-conf=/dash/.dashcore/dash.conf',
       `-port=${config.get('core.p2p.port')}`,
+      `-rpcport=${config.get('core.rpc.port')}`,
     ];
 
     if (options.wallet) {
@@ -50,12 +51,12 @@ function startCoreFactory(
       'core',
       coreCommand,
       [
-        '--publish=20002:20002',
+        `--publish=${config.get('core.rpc.port')}:${config.get('core.rpc.port')}`,
         '--detach',
       ],
     );
 
-    const rpcClient = createRpcClient();
+    const rpcClient = createRpcClient({port: config.get('core.rpc.port')});
 
     const coreService = new CoreService(
       rpcClient,

@@ -11,6 +11,9 @@ const baseConfig = {
     p2p: {
       port: 20001,
     },
+    rpc: {
+      port: 20002,
+    },
     masternode: {
       operator: {
         privateKey: null,
@@ -96,6 +99,9 @@ module.exports = {
     core: {
       p2p: {
         port: 19999,
+      },
+      rpc: {
+        port: 19998,
       },
     },
     network: NETWORKS.TESTNET,

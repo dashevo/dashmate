@@ -43,6 +43,17 @@ module.exports = {
           required: ['port'],
           additionalProperties: false,
         },
+        rpc: {
+          type: 'object',
+          properties: {
+            port: {
+              type: 'integer',
+              minimum: 0,
+            },
+          },
+          required: ['port'],
+          additionalProperties: false,
+        },
         masternode: {
           type: 'object',
           properties: {
@@ -78,7 +89,7 @@ module.exports = {
           additionalProperties: false,
         },
       },
-      required: ['docker', 'p2p', 'masternode', 'miner'],
+      required: ['docker', 'p2p', 'rpc', 'masternode', 'miner'],
       additionalProperties: false,
     },
     platform: {
