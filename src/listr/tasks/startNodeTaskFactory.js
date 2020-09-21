@@ -47,6 +47,12 @@ function startNodeTaskFactory(dockerCompose) {
         task: async () => dockerCompose.pull(config.toEnvs()),
       },
       {
+        title: 'Render configs',
+        task: () => {
+          config.renderConfigs();
+        }
+      },
+      {
         title: 'Start services',
         task: async () => {
           if (!isFullNode) {
