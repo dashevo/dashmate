@@ -9,9 +9,13 @@ const wait = require('../../util/wait');
 /**
  *
  * @param {DockerCompose} dockerCompose
+ * @param {renderServiceTemplates} renderServiceTemplates
  * @return {startNodeTask}
  */
-function startNodeTaskFactory(dockerCompose) {
+function startNodeTaskFactory(
+  dockerCompose,
+  renderServiceTemplates
+) {
   /**
    * @typedef {startNodeTask}
    * @param {Config} config
@@ -47,10 +51,8 @@ function startNodeTaskFactory(dockerCompose) {
         task: async () => dockerCompose.pull(config.toEnvs()),
       },
       {
-        title: 'Render configs',
-        task: () => {
-          config.renderConfigs();
-        }
+        title: 'Render service templates',
+        task: async () => renderServiceTemplates(config),
       },
       {
         title: 'Start services',

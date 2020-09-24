@@ -8,8 +8,6 @@ const configJsonSchema = require('./configJsonSchema');
 
 const convertObjectToEnvs = require('./convertObjectToEnvs');
 
-const applyTemplateToFile = require('./applyTemplateToFile');
-
 const InvalidOptionPathError = require('./errors/InvalidOptionPathError');
 const InvalidOptionError = require('./errors/InvalidOptionError');
 const InvalidOptionsError = require('./errors/InvalidOptionsError');
@@ -123,11 +121,6 @@ class Config {
       COMPOSE_PROJECT_NAME: `dash_masternode_${this.getName()}`,
       ...convertObjectToEnvs(this.getOptions()),
     };
-  }
-
-  renderConfigs() {
-    applyTemplateToFile('./configs/evonet/dapi/insight/dashcore-node.jsont');
-    return('done');
   }
 }
 
