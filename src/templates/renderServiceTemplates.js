@@ -1,12 +1,14 @@
 const fs = require('fs');
 const dots = require('dot');
+const crypto = require('crypto');
 
 async function renderServiceTemplates(config) {
-  const rpcpassword = 'adsf0h923qiud';
+  const rpcpassword = crypto.randomBytes(12).toString('base64');
   try {
     const files = fs.readdirSync('./templates');
     console.log(config);
     for (const file of files) {
+      console.log(file);
       const fileContents = fs.readFileSync('./templates/' + file, 'utf-8');
       const fileTemplate = dots.template(fileContents);
       const fileOutput = fileTemplate({config, rpcpassword});
