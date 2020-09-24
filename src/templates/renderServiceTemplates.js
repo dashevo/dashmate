@@ -2,6 +2,11 @@ const fs = require('fs');
 const dots = require('dot');
 const crypto = require('crypto');
 
+/**
+ * Render templates for services
+ * @param {Config} config
+ * @returns {Promise<void>}
+ */
 async function renderServiceTemplates(config) {
   const rpcpassword = crypto.randomBytes(12).toString('base64');
   try {
