@@ -71,7 +71,9 @@ const baseConfig = {
     },
   },
   externalIp: null,
-  network: NETWORKS.TESTNET,
+  network: {
+    name: NETWORKS.TESTNET,
+  },
   compose: {
     file: 'docker-compose.yml:docker-compose.platform.yml',
   },
@@ -82,7 +84,9 @@ module.exports = {
   local: lodashMerge({}, baseConfig, {
     description: 'standalone node for local development',
     externalIp: '127.0.0.1',
-    network: NETWORKS.LOCAL,
+    network: {
+      name: NETWORKS.LOCAL,
+    },
   }),
   evonet: lodashMerge({}, baseConfig, {
     description: 'node with Evonet configuration',
@@ -92,7 +96,10 @@ module.exports = {
         ownerId: '6UZ9jAodWiFxRg82HuA1Lf3mTh4fTGSiughxqkZX5kUA',
       },
     },
-    network: NETWORKS.EVONET,
+    network: {
+      name: NETWORKS.EVONET,
+      version: 6,
+    },
   }),
   testnet: lodashMerge({}, baseConfig, {
     description: 'node with testnet configuration',
@@ -104,7 +111,9 @@ module.exports = {
         port: 19998,
       },
     },
-    network: NETWORKS.TESTNET,
+    network: {
+      name: NETWORKS.TESTNET,
+    },
     compose: {
       file: 'docker-compose.yml',
     },

@@ -152,8 +152,19 @@ module.exports = {
       format: 'ipv4',
     },
     network: {
-      type: 'string',
-      enum: Object.values(NETWORKS),
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          enum: Object.values(NETWORKS),
+        },
+        version: {
+          type: 'integer',
+          minimum: 0,
+        },
+      },
+      required: ['name'],
+      additionalProperties: false,
     },
     compose: {
       type: 'object',

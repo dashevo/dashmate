@@ -59,7 +59,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Sync Core with network',
-        enabled: () => config.get('network') !== NETWORKS.LOCAL,
+        enabled: () => config.get('network.name') !== NETWORKS.LOCAL,
         task: async (ctx) => waitForCoreSync(ctx.coreService),
       },
       {
@@ -121,7 +121,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Wait for 15 confirmations',
-        enabled: () => config.get('network') !== NETWORKS.LOCAL,
+        enabled: () => config.get('network.name') !== NETWORKS.LOCAL,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await waitForConfirmations(
@@ -139,13 +139,13 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Mine 15 blocks to confirm',
-        enabled: () => config.get('network') === NETWORKS.LOCAL,
+        enabled: () => config.get('network.name') === NETWORKS.LOCAL,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await generateBlocks(
               ctx.coreService,
               15,
-              config.get('network'),
+              config.get('network.name'),
               (blocks) => {
                 observer.next(`${blocks} ${blocks > 1 ? 'blocks' : 'block'} mined`);
               },
@@ -157,7 +157,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Reach 1000 blocks to enable DML',
-        enabled: () => config.get('network') === NETWORKS.LOCAL,
+        enabled: () => config.get('network.name') === NETWORKS.LOCAL,
         // eslint-disable-next-line consistent-return
         task: async (ctx) => {
           const { result: height } = await ctx.coreService.getRpcClient().getBlockCount();
@@ -167,7 +167,7 @@ function registerMasternodeTaskFactory(
               await generateBlocks(
                 ctx.coreService,
                 1000 - height,
-                config.get('network'),
+                config.get('network.name'),
                 (blocks) => {
                   const remaining = 1000 - height - blocks;
                   observer.next(`${remaining} ${remaining > 1 ? 'blocks' : 'block'} remaining`);
@@ -198,7 +198,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Wait for 1 confirmation',
-        enabled: () => config.get('network') !== NETWORKS.LOCAL,
+        enabled: () => config.get('network.name') !== NETWORKS.LOCAL,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await waitForConfirmations(
@@ -216,13 +216,13 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Mine 1 block to confirm',
-        enabled: () => config.get('network') === NETWORKS.LOCAL,
+        enabled: () => config.get('network.name') === NETWORKS.LOCAL,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await generateBlocks(
               ctx.coreService,
               1,
-              config.get('network'),
+              config.get('network.name'),
               (blocks) => {
                 observer.next(`${blocks} ${blocks > 1 ? 'blocks' : 'block'} mined`);
               },

@@ -8,14 +8,11 @@ services:
       - ${CORE_P2P_PORT:?err}:${CORE_P2P_PORT:?err} # P2P
       - 127.0.0.1:${CORE_RPC_PORT:?err}:${CORE_RPC_PORT:?err} #RPC
     volumes:
-      - ./configs/${NETWORK:?err}/core/dashd.conf:/dash/.dashcore/dash.conf
+      - ~/.mn/${NETWORK:?err}/dashd.conf:/dash/.dashcore/dash.conf
       - core_data:/dash
     command:
       - dashd
-      - -port=${CORE_P2P_PORT:?err}
-      - -rpcport=${CORE_RPC_PORT:?err}
       - -masternodeblsprivkey=${CORE_MASTERNODE_OPERATOR_PRIVATE_KEY}
-      - -externalip=${EXTERNAL_IP}
 
   sentinel:
     image: dashpay/sentinel

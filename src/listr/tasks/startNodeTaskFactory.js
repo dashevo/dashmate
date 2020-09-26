@@ -10,11 +10,13 @@ const wait = require('../../util/wait');
  *
  * @param {DockerCompose} dockerCompose
  * @param {renderServiceTemplates} renderServiceTemplates
+ * @param {String} homeDirPath
  * @return {startNodeTask}
  */
 function startNodeTaskFactory(
   dockerCompose,
-  renderServiceTemplates
+  renderServiceTemplates,
+  homeDirPath,
 ) {
   /**
    * @typedef {startNodeTask}
@@ -40,8 +42,8 @@ function startNodeTaskFactory(
     // Check external IP is set
     config.get('externalIp', true);
 
-    if (isMinerEnabled === true && config.get('network') !== NETWORKS.LOCAL) {
-      this.error(`'core.miner.enabled' option supposed to work only with local network. Your network is ${config.get('network')}`, { exit: true });
+    if (isMinerEnabled === true && config.get('network.name') !== NETWORKS.LOCAL) {
+      this.error(`'core.miner.enabled' option supposed to work only with local network. Your network is ${config.get('network.name')}`, { exit: true });
     }
 
     return new Listr([
@@ -52,7 +54,7 @@ function startNodeTaskFactory(
       },
       {
         title: 'Render service templates',
-        task: async () => renderServiceTemplates(config),
+        task: async () => renderServiceTemplates(config, homeDirPath),
       },
       {
         title: 'Start services',
@@ -65,7 +67,7 @@ function startNodeTaskFactory(
           const envs = config.toEnvs();
 
           if (driveImageBuildPath || dapiImageBuildPath) {
-            if (config.get('network') === NETWORKS.TESTNET) {
+            if (config.get('network.name') === NETWORKS.TESTNET) {
               this.error('You can\'t use drive-image-build-path and dapi-image-build-path options with testnet network', { exit: true });
             }
 

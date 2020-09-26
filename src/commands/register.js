@@ -23,7 +23,7 @@ class RegisterCommand extends BaseCommand {
     registerMasternodeTask,
     config,
   ) {
-    const network = config.get('network');
+    const network = config.get('network.name');
 
     const fundingPrivateKey = new PrivateKey(
       fundingPrivateKeyString,

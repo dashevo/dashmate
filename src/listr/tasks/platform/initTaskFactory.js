@@ -37,7 +37,7 @@ function initTaskFactory(
         title: 'Initialize SDK',
         task: async (ctx, task) => {
           const clientOpts = {
-            network: config.get('network'),
+            network: config.get('network.name'),
           };
 
           if (ctx.seed) {

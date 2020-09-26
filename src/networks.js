@@ -1,5 +1,5 @@
 module.exports = {
   LOCAL: 'local',
-  EVONET: 'evonet-6',
+  EVONET: 'evonet',
   TESTNET: 'testnet',
 };

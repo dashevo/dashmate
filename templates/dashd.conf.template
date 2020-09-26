@@ -1,50 +1,25 @@
-# general
-
 # network
-{{? it.config.options.network === 'local'}}
+{{? it.config.options.network.name === 'local'}}
 regtest=1
-{{?? it.config.options.network.includes('evonet')}}
-
-devnet={{=it.config.options.network}}
-addnode=seed-1.evonet.networks.dash.org:20001
-addnode=seed-2.evonet.networks.dash.org:20001
-addnode=seed-3.evonet.networks.dash.org:20001
-addnode=seed-4.evonet.networks.dash.org:20001
-addnode=seed-5.evonet.networks.dash.org:20001
-
-sporkaddr=yQuAu9YAMt4yEiXBeDp3q5bKpo7jsC2eEj
-
-# First 1000 blocks should be mined with lowest difficulty (like in regtest, so it's instant)
-# and first 500 blocks are mined with a block subsidity multiplied by 10
-# this allows to register MNs immediately (DIP3 activates on block 2)
-minimumdifficultyblocks=1000
-highsubsidyblocks=500
-highsubsidyfactor=10
-
-{{?? it.config.options.network === 'testnet'}}
+{{?? it.config.options.network.name === 'evonet'}}
+devnet={{=it.config.options.network.name}}-{{=it.config.options.network.version}}
+{{?? it.config.options.network.name === 'testnet'}}
 testnet=1
 {{?}}
+port={{=it.config.options.core.p2p.port}}
+externalip={{=it.config.options.externalIp}}
 
 daemon=0  # leave this set to 0 for Docker
 logtimestamps=1
 maxconnections=256
 
-# optional indices (required for Insight)
-txindex=1
-addressindex=1
-timestampindex=1
-spentindex=1
-
-# ZeroMQ notifications (required for Insight)
-zmqpubrawtx=tcp://0.0.0.0:29998
-zmqpubrawtxlock=tcp://0.0.0.0:29998
-zmqpubhashblock=tcp://0.0.0.0:29998
-
 # JSONRPC
 server=1
 rpcuser=dashrpc
 rpcpassword={{=it.rpcpassword}}
+rpcport={{=it.config.options.core.rpc.port}}
 
+rpcallowip=127.0.0.1:{{=it.config.options.core.rpc.port}}:{{=it.config.options.core.rpc.port}}
 rpcallowip=172.16.0.0/12
 rpcallowip=192.168.0.0/16
 

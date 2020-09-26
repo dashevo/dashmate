@@ -83,7 +83,7 @@ function generateToAddressTaskFactory(
             await generateBlocks(
               ctx.coreService,
               101,
-              config.get('network'),
+              config.get('network.name'),
               (blocks) => {
                 observer.next(`${blocks} ${blocks > 1 ? 'blocks' : 'block'} mined`);
               },
