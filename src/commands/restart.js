@@ -18,7 +18,6 @@ class RestartCommand extends BaseCommand {
   async runWithDependencies(
     args,
     {
-      'full-node': isFullNode,
       update: isUpdate,
       'drive-image-build-path': driveImageBuildPath,
       'dapi-image-build-path': dapiImageBuildPath,
@@ -28,6 +27,7 @@ class RestartCommand extends BaseCommand {
     config,
   ) {
     const isMinerEnabled = config.get('core.miner.enable');
+    const isMasternode = config.get('core.masternode.enable');
 
     const tasks = new Listr(
       [
@@ -36,11 +36,11 @@ class RestartCommand extends BaseCommand {
           task: async () => dockerCompose.stop(config.toEnvs()),
         },
         {
-          title: `Start ${isFullNode ? 'full node' : 'masternode'}`,
+          title: `Start ${isMasternode ? 'masternode' : 'full node'}`,
           task: () => startNodeTask(
             config,
             {
-              isFullNode,
+              isMasternode,
               driveImageBuildPath,
               dapiImageBuildPath,
               isUpdate,
@@ -73,7 +73,6 @@ Restart masternode with specific preset
 
 RestartCommand.flags = {
   ...BaseCommand.flags,
-  'full-node': flagTypes.boolean({ char: 'f', description: 'start as full node', default: false }),
   update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
   'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
   'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),

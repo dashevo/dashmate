@@ -89,7 +89,6 @@ The `start` command is used to start a node with the default or specified config
 USAGE
   $ mn start
 OPTIONS
-  -f, --full-node                                  start as full node
   -u, --update                                     download updated services before start
   --config=config                                  configuration name to use
   --dapi-image-build-path=dapi-image-build-path    dapi's docker image build path
@@ -99,11 +98,6 @@ OPTIONS
 To start a masternode:
 ```bash
 $ mn start
-```
-
-To start a full node:
-```bash
-$ mn start -f
 ```
 
 ### Stop node
@@ -131,7 +125,6 @@ USAGE
   $ mn restart
 
 OPTIONS
-  -f, --full-node                                  start as full node
   -u, --update                                     download updated services before start
   --config=config                                  configuration name to use
   --dapi-image-build-path=dapi-image-build-path    dapi's docker image build path

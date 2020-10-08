@@ -16,7 +16,7 @@ function startNodeTaskFactory(dockerCompose) {
    * @typedef {startNodeTask}
    * @param {Config} config
    * @param {Object} options
-   * @param {boolean} [options.isFullNode]
+   * @param {boolean} [options.isMasternode]
    * @param {string} [options.driveImageBuildPath]
    * @param {string} [options.dapiImageBuildPath]
    * @param {boolean} [options.isUpdate]
@@ -26,7 +26,7 @@ function startNodeTaskFactory(dockerCompose) {
   function startNodeTask(
     config,
     {
-      isFullNode,
+      isMasternode,
       driveImageBuildPath = undefined,
       dapiImageBuildPath = undefined,
       isUpdate = undefined,
@@ -49,7 +49,7 @@ function startNodeTaskFactory(dockerCompose) {
       {
         title: 'Start services',
         task: async () => {
-          if (!isFullNode) {
+          if (isMasternode) {
             // Check operatorPrivateKey is set
             config.get('core.masternode.operator.privateKey', true);
           }
