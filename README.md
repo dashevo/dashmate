@@ -14,6 +14,7 @@ Distribution package for Dash Masternode installation
   - [Configure node](#configure-node)
   - [Start node](#start-node)
   - [Stop node](#stop-node)
+  - [Restart node](#restard-node)
   - [Register masternode](#register-masternode)
   - [Reset data](#reset-data)
   - [Development](#development)
@@ -119,6 +120,27 @@ OPTIONS
 To stop a node:
 ```bash
 $ mn stop
+```
+
+### Restart node
+
+The `restart` command is used to restart a node with the default or specified config.
+
+```
+USAGE
+  $ mn restart
+
+OPTIONS
+  -f, --full-node                                  start as full node
+  -u, --update                                     download updated services before start
+  --config=config                                  configuration name to use
+  --dapi-image-build-path=dapi-image-build-path    dapi's docker image build path
+  --drive-image-build-path=drive-image-build-path  drive's docker image build path
+```
+
+To update services and restart a masternode:
+```bash
+$ mn restart -u
 ```
 
 ### Register masternode
