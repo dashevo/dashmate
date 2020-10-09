@@ -218,6 +218,14 @@ To show the host status:
 $ mn status:host
 ```
 
+### Full node
+
+It is also possible to start a full node instead of a masternode. Modify the config setting as follows:
+
+```bash
+mn config:set core.masternode.enable false
+```
+
 ### Development
 
 When developing on a standalone node (a config specifying the `local` network), `setup-for-local-development` can be used to generate some dash, register a masternode and populate the node with the data required for local development.
