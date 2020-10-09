@@ -17,6 +17,7 @@ Distribution package for Dash Masternode installation
   - [Restart node](#restard-node)
   - [Register masternode](#register-masternode)
   - [Reset data](#reset-data)
+  - [Full node](#full-node)
   - [Development](#development)
   - [Docker Compose](#docker-compose)
 - [Contributing](#contributing)
