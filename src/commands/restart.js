@@ -26,7 +26,6 @@ class RestartCommand extends BaseCommand {
     startNodeTask,
     config,
   ) {
-    const isMinerEnabled = config.get('core.miner.enable');
     const isMasternode = config.get('core.masternode.enable');
 
     const tasks = new Listr(
@@ -40,11 +39,9 @@ class RestartCommand extends BaseCommand {
           task: () => startNodeTask(
             config,
             {
-              isMasternode,
               driveImageBuildPath,
               dapiImageBuildPath,
               isUpdate,
-              isMinerEnabled,
             },
           ),
         },

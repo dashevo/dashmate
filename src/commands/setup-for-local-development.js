@@ -54,6 +54,10 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
               task: () => registerMasternodeTask(config),
             },
             {
+              title: 'Enable miner',
+              task: () => config.set('core.miner.enable', true),
+            },
+            {
               title: 'Start masternode',
               task: async (ctx) => startNodeTask(
                 config,
@@ -61,7 +65,6 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
                   driveImageBuildPath: ctx.driveImageBuildPath,
                   dapiImageBuildPath: ctx.dapiImageBuildPath,
                   isUpdate,
-                  isMinerEnabled: true,
                 },
               ),
             },

@@ -26,15 +26,15 @@ function startNodeTaskFactory(dockerCompose) {
   function startNodeTask(
     config,
     {
-      isMasternode,
       driveImageBuildPath = undefined,
       dapiImageBuildPath = undefined,
       isUpdate = undefined,
-      isMinerEnabled = undefined,
     },
   ) {
     // Check external IP is set
     config.get('externalIp', true);
+    const isMinerEnabled = config.get('core.miner.enable');
+    const isMasternode = config.get('core.masternode.enable');
 
     if (isMinerEnabled === true && config.get('network') !== NETWORKS.LOCAL) {
       this.error(`'core.miner.enabled' option supposed to work only with local network. Your network is ${config.get('network')}`, { exit: true });

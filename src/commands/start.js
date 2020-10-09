@@ -26,7 +26,6 @@ class StartCommand extends BaseCommand {
     startNodeTask,
     config,
   ) {
-    const isMinerEnabled = config.get('core.miner.enable');
     const isMasternode = config.get('core.masternode.enable');
 
     const tasks = new Listr(
@@ -36,11 +35,9 @@ class StartCommand extends BaseCommand {
           task: () => startNodeTask(
             config,
             {
-              isMasternode,
               driveImageBuildPath,
               dapiImageBuildPath,
               isUpdate,
-              isMinerEnabled,
             },
           ),
         },
