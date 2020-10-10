@@ -13,6 +13,8 @@ const baseConfig = {
     },
     rpc: {
       port: 20002,
+      user: 'dashrpc',
+      password: 'rpcpassword'
     },
     masternode: {
       operator: {

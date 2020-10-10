@@ -50,8 +50,14 @@ module.exports = {
               type: 'integer',
               minimum: 0,
             },
+            user: {
+              type: 'string',
+            },
+            password: {
+              type: 'string',
+            },
           },
-          required: ['port'],
+          required: ['port', 'user', 'password'],
           additionalProperties: false,
         },
         masternode: {

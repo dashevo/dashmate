@@ -1,23 +1,13 @@
-# network
-{{? it.config.options.network.name === 'local'}}
-regtest=1
-{{?? it.config.options.network.name === 'evonet'}}
-devnet={{=it.config.options.network.name}}-{{=it.config.options.network.version}}
-{{?? it.config.options.network.name === 'testnet'}}
-testnet=1
-{{?}}
-port={{=it.config.options.core.p2p.port}}
-externalip={{=it.config.options.externalIp}}
-
+# general
 daemon=0  # leave this set to 0 for Docker
 logtimestamps=1
 maxconnections=256
+printtoconsole=1
 
 # JSONRPC
 server=1
-rpcuser=dashrpc
-rpcpassword={{=it.rpcpassword}}
-rpcport={{=it.config.options.core.rpc.port}}
+rpcuser={{=it.config.options.core.rpc.user}}
+rpcpassword={{=it.config.options.core.rpc.password}}
 
 rpcallowip=127.0.0.1:{{=it.config.options.core.rpc.port}}:{{=it.config.options.core.rpc.port}}
 rpcallowip=172.16.0.0/12
@@ -28,9 +18,35 @@ rpcthreads=16
 
 # external network
 listen=1
-bind=0.0.0.0
 dnsseed=0
 allowprivatenet=0
 
-printtoconsole=1
+# network
+port={{=it.config.options.core.p2p.port}}
+externalip={{=it.config.options.externalIp}}
 
+{{? it.config.options.network.name === 'local'}}
+regtest=1
+[regtest]
+{{?? it.config.options.network.name === 'evonet'}}
+devnet={{=it.config.options.network.name}}-{{=it.config.options.network.version}}
+[devnet]
+addnode=seed-1.evonet.networks.dash.org:20001
+addnode=seed-2.evonet.networks.dash.org:20001
+addnode=seed-3.evonet.networks.dash.org:20001
+addnode=seed-4.evonet.networks.dash.org:20001
+addnode=seed-5.evonet.networks.dash.org:20001
+sporkaddr=yQuAu9YAMt4yEiXBeDp3q5bKpo7jsC2eEj
+
+# First 1000 blocks should be mined with lowest difficulty (like in regtest, so it's instant)
+# and first 500 blocks are mined with a block subsidity multiplied by 10
+# this allows to register MNs immediately (DIP3 activates on block 2)
+minimumdifficultyblocks=1000
+highsubsidyblocks=500
+highsubsidyfactor=10
+{{?? it.config.options.network.name === 'testnet'}}
+testnet=1
+{{?}}
+
+bind=0.0.0.0
+rpcport={{=it.config.options.core.rpc.port}}
