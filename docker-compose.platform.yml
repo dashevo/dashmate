@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     volumes:
       - drive_mongodb_data:/data/db
-      - ./docker/mongodb/initiate_mongodb_replica.js:/docker-entrypoint-initdb.d/initiate_mongodb_replica.js
+      - ~/.mn/${CONFIG:?err}/initiate_mongodb_replica.js:/docker-entrypoint-initdb.d/initiate_mongodb_replica.js
     extra_hosts:
       - "drive_mongodb:127.0.0.1"
     command: mongod --replSet driveDocumentIndices --bind_ip_all
@@ -20,11 +20,11 @@ services:
     volumes:
       - drive_abci_leveldb:/usr/src/app/db
     environment:
-      - CORE_JSON_RPC_USERNAME=dashrpc
-      - CORE_JSON_RPC_PASSWORD=password
+      - CORE_JSON_RPC_USERNAME=${CORE_RPC_USER:?err}
+      - CORE_JSON_RPC_PASSWORD=${CORE_RPC_PASSWORD:?err}
       - CORE_JSON_RPC_HOST=core
       - CORE_JSON_RPC_PORT=${CORE_RPC_PORT:?err}
-      - DOCUMENT_MONGODB_URL=mongodb://drive_mongodb:27017?replicaSet=driveDocumentIndices
+      - DOCUMENT_MONGODB_URL=mongodb://drive_mongodb:${PLATFORM_DRIVE_MONGODB_PORT:?err}?replicaSet=driveDocumentIndices
       - DPNS_CONTRACT_ID=${PLATFORM_DPNS_CONTRACT_ID}
       - DPNS_TOP_LEVEL_IDENTITY=${PLATFORM_DPNS_OWNER_ID}
     command: npm run abci
@@ -35,9 +35,10 @@ services:
     depends_on:
       - drive_abci
     ports:
-      - 26656:26656 # P2P
+      - ${PLATFORM_DRIVE_TENDERMINT_P2P_PORT:?err}:${PLATFORM_DRIVE_TENDERMINT_P2P_PORT:?err} # P2P
     volumes:
-      - ./configs/${NETWORK:?err}/drive/tendermint:/tendermint/config:ro
+      - ~/.mn/${CONFIG:?err}/genesis.json:/tendermint/config/genesis.json
+      - ~/.mn/${CONFIG:?err}/config.toml:/tendermint/config/config.toml
       - drive_tendermint_homedir:/tendermint
     entrypoint: sh -c "/usr/bin/tendermint init && /usr/bin/tendermint node"
 
@@ -47,7 +48,7 @@ services:
     depends_on:
       - core
     volumes:
-      - ./configs/${NETWORK:?err}/dapi/insight/dashcore-node.json:/insight/dashcore-node.json
+      - ~/.mn/${CONFIG:?err}/dashcore-node.json:/insight/dashcore-node.json
 
   dapi_api:
     image: ${PLATFORM_DAPI_API_DOCKER_IMAGE:?err}
@@ -57,21 +58,21 @@ services:
       - dapi_insight
       - core
     environment:
-      - INSIGHT_URI=http://dapi_insight:3001/insight-api
-      - API_JSON_RPC_PORT=3004
-      - API_GRPC_PORT=3005
+      - INSIGHT_URI=http://dapi_insight:${PLATFORM_DAPI_INSIGHT_PORT:?err}/insight-api
+      - API_JSON_RPC_PORT=${PLATFORM_DAPI_API_JSONRPC_PORT:?err}
+      - API_GRPC_PORT=${PLATFORM_DAPI_API_GRPC_PORT:?err}
       - DASHCORE_RPC_HOST=core
       - DASHCORE_RPC_PORT=${CORE_RPC_PORT:?err}
-      - DASHCORE_RPC_USER=dashrpc
-      - DASHCORE_RPC_PASS=password
+      - DASHCORE_RPC_USER=${CORE_RPC_USER:?err}
+      - DASHCORE_RPC_PASS=${CORE_RPC_PASSWORD:?err}
       - DASHCORE_ZMQ_HOST=core
-      - DASHCORE_ZMQ_PORT=29998
+      - DASHCORE_ZMQ_PORT=${CORE_ZMQ_PORT:?err}
       - DASHCORE_P2P_HOST=core
       - DASHCORE_P2P_PORT=${CORE_P2P_PORT:?err}
       - DASHCORE_P2P_NETWORK=devnet
       - NETWORK=devnet
       - TENDERMINT_RPC_HOST=drive_tendermint
-      - TENDERMINT_RPC_PORT=26657
+      - TENDERMINT_RPC_PORT=${PLATFORM_DRIVE_TENDERMINT_RPC_PORT:?err}
     command: npm run api
 
   dapi_tx_filter_stream:
@@ -81,20 +82,20 @@ services:
       - core
       - dapi_insight
     environment:
-      - INSIGHT_URI=http://dapi_insight:3001/insight-api
-      - TX_FILTER_STREAM_GRPC_PORT=3006
+      - INSIGHT_URI=http://dapi_insight:${PLATFORM_DAPI_INSIGHT_PORT:?err}/insight-api
+      - TX_FILTER_STREAM_GRPC_PORT=${PLATFORM_DAPI_API_TXFILTERSTREAM_PORT:?err}
       - DASHCORE_RPC_HOST=core
       - DASHCORE_RPC_PORT=${CORE_RPC_PORT:?err}
-      - DASHCORE_RPC_USER=dashrpc
-      - DASHCORE_RPC_PASS=password
+      - DASHCORE_RPC_USER=${CORE_RPC_USER:?err}
+      - DASHCORE_RPC_PASS=${CORE_RPC_PASSWORD:?err}
       - DASHCORE_ZMQ_HOST=core
-      - DASHCORE_ZMQ_PORT=29998
+      - DASHCORE_ZMQ_PORT=${CORE_ZMQ_PORT:?err}
       - DASHCORE_P2P_HOST=core
       - DASHCORE_P2P_PORT=${CORE_P2P_PORT:?err}
       - DASHCORE_P2P_NETWORK=devnet
       - NETWORK=devnet
       - TENDERMINT_RPC_HOST=drive_tendermint
-      - TENDERMINT_RPC_PORT=26657
+      - TENDERMINT_RPC_PORT=${PLATFORM_DRIVE_TENDERMINT_RPC_PORT:?err}
     command: npm run tx-filter-stream
 
   dapi_envoy:
@@ -104,7 +105,7 @@ services:
       - dapi_api
       - dapi_tx_filter_stream
     volumes:
-      - ./configs/${NETWORK:?err}/dapi/envoy/grpc.yaml:/etc/envoy/envoy.yaml
+      - ~/.mn/${CONFIG:?err}/grpc.yaml:/etc/envoy/envoy.yaml
 
   dapi_nginx:
     image: ${PLATFORM_DAPI_NGINX_DOCKER_IMAGE:?err}
@@ -117,9 +118,9 @@ services:
       - 3000:80 # JSON RPC and gRPC Web
       - 3010:50051 # gRPC Native
     volumes:
-      - ./configs/${NETWORK:?err}/dapi/nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./configs/${NETWORK:?err}/dapi/nginx/grpc.conf:/etc/nginx/conf.d/grpc.conf
-      - ./configs/${NETWORK:?err}/dapi/nginx/errors.grpc_conf:/etc/nginx/conf.d/errors.grpc_conf
+      - ~/.mn/${CONFIG:?err}/default.conf:/etc/nginx/conf.d/default.conf
+      - ~/.mn/${CONFIG:?err}/grpc.conf:/etc/nginx/conf.d/grpc.conf
+      - ~/.mn/${CONFIG:?err}/errors.grpc_conf:/etc/nginx/conf.d/errors.grpc_conf
 
 volumes:
   drive_abci_leveldb:

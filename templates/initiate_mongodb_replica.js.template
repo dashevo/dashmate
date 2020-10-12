@@ -5,7 +5,7 @@ rs.initiate({
   members: [
     {
       _id: 0,
-      host: 'drive_mongodb:27017',
+      host: 'drive_mongodb:{{=it.platform.drive.mongodb.port}}',
     },
   ],
 });

@@ -15,23 +15,26 @@ server {
 
     access_log /dev/stdout grpc_json;
 
+    limit_req zone=protect_api burst=300 nodelay;
+    limit_req_status 429;
+
     location = /org.dash.platform.dapi.v0.Core/subscribeToTransactionsWithProofs {
-        grpc_pass grpc://dapi_tx_filter_stream:3006;
+        grpc_pass grpc://dapi_tx_filter_stream:{{=it.platform.dapi.api.txfilterstream.port}};
         grpc_buffer_size 128k;
     }
 
     location ~ ^/org\.dash\.platform\.dapi\.v0\.Core {
-        grpc_pass grpc://dapi_api:3005;
+        grpc_pass grpc://dapi_api:{{=it.platform.dapi.api.grpc.port}};
         grpc_buffer_size 128k;
     }
 
     location ~ ^/org\.dash\.platform\.dapi\.v0\.Platform {
-        grpc_pass grpc://dapi_api:3005;
+        grpc_pass grpc://dapi_api:{{=it.platform.dapi.api.grpc.port}};
         grpc_buffer_size 128k;
     }
 
     location /grpc.health.v1.Health {
-        grpc_pass grpc://dapi_tx_filter_stream:3006;
+        grpc_pass grpc://dapi_tx_filter_stream:{{=it.platform.dapi.api.txfilterstream.port}};
     }
 
     location ~ ^/org\.dash\.platform\.dapi\.v[0-9]+\.Core {

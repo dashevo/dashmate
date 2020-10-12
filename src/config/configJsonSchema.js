@@ -19,7 +19,10 @@ module.exports = {
         },
       },
       required: ['docker'],
-      additionalProperties: false,
+    },
+    port: {
+      type: 'integer',
+      minimum: 0,
     },
   },
   properties: {
@@ -36,8 +39,7 @@ module.exports = {
           type: 'object',
           properties: {
             port: {
-              type: 'integer',
-              minimum: 0,
+              $ref: '#/definitions/port',
             },
           },
           required: ['port'],
@@ -47,8 +49,7 @@ module.exports = {
           type: 'object',
           properties: {
             port: {
-              type: 'integer',
-              minimum: 0,
+              $ref: '#/definitions/port',
             },
             user: {
               type: 'string',
@@ -58,6 +59,16 @@ module.exports = {
             },
           },
           required: ['port', 'user', 'password'],
+          additionalProperties: false,
+        },
+        zmq: {
+          type: 'object',
+          properties: {
+            port: {
+              $ref: '#/definitions/port',
+            },
+          },
+          required: ['port'],
           additionalProperties: false,
         },
         masternode: {
@@ -95,7 +106,7 @@ module.exports = {
           additionalProperties: false,
         },
       },
-      required: ['docker', 'p2p', 'rpc', 'masternode', 'miner'],
+      required: ['docker', 'p2p', 'rpc', 'zmq', 'masternode', 'miner'],
       additionalProperties: false,
     },
     platform: {
@@ -105,16 +116,70 @@ module.exports = {
           type: 'object',
           properties: {
             envoy: {
-              $ref: '#/definitions/docker',
+              properties: {
+                docker: {
+                  $ref: '#/definitions/docker/properties/docker',
+                },
+                port: {
+                  $ref: '#/definitions/port',
+                },
+              },
+              required: ['port', 'docker'],
+              additionalProperties: false,
             },
             nginx: {
               $ref: '#/definitions/docker',
             },
             api: {
-              $ref: '#/definitions/docker',
+              properties: {
+                docker: {
+                  $ref: '#/definitions/docker/properties/docker',
+                },
+                jsonrpc: {
+                  type: 'object',
+                  properties: {
+                    port: {
+                      $ref: '#/definitions/port',
+                    },
+                  },
+                  required: ['port'],
+                  additionalProperties: false,
+                },
+                grpc: {
+                  type: 'object',
+                  properties: {
+                    port: {
+                      $ref: '#/definitions/port',
+                    },
+                  },
+                  required: ['port'],
+                  additionalProperties: false,
+                },
+                txfilterstream: {
+                  type: 'object',
+                  properties: {
+                    port: {
+                      $ref: '#/definitions/port',
+                    },
+                  },
+                  required: ['port'],
+                  additionalProperties: false,
+                },
+              },
+              required: ['docker', 'jsonrpc', 'grpc', 'txfilterstream'],
+              additionalProperties: false,
             },
             insight: {
-              $ref: '#/definitions/docker',
+              properties: {
+                docker: {
+                  $ref: '#/definitions/docker/properties/docker',
+                },
+                port: {
+                  $ref: '#/definitions/port',
+                },
+              },
+              required: ['port', 'docker'],
+              additionalProperties: false,
             },
           },
           required: ['envoy', 'nginx', 'api', 'insight'],
@@ -124,13 +189,47 @@ module.exports = {
           type: 'object',
           properties: {
             mongodb: {
-              $ref: '#/definitions/docker',
+              properties: {
+                docker: {
+                  $ref: '#/definitions/docker/properties/docker',
+                },
+                port: {
+                  $ref: '#/definitions/port',
+                },
+              },
+              required: ['port', 'docker'],
+              additionalProperties: false,
             },
             abci: {
               $ref: '#/definitions/docker',
             },
             tendermint: {
-              $ref: '#/definitions/docker',
+              properties: {
+                docker: {
+                  $ref: '#/definitions/docker/properties/docker',
+                },
+                p2p: {
+                  type: 'object',
+                  properties: {
+                    port: {
+                      $ref: '#/definitions/port',
+                    },
+                  },
+                  required: ['port'],
+                  additionalProperties: false,
+                },
+                rpc: {
+                  type: 'object',
+                  properties: {
+                    port: {
+                      $ref: '#/definitions/port',
+                    },
+                  },
+                  required: ['port'],
+                  additionalProperties: false,
+                },
+              },
+              required: ['docker', 'p2p', 'rpc'],
             },
           },
           required: ['mongodb', 'abci', 'tendermint'],

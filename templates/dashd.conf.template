@@ -6,10 +6,10 @@ printtoconsole=1
 
 # JSONRPC
 server=1
-rpcuser={{=it.config.options.core.rpc.user}}
-rpcpassword={{=it.config.options.core.rpc.password}}
+rpcuser={{=it.core.rpc.user}}
+rpcpassword={{=it.core.rpc.password}}
 
-rpcallowip=127.0.0.1:{{=it.config.options.core.rpc.port}}:{{=it.config.options.core.rpc.port}}
+rpcallowip=127.0.0.1
 rpcallowip=172.16.0.0/12
 rpcallowip=192.168.0.0/16
 
@@ -21,15 +21,31 @@ listen=1
 dnsseed=0
 allowprivatenet=0
 
-# network
-port={{=it.config.options.core.p2p.port}}
-externalip={{=it.config.options.externalIp}}
+# need this twice to support 0.15 and 0.16 conf files
+port={{=it.core.p2p.port}}
+rpcport={{=it.core.rpc.port}}
 
-{{? it.config.options.network.name === 'local'}}
+
+{{? it.network.name === 'testnet'}}
+{{??}}
+# optional indices (required for Insight)
+txindex=1
+addressindex=1
+timestampindex=1
+spentindex=1
+
+# ZeroMQ notifications (required for Insight)
+zmqpubrawtx=tcp://0.0.0.0:{{=it.core.zmq.port}}
+zmqpubrawtxlock=tcp://0.0.0.0:{{=it.core.zmq.port}}
+zmqpubhashblock=tcp://0.0.0.0:{{=it.core.zmq.port}}
+{{?}}
+
+
+{{? it.network.name === 'local'}}
 regtest=1
 [regtest]
-{{?? it.config.options.network.name === 'evonet'}}
-devnet={{=it.config.options.network.name}}-{{=it.config.options.network.version}}
+{{?? it.network.name === 'evonet'}}
+devnet={{=it.network.name}}-{{=it.network.version}}
 [devnet]
 addnode=seed-1.evonet.networks.dash.org:20001
 addnode=seed-2.evonet.networks.dash.org:20001
@@ -44,9 +60,15 @@ sporkaddr=yQuAu9YAMt4yEiXBeDp3q5bKpo7jsC2eEj
 minimumdifficultyblocks=1000
 highsubsidyblocks=500
 highsubsidyfactor=10
-{{?? it.config.options.network.name === 'testnet'}}
+{{?? it.network.name === 'testnet'}}
 testnet=1
 {{?}}
 
+# network
+externalip={{=it.externalIp}}
+port={{=it.core.p2p.port}}
+{{? it.network.name === 'testnet'}}
+{{??}}
 bind=0.0.0.0
-rpcport={{=it.config.options.core.rpc.port}}
+rpcport={{=it.core.rpc.port}}
+{{?}}

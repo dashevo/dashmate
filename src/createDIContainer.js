@@ -17,7 +17,8 @@ const createSystemConfigsFactory = require('./config/systemConfigs/createSystemC
 const resetSystemConfigFactory = require('./config/systemConfigs/resetSystemConfigFactory');
 const systemConfigs = require('./config/systemConfigs/systemConfigs');
 
-const renderServiceTemplates = require('./templates/renderServiceTemplates');
+const renderServiceTemplatesFactory = require('./templates/renderServiceTemplatesFactory');
+const writeServiceConfigs = require('./templates/writeServiceConfigs');
 
 const DockerCompose = require('./docker/DockerCompose');
 const StartedContainers = require('./docker/StartedContainers');
@@ -69,7 +70,8 @@ async function createDIContainer() {
    * Templates
    */
   container.register({
-    renderServiceTemplates: asFunction(renderServiceTemplates),
+    renderServiceTemplates: asFunction(renderServiceTemplatesFactory),
+    writeServiceConfigs: asValue(writeServiceConfigs),
   });
 
   /**

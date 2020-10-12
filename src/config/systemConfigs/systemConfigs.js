@@ -6,7 +6,7 @@ const baseConfig = {
   description: 'base config for use as template',
   core: {
     docker: {
-      image: 'dashpay/dashd:0.15',
+      image: 'dashpay/dashd:0.16',
     },
     p2p: {
       port: 20001,
@@ -15,6 +15,9 @@ const baseConfig = {
       port: 20002,
       user: 'dashrpc',
       password: 'rpcpassword'
+    },
+    zmq: {
+      port: 29998,
     },
     masternode: {
       operator: {
@@ -30,6 +33,7 @@ const baseConfig = {
   platform: {
     dapi: {
       envoy: {
+        port: 8080,
         docker: {
           image: 'envoyproxy/envoy:v1.14-latest',
         },
@@ -40,11 +44,21 @@ const baseConfig = {
         },
       },
       api: {
+        jsonrpc: {
+          port: 3004,
+        },
+        grpc: {
+          port: 3005,
+        },
+        txfilterstream: {
+          port: 3006,
+        },
         docker: {
           image: 'dashpay/dapi:0.15-dev',
         },
       },
       insight: {
+        port: 3001,
         docker: {
           image: 'dashpay/insight-api:latest',
         },
@@ -52,6 +66,7 @@ const baseConfig = {
     },
     drive: {
       mongodb: {
+        port: 27017,
         docker: {
           image: 'mongo:4.2',
         },
@@ -62,6 +77,12 @@ const baseConfig = {
         },
       },
       tendermint: {
+        p2p: {
+          port: 26656,
+        },
+        rpc: {
+          port: 26657,
+        },
         docker: {
           image: 'dashpay/tendermint:v0.32.12',
         },
