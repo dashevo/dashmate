@@ -41,7 +41,7 @@ const baseConfig = {
       },
       insight: {
         docker: {
-          image: 'dashpay/insight-api:latest',
+          image: 'shumkov/insight-api:3.0.0',
         },
       },
     },
