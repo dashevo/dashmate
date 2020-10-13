@@ -25,7 +25,7 @@ services:
       - RPCPASSWORD=${CORE_RPC_PASSWORD:?err}
       - RPCHOST=core
       - RPCPORT=${CORE_RPC_PORT:?err}
-      - NETWORK=${NETWORK?:err}
+      - NETWORK=${NETWORK_NAME?:err}
       - SENTINEL_ARGS=-b
 
 volumes: 
