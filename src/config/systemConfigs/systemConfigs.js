@@ -50,9 +50,6 @@ const baseConfig = {
         grpc: {
           port: 3005,
         },
-        txfilterstream: {
-          port: 3006,
-        },
         docker: {
           image: 'dashpay/dapi:0.15-dev',
         },
@@ -62,6 +59,9 @@ const baseConfig = {
         docker: {
           image: 'dashpay/insight-api:latest',
         },
+      },
+      txfilterstream: {
+        port: 3006,
       },
     },
     drive: {

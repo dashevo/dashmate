@@ -155,18 +155,8 @@ module.exports = {
                   required: ['port'],
                   additionalProperties: false,
                 },
-                txfilterstream: {
-                  type: 'object',
-                  properties: {
-                    port: {
-                      $ref: '#/definitions/port',
-                    },
-                  },
-                  required: ['port'],
-                  additionalProperties: false,
-                },
               },
-              required: ['docker', 'jsonrpc', 'grpc', 'txfilterstream'],
+              required: ['docker', 'jsonrpc', 'grpc'],
               additionalProperties: false,
             },
             insight: {
@@ -181,8 +171,18 @@ module.exports = {
               required: ['port', 'docker'],
               additionalProperties: false,
             },
+            txfilterstream: {
+              type: 'object',
+              properties: {
+                port: {
+                  $ref: '#/definitions/port',
+                },
+              },
+              required: ['port'],
+              additionalProperties: false,
+            },
           },
-          required: ['envoy', 'nginx', 'api', 'insight'],
+          required: ['envoy', 'nginx', 'api', 'insight', 'txfilterstream'],
           additionalProperties: false,
         },
         drive: {
