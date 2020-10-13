@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     volumes:
       - drive_mongodb_data:/data/db
-      - ~/.mn/${CONFIG:?err}/initiate_mongodb_replica.js:/docker-entrypoint-initdb.d/initiate_mongodb_replica.js
+      - ~/.mn/${CONFIG_NAME:?err}/initiate_mongodb_replica.js:/docker-entrypoint-initdb.d/initiate_mongodb_replica.js
     extra_hosts:
       - "drive_mongodb:127.0.0.1"
     command: mongod --replSet driveDocumentIndices --bind_ip_all
@@ -37,8 +37,8 @@ services:
     ports:
       - ${PLATFORM_DRIVE_TENDERMINT_P2P_PORT:?err}:${PLATFORM_DRIVE_TENDERMINT_P2P_PORT:?err} # P2P
     volumes:
-      - ~/.mn/${CONFIG:?err}/genesis.json:/tendermint/config/genesis.json
-      - ~/.mn/${CONFIG:?err}/config.toml:/tendermint/config/config.toml
+      - ~/.mn/${CONFIG_NAME:?err}/genesis.json:/tendermint/config/genesis.json
+      - ~/.mn/${CONFIG_NAME:?err}/config.toml:/tendermint/config/config.toml
       - drive_tendermint_homedir:/tendermint
     entrypoint: sh -c "/usr/bin/tendermint init && /usr/bin/tendermint node"
 
@@ -48,7 +48,7 @@ services:
     depends_on:
       - core
     volumes:
-      - ~/.mn/${CONFIG:?err}/dashcore-node.json:/insight/dashcore-node.json
+      - ~/.mn/${CONFIG_NAME:?err}/dashcore-node.json:/insight/dashcore-node.json
 
   dapi_api:
     image: ${PLATFORM_DAPI_API_DOCKER_IMAGE:?err}
@@ -105,7 +105,7 @@ services:
       - dapi_api
       - dapi_tx_filter_stream
     volumes:
-      - ~/.mn/${CONFIG:?err}/grpc.yaml:/etc/envoy/envoy.yaml
+      - ~/.mn/${CONFIG_NAME:?err}/grpc.yaml:/etc/envoy/envoy.yaml
 
   dapi_nginx:
     image: ${PLATFORM_DAPI_NGINX_DOCKER_IMAGE:?err}
@@ -118,9 +118,9 @@ services:
       - 3000:80 # JSON RPC and gRPC Web
       - 3010:50051 # gRPC Native
     volumes:
-      - ~/.mn/${CONFIG:?err}/default.conf:/etc/nginx/conf.d/default.conf
-      - ~/.mn/${CONFIG:?err}/grpc.conf:/etc/nginx/conf.d/grpc.conf
-      - ~/.mn/${CONFIG:?err}/errors.grpc_conf:/etc/nginx/conf.d/errors.grpc_conf
+      - ~/.mn/${CONFIG_NAME:?err}/default.conf:/etc/nginx/conf.d/default.conf
+      - ~/.mn/${CONFIG_NAME:?err}/grpc.conf:/etc/nginx/conf.d/grpc.conf
+      - ~/.mn/${CONFIG_NAME:?err}/errors.grpc_conf:/etc/nginx/conf.d/errors.grpc_conf
 
 volumes:
   drive_abci_leveldb:
