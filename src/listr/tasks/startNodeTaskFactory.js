@@ -33,8 +33,8 @@ function startNodeTaskFactory(dockerCompose) {
   ) {
     // Check external IP is set
     config.get('externalIp', true);
+    
     const isMinerEnabled = config.get('core.miner.enable');
-    const isMasternode = config.get('core.masternode.enable');
 
     if (isMinerEnabled === true && config.get('network') !== NETWORKS.LOCAL) {
       this.error(`'core.miner.enabled' option supposed to work only with local network. Your network is ${config.get('network')}`, { exit: true });
@@ -57,6 +57,7 @@ function startNodeTaskFactory(dockerCompose) {
       {
         title: 'Start services',
         task: async () => {
+          const isMasternode = config.get('core.masternode.enable');
           if (isMasternode) {
             // Check operatorPrivateKey is set
             config.get('core.masternode.operator.privateKey', true);
