@@ -94,6 +94,9 @@ class BaseCommand extends Command {
       this.container.register({
         config: asValue(config),
       });
+
+      const renderServiceTemplates = this.container.resolve('renderServiceTemplates');
+      renderServiceTemplates(config, this.container.resolve('homeDirPath'));
     }
 
     const params = getFunctionParams(this.runWithDependencies, 2);

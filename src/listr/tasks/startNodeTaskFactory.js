@@ -53,10 +53,6 @@ function startNodeTaskFactory(
         task: async () => dockerCompose.pull(config.toEnvs()),
       },
       {
-        title: 'Render service templates',
-        task: async () => renderServiceTemplates(config, homeDirPath),
-      },
-      {
         title: 'Start services',
         task: async () => {
           if (!isFullNode) {
