@@ -19,6 +19,7 @@ function createRpcClient(config = {}) {
     user: 'dashrpc',
     pass: 'password',
     host: '127.0.0.1',
+    port: 20002,
     ...config,
   };
 
