@@ -264,11 +264,10 @@ module.exports = {
           enum: Object.values(NETWORKS),
         },
         version: {
-          type: 'integer',
-          minimum: 0,
+          type: ['string', 'null'],
         },
       },
-      required: ['name'],
+      required: ['name', 'version'],
       additionalProperties: false,
     },
     compose: {

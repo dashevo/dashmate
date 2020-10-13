@@ -59,8 +59,8 @@ services:
       - core
     environment:
       - INSIGHT_URI=http://dapi_insight:${PLATFORM_DAPI_INSIGHT_PORT:?err}/insight-api
-      - API_JSON_RPC_PORT=${PLATFORM_DAPI_API_JSONRPC_PORT:?err}
-      - API_GRPC_PORT=${PLATFORM_DAPI_API_GRPC_PORT:?err}
+      - API_JSON_RPC_PORT=${PLATFORM_DAPI_API_JSON_RPC_PORT:?err}
+      - API_GRPC_PORT=${PLATFORM_DAPI_API_G_RPC_PORT:?err}
       - DASHCORE_RPC_HOST=core
       - DASHCORE_RPC_PORT=${CORE_RPC_PORT:?err}
       - DASHCORE_RPC_USER=${CORE_RPC_USER:?err}
@@ -83,7 +83,7 @@ services:
       - dapi_insight
     environment:
       - INSIGHT_URI=http://dapi_insight:${PLATFORM_DAPI_INSIGHT_PORT:?err}/insight-api
-      - TX_FILTER_STREAM_GRPC_PORT=${PLATFORM_DAPI_API_TXFILTERSTREAM_PORT:?err}
+      - TX_FILTER_STREAM_GRPC_PORT=${PLATFORM_DAPI_TX_FILTER_STREAM_PORT:?err}
       - DASHCORE_RPC_HOST=core
       - DASHCORE_RPC_PORT=${CORE_RPC_PORT:?err}
       - DASHCORE_RPC_USER=${CORE_RPC_USER:?err}

@@ -96,6 +96,7 @@ const baseConfig = {
   externalIp: null,
   network: {
     name: NETWORKS.TESTNET,
+    version: null,
   },
   compose: {
     file: 'docker-compose.yml:docker-compose.platform.yml',
@@ -109,6 +110,7 @@ module.exports = {
     externalIp: '127.0.0.1',
     network: {
       name: NETWORKS.LOCAL,
+      version: null,
     },
   }),
   evonet: lodashMerge({}, baseConfig, {
@@ -136,6 +138,7 @@ module.exports = {
     },
     network: {
       name: NETWORKS.TESTNET,
+      version: null,
     },
     compose: {
       file: 'docker-compose.yml',
