@@ -19,22 +19,22 @@ server {
     limit_req_status 429;
 
     location = /org.dash.platform.dapi.v0.Core/subscribeToTransactionsWithProofs {
-        grpc_pass grpc://dapi_tx_filter_stream:{{=it.platform.dapi.txfilterstream.port}};
+        grpc_pass grpc://dapi_tx_filter_stream:{{=it.platform.dapi.txFilterStream.port}};
         grpc_buffer_size 128k;
     }
 
     location ~ ^/org\.dash\.platform\.dapi\.v0\.Core {
-        grpc_pass grpc://dapi_api:{{=it.platform.dapi.api.grpc.port}};
+        grpc_pass grpc://dapi_api:{{=it.platform.dapi.api.gRpc.port}};
         grpc_buffer_size 128k;
     }
 
     location ~ ^/org\.dash\.platform\.dapi\.v0\.Platform {
-        grpc_pass grpc://dapi_api:{{=it.platform.dapi.api.grpc.port}};
+        grpc_pass grpc://dapi_api:{{=it.platform.dapi.api.gRpc.port}};
         grpc_buffer_size 128k;
     }
 
     location /grpc.health.v1.Health {
-        grpc_pass grpc://dapi_tx_filter_stream:{{=it.platform.dapi.txfilterstream.port}};
+        grpc_pass grpc://dapi_tx_filter_stream:{{=it.platform.dapi.txFilterStream.port}};
     }
 
     location ~ ^/org\.dash\.platform\.dapi\.v[0-9]+\.Core {

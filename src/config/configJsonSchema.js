@@ -135,7 +135,7 @@ module.exports = {
                 docker: {
                   $ref: '#/definitions/docker/properties/docker',
                 },
-                jsonrpc: {
+                jsonRpc: {
                   type: 'object',
                   properties: {
                     port: {
@@ -145,7 +145,7 @@ module.exports = {
                   required: ['port'],
                   additionalProperties: false,
                 },
-                grpc: {
+                gRpc: {
                   type: 'object',
                   properties: {
                     port: {
@@ -156,7 +156,7 @@ module.exports = {
                   additionalProperties: false,
                 },
               },
-              required: ['docker', 'jsonrpc', 'grpc'],
+              required: ['docker', 'jsonRpc', 'gRpc'],
               additionalProperties: false,
             },
             insight: {
@@ -171,7 +171,7 @@ module.exports = {
               required: ['port', 'docker'],
               additionalProperties: false,
             },
-            txfilterstream: {
+            txFilterStream: {
               type: 'object',
               properties: {
                 port: {
@@ -182,7 +182,7 @@ module.exports = {
               additionalProperties: false,
             },
           },
-          required: ['envoy', 'nginx', 'api', 'insight', 'txfilterstream'],
+          required: ['envoy', 'nginx', 'api', 'insight', 'txFilterStream'],
           additionalProperties: false,
         },
         drive: {

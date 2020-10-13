@@ -44,10 +44,10 @@ const baseConfig = {
         },
       },
       api: {
-        jsonrpc: {
+        jsonRpc: {
           port: 3004,
         },
-        grpc: {
+        gRpc: {
           port: 3005,
         },
         docker: {
@@ -60,7 +60,7 @@ const baseConfig = {
           image: 'dashpay/insight-api:latest',
         },
       },
-      txfilterstream: {
+      txFilterStream: {
         port: 3006,
       },
     },
