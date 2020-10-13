@@ -45,7 +45,7 @@ zmqpubhashblock=tcp://0.0.0.0:{{=it.core.zmq.port}}
 regtest=1
 [regtest]
 {{?? it.network.name === 'evonet'}}
-devnet={{=it.network.name}}-{{=it.network.version}}
+devnet={{=it.network.name}}{{? it.network.version !== null}}-{{=it.network.version}}{{?}}
 [devnet]
 addnode=seed-1.evonet.networks.dash.org:20001
 addnode=seed-2.evonet.networks.dash.org:20001
