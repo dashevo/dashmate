@@ -47,6 +47,14 @@ function startNodeTaskFactory(dockerCompose) {
         task: async () => dockerCompose.pull(config.toEnvs()),
       },
       {
+        title: 'Check for running services',
+        task: async () => {
+          if (await dockerCompose.isServiceRunning(config.toEnvs())) {
+            this.error(`Please ensure all services are stopped before starting`, { exit: true });
+          }
+        },
+      },
+      {
         title: 'Start services',
         task: async () => {
           if (isMasternode) {
