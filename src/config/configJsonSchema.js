@@ -201,7 +201,16 @@ module.exports = {
               additionalProperties: false,
             },
             abci: {
-              $ref: '#/definitions/docker',
+              properties: {
+                docker: {
+                  $ref: '#/definitions/docker/properties/docker',
+                },
+                port: {
+                  $ref: '#/definitions/port',
+                },
+              },
+              required: ['port', 'docker'],
+              additionalProperties: false,
             },
             tendermint: {
               properties: {

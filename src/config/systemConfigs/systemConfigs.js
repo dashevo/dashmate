@@ -72,6 +72,7 @@ const baseConfig = {
         },
       },
       abci: {
+        port: 26658,
         docker: {
           image: 'dashpay/drive:0.15-dev',
         },
