@@ -37,7 +37,7 @@ function startNodeTaskFactory(dockerCompose) {
     const isMinerEnabled = config.get('core.miner.enable');
 
     if (isMinerEnabled === true && config.get('network') !== NETWORKS.LOCAL) {
-      this.error(`'core.miner.enabled' option supposed to work only with local network. Your network is ${config.get('network')}`, { exit: true });
+      throw new Error(`'core.miner.enabled' option only works with local network. Your network is ${config.get('network')}.`, { exit: true });
     }
 
     return new Listr([
@@ -47,10 +47,10 @@ function startNodeTaskFactory(dockerCompose) {
         task: async () => dockerCompose.pull(config.toEnvs()),
       },
       {
-        title: 'Check for running services',
+        title: 'Check node is not started',
         task: async () => {
           if (await dockerCompose.isServiceRunning(config.toEnvs())) {
-            this.error(`Please ensure all services are stopped before starting`, { exit: true });
+            throw new Error(`Running services detected. Please ensure all services are stopped for this config before starting`, { exit: true });
           }
         },
       },
@@ -67,7 +67,7 @@ function startNodeTaskFactory(dockerCompose) {
 
           if (driveImageBuildPath || dapiImageBuildPath) {
             if (config.get('network') === NETWORKS.TESTNET) {
-              this.error('You can\'t use drive-image-build-path and dapi-image-build-path options with testnet network', { exit: true });
+              throw new Error('You can\'t use drive-image-build-path and dapi-image-build-path options with testnet network', { exit: true });
             }
 
             if (driveImageBuildPath) {
