@@ -24,12 +24,12 @@ server {
     }
 
     location ~ ^/org\.dash\.platform\.dapi\.v0\.Core {
-        grpc_pass grpc://dapi_api:{{=it.platform.dapi.api.gRpc.port}};
+        grpc_pass grpc://dapi_api:{{=it.platform.dapi.api.grpc.port}};
         grpc_buffer_size 128k;
     }
 
     location ~ ^/org\.dash\.platform\.dapi\.v0\.Platform {
-        grpc_pass grpc://dapi_api:{{=it.platform.dapi.api.gRpc.port}};
+        grpc_pass grpc://dapi_api:{{=it.platform.dapi.api.grpc.port}};
         grpc_buffer_size 128k;
     }
 

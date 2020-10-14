@@ -145,7 +145,7 @@ module.exports = {
                   required: ['port'],
                   additionalProperties: false,
                 },
-                gRpc: {
+                grpc: {
                   type: 'object',
                   properties: {
                     port: {
@@ -156,7 +156,7 @@ module.exports = {
                   additionalProperties: false,
                 },
               },
-              required: ['docker', 'jsonRpc', 'gRpc'],
+              required: ['docker', 'jsonRpc', 'grpc'],
               additionalProperties: false,
             },
             insight: {

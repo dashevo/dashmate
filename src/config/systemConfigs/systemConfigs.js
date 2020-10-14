@@ -47,7 +47,7 @@ const baseConfig = {
         jsonRpc: {
           port: 3004,
         },
-        gRpc: {
+        grpc: {
           port: 3005,
         },
         docker: {
