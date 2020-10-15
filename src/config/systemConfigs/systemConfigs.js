@@ -103,6 +103,11 @@ module.exports = {
   }),
   evonet: lodashMerge({}, baseConfig, {
     description: 'node with Evonet configuration',
+    core: {
+      docker: {
+        image: 'dashpay/dashd:0.15',
+      },
+    },
     platform: {
       dpns: {
         contractId: 'FiBkhut4LFPMJqDWbZrxVeT6Mr6LsH3mTNTSSHJY2ape',
