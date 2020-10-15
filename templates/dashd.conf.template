@@ -42,12 +42,10 @@ regtest=1
 {{?? it.network.name === 'evonet'}}
 devnet={{=it.network.name}}{{? it.network.version !== null}}-{{=it.network.version}}{{?}}
 {{? it.core.docker.image.includes('16') }}[devnet]{{?}}
-addnode=seed-1.evonet.networks.dash.org:20001
-addnode=seed-2.evonet.networks.dash.org:20001
-addnode=seed-3.evonet.networks.dash.org:20001
-addnode=seed-4.evonet.networks.dash.org:20001
-addnode=seed-5.evonet.networks.dash.org:20001
-sporkaddr=yQuAu9YAMt4yEiXBeDp3q5bKpo7jsC2eEj
+{{~it.network.seeds :value:index}}
+addnode={{=value}}
+{{~}}
+sporkaddr={{=it.network.sporkAddr}}
 
 # First 1000 blocks should be mined with lowest difficulty (like in regtest, so it's instant)
 # and first 500 blocks are mined with a block subsidity multiplied by 10

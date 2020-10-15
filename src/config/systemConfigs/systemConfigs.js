@@ -85,6 +85,8 @@ const baseConfig = {
   network: {
     name: NETWORKS.TESTNET,
     version: null,
+    seeds: [],
+    sporkAddr: null,
   },
   compose: {
     file: 'docker-compose.yml:docker-compose.platform.yml',
@@ -117,6 +119,14 @@ module.exports = {
     network: {
       name: NETWORKS.EVONET,
       version: 6,
+      seeds: [
+        'seed-1.evonet.networks.dash.org:20001',
+        'seed-2.evonet.networks.dash.org:20001',
+        'seed-3.evonet.networks.dash.org:20001',
+        'seed-4.evonet.networks.dash.org:20001',
+        'seed-5.evonet.networks.dash.org:20001',
+      ],
+      sporkAddr: 'yQuAu9YAMt4yEiXBeDp3q5bKpo7jsC2eEj',
     },
   }),
   testnet: lodashMerge({}, baseConfig, {

@@ -210,8 +210,17 @@ module.exports = {
         version: {
           type: ['string', 'null'],
         },
+        seeds: {
+          type: 'array',
+          items: {
+            type: 'string'
+          },
+        },
+        sporkAddr: {
+          type: ['string', 'null'],
+        },
       },
-      required: ['name', 'version'],
+      required: ['name', 'version', 'seeds', 'sporkAddr'],
       additionalProperties: false,
     },
     compose: {
