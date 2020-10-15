@@ -21,11 +21,6 @@ listen=1
 dnsseed=0
 allowprivatenet=0
 
-# need this twice to support 0.15 and 0.16 conf files
-port={{=it.core.p2p.port}}
-rpcport={{=it.core.rpc.port}}
-
-
 {{? it.network.name === 'testnet'}}
 {{??}}
 # optional indices (required for Insight)
@@ -35,9 +30,9 @@ timestampindex=1
 spentindex=1
 
 # ZeroMQ notifications (required for Insight)
-zmqpubrawtx=tcp://0.0.0.0:{{=it.core.zmq.port}}
-zmqpubrawtxlock=tcp://0.0.0.0:{{=it.core.zmq.port}}
-zmqpubhashblock=tcp://0.0.0.0:{{=it.core.zmq.port}}
+zmqpubrawtx=tcp://0.0.0.0:29998
+zmqpubrawtxlock=tcp://0.0.0.0:29998
+zmqpubhashblock=tcp://0.0.0.0:29998
 {{?}}
 
 
@@ -46,7 +41,7 @@ regtest=1
 [regtest]
 {{?? it.network.name === 'evonet'}}
 devnet={{=it.network.name}}{{? it.network.version !== null}}-{{=it.network.version}}{{?}}
-[devnet]
+{{? it.core.docker.image.includes('16') }}[devnet]{{?}}
 addnode=seed-1.evonet.networks.dash.org:20001
 addnode=seed-2.evonet.networks.dash.org:20001
 addnode=seed-3.evonet.networks.dash.org:20001

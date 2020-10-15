@@ -10,7 +10,7 @@
 
 # TCP or UNIX socket address of the ABCI application,
 # or the name of an ABCI application compiled in with the Tendermint binary
-proxy_app = "tcp://drive_abci:{{=it.platform.drive.abci.port}}"
+proxy_app = "tcp://drive_abci:26658"
 
 # A custom human readable name for this node
 #moniker = ""
@@ -78,7 +78,7 @@ filter_peers = false
 [rpc]
 
 # TCP or UNIX socket address for the RPC server to listen on
-laddr = "tcp://0.0.0.0:{{=it.platform.drive.tendermint.rpc.port}}"
+laddr = "tcp://0.0.0.0:26657"
 
 # A list of origins a cross-domain request can be executed from
 # Default value '[]' disables cors support

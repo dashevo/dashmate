@@ -1,6 +1,6 @@
 {
   "network": "testnet",
-  "port": {{=it.platform.dapi.insight.port}},
+  "port": 3001,
   "services": [
     "dashd",
     "@dashevo/insight-api",
@@ -13,8 +13,8 @@
         "rpcport": {{=it.core.rpc.port}},
         "rpcuser": "{{=it.core.rpc.user}}",
         "rpcpassword": "{{=it.core.rpc.password}}",
-        "zmqpubrawtx":"tcp://core:{{=it.core.zmq.port}}",
-        "zmqpubhashblock": "tcp://core:{{=it.core.zmq.port}}"
+        "zmqpubrawtx":"tcp://core:29998",
+        "zmqpubhashblock": "tcp://core:29998"
       }]
     },
     "@dashevo/insight-api": {

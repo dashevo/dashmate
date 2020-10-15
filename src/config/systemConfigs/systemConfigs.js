@@ -16,9 +16,6 @@ const baseConfig = {
       user: 'dashrpc',
       password: 'rpcpassword'
     },
-    zmq: {
-      port: 29998,
-    },
     masternode: {
       operator: {
         privateKey: null,
@@ -33,46 +30,39 @@ const baseConfig = {
   platform: {
     dapi: {
       envoy: {
-        port: 8080,
         docker: {
           image: 'envoyproxy/envoy:v1.14-latest',
         },
       },
       nginx: {
+        default: {
+          port: 3000
+        },
+        grpc: {
+          port: 3010
+        },
         docker: {
           image: 'nginx:latest',
         },
       },
       api: {
-        jsonRpc: {
-          port: 3004,
-        },
-        grpc: {
-          port: 3005,
-        },
         docker: {
           image: 'dashpay/dapi:0.15-dev',
         },
       },
       insight: {
-        port: 3001,
         docker: {
           image: 'dashpay/insight-api:latest',
         },
       },
-      txFilterStream: {
-        port: 3006,
-      },
     },
     drive: {
       mongodb: {
-        port: 27017,
         docker: {
           image: 'mongo:4.2',
         },
       },
       abci: {
-        port: 26658,
         docker: {
           image: 'dashpay/drive:0.15-dev',
         },
@@ -80,9 +70,6 @@ const baseConfig = {
       tendermint: {
         p2p: {
           port: 26656,
-        },
-        rpc: {
-          port: 26657,
         },
         docker: {
           image: 'dashpay/tendermint:v0.32.12',

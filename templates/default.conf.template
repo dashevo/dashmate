@@ -32,7 +32,7 @@ server {
         }
 
         proxy_http_version 1.1;
-        proxy_pass http://dapi_api:{{=it.platform.dapi.api.jsonRpc.port}};
+        proxy_pass http://dapi_api:3004;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Real-IP $remote_addr;
@@ -59,7 +59,7 @@ server {
 
         proxy_http_version 1.1;
         proxy_request_buffering off;
-        proxy_pass http://dapi_envoy:{{=it.platform.dapi.envoy.port}}$request_uri;
+        proxy_pass http://dapi_envoy:8080$request_uri;
         proxy_hide_header access-control-allow-origin;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -87,7 +87,7 @@ server {
 
         proxy_http_version 1.1;
         proxy_request_buffering off;
-        proxy_pass http://dapi_envoy:{{=it.platform.dapi.envoy.port}}$request_uri;
+        proxy_pass http://dapi_envoy:8080$request_uri;
         proxy_hide_header access-control-allow-origin;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -113,7 +113,7 @@ server {
             add_header 'Access-Control-Expose-Headers' 'Content-Transfer-Encoding,Grpc-Message,Grpc-Status,Custom-Header-1' always;
         }
 
-        proxy_pass http://dapi_envoy:{{=it.platform.dapi.envoy.port}}$request_uri;
+        proxy_pass http://dapi_envoy:8080$request_uri;
         proxy_http_version 1.1;
         proxy_request_buffering off;
         proxy_hide_header access-control-allow-origin;
@@ -143,7 +143,7 @@ server {
 
         proxy_http_version 1.1;
         proxy_request_buffering off;
-        proxy_pass http://dapi_envoy:{{=it.platform.dapi.envoy.port}}$request_uri;
+        proxy_pass http://dapi_envoy:8080$request_uri;
         proxy_hide_header access-control-allow-origin;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
