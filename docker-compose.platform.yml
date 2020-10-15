@@ -35,7 +35,7 @@ services:
     depends_on:
       - drive_abci
     ports:
-      - ${PLATFORM_DRIVE_TENDERMINT_P2P_PORT:?err}:${PLATFORM_DRIVE_TENDERMINT_P2P_PORT:?err} # P2P
+      - ${PLATFORM_DRIVE_TENDERMINT_P2P_PORT:?err}:26656 # P2P
     volumes:
       - ~/.mn/${CONFIG_NAME:?err}/genesis.json:/tendermint/config/genesis.json
       - ~/.mn/${CONFIG_NAME:?err}/config.toml:/tendermint/config/config.toml
