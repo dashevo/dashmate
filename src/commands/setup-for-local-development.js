@@ -61,7 +61,7 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
                   driveImageBuildPath: ctx.driveImageBuildPath,
                   dapiImageBuildPath: ctx.dapiImageBuildPath,
                   isUpdate,
-                  isMinerEnabled:true,
+                  isMinerEnabled: true,
                 },
               ),
             },
