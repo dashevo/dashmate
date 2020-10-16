@@ -41,11 +41,11 @@ regtest=1
 [regtest]
 {{?? it.network.name === 'evonet'}}
 devnet={{=it.network.name}}{{? it.network.version !== null}}-{{=it.network.version}}{{?}}
-{{? it.core.docker.image.includes('16') }}[devnet]{{?}}
-{{~it.network.seeds :value:index}}
-addnode={{=value}}
+{{? !it.core.docker.image.includes('15') }}[devnet]{{?}}
+{{~it.core.p2p.seeds :seeds}}
+addnode={{=seeds.host}}:{{=seeds.port}}
 {{~}}
-sporkaddr={{=it.network.sporkAddr}}
+sporkaddr={{=it.core.sporkAddr}}
 
 # First 1000 blocks should be mined with lowest difficulty (like in regtest, so it's instant)
 # and first 500 blocks are mined with a block subsidity multiplied by 10

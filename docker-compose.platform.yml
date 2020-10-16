@@ -115,7 +115,7 @@ services:
       - dapi_tx_filter_stream
       - dapi_envoy
     ports:
-      - ${PLATFORM_DAPI_NGINX_DEFAULT_PORT:?err}:80 # JSON RPC and gRPC Web
+      - ${PLATFORM_DAPI_NGINX_HTTP_PORT:?err}:80 # JSON RPC and gRPC Web
       - ${PLATFORM_DAPI_NGINX_GRPC_PORT:?err}:50051 # gRPC Native
     volumes:
       - ~/.mn/${CONFIG_NAME:?err}/default.conf:/etc/nginx/conf.d/default.conf

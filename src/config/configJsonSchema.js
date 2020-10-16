@@ -41,8 +41,24 @@ module.exports = {
             port: {
               $ref: '#/definitions/port',
             },
+            seeds: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  host: {
+                    type: 'string',
+                  },
+                  port: {
+                    $ref: '#/definitions/port',
+                  },
+                },
+                required: ['host', 'port'],
+                additionalProperties: false,
+              },
+            },
           },
-          required: ['port'],
+          required: ['port', 'seeds'],
           additionalProperties: false,
         },
         rpc: {
@@ -60,6 +76,9 @@ module.exports = {
           },
           required: ['port', 'user', 'password'],
           additionalProperties: false,
+        },
+        sporkAddr: {
+          type: ['string', 'null'],
         },
         masternode: {
           type: 'object',
@@ -96,7 +115,7 @@ module.exports = {
           additionalProperties: false,
         },
       },
-      required: ['docker', 'p2p', 'rpc', 'masternode', 'miner'],
+      required: ['docker', 'p2p', 'rpc', 'sporkAddr', 'masternode', 'miner'],
       additionalProperties: false,
     },
     platform: {
@@ -113,7 +132,7 @@ module.exports = {
                 docker: {
                   $ref: '#/definitions/docker/properties/docker',
                 },
-                default: {
+                http: {
                   type: 'object',
                   properties: {
                     port: {
@@ -134,7 +153,7 @@ module.exports = {
                   additionalProperties: false,
                 },
               },
-              required: ['docker', 'default', 'grpc'],
+              required: ['docker', 'http', 'grpc'],
               additionalProperties: false,
             },
             api: {
@@ -210,17 +229,8 @@ module.exports = {
         version: {
           type: ['string', 'null'],
         },
-        seeds: {
-          type: 'array',
-          items: {
-            type: 'string'
-          },
-        },
-        sporkAddr: {
-          type: ['string', 'null'],
-        },
       },
-      required: ['name', 'version', 'seeds', 'sporkAddr'],
+      required: ['name', 'version'],
       additionalProperties: false,
     },
     compose: {

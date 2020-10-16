@@ -10,12 +10,14 @@ const baseConfig = {
     },
     p2p: {
       port: 20001,
+      seeds: [],
     },
     rpc: {
       port: 20002,
       user: 'dashrpc',
       password: 'rpcpassword'
     },
+    sporkAddr: null,
     masternode: {
       operator: {
         privateKey: null,
@@ -35,7 +37,7 @@ const baseConfig = {
         },
       },
       nginx: {
-        default: {
+        http: {
           port: 3000
         },
         grpc: {
@@ -85,8 +87,6 @@ const baseConfig = {
   network: {
     name: NETWORKS.TESTNET,
     version: null,
-    seeds: [],
-    sporkAddr: null,
   },
   compose: {
     file: 'docker-compose.yml:docker-compose.platform.yml',
@@ -109,6 +109,31 @@ module.exports = {
       docker: {
         image: 'dashpay/dashd:0.15',
       },
+      p2p: {
+        seeds: [
+          {
+            host: 'seed-1.evonet.networks.dash.org',
+            port: 20001,
+          },
+          {
+            host: 'seed-2.evonet.networks.dash.org',
+            port: 20001,
+          },
+          {
+            host: 'seed-3.evonet.networks.dash.org',
+            port: 20001,
+          },
+          {
+            host: 'seed-4.evonet.networks.dash.org',
+            port: 20001,
+          },
+          {
+            host: 'seed-5.evonet.networks.dash.org',
+            port: 20001,
+          },
+        ],
+      },
+      sporkAddr: 'yQuAu9YAMt4yEiXBeDp3q5bKpo7jsC2eEj',
     },
     platform: {
       dpns: {
@@ -119,14 +144,6 @@ module.exports = {
     network: {
       name: NETWORKS.EVONET,
       version: 6,
-      seeds: [
-        'seed-1.evonet.networks.dash.org:20001',
-        'seed-2.evonet.networks.dash.org:20001',
-        'seed-3.evonet.networks.dash.org:20001',
-        'seed-4.evonet.networks.dash.org:20001',
-        'seed-5.evonet.networks.dash.org:20001',
-      ],
-      sporkAddr: 'yQuAu9YAMt4yEiXBeDp3q5bKpo7jsC2eEj',
     },
   }),
   testnet: lodashMerge({}, baseConfig, {
