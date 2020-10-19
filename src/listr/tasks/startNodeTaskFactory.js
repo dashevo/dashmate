@@ -9,20 +9,13 @@ const wait = require('../../util/wait');
 /**
  *
  * @param {DockerCompose} dockerCompose
- * @param {renderServiceTemplates} renderServiceTemplates
- * @param {String} homeDirPath
  * @return {startNodeTask}
  */
-function startNodeTaskFactory(
-  dockerCompose,
-  renderServiceTemplates,
-  homeDirPath,
-) {
+function startNodeTaskFactory(dockerCompose) {
   /**
    * @typedef {startNodeTask}
    * @param {Config} config
    * @param {Object} options
-   * @param {boolean} [options.isFullNode]
    * @param {string} [options.driveImageBuildPath]
    * @param {string} [options.dapiImageBuildPath]
    * @param {boolean} [options.isUpdate]
@@ -32,7 +25,6 @@ function startNodeTaskFactory(
   function startNodeTask(
     config,
     {
-      isFullNode,
       driveImageBuildPath = undefined,
       dapiImageBuildPath = undefined,
       isUpdate = undefined,
@@ -42,8 +34,13 @@ function startNodeTaskFactory(
     // Check external IP is set
     config.get('externalIp', true);
 
+    if (isMinerEnabled === undefined) {
+      // eslint-disable-next-line no-param-reassign
+      isMinerEnabled = config.get('core.miner.enable');
+    }
+
     if (isMinerEnabled === true && config.get('network.name') !== NETWORKS.LOCAL) {
-      this.error(`'core.miner.enabled' option supposed to work only with local network. Your network is ${config.get('network.name')}`, { exit: true });
+      throw new Error(`'core.miner.enabled' option only works with local network. Your network is ${config.get('network')}.`);
     }
 
     return new Listr([
@@ -53,9 +50,18 @@ function startNodeTaskFactory(
         task: async () => dockerCompose.pull(config.toEnvs()),
       },
       {
+        title: 'Check node is not started',
+        task: async () => {
+          if (await dockerCompose.isServiceRunning(config.toEnvs())) {
+            throw new Error(`Running services detected. Please ensure all services are stopped for this config before starting`);
+          }
+        },
+      },
+      {
         title: 'Start services',
         task: async () => {
-          if (!isFullNode) {
+          const isMasternode = config.get('core.masternode.enable');
+          if (isMasternode) {
             // Check operatorPrivateKey is set
             config.get('core.masternode.operator.privateKey', true);
           }
@@ -64,7 +70,7 @@ function startNodeTaskFactory(
 
           if (driveImageBuildPath || dapiImageBuildPath) {
             if (config.get('network.name') === NETWORKS.TESTNET) {
-              this.error('You can\'t use drive-image-build-path and dapi-image-build-path options with testnet network', { exit: true });
+              throw new Error('You can\'t use drive-image-build-path and dapi-image-build-path options with testnet network');
             }
 
             if (driveImageBuildPath) {

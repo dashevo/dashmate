@@ -83,6 +83,9 @@ module.exports = {
         masternode: {
           type: 'object',
           properties: {
+            enable: {
+              type: 'boolean',
+            },
             operator: {
               type: 'object',
               properties: {
@@ -94,7 +97,7 @@ module.exports = {
               additionalProperties: false,
             },
           },
-          required: ['operator'],
+          required: ['enable', 'operator'],
           additionalProperties: false,
         },
         miner: {
