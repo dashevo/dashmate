@@ -12,6 +12,7 @@ const baseConfig = {
       port: 20001,
     },
     masternode: {
+      enable: true,
       operator: {
         privateKey: null,
       },
