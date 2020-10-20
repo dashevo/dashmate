@@ -103,10 +103,10 @@ function initTaskFactory(
       {
         title: 'Register top level domain "dash"',
         task: async (ctx) => {
-          // noinspection JSAccessibilityCheck
-          ctx.client.apps.dpns = {
+          ctx.client.getApps().set('dpns', {
             contractId: ctx.dataContract.getId(),
-          };
+            contract: ctx.dataContract,
+          });
 
           await ctx.client.platform.names.register('dash', {
             dashAliasIdentityId: ctx.identity.getId(),
