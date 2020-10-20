@@ -41,7 +41,7 @@ regtest=1
 [regtest]
 {{?? it.network.name === 'evonet'}}
 devnet={{=it.network.name}}{{? it.network.version !== null}}-{{=it.network.version}}{{?}}
-{{? !it.core.docker.image.includes('15') }}[devnet]{{?}}
+[devnet]
 {{~it.core.p2p.seeds :seeds}}
 addnode={{=seeds.host}}:{{=seeds.port}}
 {{~}}
