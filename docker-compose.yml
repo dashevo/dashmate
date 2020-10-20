@@ -12,7 +12,6 @@ services:
       - core_data:/dash
     command:
       - dashd
-      - -masternodeblsprivkey=${CORE_MASTERNODE_OPERATOR_PRIVATE_KEY}
 
   sentinel:
     image: dashpay/sentinel

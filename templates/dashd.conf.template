@@ -16,6 +16,10 @@ rpcallowip=192.168.0.0/16
 rpcworkqueue=64
 rpcthreads=16
 
+{{? it.core.masternode.enable === true}}
+masternodeblsprivkey={{=it.core.masternode.operator.privateKey}}
+{{?}}
+
 # external network
 listen=1
 dnsseed=0
