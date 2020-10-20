@@ -1,6 +1,6 @@
 {
   "name": "@dashevo/mn-bootstrap",
-  "version": "0.16.0-dev.2",
+  "version": "0.16.0-dev.5",
   "description": "Distribution package for Dash Masternode installation",
   "main": "src/index.js",
   "scripts": {
@@ -50,8 +50,8 @@
   "dependencies": {
     "@dashevo/dashcore-lib": "~0.18.12",
     "@dashevo/dashd-rpc": "~2.0.2",
-    "@dashevo/dpns-contract": "~0.3.0-dev.4",
-    "@dashevo/wallet-lib": "git+ssh://git@github.com/dashevo/wallet-lib.git#v0.16-dev",
+    "@dashevo/dpns-contract": "~0.3.0-dev.6",
+    "@dashevo/wallet-lib": "github:dashevo/wallet-lib#bump-version",
     "@oclif/command": "^1.5.19",
     "@oclif/config": "^1.15.1",
     "@oclif/plugin-help": "^2.2.3",
@@ -59,7 +59,7 @@
     "awilix": "^4.2.6",
     "bls-signatures": "^0.1.9",
     "chalk": "^4.0.0",
-    "dash": "~3.15.0",
+    "dash": "github:dashevo/js-dash-sdk#update-dpp",
     "docker-compose": "^0.23.3",
     "dockerode": "^3.2.0",
     "dotenv": "^8.2.0",
