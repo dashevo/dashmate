@@ -74,10 +74,10 @@ function initTaskFactory(
         task: async (ctx, task) => {
           ctx.identity = await ctx.client.platform.identities.register(5);
 
-          config.set('platform.dpns.ownerId', ctx.identity.getId());
+          config.set('platform.dpns.ownerId', ctx.identity.getId().toString());
 
           // eslint-disable-next-line no-param-reassign
-          task.output = `DPNS identity: ${ctx.identity.getId()}`;
+          task.output = `DPNS identity: ${ctx.identity.getId().toString()}`;
         },
         options: { persistentOutput: true },
       },
@@ -93,10 +93,10 @@ function initTaskFactory(
             ctx.identity,
           );
 
-          config.set('platform.dpns.contractId', ctx.dataContract.getId());
+          config.set('platform.dpns.contractId', ctx.dataContract.getId().toString());
 
           // eslint-disable-next-line no-param-reassign
-          task.output = `DPNS contract ID: ${ctx.dataContract.getId()}`;
+          task.output = `DPNS contract ID: ${ctx.dataContract.getId().toString()}`;
         },
         options: { persistentOutput: true },
       },
