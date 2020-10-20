@@ -85,9 +85,6 @@ function startNodeTaskFactory(dockerCompose) {
           }
 
           await dockerCompose.up(envs);
-
-          // wait 10 seconds to ensure all services are running
-          await wait(10000);
         },
       },
       {
