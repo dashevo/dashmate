@@ -37,7 +37,7 @@ const baseConfig = {
       },
       api: {
         docker: {
-          image: 'dashpay/dapi:0.15-dev',
+          image: 'dashpay/dapi:0.16-dev',
         },
       },
       insight: {
@@ -54,7 +54,7 @@ const baseConfig = {
       },
       abci: {
         docker: {
-          image: 'dashpay/drive:0.15-dev',
+          image: 'dashpay/drive:0.16-dev',
         },
       },
       tendermint: {
