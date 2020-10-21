@@ -48,10 +48,10 @@
   },
   "homepage": "https://github.com/dashevo/mn-bootstrap#readme",
   "dependencies": {
-    "@dashevo/dashcore-lib": "~0.18.12",
+    "@dashevo/dashcore-lib": "~0.18.13",
     "@dashevo/dashd-rpc": "~2.0.2",
     "@dashevo/dpns-contract": "~0.3.0-dev.6",
-    "@dashevo/wallet-lib": "github:dashevo/wallet-lib#bump-version",
+    "@dashevo/wallet-lib": "~7.16.0-dev.2",
     "@oclif/command": "^1.5.19",
     "@oclif/config": "^1.15.1",
     "@oclif/plugin-help": "^2.2.3",
