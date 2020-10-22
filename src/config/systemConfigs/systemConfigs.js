@@ -86,16 +86,10 @@ module.exports = {
     description: 'node with Evonet configuration',
     platform: {
       dpns: {
-        contractId: 'H9AxLAvgxEpq72pDg41nsqR3bY5Cv9hTT6yZdKzY3PaE',
-        ownerId: '4jjwnJr2ufABdWqKKonoA9uBCRXF8jQ929KnHKEgZRJu',
+        contractId: 'FiBkhut4LFPMJqDWbZrxVeT6Mr6LsH3mTNTSSHJY2ape',
+        ownerId: '6UZ9jAodWiFxRg82HuA1Lf3mTh4fTGSiughxqkZX5kUA',
       },
     },
-    core: {
-      masternode: {
-        enable: false,
-      },
-    },
-    externalIp: '127.0.0.1',
     network: NETWORKS.EVONET,
   }),
   testnet: lodashMerge({}, baseConfig, {
@@ -109,5 +103,21 @@ module.exports = {
     compose: {
       file: 'docker-compose.yml',
     },
+  }),
+  palinka: lodashMerge({}, baseConfig, {
+    description: 'node with Palinka configuration',
+    platform: {
+      dpns: {
+        contractId: 'H9AxLAvgxEpq72pDg41nsqR3bY5Cv9hTT6yZdKzY3PaE',
+        ownerId: '4jjwnJr2ufABdWqKKonoA9uBCRXF8jQ929KnHKEgZRJu',
+      },
+    },
+    core: {
+      masternode: {
+        enable: false,
+      },
+    },
+    externalIp: '127.0.0.1',
+    network: NETWORKS.PALINKA,
   }),
 };
