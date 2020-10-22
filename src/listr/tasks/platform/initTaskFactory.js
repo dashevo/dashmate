@@ -91,7 +91,7 @@ function initTaskFactory(
             dpnsDocumentSchema, ctx.identity,
           );
 
-          // TODO You need to make broadcast to return ST
+          // TODO You need to make broadcast return ST
           const stateTransition = await ctx.client.platform.contracts.broadcast(
             ctx.dataContract,
             ctx.identity,
