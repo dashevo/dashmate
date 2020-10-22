@@ -64,7 +64,10 @@ const baseConfig = {
       },
     },
     dpns: {
-      contractId: null,
+      contract: {
+        id: null,
+        blockHeight: null,
+      },
       ownerId: null,
     },
   },
@@ -84,12 +87,6 @@ module.exports = {
   }),
   evonet: lodashMerge({}, baseConfig, {
     description: 'node with Evonet configuration',
-    platform: {
-      dpns: {
-        contractId: 'FiBkhut4LFPMJqDWbZrxVeT6Mr6LsH3mTNTSSHJY2ape',
-        ownerId: '6UZ9jAodWiFxRg82HuA1Lf3mTh4fTGSiughxqkZX5kUA',
-      },
-    },
     network: NETWORKS.EVONET,
   }),
   testnet: lodashMerge({}, baseConfig, {

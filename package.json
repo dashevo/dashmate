@@ -64,6 +64,7 @@
     "dockerode": "^3.2.0",
     "dotenv": "^8.2.0",
     "hasbin": "^1.2.3",
+    "jayson": "^3.3.4",
     "listr2": "^2.1.9",
     "lodash.clonedeep": "^4.5.0",
     "lodash.get": "^4.4.2",

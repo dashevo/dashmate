@@ -2,6 +2,8 @@ const { Listr } = require('listr2');
 
 const Dash = require('dash');
 
+const crypto = require('crypto');
+
 const fundWallet = require('@dashevo/wallet-lib/src/utils/fundWallet');
 
 const dpnsDocumentSchema = require('@dashevo/dpns-contract/schema/dpns-contract-documents.json');
@@ -11,6 +13,7 @@ const dpnsDocumentSchema = require('@dashevo/dpns-contract/schema/dpns-contract-
  * @return {initTask}
  */
 function initTaskFactory(
+  createTenderdashRpcClient,
 ) {
   /**
    * @typedef {initTask}
@@ -26,10 +29,10 @@ function initTaskFactory(
       throw new Error(`DPNS owner ID ('platform.dpns.ownerId') is already set in ${config.getName()} config`);
     }
 
-    const dpnsContractId = config.get('platform.dpns.contractId');
+    const dpnsContractId = config.get('platform.dpns.contract.id');
 
     if (dpnsContractId !== null) {
-      throw new Error(`DPNS owner ID ('platform.dpns.contractId') is already set in ${config.getName()} config`);
+      throw new Error(`DPNS owner ID ('platform.dpns.contract.id') is already set in ${config.getName()} config`);
     }
 
     return new Listr([
@@ -88,15 +91,35 @@ function initTaskFactory(
             dpnsDocumentSchema, ctx.identity,
           );
 
-          await ctx.client.platform.contracts.broadcast(
+          // TODO You need to make broadcast to return ST
+          const stateTransition = await ctx.client.platform.contracts.broadcast(
             ctx.dataContract,
             ctx.identity,
           );
 
-          config.set('platform.dpns.contractId', ctx.dataContract.getId().toString());
+          // Get state transition commit block height from Tenderdash
+          const tendermintRpcClient = createTenderdashRpcClient();
+
+          const stateTransitionHash = crypto.createHash('sha256')
+            .update(stateTransition.toBuffer())
+            .digest();
+
+          const params = { hash: `0x${stateTransitionHash.toString('hex')}` };
+
+          const response = await tendermintRpcClient.request('tx', params);
+
+          if (response.error) {
+            throw new Error(response.error);
+          }
+
+          const { result: { height: contractBlockHeight } } = response;
+
+          config.set('platform.dpns.contract.id', ctx.dataContract.getId().toString());
+          config.set('platform.dpns.contract.blockHeight', contractBlockHeight);
 
           // eslint-disable-next-line no-param-reassign
-          task.output = `DPNS contract ID: ${ctx.dataContract.getId().toString()}`;
+          task.output = `DPNS contract ID: ${ctx.dataContract.getId().toString()}\n`
+            + `DPNS contract block height: ${contractBlockHeight}`;
         },
         options: { persistentOutput: true },
       },
