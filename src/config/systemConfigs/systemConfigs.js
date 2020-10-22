@@ -86,8 +86,13 @@ module.exports = {
     description: 'node with Evonet configuration',
     platform: {
       dpns: {
-        contractId: 'FiBkhut4LFPMJqDWbZrxVeT6Mr6LsH3mTNTSSHJY2ape',
-        ownerId: '6UZ9jAodWiFxRg82HuA1Lf3mTh4fTGSiughxqkZX5kUA',
+        contractId: 'H9AxLAvgxEpq72pDg41nsqR3bY5Cv9hTT6yZdKzY3PaE',
+        ownerId: '4jjwnJr2ufABdWqKKonoA9uBCRXF8jQ929KnHKEgZRJu',
+      },
+    },
+    core: {
+      masternode: {
+        enable: false,
       },
     },
     externalIp: '127.0.0.1',
