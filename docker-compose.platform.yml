@@ -27,6 +27,7 @@ services:
       - DOCUMENT_MONGODB_URL=mongodb://drive_mongodb:27017?replicaSet=driveDocumentIndices
       - DPNS_CONTRACT_ID=${PLATFORM_DPNS_CONTRACT_ID}
       - DPNS_TOP_LEVEL_IDENTITY=${PLATFORM_DPNS_OWNER_ID}
+      - LOGGING_LEVEL=trace
     command: npm run abci
 
   drive_tendermint:

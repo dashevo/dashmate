@@ -90,6 +90,7 @@ module.exports = {
         ownerId: '6UZ9jAodWiFxRg82HuA1Lf3mTh4fTGSiughxqkZX5kUA',
       },
     },
+    externalIp: '127.0.0.1',
     network: NETWORKS.EVONET,
   }),
   testnet: lodashMerge({}, baseConfig, {
