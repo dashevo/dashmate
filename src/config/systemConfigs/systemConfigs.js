@@ -12,6 +12,7 @@ const baseConfig = {
       port: 20001,
     },
     masternode: {
+      enable: true,
       operator: {
         privateKey: null,
       },
@@ -36,12 +37,12 @@ const baseConfig = {
       },
       api: {
         docker: {
-          image: 'dashpay/dapi:0.15-dev',
+          image: 'dashpay/dapi:0.16-dev',
         },
       },
       insight: {
         docker: {
-          image: 'dashpay/insight-api:latest',
+          image: 'shumkov/insight-api:3.0.0',
         },
       },
     },
@@ -53,7 +54,7 @@ const baseConfig = {
       },
       abci: {
         docker: {
-          image: 'dashpay/drive:0.15-dev',
+          image: 'dashpay/drive:0.16-dev',
         },
       },
       tendermint: {
