@@ -96,20 +96,19 @@ function initTaskFactory(
             ctx.dataContract,
             ctx.identity,
           );
-
           // Get state transition commit block height from Tenderdash
           const tendermintRpcClient = createTenderdashRpcClient();
 
-          const stateTransitionHash = crypto.createHash('sha256')
+          let stateTransitionHash = crypto.createHash('sha256')
             .update(stateTransition.toBuffer())
             .digest();
 
-          const params = { hash: `0x${stateTransitionHash.toString('hex')}` };
+          const params = { hash: stateTransitionHash.toString('base64')};
 
           const response = await tendermintRpcClient.request('tx', params);
 
           if (response.error) {
-            throw new Error(response.error);
+            throw new Error(`Tendermint error: ${response.error.message}: ${response.error.data}`);
           }
 
           const { result: { height: contractBlockHeight } } = response;
