@@ -230,7 +230,8 @@ module.exports = {
           enum: Object.values(NETWORKS),
         },
         version: {
-          type: ['string', 'null'],
+          type: ['integer', 'null'],
+          minimum: 1,
         },
       },
       required: ['name', 'version'],
