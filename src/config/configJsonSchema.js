@@ -250,7 +250,17 @@ module.exports = {
       required: ['file'],
       additionalProperties: false,
     },
+    nodeEnv: {
+      type: 'string',
+      enum: ['development', 'production'],
+      additionalProperties: false,
+    },
+    loggingLevel: {
+      type: 'string',
+      enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
+      additionalProperties: false,
+    },
   },
-  required: ['description', 'core', 'platform', 'externalIp', 'network', 'compose'],
+  required: ['description', 'core', 'platform', 'externalIp', 'network', 'compose', 'nodeEnv', 'loggingLevel'],
   additionalProperties: false,
 };

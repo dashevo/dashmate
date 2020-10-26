@@ -92,6 +92,8 @@ const baseConfig = {
   compose: {
     file: 'docker-compose.yml:docker-compose.platform.yml',
   },
+  nodeEnv: 'production',
+  loggingLevel: 'info',
 };
 
 module.exports = {
