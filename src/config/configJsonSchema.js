@@ -48,6 +48,7 @@ module.exports = {
                 properties: {
                   host: {
                     type: 'string',
+                    minLength: 1,
                   },
                   port: {
                     $ref: '#/definitions/port',
@@ -69,9 +70,11 @@ module.exports = {
             },
             user: {
               type: 'string',
+              minLength: 1,
             },
             password: {
               type: 'string',
+              minLength: 1,
             },
           },
           required: ['port', 'user', 'password'],
