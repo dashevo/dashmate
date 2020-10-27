@@ -113,7 +113,23 @@ module.exports = {
               $ref: '#/definitions/docker',
             },
             abci: {
-              $ref: '#/definitions/docker',
+              properties: {
+                docker: {
+                  $ref: '#/definitions/docker/properties/docker',
+                },
+                log: {
+                  properties: {
+                    level: {
+                      type: 'string',
+                      enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
+                    },
+                  },
+                  additionalProperties: false,
+                  required: ['level'],
+                },
+              },
+              additionalProperties: false,
+              required: ['docker', 'log'],
             },
             tendermint: {
               $ref: '#/definitions/docker',
@@ -157,7 +173,11 @@ module.exports = {
       required: ['file'],
       additionalProperties: false,
     },
+    environment: {
+      type: 'string',
+      enum: ['development', 'production'],
+    },
   },
-  required: ['description', 'core', 'platform', 'externalIp', 'network', 'compose'],
+  required: ['description', 'core', 'platform', 'externalIp', 'network', 'compose', 'environment'],
   additionalProperties: false,
 };

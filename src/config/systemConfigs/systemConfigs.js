@@ -56,6 +56,9 @@ const baseConfig = {
         docker: {
           image: 'dashpay/drive:0.16-dev',
         },
+        log: {
+          level: 'info',
+        },
       },
       tendermint: {
         docker: {
@@ -73,6 +76,7 @@ const baseConfig = {
   compose: {
     file: 'docker-compose.yml:docker-compose.platform.yml',
   },
+  environment: 'production',
 };
 
 module.exports = {
@@ -81,6 +85,7 @@ module.exports = {
     description: 'standalone node for local development',
     externalIp: '127.0.0.1',
     network: NETWORKS.LOCAL,
+    environment: 'development',
   }),
   evonet: lodashMerge({}, baseConfig, {
     description: 'node with Evonet configuration',

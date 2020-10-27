@@ -27,6 +27,8 @@ services:
       - DOCUMENT_MONGODB_URL=mongodb://drive_mongodb:27017?replicaSet=driveDocumentIndices
       - DPNS_CONTRACT_ID=${PLATFORM_DPNS_CONTRACT_ID}
       - DPNS_TOP_LEVEL_IDENTITY=${PLATFORM_DPNS_OWNER_ID}
+      - NODE_ENV=${ENVIRONMENT:?err}
+      - LOGGING_LEVEL=${PLATFORM_DRIVE_ABCI_LOG_LEVEL:?err}
     command: npm run abci
 
   drive_tendermint:
@@ -72,6 +74,7 @@ services:
       - NETWORK=devnet
       - TENDERMINT_RPC_HOST=drive_tendermint
       - TENDERMINT_RPC_PORT=26657
+      - NODE_ENV=${ENVIRONMENT:?err}
     command: npm run api
 
   dapi_tx_filter_stream:
