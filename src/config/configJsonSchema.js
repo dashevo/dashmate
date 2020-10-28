@@ -141,14 +141,26 @@ module.exports = {
         dpns: {
           type: 'object',
           properties: {
-            contractId: {
-              type: ['string', 'null'],
+            contract: {
+              properties: {
+                id: {
+                  type: ['string', 'null'],
+                  minLength: 1,
+                },
+                blockHeight: {
+                  type: ['integer', 'null'],
+                  minimum: 1,
+                },
+              },
+              required: ['id', 'blockHeight'],
+              additionalProperties: false,
             },
             ownerId: {
               type: ['string', 'null'],
+              minLength: 1,
             },
           },
-          required: ['contractId', 'ownerId'],
+          required: ['contract', 'ownerId'],
           additionalProperties: false,
         },
       },
