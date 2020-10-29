@@ -110,18 +110,19 @@ function initTaskFactory(
         task: async (ctx, task) => {
           const stateTransitionHash = crypto.createHash('sha256')
             .update(ctx.dataContractStateTransition.toBuffer())
-            .digest()
-            .toString('base64');
+            .digest();
 
           if (ctx.seed || config.get('network') !== NETWORKS.LOCAL) {
-            task.skip(`Supported only local node. You need to get block height manually using state transition hash: ${stateTransitionHash}`);
+            task.skip('Can\'t obtain DPNS contract commit block height from remote node.'
+              + `Please, get block height manually using state transition hash "0x${stateTransitionHash.toString('hex')}"`
+              + 'and set it to "platform.dpns.contract.id" config option');
 
             return;
           }
 
           const tendermintRpcClient = createTenderdashRpcClient();
 
-          const params = { hash: stateTransitionHash };
+          const params = { hash: stateTransitionHash.toString('base64') };
 
           const response = await tendermintRpcClient.request('tx', params);
 
