@@ -6,7 +6,7 @@ const BaseCommand = require('../oclif/command/BaseCommand');
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
 
 const NETWORKS = require('../networks');
-const wait = require("../util/wait");
+const wait = require('../util/wait');
 
 class SetupForLocalDevelopmentCommand extends BaseCommand {
   /**
@@ -70,7 +70,7 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
               title: 'Wait 20 seconds to ensure all services are running',
               task: async () => {
                 await wait(20000);
-              }
+              },
             },
             {
               title: 'Initialize Platform',

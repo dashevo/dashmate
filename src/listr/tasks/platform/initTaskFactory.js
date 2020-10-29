@@ -8,6 +8,8 @@ const fundWallet = require('@dashevo/wallet-lib/src/utils/fundWallet');
 
 const dpnsDocumentSchema = require('@dashevo/dpns-contract/schema/dpns-contract-documents.json');
 
+const NETWORKS = require('../../../networks');
+
 /**
  *
  * @return {initTask}
@@ -91,19 +93,35 @@ function initTaskFactory(
             dpnsDocumentSchema, ctx.identity,
           );
 
-          // TODO You need to make broadcast return ST
-          const stateTransition = await ctx.client.platform.contracts.broadcast(
+          ctx.dataContractStateTransition = await ctx.client.platform.contracts.broadcast(
             ctx.dataContract,
             ctx.identity,
           );
-          // Get state transition commit block height from Tenderdash
+
+          config.set('platform.dpns.contract.id', ctx.dataContract.getId().toString());
+
+          // eslint-disable-next-line no-param-reassign
+          task.output = `DPNS contract ID: ${ctx.dataContract.getId().toString()}`;
+        },
+        options: { persistentOutput: true },
+      },
+      {
+        title: 'Obtain DPNS contract commit block height',
+        task: async (ctx, task) => {
+          const stateTransitionHash = crypto.createHash('sha256')
+            .update(ctx.dataContractStateTransition.toBuffer())
+            .digest()
+            .toString('base64');
+
+          if (ctx.seed || config.get('network') !== NETWORKS.LOCAL) {
+            task.skip(`Supported only local node. You need to get block height manually using state transition hash: ${stateTransitionHash}`);
+
+            return;
+          }
+
           const tendermintRpcClient = createTenderdashRpcClient();
 
-          let stateTransitionHash = crypto.createHash('sha256')
-            .update(stateTransition.toBuffer())
-            .digest();
-
-          const params = { hash: stateTransitionHash.toString('base64')};
+          const params = { hash: stateTransitionHash };
 
           const response = await tendermintRpcClient.request('tx', params);
 
@@ -113,12 +131,10 @@ function initTaskFactory(
 
           const { result: { height: contractBlockHeight } } = response;
 
-          config.set('platform.dpns.contract.id', ctx.dataContract.getId().toString());
           config.set('platform.dpns.contract.blockHeight', contractBlockHeight);
 
           // eslint-disable-next-line no-param-reassign
-          task.output = `DPNS contract ID: ${ctx.dataContract.getId().toString()}\n`
-            + `DPNS contract block height: ${contractBlockHeight}`;
+          task.output = `DPNS contract block height: ${contractBlockHeight}`;
         },
         options: { persistentOutput: true },
       },
