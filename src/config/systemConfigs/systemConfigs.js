@@ -37,12 +37,12 @@ const baseConfig = {
       },
       api: {
         docker: {
-          image: 'dashpay/dapi:0.16-dev',
+          image: 'dashpay/dapi:0.16',
         },
       },
       insight: {
         docker: {
-          image: 'shumkov/insight-api:3.0.0',
+          image: 'dashpay/insight-api:3.0.1',
         },
       },
     },
@@ -54,7 +54,7 @@ const baseConfig = {
       },
       abci: {
         docker: {
-          image: 'dashpay/drive:0.16-dev',
+          image: 'dashpay/drive:0.16',
         },
         log: {
           level: 'info',
@@ -93,6 +93,15 @@ module.exports = {
   evonet: lodashMerge({}, baseConfig, {
     description: 'node with Evonet configuration',
     network: NETWORKS.EVONET,
+    platform: {
+      dpns: {
+        contract: {
+          id: '3VvS19qomuGSbEYWbTsRzeuRgawU3yK4fPMzLrbV62u8',
+          blockHeight: 35,
+        },
+        ownerId: 'Gxiu28Lzfj66aPBCxD7AgTbbauLf68jFLNibWGU39Fuh',
+      },
+    },
   }),
   testnet: lodashMerge({}, baseConfig, {
     description: 'node with testnet configuration',
