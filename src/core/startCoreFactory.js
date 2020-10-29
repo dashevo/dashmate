@@ -33,9 +33,6 @@ function startCoreFactory(
 
     const coreCommand = [
       'dashd',
-      '-conf=/dash/.dashcore/dash.conf',
-      `-port=${config.get('core.p2p.port')}`,
-      `-rpcport=${config.get('core.rpc.port')}`,
     ];
 
     if (options.wallet) {
@@ -51,7 +48,7 @@ function startCoreFactory(
       'core',
       coreCommand,
       [
-        `--publish=${config.get('core.rpc.port')}:${config.get('core.rpc.port')}`,
+        '--service-ports',
         '--detach',
       ],
     );
