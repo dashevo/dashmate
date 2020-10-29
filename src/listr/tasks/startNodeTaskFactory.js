@@ -4,8 +4,6 @@ const { PrivateKey } = require('@dashevo/dashcore-lib');
 
 const NETWORKS = require('../../networks');
 
-const wait = require('../../util/wait');
-
 /**
  *
  * @param {DockerCompose} dockerCompose
@@ -16,7 +14,6 @@ function startNodeTaskFactory(dockerCompose) {
    * @typedef {startNodeTask}
    * @param {Config} config
    * @param {Object} options
-   * @param {boolean} [options.isMasternode]
    * @param {string} [options.driveImageBuildPath]
    * @param {string} [options.dapiImageBuildPath]
    * @param {boolean} [options.isUpdate]
@@ -36,6 +33,7 @@ function startNodeTaskFactory(dockerCompose) {
     config.get('externalIp', true);
 
     if (isMinerEnabled === undefined) {
+      // eslint-disable-next-line no-param-reassign
       isMinerEnabled = config.get('core.miner.enable');
     }
 
@@ -53,7 +51,7 @@ function startNodeTaskFactory(dockerCompose) {
         title: 'Check node is not started',
         task: async () => {
           if (await dockerCompose.isServiceRunning(config.toEnvs())) {
-            throw new Error(`Running services detected. Please ensure all services are stopped for this config before starting`);
+            throw new Error('Running services detected. Please ensure all services are stopped for this config before starting');
           }
         },
       },
