@@ -1,6 +1,6 @@
 {
   "name": "@dashevo/mn-bootstrap",
-  "version": "0.16.0-dev.9",
+  "version": "0.16.0",
   "description": "Distribution package for Dash Masternode installation",
   "main": "src/index.js",
   "scripts": {
@@ -59,7 +59,7 @@
     "awilix": "^4.2.6",
     "bls-signatures": "^0.1.9",
     "chalk": "^4.0.0",
-    "dash": "3.16.0-dev.3",
+    "dash": "3.16.0",
     "docker-compose": "^0.23.3",
     "dockerode": "^3.2.0",
     "dotenv": "^8.2.0",
