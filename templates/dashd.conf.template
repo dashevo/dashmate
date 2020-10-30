@@ -45,7 +45,7 @@ devnet={{=it.network.name}}{{? it.network.version !== null}}-{{=it.network.versi
 {{~it.core.p2p.seeds :seeds}}
 addnode={{=seeds.host}}:{{=seeds.port}}
 {{~}}
-sporkaddr={{=it.core.sporkAddr}}
+sporkaddr={{=it.core.spork.address}}
 
 # First 1000 blocks should be mined with lowest difficulty (like in regtest, so it's instant)
 # and first 500 blocks are mined with a block subsidity multiplied by 10

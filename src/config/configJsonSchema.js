@@ -80,8 +80,18 @@ module.exports = {
           required: ['port', 'user', 'password'],
           additionalProperties: false,
         },
-        sporkAddr: {
-          type: ['string', 'null'],
+        spork: {
+          type: 'object',
+          properties: {
+            address: {
+              type: ['string', 'null'],
+            },
+            privateKey: {
+              type: ['string', 'null'],
+            },
+          },
+          required: ['address', 'privateKey'],
+          additionalProperties: false,
         },
         masternode: {
           type: 'object',
@@ -121,7 +131,7 @@ module.exports = {
           additionalProperties: false,
         },
       },
-      required: ['docker', 'p2p', 'rpc', 'sporkAddr', 'masternode', 'miner'],
+      required: ['docker', 'p2p', 'rpc', 'spork', 'masternode', 'miner'],
       additionalProperties: false,
     },
     platform: {

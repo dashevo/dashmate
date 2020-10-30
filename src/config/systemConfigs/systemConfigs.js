@@ -17,7 +17,10 @@ const baseConfig = {
       user: 'dashrpc',
       password: 'rpcpassword'
     },
-    sporkAddr: null,
+    spork: {
+      address: null,
+      privateKey: null
+    },
     masternode: {
       enable: true,
       operator: {
@@ -136,7 +139,9 @@ module.exports = {
           },
         ],
       },
-      sporkAddr: 'yQuAu9YAMt4yEiXBeDp3q5bKpo7jsC2eEj',
+      spork: {
+        address: 'yQuAu9YAMt4yEiXBeDp3q5bKpo7jsC2eEj',
+      },
     },
     platform: {
       dpns: {
