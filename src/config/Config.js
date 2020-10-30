@@ -119,6 +119,7 @@ class Config {
   toEnvs() {
     return {
       COMPOSE_PROJECT_NAME: `dash_masternode_${this.getName()}`,
+      MN_HOME_DIR: '~/.mn', // this.container.resolve('homeDirPath'),  How do I get this variable?
       CONFIG_NAME: `${this.getName()}`,
       ...convertObjectToEnvs(this.getOptions()),
     };
