@@ -15,7 +15,7 @@ const baseConfig = {
     rpc: {
       port: 20002,
       user: 'dashrpc',
-      password: 'rpcpassword'
+      password: 'rpcpassword',
     },
     spork: {
       address: null,
@@ -76,6 +76,9 @@ const baseConfig = {
       tendermint: {
         p2p: {
           port: 26656,
+        },
+        rpc: {
+          port: 26657,
         },
         docker: {
           image: 'dashpay/tendermint:v0.32.12',

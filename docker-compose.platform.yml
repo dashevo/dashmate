@@ -36,6 +36,7 @@ services:
       - drive_abci
     ports:
       - ${PLATFORM_DRIVE_TENDERMINT_P2P_PORT:?err}:26656 # P2P
+      - 127.0.0.1:${PLATFORM_DRIVE_TENDERMINT_RPC_PORT:?err}:26657 # RPC
     volumes:
       - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/genesis.json:/tendermint/config/genesis.json
       - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/config.toml:/tendermint/config/config.toml

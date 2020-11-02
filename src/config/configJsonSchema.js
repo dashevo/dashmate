@@ -206,8 +206,18 @@ module.exports = {
                   required: ['port'],
                   additionalProperties: false,
                 },
+                rpc: {
+                  type: 'object',
+                  properties: {
+                    port: {
+                      $ref: '#/definitions/port',
+                    },
+                  },
+                  required: ['port'],
+                  additionalProperties: false,
+                },
               },
-              required: ['docker', 'p2p'],
+              required: ['docker', 'p2p', 'rpc'],
               additionalProperties: false,
             },
           },
