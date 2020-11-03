@@ -28,34 +28,23 @@ addressindex=1
 timestampindex=1
 spentindex=1
 
-{{? it.network.name === 'testnet'}}
-testnet=1
-[test]
-
-{{??}}
-# ZeroMQ notifications (required for Insight)
+{{? it.network.name === 'testnet'}}testnet=1
+[test]{{??}}# ZeroMQ notifications (required for Insight)
 zmqpubrawtx=tcp://0.0.0.0:29998
 zmqpubrawtxlock=tcp://0.0.0.0:29998
-zmqpubhashblock=tcp://0.0.0.0:29998
-{{?}}
-
+zmqpubhashblock=tcp://0.0.0.0:29998{{?}}
 {{? it.network.name === 'local'}}
 regtest=1
-[regtest]
-
-{{?? it.network.name === 'evonet'}}
+[regtest]{{?? it.network.name === 'evonet'}}
 devnet={{=it.network.name}}{{? it.network.version !== null}}-{{=it.network.version}}{{?}}
 [devnet]
-
-{{~it.core.p2p.seeds :seeds}}
-addnode={{=seeds.host}}:{{=seeds.port}}
-{{~}}
+{{~it.core.p2p.seeds :seed}}
+addnode={{=seed.host}}:{{=seed.port}}{{~}}
 
 sporkaddr={{=it.core.spork.address}}
 minimumdifficultyblocks=1000
 highsubsidyblocks=500
-highsubsidyfactor=10
-{{?}}
+highsubsidyfactor=10{{?}}
 
 # network
 port={{=it.core.p2p.port}}
