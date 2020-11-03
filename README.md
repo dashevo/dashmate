@@ -149,7 +149,7 @@ Before registering the masternode, you must have access to an address on the net
 dumpprivkey "address"
 ```
 
-If using a config specifying the `local` or `evonet` network, you can create and fund a new address using the `wallet` command as shown below.
+If using a config specifying the `local` network, you can create and fund a new address using the `wallet` command as shown below.
 
 ```
 USAGE

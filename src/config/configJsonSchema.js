@@ -189,7 +189,23 @@ module.exports = {
               $ref: '#/definitions/docker',
             },
             abci: {
-              $ref: '#/definitions/docker',
+              properties: {
+                docker: {
+                  $ref: '#/definitions/docker/properties/docker',
+                },
+                log: {
+                  properties: {
+                    level: {
+                      type: 'string',
+                      enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
+                    },
+                  },
+                  additionalProperties: false,
+                  required: ['level'],
+                },
+              },
+              additionalProperties: false,
+              required: ['docker', 'log'],
             },
             tendermint: {
               properties: {
@@ -266,14 +282,26 @@ module.exports = {
         dpns: {
           type: 'object',
           properties: {
-            contractId: {
-              type: ['string', 'null'],
+            contract: {
+              properties: {
+                id: {
+                  type: ['string', 'null'],
+                  minLength: 1,
+                },
+                blockHeight: {
+                  type: ['integer', 'null'],
+                  minimum: 1,
+                },
+              },
+              required: ['id', 'blockHeight'],
+              additionalProperties: false,
             },
             ownerId: {
               type: ['string', 'null'],
+              minLength: 1,
             },
           },
-          required: ['contractId', 'ownerId'],
+          required: ['contract', 'ownerId'],
           additionalProperties: false,
         },
       },
@@ -309,17 +337,11 @@ module.exports = {
       required: ['file'],
       additionalProperties: false,
     },
-    nodeEnv: {
+    environment: {
       type: 'string',
       enum: ['development', 'production'],
-      additionalProperties: false,
-    },
-    loggingLevel: {
-      type: 'string',
-      enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
-      additionalProperties: false,
     },
   },
-  required: ['description', 'core', 'platform', 'externalIp', 'network', 'compose', 'nodeEnv', 'loggingLevel'],
+  required: ['description', 'core', 'platform', 'externalIp', 'network', 'compose', 'environment'],
   additionalProperties: false,
 };

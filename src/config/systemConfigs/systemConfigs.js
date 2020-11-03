@@ -72,6 +72,9 @@ const baseConfig = {
         docker: {
           image: 'dashpay/drive:0.16',
         },
+        log: {
+          level: 'info',
+        },
       },
       tendermint: {
         p2p: {
@@ -88,7 +91,10 @@ const baseConfig = {
       },
     },
     dpns: {
-      contractId: null,
+      contract: {
+        id: null,
+        blockHeight: null,
+      },
       ownerId: null,
     },
   },
@@ -100,8 +106,7 @@ const baseConfig = {
   compose: {
     file: 'docker-compose.yml:docker-compose.platform.yml',
   },
-  nodeEnv: 'production',
-  loggingLevel: 'info',
+  environment: 'production',
 };
 
 module.exports = {
@@ -109,6 +114,8 @@ module.exports = {
   local: lodashMerge({}, baseConfig, {
     description: 'standalone node for local development',
     externalIp: '127.0.0.1',
+    network: NETWORKS.LOCAL,
+    environment: 'development',
     network: {
       name: NETWORKS.LOCAL,
       version: null,
@@ -116,6 +123,7 @@ module.exports = {
   }),
   evonet: lodashMerge({}, baseConfig, {
     description: 'node with Evonet configuration',
+    network: NETWORKS.EVONET,
     core: {
       docker: {
         image: 'dashpay/dashd:0.16',
@@ -150,7 +158,10 @@ module.exports = {
     },
     platform: {
       dpns: {
-        contractId: '3VvS19qomuGSbEYWbTsRzeuRgawU3yK4fPMzLrbV62u8',
+        contract: {
+          id: '3VvS19qomuGSbEYWbTsRzeuRgawU3yK4fPMzLrbV62u8',
+          blockHeight: 35,
+        },
         ownerId: 'Gxiu28Lzfj66aPBCxD7AgTbbauLf68jFLNibWGU39Fuh',
       },
       drive: {

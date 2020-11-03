@@ -4,8 +4,6 @@ const { PrivateKey } = require('@dashevo/dashcore-lib');
 
 const NETWORKS = require('../../networks');
 
-const wait = require('../../util/wait');
-
 /**
  *
  * @param {DockerCompose} dockerCompose
@@ -53,7 +51,7 @@ function startNodeTaskFactory(dockerCompose) {
         title: 'Check node is not started',
         task: async () => {
           if (await dockerCompose.isServiceRunning(config.toEnvs())) {
-            throw new Error(`Running services detected. Please ensure all services are stopped for this config before starting`);
+            throw new Error('Running services detected. Please ensure all services are stopped for this config before starting');
           }
         },
       },
@@ -85,9 +83,6 @@ function startNodeTaskFactory(dockerCompose) {
           }
 
           await dockerCompose.up(envs);
-
-          // wait 10 seconds to ensure all services are running
-          await wait(10000);
         },
       },
       {
