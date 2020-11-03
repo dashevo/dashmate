@@ -1,5 +1,5 @@
 {
-  "genesis_time": "2020-09-04T14:44:05.927475139Z",
+  "genesis_time": "{{=it.platform.drive.tendermint.genesisTime}}",
   "chain_id": "dash-devnet-evonet{{? it.network.version !== null}}-{{=it.network.version}}{{?}}",
   "consensus_params": {
     "block": {

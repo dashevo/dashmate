@@ -86,6 +86,7 @@ const baseConfig = {
         docker: {
           image: 'dashpay/tendermint:v0.32.12',
         },
+        genesisTime: null,
         validators: [],
         persistentPeers: [],
       },
@@ -166,6 +167,7 @@ module.exports = {
       },
       drive: {
         tendermint: {
+          genesisTime: '2020-10-29T14:54:55.243362093Z',
           validators: [
             {
               address: '8AA28E29CBE6F8C44228AFF79212A05211531D31',

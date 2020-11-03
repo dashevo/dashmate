@@ -232,6 +232,10 @@ module.exports = {
                   required: ['port'],
                   additionalProperties: false,
                 },
+                genesisTime: {
+                  type: ['string', 'null'],
+                  minLength: 1,
+                },
                 validators: {
                   type: 'array',
                   items: {
@@ -272,7 +276,7 @@ module.exports = {
                   },
                 },
               },
-              required: ['docker', 'p2p', 'rpc', 'validators', 'persistentPeers'],
+              required: ['docker', 'p2p', 'rpc', 'genesisTime', 'validators', 'persistentPeers'],
               additionalProperties: false,
             },
           },
