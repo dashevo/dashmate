@@ -216,8 +216,47 @@ module.exports = {
                   required: ['port'],
                   additionalProperties: false,
                 },
+                validators: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      address: {
+                        type: 'string',
+                        minLength: 1,
+                      },
+                      pubKey: {
+                        type: 'string',
+                        minLength: 1,
+                      },
+                    },
+                    required: ['address', 'pubKey'],
+                    additionalProperties: false,
+                  },
+                },
+                persistentPeers: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: {
+                        type: 'string',
+                        minLength: 1,
+                      },
+                      host: {
+                        type: 'string',
+                        minLength: 1,
+                      },
+                      port: {
+                        $ref: '#/definitions/port',
+                      },
+                    },
+                    required: ['id', 'host', 'port'],
+                    additionalProperties: false,
+                  },
+                },
               },
-              required: ['docker', 'p2p', 'rpc'],
+              required: ['docker', 'p2p', 'rpc', 'validators', 'persistentPeers'],
               additionalProperties: false,
             },
           },
