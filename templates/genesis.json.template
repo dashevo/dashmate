@@ -1,5 +1,5 @@
 {
-  "genesis_time": "{{=it.platform.drive.tendermint.genesisTime}}",
+  "genesis_time": "{{=it.platform.drive.tendermint.genesis.time}}",
   "chain_id": "dash-devnet-evonet{{? it.network.version !== null}}-{{=it.network.version}}{{?}}",
   "consensus_params": {
     "block": {
@@ -17,7 +17,7 @@
     }
   },
   "validators": [
-    {{~it.platform.drive.tendermint.validators :validator:index}}{{? index }},
+    {{~it.platform.drive.tendermint.genesis.validators :validator:index}}{{? index }},
     {{?}}{
       "address": "{{=validator.address}}",
       "pub_key": {

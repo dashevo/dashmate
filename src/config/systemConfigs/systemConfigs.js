@@ -77,6 +77,9 @@ const baseConfig = {
         },
       },
       tendermint: {
+        docker: {
+          image: 'dashpay/tendermint:v0.32.12',
+        },
         p2p: {
           port: 26656,
           persistentPeers: [],
@@ -84,11 +87,10 @@ const baseConfig = {
         rpc: {
           port: 26657,
         },
-        docker: {
-          image: 'dashpay/tendermint:v0.32.12',
+        genesis: {
+          time: null,
+          validators: [],
         },
-        genesisTime: null,
-        validators: [],
       },
     },
     dpns: {
@@ -416,209 +418,211 @@ module.exports = {
               },
             ],
           },
-          genesisTime: '2020-10-29T14:54:55.243362093Z',
-          validators: [
-            {
-              address: '8AA28E29CBE6F8C44228AFF79212A05211531D31',
-              pubKey: 'YY8qJE2Jyl90SN0NeV4G+btces5S2MLxkdHu1dzK9gE=',
-            },
-            {
-              address: '9776D772EF437DBC550BFCFDF00BA85748F73F05',
-              pubKey: 'Q2jE22KAsTg+mzcODSuQR7cNFyaDfhn2Bf5+y0Ssm30=',
-            },
-            {
-              address: 'C8F7D628EED93D33AA6C264BFFB3CD9476058FB1',
-              pubKey: 'hS+U08pOWjxsvqVS3vq0qD8yjQUHWH1IbEjZpCWsnqo=',
-            },
-            {
-              address: '09794F8EC5F1998CEA9C3E849F42EA0BC333F524',
-              pubKey: 'T5J1zf2kANtmtMpsu1EXl9OznOivWlIO5q1jpJ6B5d8=',
-            },
-            {
-              address: 'BA486FE73F3242ED721C736E480261223FDE287E',
-              pubKey: 'HsEjBaDtaubMxjlG4iSIOqhflyKIY99BKkM9tcM9yOo=',
-            },
-            {
-              address: '701C3E9F901B87A49BFA521BF9D504BB8C2BB98A',
-              pubKey: 'QPC+O0rctfMrfXMDsj9DnDEi8KypCED/UxtAbjK3D3I=',
-            },
-            {
-              address: 'BFFB2EE1328E733BC6937EB0FDC48DDD88664C87',
-              pubKey: 'VoVlGN/CzXEkj27SrOVsE4TPYaEOjukUAM+HKKOX9p8=',
-            },
-            {
-              address: '536D4E4C98F11CF73CE452516F88641E5E98C225',
-              pubKey: 'S8zd/4Y+Aa4USQqv4zQqxWsUh83J9kzjuGDMZGvs0mg=',
-            },
-            {
-              address: '426AF75057755FA77DAEB57E84F112EC61BC0C23',
-              pubKey: 'VgptZSnRGd3mGj9Xw8ThWknkXiq8xchHoYsz5+PdvEY=',
-            },
-            {
-              address: '07F9D83F23933B9BC5252E7AB0D6F2C1737330CF',
-              pubKey: 'nOsFaCMtxYtGPu7MsTNs+H8j5NAOFnbH8BEYKXRJOiM=',
-            },
-            {
-              address: '1676685AF7DE461175E9595A73D5BE2481714EE9',
-              pubKey: 'IPz4FOI5QDIBQnt6+yohwpoI5hHLXy9dCsJ3UFpLhnw=',
-            },
-            {
-              address: '7A2585A7E16BAEC975126E01568B722183D2E051',
-              pubKey: 'f7oR6yK1hYm/i7U06MvGHTFnuMEuHHnlSnqlXQRA8rY=',
-            },
-            {
-              address: '8F9D9F55AD7EFCD1ECE143A11FCDF9BCC6264682',
-              pubKey: '5co5iELzJnRkppYLWEk31XBlBch8wcdV8FtCYeBf+GI=',
-            },
-            {
-              address: 'CBFD58CED7CFFC61D6EE3A279E983D211C0639AA',
-              pubKey: 'rnwGhO9BGtMgAqkIIT4pnkVfrOhcXxsmeoFczXwhisE=',
-            },
-            {
-              address: '267A351A6263D2C2BF18B7E2B94F83BF2AF0731F',
-              pubKey: 'vR7nVdkz1b03FxS5t29380qGEy+Rawl+dJBZQst6PUY=',
-            },
-            {
-              address: 'FE28EDCCB8918F8EEB687771EB1A3B3CCFFBED1E',
-              pubKey: 'TdkmKdE7h694uzmY2ADVnlLP/QQUohnIhsiGN62U2e8=',
-            },
-            {
-              address: 'D9A58D252185AFF88D729E82995E98A1805CEC5C',
-              pubKey: 'qjZIRbD7yU4b+0IQx7ZuAU7weA0+Nt6G1ZeEfpCrfuo=',
-            },
-            {
-              address: '470CB581A6CBC3ED01AAD9411ECD7C2D9FD5C54D',
-              pubKey: 'eEQhtx3twf/Jk+QdASZ6VhTTCPB9MrJzvVk72IPRWys=',
-            },
-            {
-              address: '2188A90F81D3BA3F8CBABABBA03696FE84598D88',
-              pubKey: 'Lkoq1y+9AaGAN3PzHTPYyALiofYijHeYO998fpGwEl0=',
-            },
-            {
-              address: 'FCB9FE6B879F7320FB2FB06BDD461BEEBB846B85',
-              pubKey: 'nDAxHaxWUBxtCLWq8vxiAe0VFolR6Yw4HEgM9zC2egE=',
-            },
-            {
-              address: '2B67AF00F7738FED12780B02F70AF766B9B5C0F2',
-              pubKey: 'nsEDH4zcbUC8Dufa17ZxRwAqct7diNoNzgYHb2TQ2mg=',
-            },
-            {
-              address: 'E6F029EFB7B248C84B320B380B30619EAA22A65E',
-              pubKey: 'wHBzA9ic/90SbhODRbT9cWzbhqXoXu3X/1NgYKt832A=',
-            },
-            {
-              address: '1A761A571BD1786897BA4D969A03528039C54381',
-              pubKey: 'z/wzEYKiEwxP/nkgN11WL6erfTEq4wcBulFCi0bsQgg=',
-            },
-            {
-              address: '816F57EBC23F03F069E648ECC2E5FD5CB12F6C4A',
-              pubKey: 'jsB/NVdo24Rsl73P5ymOhSAgK+V7aBodr/EJdarBspA=',
-            },
-            {
-              address: 'C304B9B9E76DEBFDDB71B66C83E0E04441C5C113',
-              pubKey: 'KSXR93tqocMmmAfUJY9DagiciomWXnZ+SKgAt64vImg=',
-            },
-            {
-              address: 'A6CF545577FCAE91D92A091A572B1DFF7FD3A574',
-              pubKey: 'DxMddyEkMix5lu1CFGSSd+XskrFhq+ZOzXzBRUq/Yyg=',
-            },
-            {
-              address: '63D4A3B2F0EA3576109A7BA8440C47559732BD92',
-              pubKey: 'NAW+eCntw8ssgjJ6yY/hGuAlgCMY5gKXPHbya4rPNfs=',
-            },
-            {
-              address: '04462517B4EEE922E3EAC62D8FC3B39157D4CBF1',
-              pubKey: 'YLyrpYp/I7EhxCA9yzGwmnXw9VI5t1fv2H7PDpDPFiI=',
-            },
-            {
-              address: '77A193DC1A73F7DF324482268CE3F03740DACC33',
-              pubKey: 'mbXb1wqBREq9j9TkX9Hn+ZyP6eJNRQ2UiWiwqgRxN98=',
-            },
-            {
-              address: 'E9BBE3577D67A63C0B3DA23A8F65C2E4C388E567',
-              pubKey: 'kECCYzOnEcA5FiqYq7/+VaO/lV8nQuUhSR+zDMoHjW8=',
-            },
-            {
-              address: '6D9EA83F44A8A309D2979DA0716B6E06CBD8D926',
-              pubKey: 'wi1tZegVxE/cFa8pjzZVUKInxwqbELarJjlSisuJoSE=',
-            },
-            {
-              address: '4816F44F85A1EE7EEA6FC6CCC19AEC93631909FC',
-              pubKey: 'C4O3e/0wAOa902JtcC3okmLq0VkO88DXkbruLVwAc7c=',
-            },
-            {
-              address: '794389AC17E4C4F92ED18D5DB5458150B0918835',
-              pubKey: 'TOMdmb/WlzaOp6hMe7vAF9Xbrju//b7az0QLhKraawM=',
-            },
-            {
-              address: '6C1A743FF3393529A707B55F5EB649EA4FAD5980',
-              pubKey: '0PRvdsjn1APsMDUw/HT/MqdE3Z9HR877Dx60fk997y4=',
-            },
-            {
-              address: '8EB9F71D65DF48396AF2F6770FD42BAD36A98F69',
-              pubKey: 'bUZR4IVeHgtfIksl5MTUbGJr2tBGSRHL0G+/vVpgBgE=',
-            },
-            {
-              address: '50FF638F377821861790A61DA0D6A03FAB10223D',
-              pubKey: '+kCo1Ztc+JA8xq7xuj/ggVfGRQWBseTuf95omfB2HmU=',
-            },
-            {
-              address: 'B7DEE29CF61EA9455E85E5CC88D39688732799DD',
-              pubKey: 'tjjQbJ10uwCoZYSvNbZgcEf/Er8e95ymoCsAwhp5Ndk=',
-            },
-            {
-              address: 'BF01E4C420DB3256C3BDF561D6DE806A6A0FAF72',
-              pubKey: 'Ti4MSaMJIDO5TTMKyOCVn08ZIfA9558nf/4SuXbqijU=',
-            },
-            {
-              address: '34A1F4C14D6682E010243E154AB1205F2277084D',
-              pubKey: 'bexU65YMRfR8b1fEkUwIOUKHNl9V8cT0soi8DDG90As=',
-            },
-            {
-              address: 'C3EB398E6499A726D083EABEAB9653302F94EF90',
-              pubKey: 'iPHtYcQTAaq08hq5vf67ufYLNf6i6SW5f5echYKvV3c=',
-            },
-            {
-              address: 'AFA41D67E999F628EE67C7F00BFF492682180A6B',
-              pubKey: 'fUF/43vvbaAcaEpuoJmrY66LerYNpTmE8rmE1fraxnM=',
-            },
-            {
-              address: '80F3F1CB7B2F7EA0151EA1433E62E76B17D5F1A3',
-              pubKey: 'JIc05l8UK1kGzMeDUu4mhDPCDkLTwkymiQPgIrNqeyU=',
-            },
-            {
-              address: 'D99C5CE2F15F53B2C4DA37ECCA6A427C612CB86E',
-              pubKey: 'QkBN043FReHmIndf0zpM1deZTSgjc6pZgLfswxi4LI0=',
-            },
-            {
-              address: '94DC7A83BCEBDC14DCC8D9AA796A9F3C30758A5A',
-              pubKey: 'MGzwcGFyj5OM6BQfaF6qERvRwFVLwrEtIjzrD4HJgXM=',
-            },
-            {
-              address: 'BE664A59B0FE59B6809CE6F3D74AFB6FF9F4F595',
-              pubKey: 'VwdQNhEKVHYUZK/9YyeZokdbG6xWbUH8UAZJ+0MMPkA=',
-            },
-            {
-              address: 'B924A4F48AF9B0902E046055A0B9217EA7D8AB31',
-              pubKey: 'QSVnY9ZBIjh0eQg9E9TQ3C6MqAZcGkH+iCMz2+F4Y4E=',
-            },
-            {
-              address: '1C4AC45AE3846BCB28427FF80C82E6A1BC66B786',
-              pubKey: 'W6R5wifl0maN1f+jGOAFRRyUphFtp/6os1We3rfVIAI=',
-            },
-            {
-              address: 'EC910949C536C9F4EF512BF36A722D00C04C7A59',
-              pubKey: '6OcOw3+BmuW33tmcO8TiG1HLRsA9iMZkDJB2wJQs5so=',
-            },
-            {
-              address: '856B7A347EB77DB7D9BE1F4748D0B90985B54CF4',
-              pubKey: 'TbiLMDredczYV6fJdAfrK4dAh8Gdn8rt61nP+od3Nd8=',
-            },
-            {
-              address: '1E984D356B54AACC996D25C179F2506C18CCC55D',
-              pubKey: 'pRkdsp3BT9Av2EZDzERzaM/ySuce7YnY5YJc8vVodRI=',
-            },
-          ],
+          genesis: {
+            time: '2020-10-29T14:54:55.243362093Z',
+            validators: [
+              {
+                address: '8AA28E29CBE6F8C44228AFF79212A05211531D31',
+                pubKey: 'YY8qJE2Jyl90SN0NeV4G+btces5S2MLxkdHu1dzK9gE=',
+              },
+              {
+                address: '9776D772EF437DBC550BFCFDF00BA85748F73F05',
+                pubKey: 'Q2jE22KAsTg+mzcODSuQR7cNFyaDfhn2Bf5+y0Ssm30=',
+              },
+              {
+                address: 'C8F7D628EED93D33AA6C264BFFB3CD9476058FB1',
+                pubKey: 'hS+U08pOWjxsvqVS3vq0qD8yjQUHWH1IbEjZpCWsnqo=',
+              },
+              {
+                address: '09794F8EC5F1998CEA9C3E849F42EA0BC333F524',
+                pubKey: 'T5J1zf2kANtmtMpsu1EXl9OznOivWlIO5q1jpJ6B5d8=',
+              },
+              {
+                address: 'BA486FE73F3242ED721C736E480261223FDE287E',
+                pubKey: 'HsEjBaDtaubMxjlG4iSIOqhflyKIY99BKkM9tcM9yOo=',
+              },
+              {
+                address: '701C3E9F901B87A49BFA521BF9D504BB8C2BB98A',
+                pubKey: 'QPC+O0rctfMrfXMDsj9DnDEi8KypCED/UxtAbjK3D3I=',
+              },
+              {
+                address: 'BFFB2EE1328E733BC6937EB0FDC48DDD88664C87',
+                pubKey: 'VoVlGN/CzXEkj27SrOVsE4TPYaEOjukUAM+HKKOX9p8=',
+              },
+              {
+                address: '536D4E4C98F11CF73CE452516F88641E5E98C225',
+                pubKey: 'S8zd/4Y+Aa4USQqv4zQqxWsUh83J9kzjuGDMZGvs0mg=',
+              },
+              {
+                address: '426AF75057755FA77DAEB57E84F112EC61BC0C23',
+                pubKey: 'VgptZSnRGd3mGj9Xw8ThWknkXiq8xchHoYsz5+PdvEY=',
+              },
+              {
+                address: '07F9D83F23933B9BC5252E7AB0D6F2C1737330CF',
+                pubKey: 'nOsFaCMtxYtGPu7MsTNs+H8j5NAOFnbH8BEYKXRJOiM=',
+              },
+              {
+                address: '1676685AF7DE461175E9595A73D5BE2481714EE9',
+                pubKey: 'IPz4FOI5QDIBQnt6+yohwpoI5hHLXy9dCsJ3UFpLhnw=',
+              },
+              {
+                address: '7A2585A7E16BAEC975126E01568B722183D2E051',
+                pubKey: 'f7oR6yK1hYm/i7U06MvGHTFnuMEuHHnlSnqlXQRA8rY=',
+              },
+              {
+                address: '8F9D9F55AD7EFCD1ECE143A11FCDF9BCC6264682',
+                pubKey: '5co5iELzJnRkppYLWEk31XBlBch8wcdV8FtCYeBf+GI=',
+              },
+              {
+                address: 'CBFD58CED7CFFC61D6EE3A279E983D211C0639AA',
+                pubKey: 'rnwGhO9BGtMgAqkIIT4pnkVfrOhcXxsmeoFczXwhisE=',
+              },
+              {
+                address: '267A351A6263D2C2BF18B7E2B94F83BF2AF0731F',
+                pubKey: 'vR7nVdkz1b03FxS5t29380qGEy+Rawl+dJBZQst6PUY=',
+              },
+              {
+                address: 'FE28EDCCB8918F8EEB687771EB1A3B3CCFFBED1E',
+                pubKey: 'TdkmKdE7h694uzmY2ADVnlLP/QQUohnIhsiGN62U2e8=',
+              },
+              {
+                address: 'D9A58D252185AFF88D729E82995E98A1805CEC5C',
+                pubKey: 'qjZIRbD7yU4b+0IQx7ZuAU7weA0+Nt6G1ZeEfpCrfuo=',
+              },
+              {
+                address: '470CB581A6CBC3ED01AAD9411ECD7C2D9FD5C54D',
+                pubKey: 'eEQhtx3twf/Jk+QdASZ6VhTTCPB9MrJzvVk72IPRWys=',
+              },
+              {
+                address: '2188A90F81D3BA3F8CBABABBA03696FE84598D88',
+                pubKey: 'Lkoq1y+9AaGAN3PzHTPYyALiofYijHeYO998fpGwEl0=',
+              },
+              {
+                address: 'FCB9FE6B879F7320FB2FB06BDD461BEEBB846B85',
+                pubKey: 'nDAxHaxWUBxtCLWq8vxiAe0VFolR6Yw4HEgM9zC2egE=',
+              },
+              {
+                address: '2B67AF00F7738FED12780B02F70AF766B9B5C0F2',
+                pubKey: 'nsEDH4zcbUC8Dufa17ZxRwAqct7diNoNzgYHb2TQ2mg=',
+              },
+              {
+                address: 'E6F029EFB7B248C84B320B380B30619EAA22A65E',
+                pubKey: 'wHBzA9ic/90SbhODRbT9cWzbhqXoXu3X/1NgYKt832A=',
+              },
+              {
+                address: '1A761A571BD1786897BA4D969A03528039C54381',
+                pubKey: 'z/wzEYKiEwxP/nkgN11WL6erfTEq4wcBulFCi0bsQgg=',
+              },
+              {
+                address: '816F57EBC23F03F069E648ECC2E5FD5CB12F6C4A',
+                pubKey: 'jsB/NVdo24Rsl73P5ymOhSAgK+V7aBodr/EJdarBspA=',
+              },
+              {
+                address: 'C304B9B9E76DEBFDDB71B66C83E0E04441C5C113',
+                pubKey: 'KSXR93tqocMmmAfUJY9DagiciomWXnZ+SKgAt64vImg=',
+              },
+              {
+                address: 'A6CF545577FCAE91D92A091A572B1DFF7FD3A574',
+                pubKey: 'DxMddyEkMix5lu1CFGSSd+XskrFhq+ZOzXzBRUq/Yyg=',
+              },
+              {
+                address: '63D4A3B2F0EA3576109A7BA8440C47559732BD92',
+                pubKey: 'NAW+eCntw8ssgjJ6yY/hGuAlgCMY5gKXPHbya4rPNfs=',
+              },
+              {
+                address: '04462517B4EEE922E3EAC62D8FC3B39157D4CBF1',
+                pubKey: 'YLyrpYp/I7EhxCA9yzGwmnXw9VI5t1fv2H7PDpDPFiI=',
+              },
+              {
+                address: '77A193DC1A73F7DF324482268CE3F03740DACC33',
+                pubKey: 'mbXb1wqBREq9j9TkX9Hn+ZyP6eJNRQ2UiWiwqgRxN98=',
+              },
+              {
+                address: 'E9BBE3577D67A63C0B3DA23A8F65C2E4C388E567',
+                pubKey: 'kECCYzOnEcA5FiqYq7/+VaO/lV8nQuUhSR+zDMoHjW8=',
+              },
+              {
+                address: '6D9EA83F44A8A309D2979DA0716B6E06CBD8D926',
+                pubKey: 'wi1tZegVxE/cFa8pjzZVUKInxwqbELarJjlSisuJoSE=',
+              },
+              {
+                address: '4816F44F85A1EE7EEA6FC6CCC19AEC93631909FC',
+                pubKey: 'C4O3e/0wAOa902JtcC3okmLq0VkO88DXkbruLVwAc7c=',
+              },
+              {
+                address: '794389AC17E4C4F92ED18D5DB5458150B0918835',
+                pubKey: 'TOMdmb/WlzaOp6hMe7vAF9Xbrju//b7az0QLhKraawM=',
+              },
+              {
+                address: '6C1A743FF3393529A707B55F5EB649EA4FAD5980',
+                pubKey: '0PRvdsjn1APsMDUw/HT/MqdE3Z9HR877Dx60fk997y4=',
+              },
+              {
+                address: '8EB9F71D65DF48396AF2F6770FD42BAD36A98F69',
+                pubKey: 'bUZR4IVeHgtfIksl5MTUbGJr2tBGSRHL0G+/vVpgBgE=',
+              },
+              {
+                address: '50FF638F377821861790A61DA0D6A03FAB10223D',
+                pubKey: '+kCo1Ztc+JA8xq7xuj/ggVfGRQWBseTuf95omfB2HmU=',
+              },
+              {
+                address: 'B7DEE29CF61EA9455E85E5CC88D39688732799DD',
+                pubKey: 'tjjQbJ10uwCoZYSvNbZgcEf/Er8e95ymoCsAwhp5Ndk=',
+              },
+              {
+                address: 'BF01E4C420DB3256C3BDF561D6DE806A6A0FAF72',
+                pubKey: 'Ti4MSaMJIDO5TTMKyOCVn08ZIfA9558nf/4SuXbqijU=',
+              },
+              {
+                address: '34A1F4C14D6682E010243E154AB1205F2277084D',
+                pubKey: 'bexU65YMRfR8b1fEkUwIOUKHNl9V8cT0soi8DDG90As=',
+              },
+              {
+                address: 'C3EB398E6499A726D083EABEAB9653302F94EF90',
+                pubKey: 'iPHtYcQTAaq08hq5vf67ufYLNf6i6SW5f5echYKvV3c=',
+              },
+              {
+                address: 'AFA41D67E999F628EE67C7F00BFF492682180A6B',
+                pubKey: 'fUF/43vvbaAcaEpuoJmrY66LerYNpTmE8rmE1fraxnM=',
+              },
+              {
+                address: '80F3F1CB7B2F7EA0151EA1433E62E76B17D5F1A3',
+                pubKey: 'JIc05l8UK1kGzMeDUu4mhDPCDkLTwkymiQPgIrNqeyU=',
+              },
+              {
+                address: 'D99C5CE2F15F53B2C4DA37ECCA6A427C612CB86E',
+                pubKey: 'QkBN043FReHmIndf0zpM1deZTSgjc6pZgLfswxi4LI0=',
+              },
+              {
+                address: '94DC7A83BCEBDC14DCC8D9AA796A9F3C30758A5A',
+                pubKey: 'MGzwcGFyj5OM6BQfaF6qERvRwFVLwrEtIjzrD4HJgXM=',
+              },
+              {
+                address: 'BE664A59B0FE59B6809CE6F3D74AFB6FF9F4F595',
+                pubKey: 'VwdQNhEKVHYUZK/9YyeZokdbG6xWbUH8UAZJ+0MMPkA=',
+              },
+              {
+                address: 'B924A4F48AF9B0902E046055A0B9217EA7D8AB31',
+                pubKey: 'QSVnY9ZBIjh0eQg9E9TQ3C6MqAZcGkH+iCMz2+F4Y4E=',
+              },
+              {
+                address: '1C4AC45AE3846BCB28427FF80C82E6A1BC66B786',
+                pubKey: 'W6R5wifl0maN1f+jGOAFRRyUphFtp/6os1We3rfVIAI=',
+              },
+              {
+                address: 'EC910949C536C9F4EF512BF36A722D00C04C7A59',
+                pubKey: '6OcOw3+BmuW33tmcO8TiG1HLRsA9iMZkDJB2wJQs5so=',
+              },
+              {
+                address: '856B7A347EB77DB7D9BE1F4748D0B90985B54CF4',
+                pubKey: 'TbiLMDredczYV6fJdAfrK4dAh8Gdn8rt61nP+od3Nd8=',
+              },
+              {
+                address: '1E984D356B54AACC996D25C179F2506C18CCC55D',
+                pubKey: 'pRkdsp3BT9Av2EZDzERzaM/ySuce7YnY5YJc8vVodRI=',
+              },
+            ],
+          },
         },
       },
     },
