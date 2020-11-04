@@ -218,8 +218,29 @@ module.exports = {
                     port: {
                       $ref: '#/definitions/port',
                     },
+                    persistentPeers: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          id: {
+                            type: 'string',
+                            minLength: 1,
+                          },
+                          host: {
+                            type: 'string',
+                            minLength: 1,
+                          },
+                          port: {
+                            $ref: '#/definitions/port',
+                          },
+                        },
+                        required: ['id', 'host', 'port'],
+                        additionalProperties: false,
+                      },
+                    },
                   },
-                  required: ['port'],
+                  required: ['port', 'persistentPeers'],
                   additionalProperties: false,
                 },
                 rpc: {
@@ -254,29 +275,8 @@ module.exports = {
                     additionalProperties: false,
                   },
                 },
-                persistentPeers: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      id: {
-                        type: 'string',
-                        minLength: 1,
-                      },
-                      host: {
-                        type: 'string',
-                        minLength: 1,
-                      },
-                      port: {
-                        $ref: '#/definitions/port',
-                      },
-                    },
-                    required: ['id', 'host', 'port'],
-                    additionalProperties: false,
-                  },
-                },
               },
-              required: ['docker', 'p2p', 'rpc', 'genesisTime', 'validators', 'persistentPeers'],
+              required: ['docker', 'p2p', 'rpc', 'genesisTime', 'validators'],
               additionalProperties: false,
             },
           },
