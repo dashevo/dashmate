@@ -255,33 +255,6 @@ module.exports = {
                 },
                 genesis: {
                   type: 'object',
-                  properties: {
-                    time: {
-                      type: ['string', 'null'],
-                      minLength: 1,
-                      format: 'date-time',
-                    },
-                    validators: {
-                      type: 'array',
-                      items: {
-                        type: 'object',
-                        properties: {
-                          address: {
-                            type: 'string',
-                            minLength: 1,
-                          },
-                          pubKey: {
-                            type: 'string',
-                            minLength: 1,
-                          },
-                        },
-                        required: ['address', 'pubKey'],
-                        additionalProperties: false,
-                      },
-                    },
-                  },
-                  required: ['time', 'validators'],
-                  additionalProperties: false,
                 },
               },
               required: ['docker', 'p2p', 'rpc', 'genesis'],
