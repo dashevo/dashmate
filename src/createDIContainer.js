@@ -46,7 +46,7 @@ const initTaskFactory = require('./listr/tasks/platform/initTaskFactory');
 const startNodeTaskFactory = require('./listr/tasks/startNodeTaskFactory');
 const createTenderdashRpcClient = require('./tenderdash/createTenderdashRpcClient');
 
-async function createDIContainer() {
+async function createDIContainer(options) {
   const container = createAwilixContainer({
     injectionMode: InjectionMode.CLASSIC,
   });
@@ -54,7 +54,7 @@ async function createDIContainer() {
   /**
    * Config
    */
-  const homeDirPath = path.resolve(os.homedir(), '.mn');
+  const homeDirPath = options.MN_HOME_DIR ? options.MN_HOME_DIR : path.resolve(os.homedir(), '.mn');
 
   container.register({
     homeDirPath: asValue(homeDirPath),
