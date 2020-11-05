@@ -19,7 +19,7 @@ const baseConfig = {
     },
     spork: {
       address: null,
-      privateKey: null
+      privateKey: null,
     },
     masternode: {
       enable: true,
@@ -42,10 +42,10 @@ const baseConfig = {
       },
       nginx: {
         http: {
-          port: 3000
+          port: 3000,
         },
         grpc: {
-          port: 3010
+          port: 3010,
         },
         docker: {
           image: 'nginx:latest',
@@ -115,7 +115,6 @@ module.exports = {
   local: lodashMerge({}, baseConfig, {
     description: 'standalone node for local development',
     externalIp: '127.0.0.1',
-    network: NETWORKS.LOCAL,
     environment: 'development',
     network: {
       name: NETWORKS.LOCAL,
@@ -124,7 +123,6 @@ module.exports = {
   }),
   evonet: lodashMerge({}, baseConfig, {
     description: 'node with Evonet configuration',
-    network: NETWORKS.EVONET,
     core: {
       docker: {
         image: 'dashpay/dashd:0.16',
