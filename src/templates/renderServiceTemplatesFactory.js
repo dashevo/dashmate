@@ -21,6 +21,9 @@ function renderServiceTemplatesFactory(writeServiceConfigs) {
     for (const file of files) {
       const fileContents = fs.readFileSync('./templates/' + file, 'utf-8');
       const fileTemplate = dots.template(fileContents);
+      if (file === 'genesis.json.template' && Object.keys(config.options.platform.drive.tendermint.genesis).length === 0) {
+        continue;
+      }
       const fileOutput = fileTemplate(config.options);
       configFiles[file] = fileOutput;
     }
