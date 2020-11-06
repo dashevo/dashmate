@@ -35,8 +35,8 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
     dockerCompose,
     config,
   ) {
-    if (config.get('network.name') !== NETWORKS.LOCAL) {
-      throw new Error(`This command supposed to work only with local network. Your network is ${config.get('network.name')}`);
+    if (config.get('network') !== NETWORKS.LOCAL) {
+      throw new Error(`This command supposed to work only with local network. Your network is ${config.get('network')}`);
     }
 
     const amount = 10000;

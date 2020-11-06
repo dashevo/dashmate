@@ -32,6 +32,7 @@ const baseConfig = {
       interval: '2.5m',
       address: null,
     },
+    devnetName: null,
   },
   platform: {
     dapi: {
@@ -100,10 +101,7 @@ const baseConfig = {
     },
   },
   externalIp: null,
-  network: {
-    name: NETWORKS.TESTNET,
-    version: null,
-  },
+  network: NETWORKS.TESTNET,
   compose: {
     file: 'docker-compose.yml:docker-compose.platform.yml',
   },
@@ -116,10 +114,7 @@ module.exports = {
     description: 'standalone node for local development',
     externalIp: '127.0.0.1',
     environment: 'development',
-    network: {
-      name: NETWORKS.LOCAL,
-      version: null,
-    },
+    network: NETWORKS.LOCAL,
   }),
   evonet: lodashMerge({}, baseConfig, {
     description: 'node with Evonet configuration',
@@ -154,6 +149,7 @@ module.exports = {
       spork: {
         address: 'yQuAu9YAMt4yEiXBeDp3q5bKpo7jsC2eEj',
       },
+      devnetName: 'evonet-8',
     },
     platform: {
       dpns: {
@@ -889,10 +885,7 @@ module.exports = {
         },
       },
     },
-    network: {
-      name: NETWORKS.EVONET,
-      version: 8,
-    },
+    network: NETWORKS.EVONET,
   }),
   testnet: lodashMerge({}, baseConfig, {
     description: 'node with testnet configuration',
@@ -904,10 +897,7 @@ module.exports = {
         port: 19998,
       },
     },
-    network: {
-      name: NETWORKS.TESTNET,
-      version: null,
-    },
+    network: NETWORKS.TESTNET,
     compose: {
       file: 'docker-compose.yml',
     },

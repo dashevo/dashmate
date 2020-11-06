@@ -25,7 +25,7 @@ class MintCommand extends BaseCommand {
     generateToAddressTask,
     config,
   ) {
-    const network = config.get('network.name');
+    const network = config.get('network');
 
     if (network !== NETWORKS.LOCAL) {
       throw new Error('Only local network supports generation of dash');

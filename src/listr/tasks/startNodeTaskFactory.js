@@ -37,7 +37,7 @@ function startNodeTaskFactory(dockerCompose) {
       isMinerEnabled = config.get('core.miner.enable');
     }
 
-    if (isMinerEnabled === true && config.get('network.name') !== NETWORKS.LOCAL) {
+    if (isMinerEnabled === true && config.get('network') !== NETWORKS.LOCAL) {
       throw new Error(`'core.miner.enabled' option only works with local network. Your network is ${config.get('network')}.`);
     }
 
@@ -67,7 +67,7 @@ function startNodeTaskFactory(dockerCompose) {
           const envs = config.toEnvs();
 
           if (driveImageBuildPath || dapiImageBuildPath) {
-            if (config.get('network.name') === NETWORKS.TESTNET) {
+            if (config.get('network') === NETWORKS.TESTNET) {
               throw new Error('You can\'t use drive-image-build-path and dapi-image-build-path options with testnet network');
             }
 

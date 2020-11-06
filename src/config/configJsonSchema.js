@@ -130,8 +130,12 @@ module.exports = {
           required: ['enable', 'interval', 'address'],
           additionalProperties: false,
         },
+        devnetName: {
+          type: ['string', 'null'],
+          minLength: 1,
+        },
       },
-      required: ['docker', 'p2p', 'rpc', 'spork', 'masternode', 'miner'],
+      required: ['docker', 'p2p', 'rpc', 'spork', 'masternode', 'miner', 'devnetName'],
       additionalProperties: false,
     },
     platform: {
@@ -298,19 +302,8 @@ module.exports = {
       format: 'ipv4',
     },
     network: {
-      type: 'object',
-      properties: {
-        name: {
-          type: 'string',
-          enum: Object.values(NETWORKS),
-        },
-        version: {
-          type: ['integer', 'null'],
-          minimum: 1,
-        },
-      },
-      required: ['name', 'version'],
-      additionalProperties: false,
+      type: 'string',
+      enum: Object.values(NETWORKS),
     },
     compose: {
       type: 'object',
