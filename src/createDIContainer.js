@@ -17,6 +17,9 @@ const createSystemConfigsFactory = require('./config/systemConfigs/createSystemC
 const resetSystemConfigFactory = require('./config/systemConfigs/resetSystemConfigFactory');
 const systemConfigs = require('./config/systemConfigs/systemConfigs');
 
+const renderServiceTemplatesFactory = require('./templates/renderServiceTemplatesFactory');
+const writeServiceConfigs = require('./templates/writeServiceConfigs');
+
 const DockerCompose = require('./docker/DockerCompose');
 const StartedContainers = require('./docker/StartedContainers');
 const stopAllContainersFactory = require('./docker/stopAllContainersFactory');
@@ -41,8 +44,9 @@ const generateToAddressTaskFactory = require('./listr/tasks/wallet/generateToAdd
 const registerMasternodeTaskFactory = require('./listr/tasks/registerMasternodeTaskFactory');
 const initTaskFactory = require('./listr/tasks/platform/initTaskFactory');
 const startNodeTaskFactory = require('./listr/tasks/startNodeTaskFactory');
+const createTenderdashRpcClient = require('./tenderdash/createTenderdashRpcClient');
 
-async function createDIContainer() {
+async function createDIContainer(options) {
   const container = createAwilixContainer({
     injectionMode: InjectionMode.CLASSIC,
   });
@@ -50,7 +54,7 @@ async function createDIContainer() {
   /**
    * Config
    */
-  const homeDirPath = path.resolve(os.homedir(), '.mn');
+  const homeDirPath = options.MN_HOME_DIR ? options.MN_HOME_DIR : path.resolve(os.homedir(), '.mn');
 
   container.register({
     homeDirPath: asValue(homeDirPath),
@@ -61,6 +65,14 @@ async function createDIContainer() {
     createSystemConfigs: asFunction(createSystemConfigsFactory),
     resetSystemConfig: asFunction(resetSystemConfigFactory),
     // `configCollection` and `config` are registering on command init
+  });
+
+  /**
+   * Templates
+   */
+  container.register({
+    renderServiceTemplates: asFunction(renderServiceTemplatesFactory),
+    writeServiceConfigs: asValue(writeServiceConfigs),
   });
 
   /**
@@ -101,6 +113,13 @@ async function createDIContainer() {
     getAddressBalance: asValue(getAddressBalance),
     sendToAddress: asValue(sendToAddress),
     registerMasternode: asValue(registerMasternode),
+  });
+
+  /**
+   * Tenderdash
+   */
+  container.register({
+    createTenderdashRpcClient: asValue(createTenderdashRpcClient),
   });
 
   /**

@@ -19,7 +19,10 @@ module.exports = {
         },
       },
       required: ['docker'],
-      additionalProperties: false,
+    },
+    port: {
+      type: 'integer',
+      minimum: 0,
     },
   },
   properties: {
@@ -36,16 +39,66 @@ module.exports = {
           type: 'object',
           properties: {
             port: {
-              type: 'integer',
-              minimum: 0,
+              $ref: '#/definitions/port',
+            },
+            seeds: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  host: {
+                    type: 'string',
+                    minLength: 1,
+                  },
+                  port: {
+                    $ref: '#/definitions/port',
+                  },
+                },
+                required: ['host', 'port'],
+                additionalProperties: false,
+              },
             },
           },
-          required: ['port'],
+          required: ['port', 'seeds'],
+          additionalProperties: false,
+        },
+        rpc: {
+          type: 'object',
+          properties: {
+            port: {
+              $ref: '#/definitions/port',
+            },
+            user: {
+              type: 'string',
+              minLength: 1,
+            },
+            password: {
+              type: 'string',
+              minLength: 1,
+            },
+          },
+          required: ['port', 'user', 'password'],
+          additionalProperties: false,
+        },
+        spork: {
+          type: 'object',
+          properties: {
+            address: {
+              type: ['string', 'null'],
+            },
+            privateKey: {
+              type: ['string', 'null'],
+            },
+          },
+          required: ['address', 'privateKey'],
           additionalProperties: false,
         },
         masternode: {
           type: 'object',
           properties: {
+            enable: {
+              type: 'boolean',
+            },
             operator: {
               type: 'object',
               properties: {
@@ -57,7 +110,7 @@ module.exports = {
               additionalProperties: false,
             },
           },
-          required: ['operator'],
+          required: ['enable', 'operator'],
           additionalProperties: false,
         },
         miner: {
@@ -77,8 +130,12 @@ module.exports = {
           required: ['enable', 'interval', 'address'],
           additionalProperties: false,
         },
+        devnetName: {
+          type: ['string', 'null'],
+          minLength: 1,
+        },
       },
-      required: ['docker', 'p2p', 'masternode', 'miner'],
+      required: ['docker', 'p2p', 'rpc', 'spork', 'masternode', 'miner', 'devnetName'],
       additionalProperties: false,
     },
     platform: {
@@ -91,7 +148,33 @@ module.exports = {
               $ref: '#/definitions/docker',
             },
             nginx: {
-              $ref: '#/definitions/docker',
+              properties: {
+                docker: {
+                  $ref: '#/definitions/docker/properties/docker',
+                },
+                http: {
+                  type: 'object',
+                  properties: {
+                    port: {
+                      $ref: '#/definitions/port',
+                    },
+                  },
+                  required: ['port'],
+                  additionalProperties: false,
+                },
+                grpc: {
+                  type: 'object',
+                  properties: {
+                    port: {
+                      $ref: '#/definitions/port',
+                    },
+                  },
+                  required: ['port'],
+                  additionalProperties: false,
+                },
+              },
+              required: ['docker', 'http', 'grpc'],
+              additionalProperties: false,
             },
             api: {
               $ref: '#/definitions/docker',
@@ -110,10 +193,76 @@ module.exports = {
               $ref: '#/definitions/docker',
             },
             abci: {
-              $ref: '#/definitions/docker',
+              properties: {
+                docker: {
+                  $ref: '#/definitions/docker/properties/docker',
+                },
+                log: {
+                  properties: {
+                    level: {
+                      type: 'string',
+                      enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
+                    },
+                  },
+                  additionalProperties: false,
+                  required: ['level'],
+                },
+              },
+              additionalProperties: false,
+              required: ['docker', 'log'],
             },
             tendermint: {
-              $ref: '#/definitions/docker',
+              properties: {
+                docker: {
+                  $ref: '#/definitions/docker/properties/docker',
+                },
+                p2p: {
+                  type: 'object',
+                  properties: {
+                    port: {
+                      $ref: '#/definitions/port',
+                    },
+                    persistentPeers: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          id: {
+                            type: 'string',
+                            minLength: 1,
+                          },
+                          host: {
+                            type: 'string',
+                            minLength: 1,
+                          },
+                          port: {
+                            $ref: '#/definitions/port',
+                          },
+                        },
+                        required: ['id', 'host', 'port'],
+                        additionalProperties: false,
+                      },
+                    },
+                  },
+                  required: ['port', 'persistentPeers'],
+                  additionalProperties: false,
+                },
+                rpc: {
+                  type: 'object',
+                  properties: {
+                    port: {
+                      $ref: '#/definitions/port',
+                    },
+                  },
+                  required: ['port'],
+                  additionalProperties: false,
+                },
+                genesis: {
+                  type: 'object',
+                },
+              },
+              required: ['docker', 'p2p', 'rpc', 'genesis'],
+              additionalProperties: false,
             },
           },
           required: ['mongodb', 'abci', 'tendermint'],
@@ -122,14 +271,26 @@ module.exports = {
         dpns: {
           type: 'object',
           properties: {
-            contractId: {
-              type: ['string', 'null'],
+            contract: {
+              properties: {
+                id: {
+                  type: ['string', 'null'],
+                  minLength: 1,
+                },
+                blockHeight: {
+                  type: ['integer', 'null'],
+                  minimum: 1,
+                },
+              },
+              required: ['id', 'blockHeight'],
+              additionalProperties: false,
             },
             ownerId: {
               type: ['string', 'null'],
+              minLength: 1,
             },
           },
-          required: ['contractId', 'ownerId'],
+          required: ['contract', 'ownerId'],
           additionalProperties: false,
         },
       },
@@ -154,7 +315,11 @@ module.exports = {
       required: ['file'],
       additionalProperties: false,
     },
+    environment: {
+      type: 'string',
+      enum: ['development', 'production'],
+    },
   },
-  required: ['description', 'core', 'platform', 'externalIp', 'network', 'compose'],
+  required: ['description', 'core', 'platform', 'externalIp', 'network', 'compose', 'environment'],
   additionalProperties: false,
 };
