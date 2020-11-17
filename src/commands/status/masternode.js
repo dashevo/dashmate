@@ -58,6 +58,8 @@ class MasternodeStatusCommand extends BaseCommand {
 
     let tendermintVersion;
     let tendermintStatus;
+    let tendermintPortNum;
+    let tendermintPortState;
 
     if (config.options.network !== 'testnet') {
       // Tendermint
@@ -69,11 +71,7 @@ class MasternodeStatusCommand extends BaseCommand {
 
       // curl fails if tendermint has not started yet because abci is waiting for core to sync
       if (mnsyncStatus.IsSynced === true) {
-        tendermintStatus = JSON.parse((await dockerCompose.execCommand(
-          config.toEnvs(),
-          'drive_tendermint',
-          'curl localhost:26657/status',
-        )).out);
+        tendermintStatus = JSON.parse(await fetch(`localhost:${config.options.platform.drive.tendermint.rpc.port}/status`).then((res) => res.text()));
       }
     }
 
@@ -81,12 +79,8 @@ class MasternodeStatusCommand extends BaseCommand {
     const corePortState = await fetch(`https://mnowatch.org/${config.options.core.p2p.port}/`).then((res) => res.text());
 
     if (config.options.network !== 'testnet') {
-      const tendermintPortNum = (await dockerCompose.inspectService(
-        config.toEnvs(),
-        'drive_tendermint',
-      )).NetworkSettings.Ports['26656/tcp'][0].HostPort;
-
-      const tendermintPortState = await fetch(`https://mnowatch.org/${tendermintPortNum}/`).then((res) => res.text());
+      tendermintPortNum = config.get('platform.drive.tendermint.p2p.port');
+      tendermintPortState = await fetch(`https://mnowatch.org/${tendermintPortNum}/`).then((res) => res.text());
     }
 
     // Build table
