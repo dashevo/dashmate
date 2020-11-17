@@ -71,7 +71,7 @@ class MasternodeStatusCommand extends BaseCommand {
 
       // curl fails if tendermint has not started yet because abci is waiting for core to sync
       if (mnsyncStatus.IsSynced === true) {
-        tendermintStatus = JSON.parse(await fetch(`localhost:${config.options.platform.drive.tendermint.rpc.port}/status`).then((res) => res.text()));
+        tendermintStatus = JSON.parse(await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`).then((res) => res.text()));
       }
     }
 
