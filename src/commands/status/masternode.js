@@ -85,10 +85,10 @@ class MasternodeStatusCommand extends BaseCommand {
 
     // Build table
     rows.push(['Dashd Version', dashdVersion]);
-    rows.push(['Sync Status', mnsyncStatus.AssetName]);
+    rows.push(['Core Sync', mnsyncStatus.AssetName]);
     rows.push(['Core Port', `${config.options.core.p2p.port} ${corePortState}`]);
-    rows.push(['Headers', blockchainInfo.headers]);
-    rows.push(['Blocks', blockchainInfo.blocks]);
+    rows.push(['Core Headers', blockchainInfo.headers]);
+    rows.push(['Core Blocks', blockchainInfo.blocks]);
     rows.push(['Core Sync', mnsyncStatus.IsSynced]);
     rows.push(['Masternode State', masternodeStatus.state]);
     rows.push(['Masternode Status', masternodeStatus.status]);
@@ -97,7 +97,7 @@ class MasternodeStatusCommand extends BaseCommand {
       rows.push(['Service', masternodeStatus.dmnState.service]);
       rows.push(['PoSe Penalty', masternodeStatus.dmnState.PoSePenalty]);
     }
-    rows.push(['Sentinel', (sentinelState !== '' ? sentinelState : 'No errors')]);
+    rows.push(['Sentinel Status', (sentinelState !== '' ? sentinelState : 'No errors')]);
     if (config.options.network !== 'testnet') {
       rows.push(['Tendermint Version', tendermintVersion]);
       rows.push(['Tendermint Port', `${tendermintPortNum} ${tendermintPortState}`]);
