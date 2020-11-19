@@ -18,7 +18,7 @@ class HostStatusCommand extends BaseCommand {
     rows.push(['Platform', os.platform()]);
     rows.push(['Arch', os.arch()]);
     rows.push(['Username', os.userInfo().username]);
-    rows.push(['Loadavg', os.loadavg()]);
+    rows.push(['Loadavg', os.loadavg().map((load) => load.toFixed(2))]);
     rows.push(['Diskfree', 0]); // Waiting for feature: https://github.com/nodejs/node/pull/31351
     rows.push(['Memory', `${prettyByte(os.totalmem())} / ${prettyByte(os.freemem())}`]);
     rows.push(['CPUs', os.cpus().length]);
