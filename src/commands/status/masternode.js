@@ -1,8 +1,9 @@
 const { table } = require('table');
-const fetch = require('node-fetch');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
 const CoreService = require('../../core/CoreService');
+
+const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
 
 class MasternodeStatusCommand extends BaseCommand {
   /**
@@ -33,79 +34,43 @@ class MasternodeStatusCommand extends BaseCommand {
       dockerCompose.docker.getContainer('core'),
     );
 
-    // Version
-    const dashdVersion = (await dockerCompose.execCommand(
-      config.toEnvs(),
-      'core',
-      'dashd --version',
-    )).out.split('\n')[0];
-
-    // Sync status
+    // Collect data
     const mnsyncStatus = (await coreService.getRpcClient().mnsync('status')).result;
-
-    // Header and block count
     const blockchainInfo = (await coreService.getRpcClient().getBlockchainInfo()).result;
-
-    // Masternode data
     const masternodeStatus = (await coreService.getRpcClient().masternode('status')).result;
 
-    // Sentinel
+    // Determine status
+    let status;
+    try {
+      ({
+        State: {
+          Status: status,
+        },
+      } = await dockerCompose.inspectService(config.toEnvs(), 'core'));
+    } catch (e) {
+      if (e instanceof ContainerIsNotPresentError) {
+        status = 'not started';
+      }
+    }
+    if (status === 'running') {
+      if (mnsyncStatus.AssetName !== 'MASTERNODE_SYNC_FINISHED') {
+        status = `syncing ${(blockchainInfo.verificationprogress * 100).toFixed(2)}%`;
+      }
+    }
+
     const sentinelState = (await dockerCompose.execCommand(
       config.toEnvs(),
       'sentinel',
       'python bin/sentinel.py',
     )).out.split('\n')[0];
 
-    let tendermintVersion;
-    let tendermintStatus;
-    let tendermintPortNum;
-    let tendermintPortState;
-
-    if (config.options.network !== 'testnet') {
-      // Tendermint
-      tendermintVersion = (await dockerCompose.execCommand(
-        config.toEnvs(),
-        'drive_tendermint',
-        'tendermint version',
-      )).out.split('\n')[0];
-
-      // curl fails if tendermint has not started yet because abci is waiting for core to sync
-      if (mnsyncStatus.IsSynced === true) {
-        tendermintStatus = JSON.parse(await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`).then((res) => res.text()));
-      }
-    }
-
-    // Port check
-    const corePortState = await fetch(`https://mnowatch.org/${config.options.core.p2p.port}/`).then((res) => res.text());
-
-    if (config.options.network !== 'testnet') {
-      tendermintPortNum = config.get('platform.drive.tendermint.p2p.port');
-      tendermintPortState = await fetch(`https://mnowatch.org/${tendermintPortNum}/`).then((res) => res.text());
-    }
-
     // Build table
-    rows.push(['Dashd Version', dashdVersion]);
-    rows.push(['Core Sync', mnsyncStatus.AssetName]);
-    rows.push(['Core Port', `${config.options.core.p2p.port} ${corePortState}`]);
-    rows.push(['Core Headers', blockchainInfo.headers]);
-    rows.push(['Core Blocks', blockchainInfo.blocks]);
-    rows.push(['Core Sync', mnsyncStatus.IsSynced]);
-    rows.push(['Masternode State', masternodeStatus.state]);
-    rows.push(['Masternode Status', masternodeStatus.status]);
+    rows.push(['Masternode status', status]);
+    rows.push(['Sentinel status', sentinelState]);
     if (masternodeStatus.state === 'READY') {
       rows.push(['ProTx Hash', masternodeStatus.proTxHash]);
-      rows.push(['Service', masternodeStatus.dmnState.service]);
       rows.push(['PoSe Penalty', masternodeStatus.dmnState.PoSePenalty]);
-    }
-    rows.push(['Sentinel Status', (sentinelState !== '' ? sentinelState : 'No errors')]);
-    if (config.options.network !== 'testnet') {
-      rows.push(['Tendermint Version', tendermintVersion]);
-      rows.push(['Tendermint Port', `${tendermintPortNum} ${tendermintPortState}`]);
-      if (mnsyncStatus.IsSynced === true) {
-        rows.push(['Tendermint Blocks', tendermintStatus.result.sync_info.latest_block_height]);
-        rows.push(['Tendermint Sync', !tendermintStatus.result.sync_info.catching_up]);
-        rows.push(['Tendermint App Hash', tendermintStatus.result.sync_info.latest_app_hash]);
-      }
+      rows.push(['Last paid', masternodeStatus.dmnState.lastPaidHeight]);
     }
 
     const output = table(rows, { singleLine: true });

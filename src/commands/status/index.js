@@ -24,37 +24,6 @@ class StatusCommand extends BaseCommand {
   ) {
     const rows = [];
 
-    const serviceHumanNames = {
-      core: 'Core Status',
-    };
-
-    if (config.options.network !== 'testnet') {
-      Object.assign(serviceHumanNames, {
-        drive_tendermint: 'Tenderdash Status',
-      });
-    }
-
-    for (const [serviceName, serviceDescription] of Object.entries(serviceHumanNames)) {
-      let status;
-
-      try {
-        ({
-          State: {
-            Status: status,
-          },
-        } = await dockerCompose.inspectService(config.toEnvs(), serviceName));
-      } catch (e) {
-        if (e instanceof ContainerIsNotPresentError) {
-          status = 'not started';
-        }
-      }
-
-      rows.push([
-        serviceDescription,
-        status,
-      ]);
-    }
-
     const coreService = new CoreService(
       createRpcClient(
         {
@@ -66,16 +35,10 @@ class StatusCommand extends BaseCommand {
       dockerCompose.docker.getContainer('core'),
     );
 
-    // Core status
+    // Collect data
     const mnsyncStatus = (await coreService.getRpcClient().mnsync('status')).result;
-
-    // Network data
-    const networkStatus = (await coreService.getRpcClient().getNetworkInfo()).result;
-
-    // Network data
-    const blockchainStatus = (await coreService.getRpcClient().getBlockchainInfo()).result;
-
-    // Masternode data
+    const networkInfo = (await coreService.getRpcClient().getNetworkInfo()).result;
+    const blockchainInfo = (await coreService.getRpcClient().getBlockchainInfo()).result;
     const masternodeStatus = (await coreService.getRpcClient().masternode('status')).result;
 
     // Platform status
@@ -87,14 +50,49 @@ class StatusCommand extends BaseCommand {
       }
     }
 
+    // Determine status
+    let coreStatus;
+    try {
+      ({
+        State: {
+          Status: coreStatus,
+        },
+      } = await dockerCompose.inspectService(config.toEnvs(), 'core'));
+    } catch (e) {
+      if (e instanceof ContainerIsNotPresentError) {
+        coreStatus = 'not started';
+      }
+    }
+    if (coreStatus === 'running') {
+      if (mnsyncStatus.AssetName !== 'MASTERNODE_SYNC_FINISHED') {
+        coreStatus = `syncing ${(blockchainInfo.verificationprogress * 100).toFixed(2)}%`;
+      }
+    }
+
+    let platformStatus;
+    try {
+      ({
+        State: {
+          Status: platformStatus,
+        },
+      } = await dockerCompose.inspectService(config.toEnvs(), 'drive_tendermint'));
+    } catch (e) {
+      if (e instanceof ContainerIsNotPresentError) {
+        platformStatus = 'not started';
+      }
+    }
+    if (platformStatus === 'running' && tendermintStatus.result.sync_info.catching_up === true) {
+      platformStatus = 'syncing';
+    }
+
     // Build table
-    rows.push(['Network', blockchainStatus.chain]);
+    rows.push(['Network', blockchainInfo.chain]);
     rows.push(['Masternode Status', masternodeStatus.status]);
-    rows.push(['Core Version', networkStatus.subversion.replace(/\/|\(.*?\)/g, '')]);
-    rows.push(['Core Status', mnsyncStatus.AssetName]);
+    rows.push(['Core Version', networkInfo.subversion.replace(/\/|\(.*?\)/g, '')]);
+    rows.push(['Core Status', coreStatus]);
     if (config.options.network !== 'testnet') {
       rows.push(['Platform Version', tendermintStatus.result.node_info.version]);
-      rows.push(['Platform Status', '-']);
+      rows.push(['Platform Status', platformStatus]);
     }
     if (masternodeStatus.state === 'READY') {
       rows.push(['PoSe Penalty', masternodeStatus.dmnState.PoSePenalty]);
