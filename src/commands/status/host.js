@@ -16,6 +16,7 @@ class HostStatusCommand extends BaseCommand {
     rows.push(['Hostname', os.hostname()]);
     rows.push(['Uptime', prettyMs(os.uptime() * 1000)]);
     rows.push(['Platform', os.platform()]);
+    rows.push(['Arch', os.arch()]);
     rows.push(['Username', os.userInfo().username]);
     rows.push(['Loadavg', os.loadavg()]);
     rows.push(['Diskfree', 0]); // Waiting for feature: https://github.com/nodejs/node/pull/31351
