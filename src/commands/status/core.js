@@ -96,7 +96,7 @@ class CoreStatusCommand extends BaseCommand {
     rows.push(['Remote block height', insightBlockHeight.info.blocks]);
     rows.push(['Difficulty', blockchainInfo.difficulty]);
     rows.push(['Sentinel version', sentinelVersion]);
-    rows.push(['Sentinel status', sentinelState]);
+    rows.push(['Sentinel status', (sentinelState !== '' ? sentinelState : 'No errors')]);
 
     const output = table(rows, { singleLine: true });
 

@@ -61,11 +61,19 @@ class MasternodeStatusCommand extends BaseCommand {
 
     let paymentQueuePosition;
     if (masternodeStatus.state === 'READY') {
-      paymentQueuePosition = (masternodeStatus.dmnState.lastPaidHeight === 0
-        ? masternodeStatus.dmnState.registeredHeight
-        : masternodeStatus.dmnState.lastPaidHeight)
-        + masternodeCount.enabled
-        - blockchainInfo.blocks;
+      if (masternodeStatus.dmnState.PoSeRevivedHeight > 0) {
+        paymentQueuePosition = masternodeStatus.dmnState.PoSeRevivedHeight
+          + masternodeCount.enabled
+          - blockchainInfo.blocks;
+      } else if (masternodeStatus.dmnState.lastPaidHeight === 0) {
+        paymentQueuePosition = masternodeStatus.dmnState.registeredHeight
+          + masternodeCount.enabled
+          - blockchainInfo.blocks;
+      } else {
+        paymentQueuePosition = masternodeStatus.dmnState.lastPaidHeight
+          + masternodeCount.enabled
+          - blockchainInfo.blocks;
+      }
     }
 
     const sentinelState = (await dockerCompose.execCommand(
@@ -76,7 +84,7 @@ class MasternodeStatusCommand extends BaseCommand {
 
     // Build table
     rows.push(['Masternode status', status]);
-    rows.push(['Sentinel status', sentinelState]);
+    rows.push(['Sentinel status', (sentinelState !== '' ? sentinelState : 'No errors')]);
     if (masternodeStatus.state === 'READY') {
       rows.push(['ProTx Hash', masternodeStatus.proTxHash]);
       rows.push(['PoSe Penalty', masternodeStatus.dmnState.PoSePenalty]);

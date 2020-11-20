@@ -88,11 +88,19 @@ class StatusCommand extends BaseCommand {
 
     let paymentQueuePosition;
     if (masternodeStatus.state === 'READY') {
-      paymentQueuePosition = (masternodeStatus.dmnState.lastPaidHeight === 0
-        ? masternodeStatus.dmnState.registeredHeight
-        : masternodeStatus.dmnState.lastPaidHeight)
-        + masternodeCount.enabled
-        - blockchainInfo.blocks;
+      if (masternodeStatus.dmnState.PoSeRevivedHeight > 0) {
+        paymentQueuePosition = masternodeStatus.dmnState.PoSeRevivedHeight
+          + masternodeCount.enabled
+          - blockchainInfo.blocks;
+      } else if (masternodeStatus.dmnState.lastPaidHeight === 0) {
+        paymentQueuePosition = masternodeStatus.dmnState.registeredHeight
+          + masternodeCount.enabled
+          - blockchainInfo.blocks;
+      } else {
+        paymentQueuePosition = masternodeStatus.dmnState.lastPaidHeight
+          + masternodeCount.enabled
+          - blockchainInfo.blocks;
+      }
     }
 
     // Build table
