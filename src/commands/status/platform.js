@@ -43,19 +43,22 @@ class CoreStatusCommand extends BaseCommand {
 
     // Collect data
     const mnsyncStatus = (await coreService.getRpcClient().mnsync('status')).result;
-    let tendermintStatus;
-    let tendermintNetInfo;
-    if (config.options.network !== 'testnet') {
-      // curl fails if tendermint has not started yet because abci is waiting for core to sync
-      if (mnsyncStatus.IsSynced === true) {
-        tendermintStatus = JSON.parse(await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`).then((res) => res.text()));
-        tendermintNetInfo = JSON.parse(await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/net_info`).then((res) => res.text()));
-      }
+
+    // curl fails if tendermint has not started yet because abci is waiting for core to sync
+    if (mnsyncStatus.IsSynced === false) {
+      // eslint-disable-next-line no-console
+      console.log('Platform status is not available until core sync is complete!');
+      this.exit();
     }
+
+    const tendermintStatus = JSON.parse(await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`).then((res) => res.text()));
+    const tendermintNetInfo = JSON.parse(await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/net_info`).then((res) => res.text()));
 
     const httpPortState = await fetch(`https://mnowatch.org/${config.options.platform.dapi.nginx.http.port}/`).then((res) => res.text());
     const gRpcPortState = await fetch(`https://mnowatch.org/${config.options.platform.dapi.nginx.grpc.port}/`).then((res) => res.text());
     const p2pPortState = await fetch(`https://mnowatch.org/${config.options.platform.drive.tendermint.p2p.port}/`).then((res) => res.text());
+
+    const explorerBlockHeight = JSON.parse(await fetch('https://rpc.cloudwheels.net:26657/status').then((res) => res.text()));
 
     // Determine status
     let status;
@@ -71,7 +74,9 @@ class CoreStatusCommand extends BaseCommand {
       }
     }
     if (status === 'running' && tendermintStatus.result.sync_info.catching_up === true) {
-      status = 'syncing';
+      status = `syncing ${((tendermintStatus.result.sync_info.latest_block_height
+        / explorerBlockHeight.result.sync_info.latest_block_height)
+        * 100).toFixed(2)}%`;
     }
 
     // Build table
@@ -79,7 +84,7 @@ class CoreStatusCommand extends BaseCommand {
     rows.push(['Network', tendermintStatus.result.node_info.network]);
     rows.push(['Status', status]);
     rows.push(['Block height', tendermintStatus.result.sync_info.latest_block_height]);
-    rows.push(['Remote block height', '-']);
+    rows.push(['Remote block height', explorerBlockHeight.result.sync_info.latest_block_height]);
     rows.push(['Peer count', tendermintNetInfo.result.n_peers]);
     rows.push(['App hash', tendermintStatus.result.sync_info.latest_app_hash]);
     rows.push(['HTTP service', `${config.options.externalIp}:${config.options.platform.dapi.nginx.http.port}`]);
