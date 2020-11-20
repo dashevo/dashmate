@@ -54,7 +54,7 @@ class ServicesStatusCommand extends BaseCommand {
           },
           Config: {
             Image: image,
-          }
+          },
         } = await dockerCompose.inspectService(config.toEnvs(), serviceName));
       } catch (e) {
         if (e instanceof ContainerIsNotPresentError) {
