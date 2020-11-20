@@ -38,6 +38,7 @@ class MasternodeStatusCommand extends BaseCommand {
     const mnsyncStatus = (await coreService.getRpcClient().mnsync('status')).result;
     const blockchainInfo = (await coreService.getRpcClient().getBlockchainInfo()).result;
     const masternodeStatus = (await coreService.getRpcClient().masternode('status')).result;
+    const masternodeCount = (await coreService.getRpcClient().masternode('count')).result;
 
     // Determine status
     let status;
@@ -58,6 +59,15 @@ class MasternodeStatusCommand extends BaseCommand {
       }
     }
 
+    let paymentQueuePosition;
+    if (masternodeStatus.state === 'READY') {
+      paymentQueuePosition = (masternodeStatus.dmnState.lastPaidHeight === 0
+        ? masternodeStatus.dmnState.registeredHeight
+        : masternodeStatus.dmnState.lastPaidHeight)
+        + masternodeCount.enabled
+        - blockchainInfo.blocks;
+    }
+
     const sentinelState = (await dockerCompose.execCommand(
       config.toEnvs(),
       'sentinel',
@@ -71,6 +81,7 @@ class MasternodeStatusCommand extends BaseCommand {
       rows.push(['ProTx Hash', masternodeStatus.proTxHash]);
       rows.push(['PoSe Penalty', masternodeStatus.dmnState.PoSePenalty]);
       rows.push(['Last paid', masternodeStatus.dmnState.lastPaidHeight]);
+      rows.push(['Payment queue', `${paymentQueuePosition}/${masternodeCount.enabled}`]);
     }
 
     const output = table(rows, { singleLine: true });

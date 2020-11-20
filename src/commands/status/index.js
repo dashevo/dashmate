@@ -40,6 +40,7 @@ class StatusCommand extends BaseCommand {
     const networkInfo = (await coreService.getRpcClient().getNetworkInfo()).result;
     const blockchainInfo = (await coreService.getRpcClient().getBlockchainInfo()).result;
     const masternodeStatus = (await coreService.getRpcClient().masternode('status')).result;
+    const masternodeCount = (await coreService.getRpcClient().masternode('count')).result;
 
     // Platform status
     let tendermintStatus;
@@ -85,6 +86,15 @@ class StatusCommand extends BaseCommand {
       platformStatus = 'syncing';
     }
 
+    let paymentQueuePosition;
+    if (masternodeStatus.state === 'READY') {
+      paymentQueuePosition = (masternodeStatus.dmnState.lastPaidHeight === 0
+        ? masternodeStatus.dmnState.registeredHeight
+        : masternodeStatus.dmnState.lastPaidHeight)
+        + masternodeCount.enabled
+        - blockchainInfo.blocks;
+    }
+
     // Build table
     rows.push(['Network', blockchainInfo.chain]);
     rows.push(['Masternode Status', masternodeStatus.status]);
@@ -97,6 +107,7 @@ class StatusCommand extends BaseCommand {
     if (masternodeStatus.state === 'READY') {
       rows.push(['PoSe Penalty', masternodeStatus.dmnState.PoSePenalty]);
       rows.push(['Last paid', masternodeStatus.dmnState.lastPaidHeight]);
+      rows.push(['Payment queue', `${paymentQueuePosition}/${masternodeCount.enabled}`]);
     }
 
     const output = table(rows, { singleLine: true });
