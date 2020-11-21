@@ -36,13 +36,11 @@ class CoreStatusCommand extends BaseCommand {
       dockerCompose.docker.getContainer('core'),
     );
 
-    let insightUrl;
-    switch (config.options.network) {
-      case 'evonet': insightUrl = 'http://insight.evonet.networks.dash.org:3001/insight-api'; break;
-      case 'testnet': insightUrl = 'https://testnet-insight.dashevo.org/insight-api'; break;
-      case 'mainnet': insightUrl = 'https://insight.dash.org/insight-api'; break;
-      default: insightUrl = 'https://insight.dash.org/insight-api';
-    }
+    const insightURLs = {
+      evonet: 'http://insight.evonet.networks.dash.org:3001/insight-api',
+      testnet: 'https://testnet-insight.dashevo.org/insight-api',
+      mainnet: 'https://insight.dash.org/insight-api',
+    };
 
     // Collect data
     const blockchainInfo = (await coreService.getRpcClient().getBlockchainInfo()).result;
@@ -50,7 +48,7 @@ class CoreStatusCommand extends BaseCommand {
     const mnsyncStatus = (await coreService.getRpcClient().mnsync('status')).result;
     const peerInfo = (await coreService.getRpcClient().getPeerInfo()).result;
     const latestVersion = JSON.parse(await fetch('https://api.github.com/repos/dashpay/dash/releases/latest').then((res) => res.text()));
-    const insightBlockHeight = JSON.parse(await fetch(`${insightUrl}/status`).then((res) => res.text()));
+    const insightBlockHeight = JSON.parse(await fetch(`${insightURLs[config.options.network]}/status`).then((res) => res.text()));
     let corePortState = await fetch(`https://mnowatch.org/${config.options.core.p2p.port}/`).then((res) => res.text());
     let coreVersion = networkInfo.subversion.replace(/\/|\(.*?\)/g, '');
     const sentinelVersion = (await dockerCompose.execCommand(
