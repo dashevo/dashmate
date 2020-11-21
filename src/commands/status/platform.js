@@ -135,7 +135,7 @@ class CoreStatusCommand extends BaseCommand {
   }
 }
 
-CoreStatusCommand.description = 'Show status overview';
+CoreStatusCommand.description = 'Show platform status details';
 
 CoreStatusCommand.flags = {
   ...BaseCommand.flags,
