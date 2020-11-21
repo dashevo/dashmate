@@ -1,5 +1,6 @@
 const { table } = require('table');
 const fetch = require('node-fetch');
+const chalk = require('chalk');
 
 const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
 
@@ -114,13 +115,30 @@ class StatusCommand extends BaseCommand {
       }
     }
 
+    // Apply colors
+    if (coreStatus === 'running') {
+      coreStatus = chalk.keyword('green')(coreStatus);
+    } else if (coreStatus.includes('syncing')) {
+      coreStatus = chalk.keyword('yellow')(coreStatus);
+    } else {
+      coreStatus = chalk.keyword('red')(coreStatus);
+    }
+
+    if (platformStatus === 'running') {
+      platformStatus = chalk.keyword('green')(platformStatus);
+    } else if (platformStatus.includes('syncing')) {
+      platformStatus = chalk.keyword('yellow')(platformStatus);
+    } else {
+      platformStatus = chalk.keyword('red')(platformStatus);
+    }
+
     // Build table
     rows.push(['Network', blockchainInfo.chain]);
-    if (config.options.core.masternode.enable === true) {
-      rows.push(['Masternode Status', masternodeStatus.status]);
-    }
     rows.push(['Core Version', networkInfo.subversion.replace(/\/|\(.*?\)/g, '')]);
     rows.push(['Core Status', coreStatus]);
+    if (config.options.core.masternode.enable === true) {
+      rows.push(['Masternode Status', chalk.keyword(masternodeStatus.status === 'Ready' ? 'green' : 'red')(masternodeStatus.status)]);
+    }
     if (config.options.network !== 'testnet' && mnsyncStatus.IsSynced === true) {
       rows.push(['Platform Version', tendermintStatus.result.node_info.version]);
     }

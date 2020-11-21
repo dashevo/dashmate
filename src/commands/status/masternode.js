@@ -1,4 +1,5 @@
 const { table } = require('table');
+const chalk = require('chalk');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
 const CoreService = require('../../core/CoreService');
@@ -82,18 +83,40 @@ class MasternodeStatusCommand extends BaseCommand {
       }
     }
 
-    const sentinelState = (await dockerCompose.execCommand(
+    let sentinelState = (await dockerCompose.execCommand(
       config.toEnvs(),
       'sentinel',
       'python bin/sentinel.py',
     )).out.split('\n')[0];
+
+    // Apply colors
+    if (status === 'running') {
+      status = chalk.green(status);
+    } else if (status.includes('syncing')) {
+      status = chalk.yellow(status);
+    } else {
+      status = chalk.red(status);
+    }
+
+    if (sentinelState === '') {
+      sentinelState = chalk.green('No errors');
+    } else {
+      sentinelState = chalk.red(sentinelState);
+    }
+
+    let PoSePenalty;
+    if (masternodeStatus.dmnState.PoSePenalty === 0) {
+      PoSePenalty = chalk.green(masternodeStatus.dmnState.PoSePenalty);
+    } else {
+      PoSePenalty = chalk.red(masternodeStatus.dmnState.PoSePenalty);
+    }
 
     // Build table
     rows.push(['Masternode status', status]);
     rows.push(['Sentinel status', (sentinelState !== '' ? sentinelState : 'No errors')]);
     if (masternodeStatus.state === 'READY') {
       rows.push(['ProTx Hash', masternodeStatus.proTxHash]);
-      rows.push(['PoSe Penalty', masternodeStatus.dmnState.PoSePenalty]);
+      rows.push(['PoSe Penalty', PoSePenalty]);
       rows.push(['Last paid', masternodeStatus.dmnState.lastPaidHeight]);
       rows.push(['Payment queue', `${paymentQueuePosition}/${masternodeCount.enabled}`]);
     }
