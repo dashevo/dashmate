@@ -42,10 +42,10 @@ class MasternodeStatusCommand extends BaseCommand {
     }
 
     // Collect data
-    const mnsyncStatus = (await coreService.getRpcClient().mnsync('status')).result;
-    const blockchainInfo = (await coreService.getRpcClient().getBlockchainInfo()).result;
-    const masternodeStatus = (await coreService.getRpcClient().masternode('status')).result;
-    const masternodeCount = (await coreService.getRpcClient().masternode('count')).result;
+    const { result: mnsyncStatus } = await coreService.getRpcClient().mnsync('status');
+    const { result: blockchainInfo } = await coreService.getRpcClient().getBlockchainInfo();
+    const { result: masternodeStatus } = await coreService.getRpcClient().masternode('status');
+    const { result: masternodeCount } = await coreService.getRpcClient().masternode('count');
 
     // Determine status
     let status;

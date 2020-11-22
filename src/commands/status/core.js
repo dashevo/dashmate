@@ -43,12 +43,14 @@ class CoreStatusCommand extends BaseCommand {
     };
 
     // Collect data
-    const blockchainInfo = (await coreService.getRpcClient().getBlockchainInfo()).result;
-    const networkInfo = (await coreService.getRpcClient().getNetworkInfo()).result;
-    const mnsyncStatus = (await coreService.getRpcClient().mnsync('status')).result;
-    const peerInfo = (await coreService.getRpcClient().getPeerInfo()).result;
-    const latestVersion = JSON.parse(await fetch('https://api.github.com/repos/dashpay/dash/releases/latest').then((res) => res.text()));
-    const insightBlockHeight = JSON.parse(await fetch(`${insightURLs[config.options.network]}/status`).then((res) => res.text()));
+    const { result: blockchainInfo } = await coreService.getRpcClient().getBlockchainInfo();
+    const { result: networkInfo } = await coreService.getRpcClient().getNetworkInfo();
+    const { result: mnsyncStatus } = await coreService.getRpcClient().mnsync('status');
+    const { result: peerInfo } = await coreService.getRpcClient().getPeerInfo();
+    const latestVersionRes = await fetch('https://api.github.com/repos/dashpay/dash/releases/latest').then((res) => res.text());
+    const latestVersion = JSON.parse(latestVersionRes);
+    const insightBlockHeightRes = await fetch(`${insightURLs[config.options.network]}/status`).then((res) => res.text());
+    const insightBlockHeight = JSON.parse(insightBlockHeightRes);
     let corePortState = await fetch(`https://mnowatch.org/${config.options.core.p2p.port}/`).then((res) => res.text());
     let coreVersion = networkInfo.subversion.replace(/\/|\(.*?\)/g, '');
     const sentinelVersion = (await dockerCompose.execCommand(

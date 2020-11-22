@@ -43,7 +43,7 @@ class CoreStatusCommand extends BaseCommand {
     );
 
     // Collect data
-    const mnsyncStatus = (await coreService.getRpcClient().mnsync('status')).result;
+    const { result: mnsyncStatus } = await coreService.getRpcClient().mnsync('status');
 
     // curl fails if tendermint has not started yet because abci is waiting for core to sync
     if (mnsyncStatus.IsSynced === false) {
@@ -52,14 +52,16 @@ class CoreStatusCommand extends BaseCommand {
       this.exit();
     }
 
-    const tendermintStatus = JSON.parse(await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`).then((res) => res.text()));
-    const tendermintNetInfo = JSON.parse(await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/net_info`).then((res) => res.text()));
+    const tendermintStatusRes = await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`).then((res) => res.text());
+    const tendermintStatus = JSON.parse(tendermintStatusRes);
+    const tendermintNetInfoRes = await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/net_info`).then((res) => res.text());
+    const tendermintNetInfo = JSON.parse(tendermintNetInfoRes);
+    const explorerBlockHeightRes = await fetch('https://rpc.cloudwheels.net:26657/status').then((res) => res.text());
+    const explorerBlockHeight = JSON.parse(explorerBlockHeightRes);
 
     let httpPortState = await fetch(`https://mnowatch.org/${config.options.platform.dapi.nginx.http.port}/`).then((res) => res.text());
     let gRpcPortState = await fetch(`https://mnowatch.org/${config.options.platform.dapi.nginx.grpc.port}/`).then((res) => res.text());
     let p2pPortState = await fetch(`https://mnowatch.org/${config.options.platform.drive.tendermint.p2p.port}/`).then((res) => res.text());
-
-    const explorerBlockHeight = JSON.parse(await fetch('https://rpc.cloudwheels.net:26657/status').then((res) => res.text()));
 
     // Determine status
     let status;

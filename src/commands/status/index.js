@@ -37,14 +37,15 @@ class StatusCommand extends BaseCommand {
     );
 
     // Collect data
-    const mnsyncStatus = (await coreService.getRpcClient().mnsync('status')).result;
-    const networkInfo = (await coreService.getRpcClient().getNetworkInfo()).result;
-    const blockchainInfo = (await coreService.getRpcClient().getBlockchainInfo()).result;
+    const { result: mnsyncStatus } = await coreService.getRpcClient().mnsync('status');
+    const { result: networkInfo } = await coreService.getRpcClient().getNetworkInfo();
+    const { result: blockchainInfo } = await coreService.getRpcClient().getBlockchainInfo();
+
     let masternodeStatus;
     let masternodeCount;
     if (config.options.core.masternode.enable === true) {
-      masternodeStatus = (await coreService.getRpcClient().masternode('status')).result;
-      masternodeCount = (await coreService.getRpcClient().masternode('count')).result;
+      ({ result: masternodeStatus } = await coreService.getRpcClient().masternode('status'));
+      ({ result: masternodeCount } = await coreService.getRpcClient().masternode('count'));
     }
 
     // Platform status
@@ -52,10 +53,12 @@ class StatusCommand extends BaseCommand {
     if (config.options.network !== 'testnet') {
       // curl fails if tendermint has not started yet because abci is waiting for core to sync
       if (mnsyncStatus.IsSynced === true) {
-        tendermintStatus = JSON.parse(await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`).then((res) => res.text()));
+        const tendermintStatusRes = await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`).then((res) => res.text());
+        tendermintStatus = JSON.parse(tendermintStatusRes);
       }
     }
-    const explorerBlockHeight = JSON.parse(await fetch('https://rpc.cloudwheels.net:26657/status').then((res) => res.text()));
+    const explorerBlockHeightRes = await fetch('https://rpc.cloudwheels.net:26657/status').then((res) => res.text());
+    const explorerBlockHeight = JSON.parse(explorerBlockHeightRes);
 
     // Determine status
     let coreStatus;
