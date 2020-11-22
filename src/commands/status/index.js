@@ -6,6 +6,7 @@ const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPr
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
 const CoreService = require('../../core/CoreService');
+const blocksToTime = require('../../util/blocksToTime');
 
 class StatusCommand extends BaseCommand {
   /**
@@ -149,8 +150,10 @@ class StatusCommand extends BaseCommand {
     if (config.options.core.masternode.enable === true) {
       if (masternodeStatus.state === 'READY') {
         rows.push(['PoSe Penalty', masternodeStatus.dmnState.PoSePenalty]);
-        rows.push(['Last paid', masternodeStatus.dmnState.lastPaidHeight]);
-        rows.push(['Payment queue', `${paymentQueuePosition}/${masternodeCount.enabled}`]);
+        rows.push(['Last paid block', masternodeStatus.dmnState.lastPaidHeight]);
+        rows.push(['Last paid time', `${blocksToTime(blockchainInfo.blocks - masternodeStatus.dmnState.lastPaidHeight)} ago`]);
+        rows.push(['Payment queue position', `${paymentQueuePosition}/${masternodeCount.enabled}`]);
+        rows.push(['Next payment time', `in ${blocksToTime(paymentQueuePosition)}`]);
       }
     }
 

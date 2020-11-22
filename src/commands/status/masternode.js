@@ -3,6 +3,7 @@ const chalk = require('chalk');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
 const CoreService = require('../../core/CoreService');
+const blocksToTime = require('../../util/blocksToTime');
 
 const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
 
@@ -117,8 +118,10 @@ class MasternodeStatusCommand extends BaseCommand {
     if (masternodeStatus.state === 'READY') {
       rows.push(['ProTx Hash', masternodeStatus.proTxHash]);
       rows.push(['PoSe Penalty', PoSePenalty]);
-      rows.push(['Last paid', masternodeStatus.dmnState.lastPaidHeight]);
-      rows.push(['Payment queue', `${paymentQueuePosition}/${masternodeCount.enabled}`]);
+      rows.push(['Last paid block', masternodeStatus.dmnState.lastPaidHeight]);
+      rows.push(['Last paid time', `${blocksToTime(blockchainInfo.blocks - masternodeStatus.dmnState.lastPaidHeight)} ago`]);
+      rows.push(['Payment queue position', `${paymentQueuePosition}/${masternodeCount.enabled}`]);
+      rows.push(['Next payment time', `in ${blocksToTime(paymentQueuePosition)}`]);
     }
 
     const output = table(rows, { singleLine: true });
