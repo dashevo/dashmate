@@ -39,27 +39,73 @@ class StatusCommand extends BaseCommand {
 
     // Collect data
     const { result: mnsyncStatus } = await coreService.getRpcClient().mnsync('status');
-    const { result: networkInfo } = await coreService.getRpcClient().getNetworkInfo();
-    const { result: blockchainInfo } = await coreService.getRpcClient().getBlockchainInfo();
+    const {
+      result: {
+        subversion: coreVersion,
+      },
+    } = await coreService.getRpcClient().getNetworkInfo();
+    const {
+      result: {
+        blocks: coreBlocks,
+        chain: coreChain,
+        verificationprogress: coreVerificationProgress,
+      },
+    } = await coreService.getRpcClient().getBlockchainInfo();
 
     let masternodeStatus;
-    let masternodeCount;
+    let masternodePoSeRevivedHeight;
+    let masternodeLastPaidHeight;
+    let masternodeRegisteredHeight;
+    let masternodeEnabledCount;
+    let masternodePoSePenalty;
     if (config.options.core.masternode.enable === true) {
-      ({ result: masternodeStatus } = await coreService.getRpcClient().masternode('status'));
-      ({ result: masternodeCount } = await coreService.getRpcClient().masternode('count'));
+      ({
+        result: {
+          dmnState: {
+            lastPaidHeight: masternodeLastPaidHeight,
+            registeredHeight: masternodeRegisteredHeight,
+            PoSeRevivedHeight: masternodePoSeRevivedHeight,
+            PoSePenalty: masternodePoSePenalty,
+          },
+          status: masternodeStatus,
+        },
+      } = await coreService.getRpcClient().masternode('status'));
+      ({
+        result: {
+          enabled: masternodeEnabledCount,
+        },
+      } = await coreService.getRpcClient().masternode('count'));
     }
 
     // Platform status
-    let tendermintStatus;
+    let tendermintVersion;
+    let tendermintBlockHeight;
+    let tendermintCatchingUp;
     if (config.options.network !== 'testnet') {
       // curl fails if tendermint has not started yet because abci is waiting for core to sync
       if (mnsyncStatus.IsSynced === true) {
         const tendermintStatusRes = await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`);
-        tendermintStatus = await tendermintStatusRes.json();
+        ({
+          result: {
+            node_info: {
+              version: tendermintVersion,
+            },
+            sync_info: {
+              latest_block_height: tendermintBlockHeight,
+              catching_up: tendermintCatchingUp,
+            },
+          },
+        } = await tendermintStatusRes.json());
       }
     }
     const explorerBlockHeightRes = await fetch('https://rpc.cloudwheels.net:26657/status');
-    const explorerBlockHeight = await explorerBlockHeightRes.json();
+    const {
+      result: {
+        sync_info: {
+          latest_block_height: explorerBlockHeight,
+        },
+      },
+    } = await explorerBlockHeightRes.json();
 
     // Determine status
     let coreStatus;
@@ -76,7 +122,7 @@ class StatusCommand extends BaseCommand {
     }
     if (coreStatus === 'running') {
       if (mnsyncStatus.AssetName !== 'MASTERNODE_SYNC_FINISHED') {
-        coreStatus = `syncing ${(blockchainInfo.verificationprogress * 100).toFixed(2)}%`;
+        coreStatus = `syncing ${(coreVerificationProgress * 100).toFixed(2)}%`;
       }
     }
 
@@ -94,27 +140,25 @@ class StatusCommand extends BaseCommand {
     }
     if (platformStatus === 'running' && mnsyncStatus.IsSynced === false) {
       platformStatus = 'waiting for core sync';
-    } else if (platformStatus === 'running' && tendermintStatus.result.sync_info.catching_up === true) {
-      platformStatus = `syncing ${((tendermintStatus.result.sync_info.latest_block_height
-        / explorerBlockHeight.result.sync_info.latest_block_height)
-        * 100).toFixed(2)}%`;
+    } else if (platformStatus === 'running' && tendermintCatchingUp === true) {
+      platformStatus = `syncing ${((tendermintBlockHeight / explorerBlockHeight) * 100).toFixed(2)}%`;
     }
 
     let paymentQueuePosition;
     if (config.options.core.masternode.enable === true) {
-      if (masternodeStatus.state === 'READY') {
-        if (masternodeStatus.dmnState.PoSeRevivedHeight > 0) {
-          paymentQueuePosition = masternodeStatus.dmnState.PoSeRevivedHeight
-            + masternodeCount.enabled
-            - blockchainInfo.blocks;
-        } else if (masternodeStatus.dmnState.lastPaidHeight === 0) {
-          paymentQueuePosition = masternodeStatus.dmnState.registeredHeight
-            + masternodeCount.enabled
-            - blockchainInfo.blocks;
+      if (masternodeStatus === 'Ready') {
+        if (masternodePoSeRevivedHeight > 0) {
+          paymentQueuePosition = masternodePoSeRevivedHeight
+            + masternodeEnabledCount
+            - coreBlocks;
+        } else if (masternodeLastPaidHeight === 0) {
+          paymentQueuePosition = masternodeRegisteredHeight
+            + masternodeEnabledCount
+            - coreBlocks;
         } else {
-          paymentQueuePosition = masternodeStatus.dmnState.lastPaidHeight
-            + masternodeCount.enabled
-            - blockchainInfo.blocks;
+          paymentQueuePosition = masternodeLastPaidHeight
+            + masternodeEnabledCount
+            - coreBlocks;
         }
       }
     }
@@ -137,22 +181,22 @@ class StatusCommand extends BaseCommand {
     }
 
     // Build table
-    rows.push(['Network', blockchainInfo.chain]);
-    rows.push(['Core Version', networkInfo.subversion.replace(/\/|\(.*?\)/g, '')]);
+    rows.push(['Network', coreChain]);
+    rows.push(['Core Version', coreVersion.replace(/\/|\(.*?\)/g, '')]);
     rows.push(['Core Status', coreStatus]);
     if (config.options.core.masternode.enable === true) {
-      rows.push(['Masternode Status', (masternodeStatus.status === 'Ready' ? chalk.green : chalk.red)(masternodeStatus.status)]);
+      rows.push(['Masternode Status', (masternodeStatus === 'Ready' ? chalk.green : chalk.red)(masternodeStatus)]);
     }
     if (config.options.network !== 'testnet' && mnsyncStatus.IsSynced === true) {
-      rows.push(['Platform Version', tendermintStatus.result.node_info.version]);
+      rows.push(['Platform Version', tendermintVersion]);
     }
     rows.push(['Platform Status', platformStatus]);
     if (config.options.core.masternode.enable === true) {
-      if (masternodeStatus.state === 'READY') {
-        rows.push(['PoSe Penalty', masternodeStatus.dmnState.PoSePenalty]);
-        rows.push(['Last paid block', masternodeStatus.dmnState.lastPaidHeight]);
-        rows.push(['Last paid time', `${blocksToTime(blockchainInfo.blocks - masternodeStatus.dmnState.lastPaidHeight)} ago`]);
-        rows.push(['Payment queue position', `${paymentQueuePosition}/${masternodeCount.enabled}`]);
+      if (masternodeStatus === 'Ready') {
+        rows.push(['PoSe Penalty', masternodePoSePenalty]);
+        rows.push(['Last paid block', masternodeLastPaidHeight]);
+        rows.push(['Last paid time', `${blocksToTime(coreBlocks - masternodeLastPaidHeight)} ago`]);
+        rows.push(['Payment queue position', `${paymentQueuePosition}/${masternodeEnabledCount}`]);
         rows.push(['Next payment time', `in ${blocksToTime(paymentQueuePosition)}`]);
       }
     }
