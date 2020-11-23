@@ -52,16 +52,19 @@ class CoreStatusCommand extends BaseCommand {
       this.exit();
     }
 
-    const tendermintStatusRes = await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`).then((res) => res.text());
-    const tendermintStatus = JSON.parse(tendermintStatusRes);
-    const tendermintNetInfoRes = await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/net_info`).then((res) => res.text());
-    const tendermintNetInfo = JSON.parse(tendermintNetInfoRes);
-    const explorerBlockHeightRes = await fetch('https://rpc.cloudwheels.net:26657/status').then((res) => res.text());
-    const explorerBlockHeight = JSON.parse(explorerBlockHeightRes);
+    const tendermintStatusRes = await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`);
+    const tendermintStatus = await tendermintStatusRes.json();
+    const tendermintNetInfoRes = await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/net_info`);
+    const tendermintNetInfo = await tendermintNetInfoRes.json();
+    const explorerBlockHeightRes = await fetch('https://rpc.cloudwheels.net:26657/status');
+    const explorerBlockHeight = await explorerBlockHeightRes.json();
 
-    let httpPortState = await fetch(`https://mnowatch.org/${config.options.platform.dapi.nginx.http.port}/`).then((res) => res.text());
-    let gRpcPortState = await fetch(`https://mnowatch.org/${config.options.platform.dapi.nginx.grpc.port}/`).then((res) => res.text());
-    let p2pPortState = await fetch(`https://mnowatch.org/${config.options.platform.drive.tendermint.p2p.port}/`).then((res) => res.text());
+    const httpPortStateRes = await fetch(`https://mnowatch.org/${config.options.platform.dapi.nginx.http.port}/`);
+    let httpPortState = await httpPortStateRes.text();
+    const gRpcPortStateRes = await fetch(`https://mnowatch.org/${config.options.platform.dapi.nginx.grpc.port}/`);
+    let gRpcPortState = await gRpcPortStateRes.text();
+    const p2pPortStateRes = await fetch(`https://mnowatch.org/${config.options.platform.drive.tendermint.p2p.port}/`);
+    let p2pPortState = await p2pPortStateRes.text();
 
     // Determine status
     let status;

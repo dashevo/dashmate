@@ -47,11 +47,12 @@ class CoreStatusCommand extends BaseCommand {
     const { result: networkInfo } = await coreService.getRpcClient().getNetworkInfo();
     const { result: mnsyncStatus } = await coreService.getRpcClient().mnsync('status');
     const { result: peerInfo } = await coreService.getRpcClient().getPeerInfo();
-    const latestVersionRes = await fetch('https://api.github.com/repos/dashpay/dash/releases/latest').then((res) => res.text());
-    const latestVersion = JSON.parse(latestVersionRes);
-    const insightBlockHeightRes = await fetch(`${insightURLs[config.options.network]}/status`).then((res) => res.text());
-    const insightBlockHeight = JSON.parse(insightBlockHeightRes);
-    let corePortState = await fetch(`https://mnowatch.org/${config.options.core.p2p.port}/`).then((res) => res.text());
+    const latestVersionRes = await fetch('https://api.github.com/repos/dashpay/dash/releases/latest');
+    const latestVersion = await latestVersionRes.json();
+    const insightBlockHeightRes = await fetch(`${insightURLs[config.options.network]}/status`);
+    const insightBlockHeight = await insightBlockHeightRes.json();
+    const corePortStateRes = await fetch(`https://mnowatch.org/${config.options.core.p2p.port}/`);
+    let corePortState = await corePortStateRes.text();
     let coreVersion = networkInfo.subversion.replace(/\/|\(.*?\)/g, '');
     const sentinelVersion = (await dockerCompose.execCommand(
       config.toEnvs(),

@@ -54,12 +54,12 @@ class StatusCommand extends BaseCommand {
     if (config.options.network !== 'testnet') {
       // curl fails if tendermint has not started yet because abci is waiting for core to sync
       if (mnsyncStatus.IsSynced === true) {
-        const tendermintStatusRes = await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`).then((res) => res.text());
-        tendermintStatus = JSON.parse(tendermintStatusRes);
+        const tendermintStatusRes = await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`);
+        tendermintStatus = await tendermintStatusRes.json();
       }
     }
-    const explorerBlockHeightRes = await fetch('https://rpc.cloudwheels.net:26657/status').then((res) => res.text());
-    const explorerBlockHeight = JSON.parse(explorerBlockHeightRes);
+    const explorerBlockHeightRes = await fetch('https://rpc.cloudwheels.net:26657/status');
+    const explorerBlockHeight = await explorerBlockHeightRes.json();
 
     // Determine status
     let coreStatus;
