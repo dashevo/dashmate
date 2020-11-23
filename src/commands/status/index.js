@@ -121,19 +121,19 @@ class StatusCommand extends BaseCommand {
 
     // Apply colors
     if (coreStatus === 'running') {
-      coreStatus = chalk.keyword('green')(coreStatus);
+      coreStatus = chalk.green(coreStatus);
     } else if (coreStatus.includes('syncing')) {
-      coreStatus = chalk.keyword('yellow')(coreStatus);
+      coreStatus = chalk.yellow(coreStatus);
     } else {
-      coreStatus = chalk.keyword('red')(coreStatus);
+      coreStatus = chalk.red(coreStatus);
     }
 
     if (platformStatus === 'running') {
-      platformStatus = chalk.keyword('green')(platformStatus);
+      platformStatus = chalk.green(platformStatus);
     } else if (platformStatus.includes('syncing')) {
-      platformStatus = chalk.keyword('yellow')(platformStatus);
+      platformStatus = chalk.yellow(platformStatus);
     } else {
-      platformStatus = chalk.keyword('red')(platformStatus);
+      platformStatus = chalk.red(platformStatus);
     }
 
     // Build table
@@ -141,7 +141,7 @@ class StatusCommand extends BaseCommand {
     rows.push(['Core Version', networkInfo.subversion.replace(/\/|\(.*?\)/g, '')]);
     rows.push(['Core Status', coreStatus]);
     if (config.options.core.masternode.enable === true) {
-      rows.push(['Masternode Status', chalk.keyword(masternodeStatus.status === 'Ready' ? 'green' : 'red')(masternodeStatus.status)]);
+      rows.push(['Masternode Status', (masternodeStatus.status === 'Ready' ? chalk.green : chalk.red)(masternodeStatus.status)]);
     }
     if (config.options.network !== 'testnet' && mnsyncStatus.IsSynced === true) {
       rows.push(['Platform Version', tendermintStatus.result.node_info.version]);

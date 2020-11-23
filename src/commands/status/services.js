@@ -64,7 +64,7 @@ class ServicesStatusCommand extends BaseCommand {
 
       let statusText;
       if (status) {
-        statusText = chalk.keyword(status === 'running' ? 'green' : 'red')(status);
+        statusText = (status === 'running' ? chalk.green : chalk.red)(status);
       }
 
       tableRows.push([
