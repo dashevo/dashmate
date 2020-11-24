@@ -49,11 +49,15 @@ class CoreStatusCommand extends BaseCommand {
     const { result: peerInfo } = await coreService.getRpcClient().getPeerInfo();
     const latestVersionRes = await fetch('https://api.github.com/repos/dashpay/dash/releases/latest');
     const latestVersion = await latestVersionRes.json();
-    const insightBlockHeightRes = await fetch(`${insightURLs[config.options.network]}/status`);
-    const insightBlockHeight = await insightBlockHeightRes.json();
     const corePortStateRes = await fetch(`https://mnowatch.org/${config.options.core.p2p.port}/`);
     let corePortState = await corePortStateRes.text();
     let coreVersion = networkInfo.subversion.replace(/\/|\(.*?\)/g, '');
+    let insightBlockHeightRes;
+    let insightBlockHeight;
+    if (insightURLs[config.options.network]) {
+      insightBlockHeightRes = await fetch(`${insightURLs[config.options.network]}/status`);
+      insightBlockHeight = await insightBlockHeightRes.json();
+    }
     const sentinelVersion = (await dockerCompose.execCommand(
       config.toEnvs(),
       'sentinel',
@@ -135,7 +139,9 @@ class CoreStatusCommand extends BaseCommand {
     rows.push(['RPC service', `127.0.0.1:${config.options.core.rpc.port}`]);
     rows.push(['Block height', blocks]);
     rows.push(['Header height', blockchainInfo.headers]);
-    rows.push(['Remote block height', insightBlockHeight.info.blocks]);
+    if (insightURLs[config.options.network]) {
+      rows.push(['Remote block height', insightBlockHeight.info.blocks]);
+    }
     rows.push(['Difficulty', blockchainInfo.difficulty]);
     rows.push(['Sentinel version', sentinelVersion]);
     rows.push(['Sentinel status', (sentinelState)]);
