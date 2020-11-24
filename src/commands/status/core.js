@@ -87,7 +87,7 @@ class CoreStatusCommand extends BaseCommand {
     // Apply colors
     if (status === 'running') {
       status = chalk.green(status);
-    } else if (status.includes('syncing')) {
+    } else if (status.startsWith('syncing')) {
       status = chalk.yellow(status);
     } else {
       status = chalk.red(status);
@@ -95,6 +95,8 @@ class CoreStatusCommand extends BaseCommand {
 
     if (coreVersion.substring(coreVersion.indexOf(':') + 1) === latestVersion.tag_name.substring(1)) {
       coreVersion = chalk.green(coreVersion);
+    } else if (coreVersion.match(/(?<=:)\d+.\d+/)[0] === latestVersion.tag_name.match(/(?<=v)\d+.\d+/)[0]) {
+      coreVersion = chalk.yellow(coreVersion);
     } else {
       coreVersion = chalk.red(coreVersion);
     }
@@ -109,6 +111,8 @@ class CoreStatusCommand extends BaseCommand {
     if (blockchainInfo.blocks === blockchainInfo.headers
       || blockchainInfo.blocks >= insightBlockHeight.info.blocks) {
       blocks = chalk.green(blockchainInfo.blocks);
+    } else if ((insightBlockHeight.info.blocks - blockchainInfo.blocks) < 3) {
+      blocks = chalk.yellow(blockchainInfo.blocks);
     } else {
       blocks = chalk.red(blockchainInfo.blocks);
     }
