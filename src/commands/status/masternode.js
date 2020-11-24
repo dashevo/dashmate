@@ -106,10 +106,12 @@ class MasternodeStatusCommand extends BaseCommand {
     }
 
     let PoSePenalty;
-    if (masternodeStatus.dmnState.PoSePenalty === 0) {
-      PoSePenalty = chalk.green(masternodeStatus.dmnState.PoSePenalty);
-    } else {
-      PoSePenalty = chalk.red(masternodeStatus.dmnState.PoSePenalty);
+    if (masternodeStatus.state === 'READY') {
+      if (masternodeStatus.dmnState.PoSePenalty === 0) {
+        PoSePenalty = chalk.green(masternodeStatus.dmnState.PoSePenalty);
+      } else {
+        PoSePenalty = chalk.red(masternodeStatus.dmnState.PoSePenalty);
+      }
     }
 
     // Build table
