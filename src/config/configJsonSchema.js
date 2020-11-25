@@ -172,6 +172,22 @@ module.exports = {
                   required: ['port'],
                   additionalProperties: false,
                 },
+                rateLimiter: {
+                  type: 'object',
+                  properties: {
+                    enable: {
+                      type: 'boolean',
+                    },
+                    rate: {
+                      type: 'integer',
+                      minimum: 0,
+                    },
+                    burst: {
+                      type: 'integer',
+                      minimum: 0,
+                    },
+                  },
+                },
               },
               required: ['docker', 'http', 'grpc'],
               additionalProperties: false,
