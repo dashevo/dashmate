@@ -43,26 +43,41 @@ class CoreStatusCommand extends BaseCommand {
     };
 
     // Collect data
-    const { result: blockchainInfo } = await coreService.getRpcClient().getBlockchainInfo();
+    const {
+      result: {
+        blocks: coreBlocks,
+        chain: coreChain,
+        difficulty: coreDifficulty,
+        headers: coreHeaders,
+        verificationprogress: coreVerificationProgress,
+      },
+    } = await coreService.getRpcClient().getBlockchainInfo();
     const { result: networkInfo } = await coreService.getRpcClient().getNetworkInfo();
     const { result: mnsyncStatus } = await coreService.getRpcClient().mnsync('status');
     const { result: peerInfo } = await coreService.getRpcClient().getPeerInfo();
     const latestVersionRes = await fetch('https://api.github.com/repos/dashpay/dash/releases/latest');
-    const latestVersion = await latestVersionRes.json();
+    let {
+      tag_name: latestVersion,
+    } = await latestVersionRes.json();
+    latestVersion = latestVersion.substring(1);
     const corePortStateRes = await fetch(`https://mnowatch.org/${config.options.core.p2p.port}/`);
     let corePortState = await corePortStateRes.text();
-    let coreVersion = networkInfo.subversion.replace(/\/|\(.*?\)/g, '');
-    let insightBlockHeightRes;
-    let insightBlockHeight;
+    let coreVersion = networkInfo.subversion.replace(/\/|\(.*?\)|Dash Core:/g, '');
+    let explorerBlockHeightRes;
+    let explorerBlockHeight;
     if (insightURLs[config.options.network]) {
-      insightBlockHeightRes = await fetch(`${insightURLs[config.options.network]}/status`);
-      insightBlockHeight = await insightBlockHeightRes.json();
+      explorerBlockHeightRes = await fetch(`${insightURLs[config.options.network]}/status`);
+      ({
+        info: {
+          blocks: explorerBlockHeight,
+        },
+      } = await explorerBlockHeightRes.json());
     }
     const sentinelVersion = (await dockerCompose.execCommand(
       config.toEnvs(),
       'sentinel',
       'python bin/sentinel.py -v',
-    )).out.split('\n')[0];
+    )).out.split('\n')[0].replace(/Dash Sentinel v/, '');
     let sentinelState = (await dockerCompose.execCommand(
       config.toEnvs(),
       'sentinel',
@@ -82,10 +97,8 @@ class CoreStatusCommand extends BaseCommand {
         status = 'not started';
       }
     }
-    if (status === 'running') {
-      if (mnsyncStatus.AssetName !== 'MASTERNODE_SYNC_FINISHED') {
-        status = `syncing ${(blockchainInfo.verificationprogress * 100).toFixed(2)}%`;
-      }
+    if (status === 'running' && mnsyncStatus.AssetName !== 'MASTERNODE_SYNC_FINISHED') {
+      status = `syncing ${(coreVerificationProgress * 100).toFixed(2)}%`;
     }
 
     // Apply colors
@@ -97,9 +110,9 @@ class CoreStatusCommand extends BaseCommand {
       status = chalk.red(status);
     }
 
-    if (coreVersion.substring(coreVersion.indexOf(':') + 1) === latestVersion.tag_name.substring(1)) {
+    if (coreVersion === latestVersion) {
       coreVersion = chalk.green(coreVersion);
-    } else if (coreVersion.match(/(?<=:)\d+.\d+/)[0] === latestVersion.tag_name.match(/(?<=v)\d+.\d+/)[0]) {
+    } else if (coreVersion.match(/\d+.\d+/)[0] === latestVersion.match(/\d+.\d+/)[0]) {
       coreVersion = chalk.yellow(coreVersion);
     } else {
       coreVersion = chalk.red(coreVersion);
@@ -112,13 +125,12 @@ class CoreStatusCommand extends BaseCommand {
     }
 
     let blocks;
-    if (blockchainInfo.blocks === blockchainInfo.headers
-      || blockchainInfo.blocks >= insightBlockHeight.info.blocks) {
-      blocks = chalk.green(blockchainInfo.blocks);
-    } else if ((insightBlockHeight.info.blocks - blockchainInfo.blocks) < 3) {
-      blocks = chalk.yellow(blockchainInfo.blocks);
+    if (coreBlocks === coreHeaders || coreBlocks >= explorerBlockHeight) {
+      blocks = chalk.green(coreBlocks);
+    } else if ((explorerBlockHeight - coreBlocks) < 3) {
+      blocks = chalk.yellow(coreBlocks);
     } else {
-      blocks = chalk.red(blockchainInfo.blocks);
+      blocks = chalk.red(coreBlocks);
     }
 
     if (sentinelState === '') {
@@ -129,8 +141,8 @@ class CoreStatusCommand extends BaseCommand {
 
     // Build table
     rows.push(['Version', coreVersion]);
-    rows.push(['Latest version', latestVersion.tag_name]);
-    rows.push(['Network', blockchainInfo.chain]);
+    rows.push(['Latest version', latestVersion]);
+    rows.push(['Network', coreChain]);
     rows.push(['Status', status]);
     rows.push(['Sync asset', mnsyncStatus.AssetName]);
     rows.push(['Peer count', peerInfo.length]);
@@ -138,11 +150,11 @@ class CoreStatusCommand extends BaseCommand {
     rows.push(['P2P port', `${config.options.core.p2p.port} ${corePortState}`]);
     rows.push(['RPC service', `127.0.0.1:${config.options.core.rpc.port}`]);
     rows.push(['Block height', blocks]);
-    rows.push(['Header height', blockchainInfo.headers]);
+    rows.push(['Header height', coreHeaders]);
     if (insightURLs[config.options.network]) {
-      rows.push(['Remote block height', insightBlockHeight.info.blocks]);
+      rows.push(['Remote block height', explorerBlockHeight]);
     }
-    rows.push(['Difficulty', blockchainInfo.difficulty]);
+    rows.push(['Difficulty', coreDifficulty]);
     rows.push(['Sentinel version', sentinelVersion]);
     rows.push(['Sentinel status', (sentinelState)]);
 

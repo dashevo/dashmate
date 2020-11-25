@@ -7,6 +7,7 @@ const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPr
 const BaseCommand = require('../../oclif/command/BaseCommand');
 const CoreService = require('../../core/CoreService');
 const blocksToTime = require('../../util/blocksToTime');
+const getPaymentQueuePosition = require('../../util/getPaymentQueuePosition');
 
 class StatusCommand extends BaseCommand {
   /**
@@ -37,13 +38,21 @@ class StatusCommand extends BaseCommand {
       dockerCompose.docker.getContainer('core'),
     );
 
-    // Collect data
-    const { result: mnsyncStatus } = await coreService.getRpcClient().mnsync('status');
+    // Collect core data
     const {
+      result: {
+        AssetName: coreSyncAsset,
+        IsSynced: coreIsSynced,
+      },
+    } = await coreService.getRpcClient().mnsync('status');
+
+    let {
       result: {
         subversion: coreVersion,
       },
     } = await coreService.getRpcClient().getNetworkInfo();
+    coreVersion = coreVersion.replace(/\/|\(.*?\)|Dash Core:/g, '');
+
     const {
       result: {
         blocks: coreBlocks,
@@ -52,21 +61,14 @@ class StatusCommand extends BaseCommand {
       },
     } = await coreService.getRpcClient().getBlockchainInfo();
 
+    // Collect masternode data
+    let masternodeState;
     let masternodeStatus;
-    let masternodePoSeRevivedHeight;
-    let masternodeLastPaidHeight;
-    let masternodeRegisteredHeight;
     let masternodeEnabledCount;
-    let masternodePoSePenalty;
     if (config.options.core.masternode.enable === true) {
       ({
         result: {
-          dmnState: {
-            lastPaidHeight: masternodeLastPaidHeight,
-            registeredHeight: masternodeRegisteredHeight,
-            PoSeRevivedHeight: masternodePoSeRevivedHeight,
-            PoSePenalty: masternodePoSePenalty,
-          },
+          dmnState: masternodeState,
           status: masternodeStatus,
         },
       } = await coreService.getRpcClient().masternode('status'));
@@ -77,27 +79,26 @@ class StatusCommand extends BaseCommand {
       } = await coreService.getRpcClient().masternode('count'));
     }
 
-    // Platform status
-    let tendermintVersion;
-    let tendermintBlockHeight;
-    let tendermintCatchingUp;
-    if (config.options.network !== 'testnet') {
-      // curl fails if tendermint has not started yet because abci is waiting for core to sync
-      if (mnsyncStatus.IsSynced === true) {
-        const tendermintStatusRes = await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`);
-        ({
-          result: {
-            node_info: {
-              version: tendermintVersion,
-            },
-            sync_info: {
-              latest_block_height: tendermintBlockHeight,
-              catching_up: tendermintCatchingUp,
-            },
+    // Collect platform data
+    let platformVersion;
+    let platformBlockHeight;
+    let platformCatchingUp;
+    // Collecting platform data fails if Tenderdash is waiting for core to sync
+    if (config.options.network !== 'testnet' && coreIsSynced === true) {
+      const platformStatusRes = await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`);
+      ({
+        result: {
+          node_info: {
+            version: platformVersion,
           },
-        } = await tendermintStatusRes.json());
-      }
+          sync_info: {
+            latest_block_height: platformBlockHeight,
+            catching_up: platformCatchingUp,
+          },
+        },
+      } = await platformStatusRes.json());
     }
+
     const explorerBlockHeightRes = await fetch('https://rpc.cloudwheels.net:26657/status');
     const {
       result: {
@@ -120,47 +121,36 @@ class StatusCommand extends BaseCommand {
         coreStatus = 'not started';
       }
     }
-    if (coreStatus === 'running') {
-      if (mnsyncStatus.AssetName !== 'MASTERNODE_SYNC_FINISHED') {
-        coreStatus = `syncing ${(coreVerificationProgress * 100).toFixed(2)}%`;
-      }
+    if (coreStatus === 'running' && coreSyncAsset !== 'MASTERNODE_SYNC_FINISHED') {
+      coreStatus = `syncing ${(coreVerificationProgress * 100).toFixed(2)}%`;
     }
 
     let platformStatus;
-    try {
-      ({
-        State: {
-          Status: platformStatus,
-        },
-      } = await dockerCompose.inspectService(config.toEnvs(), 'drive_tendermint'));
-    } catch (e) {
-      if (e instanceof ContainerIsNotPresentError) {
-        platformStatus = 'not started';
-      }
-    }
-    if (platformStatus === 'running' && mnsyncStatus.IsSynced === false) {
-      platformStatus = 'waiting for core sync';
-    } else if (platformStatus === 'running' && tendermintCatchingUp === true) {
-      platformStatus = `syncing ${((tendermintBlockHeight / explorerBlockHeight) * 100).toFixed(2)}%`;
-    }
-
-    let paymentQueuePosition;
-    if (config.options.core.masternode.enable === true) {
-      if (masternodeStatus === 'Ready') {
-        if (masternodePoSeRevivedHeight > 0) {
-          paymentQueuePosition = masternodePoSeRevivedHeight
-            + masternodeEnabledCount
-            - coreBlocks;
-        } else if (masternodeLastPaidHeight === 0) {
-          paymentQueuePosition = masternodeRegisteredHeight
-            + masternodeEnabledCount
-            - coreBlocks;
-        } else {
-          paymentQueuePosition = masternodeLastPaidHeight
-            + masternodeEnabledCount
-            - coreBlocks;
+    if (config.options.network !== 'testnet') {
+      try {
+        ({
+          State: {
+            Status: platformStatus,
+          },
+        } = await dockerCompose.inspectService(config.toEnvs(), 'drive_tendermint'));
+      } catch (e) {
+        if (e instanceof ContainerIsNotPresentError) {
+          platformStatus = 'not started';
         }
       }
+      if (platformStatus === 'running' && coreIsSynced === false) {
+        platformStatus = 'waiting for core sync';
+      } else if (platformStatus === 'running' && platformCatchingUp === true) {
+        platformStatus = `syncing ${((platformBlockHeight / explorerBlockHeight) * 100).toFixed(2)}%`;
+      }
+    }
+
+    // Determine payment queue position
+    let paymentQueuePosition;
+    if (config.options.core.masternode.enable === true && masternodeStatus === 'Ready') {
+      paymentQueuePosition = getPaymentQueuePosition(
+        masternodeState, masternodeEnabledCount, coreBlocks,
+      );
     }
 
     // Apply colors
@@ -172,12 +162,20 @@ class StatusCommand extends BaseCommand {
       coreStatus = chalk.red(coreStatus);
     }
 
-    if (platformStatus === 'running') {
-      platformStatus = chalk.green(platformStatus);
-    } else if (platformStatus.includes('syncing')) {
-      platformStatus = chalk.yellow(platformStatus);
+    if (config.options.network !== 'testnet') {
+      if (platformStatus === 'running') {
+        platformStatus = chalk.green(platformStatus);
+      } else if (platformStatus.startsWith('syncing')) {
+        platformStatus = chalk.yellow(platformStatus);
+      } else {
+        platformStatus = chalk.red(platformStatus);
+      }
+    }
+
+    if (masternodeStatus === 'Ready') {
+      masternodeStatus = chalk.green(masternodeStatus);
     } else {
-      platformStatus = chalk.red(platformStatus);
+      masternodeStatus = chalk.red(masternodeStatus);
     }
 
     // Build table
@@ -185,17 +183,19 @@ class StatusCommand extends BaseCommand {
     rows.push(['Core Version', coreVersion.replace(/\/|\(.*?\)/g, '')]);
     rows.push(['Core Status', coreStatus]);
     if (config.options.core.masternode.enable === true) {
-      rows.push(['Masternode Status', (masternodeStatus === 'Ready' ? chalk.green : chalk.red)(masternodeStatus)]);
+      rows.push(['Masternode Status', (masternodeStatus)]);
     }
-    if (config.options.network !== 'testnet' && mnsyncStatus.IsSynced === true) {
-      rows.push(['Platform Version', tendermintVersion]);
+    if (config.options.network !== 'testnet') {
+      if (coreIsSynced === true) {
+        rows.push(['Platform Version', platformVersion]);
+      }
+      rows.push(['Platform Status', platformStatus]);
     }
-    rows.push(['Platform Status', platformStatus]);
     if (config.options.core.masternode.enable === true) {
       if (masternodeStatus === 'Ready') {
-        rows.push(['PoSe Penalty', masternodePoSePenalty]);
-        rows.push(['Last paid block', masternodeLastPaidHeight]);
-        rows.push(['Last paid time', `${blocksToTime(coreBlocks - masternodeLastPaidHeight)} ago`]);
+        rows.push(['PoSe Penalty', masternodeState.PoSePenalty]);
+        rows.push(['Last paid block', masternodeState.lastPaidHeight]);
+        rows.push(['Last paid time', `${blocksToTime(coreBlocks - masternodeState.lastPaidHeight)} ago`]);
         rows.push(['Payment queue position', `${paymentQueuePosition}/${masternodeEnabledCount}`]);
         rows.push(['Next payment time', `in ${blocksToTime(paymentQueuePosition)}`]);
       }
