@@ -187,9 +187,11 @@ module.exports = {
                       minimum: 0,
                     },
                   },
+                  required: ['enable', 'rate', 'burst'],
+                  additionalProperties: false,
                 },
               },
-              required: ['docker', 'http', 'grpc'],
+              required: ['docker', 'http', 'grpc', 'rateLimiter'],
               additionalProperties: false,
             },
             api: {
