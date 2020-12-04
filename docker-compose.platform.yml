@@ -130,7 +130,7 @@ services:
       - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/grpc.conf:/etc/nginx/conf.d/grpc.conf
       - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/errors.grpc_conf:/etc/nginx/conf.d/errors.grpc_conf
       - ${MN_HOME_DIR:?err}/ssl/bundle.crt:/etc/ssl/bundle.crt
-      - ${MN_HOME_DIR:?err}/ssl/private.key:/etc/ssl/private.key
+      - ${MN_HOME_DIR:?err}/private.key:/etc/ssl/private.key
 
 volumes:
   drive_abci_leveldb:
