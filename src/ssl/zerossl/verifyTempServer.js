@@ -1,11 +1,7 @@
+const { Observable } = require('rxjs');
 const axios = require('axios');
 
-/**
- * Verify if the temp server is up
- *
- * @param {string} serverURL
- */
-async function verifyTempServer(serverURL) {
+async function queryTempServer(serverURL) {
   const config = {
     method: 'get',
     url: serverURL,
@@ -17,6 +13,32 @@ async function verifyTempServer(serverURL) {
       throw new Error(error);
     });
   return response;
+}
+
+/**
+ * Setup temp server for ZeroSSL challenge
+ *
+ * @typedef {verifyTempServer}
+ * @param {string} challengePath
+ * @return {Promise<string>}
+ */
+async function verifyTempServer(
+  challengeFile,
+  externalIp,
+) {
+  // eslint-disable-next-line no-new
+  new Observable(async (observer) => {
+    const serverUrl = `http://${externalIp}/.well-known/pki-validation/${challengeFile}`;
+
+    // I don't know if this is working...
+    setTimeout(async () => {
+      observer.next('Wait for server');
+      await queryTempServer(serverUrl);
+      observer.complete();
+    }, 2000);
+  });
+
+  return undefined;
 }
 
 module.exports = verifyTempServer;

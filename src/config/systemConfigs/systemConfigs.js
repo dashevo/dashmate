@@ -45,11 +45,24 @@ const baseConfig = {
         http: {
           port: 3000,
         },
+        https: {
+          port: 443,
+        },
         grpc: {
           port: 3010,
         },
+        grpcs: {
+          port: 1443,
+        },
         docker: {
           image: 'nginx:latest',
+        },
+        ssl: {
+          provider: 'zerossl',
+          enable: false,
+          zerossl: {
+            apikey: null,
+          },
         },
       },
       api: {

@@ -162,6 +162,16 @@ module.exports = {
                   required: ['port'],
                   additionalProperties: false,
                 },
+                https: {
+                  type: 'object',
+                  properties: {
+                    port: {
+                      $ref: '#/definitions/port',
+                    },
+                  },
+                  required: ['port'],
+                  additionalProperties: false,
+                },
                 grpc: {
                   type: 'object',
                   properties: {
@@ -172,8 +182,43 @@ module.exports = {
                   required: ['port'],
                   additionalProperties: false,
                 },
+                grpcs: {
+                  type: 'object',
+                  properties: {
+                    port: {
+                      $ref: '#/definitions/port',
+                    },
+                  },
+                  required: ['port'],
+                  additionalProperties: false,
+                },
+                ssl: {
+                  type: 'object',
+                  properties: {
+                    provider: {
+                      type: 'string',
+                      enum: ['zerossl', 'manual'],
+                    },
+                    zerossl: {
+                      type: ['object', 'null'],
+                      properties: {
+                        apikey: {
+                          type: ['string', 'null'],
+                          minLength: 32,
+                        },
+                      },
+                      required: ['apikey'],
+                      additionalProperties: false,
+                    },
+                    enable: {
+                      type: 'boolean',
+                    },
+                  },
+                  required: ['provider', 'zerossl', 'enable'],
+                  additionalProperties: false,
+                },
               },
-              required: ['docker', 'http', 'grpc'],
+              required: ['docker', 'http', 'https', 'grpc', 'grpcs', 'ssl'],
               additionalProperties: false,
             },
             api: {

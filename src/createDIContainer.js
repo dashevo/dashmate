@@ -20,6 +20,13 @@ const systemConfigs = require('./config/systemConfigs/systemConfigs');
 const renderServiceTemplatesFactory = require('./templates/renderServiceTemplatesFactory');
 const writeServiceConfigs = require('./templates/writeServiceConfigs');
 
+const createCertificate = require('./ssl/zerossl/createCertificate');
+const saveChallenge = require('./ssl/zerossl/saveChallenge');
+const verifyTempServer = require('./ssl/zerossl/verifyTempServer');
+const verifyDomain = require('./ssl/zerossl/verifyDomain');
+const downloadCertificate = require('./ssl/zerossl/downloadCertificate');
+const generateCsr = require('./ssl/zerossl/generateCsr');
+
 const DockerCompose = require('./docker/DockerCompose');
 const StartedContainers = require('./docker/StartedContainers');
 const stopAllContainersFactory = require('./docker/stopAllContainersFactory');
@@ -45,6 +52,8 @@ const registerMasternodeTaskFactory = require('./listr/tasks/registerMasternodeT
 const initTaskFactory = require('./listr/tasks/platform/initTaskFactory');
 const startNodeTaskFactory = require('./listr/tasks/startNodeTaskFactory');
 const createTenderdashRpcClient = require('./tenderdash/createTenderdashRpcClient');
+const checkCertificateTaskFactory = require('./ssl/checkCertificateTaskFactory');
+const createZerosslCertificateTaskFactory = require('./ssl/zerossl/createZerosslCertificateTaskFactory');
 
 async function createDIContainer(options) {
   const container = createAwilixContainer({
@@ -73,6 +82,18 @@ async function createDIContainer(options) {
   container.register({
     renderServiceTemplates: asFunction(renderServiceTemplatesFactory),
     writeServiceConfigs: asValue(writeServiceConfigs),
+  });
+
+  /**
+   * SSL
+   */
+  container.register({
+    createCertificate: asValue(createCertificate),
+    saveChallenge: asValue(saveChallenge),
+    verifyTempServer: asValue(verifyTempServer),
+    verifyDomain: asValue(verifyDomain),
+    downloadCertificate: asValue(downloadCertificate),
+    generateCsr: asValue(generateCsr),
   });
 
   /**
@@ -130,6 +151,8 @@ async function createDIContainer(options) {
     registerMasternodeTask: asFunction(registerMasternodeTaskFactory),
     initTask: asFunction(initTaskFactory),
     startNodeTask: asFunction(startNodeTaskFactory),
+    checkCertificateTask: asFunction(checkCertificateTaskFactory),
+    createZerosslCertificateTask: asFunction(createZerosslCertificateTaskFactory),
   });
 
   return container;

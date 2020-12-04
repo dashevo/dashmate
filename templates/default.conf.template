@@ -2,7 +2,7 @@ limit_req_zone $binary_remote_addr zone=protect_api:15m rate=120r/m;
 
 server {
     listen 80 default_server;
-    listen 443 ssl http2;
+    {{? it.platform.dapi.nginx.ssl.enable}}listen 443 ssl http2;
     listen [::]:443 ssl http2;
 
     ssl on;
@@ -10,7 +10,7 @@ server {
     ssl_certificate_key /etc/ssl/private.key;
 
     ssl_protocols TLSv1.2 TLSv1.3;
-
+    {{?}}
     limit_req zone=protect_api burst=300 nodelay;
     limit_req_status 429;
 

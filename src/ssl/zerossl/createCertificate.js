@@ -4,27 +4,31 @@ const qs = require('qs');
 /**
  * Create a ZeroSSL Certificate
  *
- * @typedef {createNewAddress}
- * @param {string} apiKey
- * @param {string} domain
+ * @typedef {createCertificate}
+ * @param {string} csr
+ * @param {Config} config
+ * @return {Promise<string>}
  */
-async function createCertificate(apiKey, domain, csr) {
+async function createCertificate(
+  csr,
+  config,
+) {
   const data = qs.stringify({
-    certificate_domains: domain,
+    certificate_domains: config.get('externalIp'),
     certificate_validity_days: '90',
     certificate_csr: csr,
   });
 
-  const config = {
+  const request = {
     method: 'post',
-    url: `https://api.zerossl.com/certificates?access_key=${apiKey}`,
+    url: `https://api.zerossl.com/certificates?access_key=${config.get('platform.dapi.nginx.ssl.zerossl.apikey')}`,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     data,
   };
 
-  const response = await axios(config)
+  const response = await axios(request)
     .catch((error) => {
       throw new Error(error);
     });

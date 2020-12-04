@@ -11,8 +11,6 @@ const downloadCertificate = require('../../../../ssl/zerossl/downloadCertificate
 const verifyDomain = require('../../../../ssl/zerossl/verifyDomain');
 const verifyTempServer = require('../../../../ssl/zerossl/verifyTempServer');
 
-const PRESETS = require('../../../../presets');
-
 class RenewCommand extends BaseCommand {
   /**
    * @param {Object} args
@@ -21,27 +19,26 @@ class RenewCommand extends BaseCommand {
    */
   async runWithDependencies(
     {
-      preset,
-      'external-ip': externalIp,
-      'zerossl-apikey': zerosslAPIKey,
+      config,
+      homeDirPath,
     },
   ) {
     const tasks = new Listr([
       {
-        title: `Search ZeroSSL cert for ip ${externalIp}`,
+        title: `Search ZeroSSL cert for ip ${config.get('externalIp')}`,
         task: async (ctx, task) => {
           try {
-            const response = await listCertificate(zerosslAPIKey);
+            const response = await listCertificate(config.get('platform.dapi.nginx.certificate.zerossl.apikey'));
 
             if ('error' in response.data) {
               throw new Error(response.data.error.type);
             } else {
               for (const result in response.data.results) {
-                if (response.data.results[result].common_name === externalIp) {
+                if (response.data.results[result].common_name === config.get('externalIp')) {
                   ctx.certId = response.data.results[result].id;
                   // eslint-disable-next-line max-len
-                  const url = response.data.results[result].validation.other_methods[externalIp].file_validation_url_http;
-                  ctx.fileName = url.replace(`http://${externalIp}/.well-known/pki-validation/`, '');
+                  const url = response.data.results[result].validation.other_methods[config.get('externalIp')].file_validation_url_http;
+                  ctx.fileName = url.replace(`http://${config.get('externalIp')}/.well-known/pki-validation/`, '');
                 }
               }
 
@@ -66,7 +63,7 @@ class RenewCommand extends BaseCommand {
       {
         title: 'Test temp server',
         task: async (ctx) => new Observable(async (observer) => {
-          const serverURL = `http://${externalIp}/.well-known/pki-validation/${ctx.fileName}`;
+          const serverURL = `http://${config.get('externalIp')}/.well-known/pki-validation/${ctx.fileName}`;
           setTimeout(async () => {
             observer.next('Wait for server');
             await verifyTempServer(serverURL);
@@ -78,7 +75,7 @@ class RenewCommand extends BaseCommand {
         title: 'Verify IP',
         task: async (ctx) => {
           try {
-            await verifyDomain(ctx.certId, zerosslAPIKey);
+            await verifyDomain(ctx.certId, config.get('platform.dapi.nginx.certificate.zerossl.apikey'));
           } catch (error) {
             throw new Error(error);
           }
@@ -88,11 +85,11 @@ class RenewCommand extends BaseCommand {
         title: 'Download Certificate',
         task: async (ctx, task) => {
           try {
-            let response = await downloadCertificate(ctx.certId, zerosslAPIKey);
-            const bundleFile = `./configs/${preset}/dapi/nginx/bundle.crt`;
+            let response = await downloadCertificate(ctx.certId, config.get('platform.dapi.nginx.certificate.zerossl.apikey'));
+            const bundleFile = `${homeDirPath}/bundle.crt`;
 
             while ('error' in response.data) {
-              response = await downloadCertificate(ctx.certId, zerosslAPIKey);
+              response = await downloadCertificate(ctx.certId, config.get('platform.dapi.nginx.certificate.zerossl.apikey'));
             }
 
             fs.writeFile(bundleFile, `${response.data['certificate.crt']}\n${response.data['ca_bundle.crt']}`, (err) => {
@@ -103,7 +100,7 @@ class RenewCommand extends BaseCommand {
               forceKillAfterTimeout: 2000,
             });
 
-            const privateKeyFile = `./configs/${preset}/dapi/nginx/private.key`;
+            const privateKeyFile = `${homeDirPath}/private.key`;
             try {
               if (fs.existsSync(bundleFile) && fs.existsSync(privateKeyFile)) {
                 // eslint-disable-next-line no-param-reassign
@@ -128,10 +125,7 @@ class RenewCommand extends BaseCommand {
     });
 
     try {
-      await tasks.run({
-        externalIp,
-        zerosslAPIKey,
-      });
+      await tasks.run();
     } catch (e) {
       throw new MuteOneLineError(e);
     }
@@ -143,19 +137,8 @@ RenewCommand.description = `Renew SSL Cert
 Renew SSL Cert using ZeroSLL API Key
 `;
 
-RenewCommand.args = [{
-  name: 'preset',
-  required: true,
-  description: 'preset to use',
-  options: Object.values(PRESETS),
-}, {
-  name: 'external-ip',
-  required: true,
-  description: 'masternode external IP',
-}, {
-  name: 'zerossl-apikey',
-  required: true,
-  description: 'ZeroSSL API Key - https://app.zerossl.com/developer',
-}];
+RenewCommand.flags = {
+  ...BaseCommand.flags,
+};
 
 module.exports = RenewCommand;

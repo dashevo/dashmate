@@ -12,7 +12,7 @@ map $upstream_trailer_grpc_status $grpc_status {
 
 server {
     listen 50051 http2;
-    listen 1443 ssl http2;
+    {{? it.platform.dapi.nginx.ssl.enable}}listen 1443 ssl http2;
     listen [::]:1443 ssl http2;
 
     ssl on;
@@ -20,7 +20,7 @@ server {
     ssl_certificate_key /etc/ssl/private.key;
 
     ssl_protocols TLSv1.2 TLSv1.3;
-
+    {{?}}
     access_log /dev/stdout grpc_json;
 
     limit_req zone=protect_api burst=300 nodelay;
