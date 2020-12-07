@@ -29,6 +29,9 @@ module.exports = {
     description: {
       type: ['string', 'null'],
     },
+    configVersion: {
+      type: ['string'],
+    },
     core: {
       type: 'object',
       properties: {
@@ -338,6 +341,6 @@ module.exports = {
       enum: ['development', 'production'],
     },
   },
-  required: ['description', 'core', 'platform', 'externalIp', 'network', 'compose', 'environment'],
+  required: ['description', 'configVersion', 'core', 'platform', 'externalIp', 'network', 'compose', 'environment'],
   additionalProperties: false,
 };

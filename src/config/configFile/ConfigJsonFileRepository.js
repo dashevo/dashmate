@@ -10,6 +10,8 @@ const configFileJsonSchema = require('./configFileJsonSchema');
 const ConfigFileNotFoundError = require('../errors/ConfigFileNotFoundError');
 const InvalidConfigFileFormatError = require('../errors/InvalidConfigFileFormatError');
 
+const packageJson = require('../../../package.json');
+
 class ConfigJsonFileRepository {
   /**
    * @param configFilePath
@@ -36,6 +38,10 @@ class ConfigJsonFileRepository {
       configFileData = JSON.parse(configFileJSON);
     } catch (e) {
       throw new InvalidConfigFileFormatError(this.configFilePath, e);
+    }
+
+    if (packageJson.version !== configFileData.version) {
+      // do config upgrade
     }
 
     const isValid = this.ajv.validate(configFileJsonSchema, configFileData);

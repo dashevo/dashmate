@@ -4,6 +4,7 @@ const NETWORKS = require('../../networks');
 
 const baseConfig = {
   description: 'base config for use as template',
+  configVersion: 0.16,
   core: {
     docker: {
       image: 'dashpay/dashd-develop:latest',
