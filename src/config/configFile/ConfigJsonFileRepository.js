@@ -40,16 +40,16 @@ class ConfigJsonFileRepository {
       throw new InvalidConfigFileFormatError(this.configFilePath, e);
     }
 
-    if (packageJson.version !== configFileData.version) {
-      // do config upgrade
-    }
-
     const isValid = this.ajv.validate(configFileJsonSchema, configFileData);
 
     if (!isValid) {
       const error = new Error(this.ajv.errorsText(undefined, { dataVar: 'configFile' }));
 
       throw new InvalidConfigFileFormatError(this.configFilePath, error);
+    }
+
+    if (packageJson.version !== configFileData.configVersion) {
+      // do config upgrade
     }
 
     let configs;
@@ -72,6 +72,7 @@ class ConfigJsonFileRepository {
   async write(configCollection) {
     const configFileData = {
       defaultConfigName: configCollection.getDefaultConfigName(),
+      configVersion: configCollection.getConfigVersion(),
     };
 
     configFileData.configs = configCollection.getAllConfigs().reduce((configsMap, config) => {

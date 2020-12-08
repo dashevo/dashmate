@@ -2,6 +2,9 @@ module.exports = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   type: 'object',
   properties: {
+    configVersion: {
+      type: 'string',
+    },
     defaultConfigName: {
       type: ['string', 'null'],
     },
@@ -9,6 +12,6 @@ module.exports = {
       type: 'object',
     },
   },
-  required: ['defaultConfigName', 'configs'],
+  required: ['configVersion', 'defaultConfigName', 'configs'],
   additionalProperties: false,
 };
