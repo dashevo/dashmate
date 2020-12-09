@@ -44,7 +44,9 @@ const generateToAddressTaskFactory = require('./listr/tasks/wallet/generateToAdd
 const registerMasternodeTaskFactory = require('./listr/tasks/registerMasternodeTaskFactory');
 const initTaskFactory = require('./listr/tasks/platform/initTaskFactory');
 const startNodeTaskFactory = require('./listr/tasks/startNodeTaskFactory');
+
 const createTenderdashRpcClient = require('./tenderdash/createTenderdashRpcClient');
+const generateGenesisConfigFactory = require('./tenderdash/generateGenesisConfigFactory');
 
 async function createDIContainer(options) {
   const container = createAwilixContainer({
@@ -120,6 +122,7 @@ async function createDIContainer(options) {
    */
   container.register({
     createTenderdashRpcClient: asValue(createTenderdashRpcClient),
+    generateGenesisConfig: asFunction(generateGenesisConfigFactory),
   });
 
   /**

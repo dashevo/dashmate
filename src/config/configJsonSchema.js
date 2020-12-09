@@ -229,7 +229,7 @@ module.exports = {
               additionalProperties: false,
               required: ['docker', 'log'],
             },
-            tendermint: {
+            tenderdash: {
               properties: {
                 docker: {
                   $ref: '#/definitions/docker/properties/docker',
@@ -283,7 +283,7 @@ module.exports = {
               additionalProperties: false,
             },
           },
-          required: ['mongodb', 'abci', 'tendermint'],
+          required: ['mongodb', 'abci', 'tenderdash'],
           additionalProperties: false,
         },
         dpns: {

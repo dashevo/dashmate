@@ -95,8 +95,17 @@ class BaseCommand extends Command {
         config: asValue(config),
       });
 
+      // Generate Tenderdash genesis config if empty
+      if (Object.keys(config.options.platform.drive.tenderdash.genesis).length === 0) {
+        const generateGenesisConfig = this.container.resolve('generateGenesisConfig');
+
+        const genesisConfig = await generateGenesisConfig(config);
+
+        config.set('platform.drive.tenderdash.genesis', genesisConfig);
+      }
+
       const renderServiceTemplates = this.container.resolve('renderServiceTemplates');
-      renderServiceTemplates(config, this.container.resolve('homeDirPath'));
+      renderServiceTemplates(config);
     }
 
     const params = getFunctionParams(this.runWithDependencies, 2);

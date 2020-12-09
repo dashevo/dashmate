@@ -82,9 +82,9 @@ const baseConfig = {
           level: 'info',
         },
       },
-      tendermint: {
+      tenderdash: {
         docker: {
-          image: 'dashpay/tendermint:v0.32.12',
+          image: 'dashpay/tenderdash',
         },
         p2p: {
           port: 26656,
@@ -174,7 +174,7 @@ module.exports = {
         ownerId: 'Gxiu28Lzfj66aPBCxD7AgTbbauLf68jFLNibWGU39Fuh',
       },
       drive: {
-        tendermint: {
+        tenderdash: {
           p2p: {
             persistentPeers: [
               {

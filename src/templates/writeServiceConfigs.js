@@ -4,13 +4,14 @@ const path = require('path');
 /**
  * Write service config files
  *
+ * @typedef {writeServiceConfigs}
  * @param {Object} configFiles
  * @param {string} homedirPath
  * @param {string} configName
  *
  * @return {Promise<void>}
  */
-async function writeServiceConfigs(configFiles, homedirPath, configName) {
+function writeServiceConfigs(configFiles, homedirPath, configName) {
   const configPath = path.join(homedirPath, configName);
 
   try {
