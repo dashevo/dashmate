@@ -1,6 +1,5 @@
 const { Listr } = require('listr2');
 const fs = require('fs');
-const execa = require('execa');
 
 /**
  * @param {createCertificate} createCertificate
@@ -8,6 +7,7 @@ const execa = require('execa');
  * @param {verifyTempServer} verifyTempServer
  * @param {verifyDomain} verifyDomain
  * @param {downloadCertificate} downloadCertificate
+ * @param {Docker} docker
  * @param {string} homeDirPath
  * @return {createZerosslCertificateTask}
  */
@@ -17,6 +17,7 @@ function createZerosslCertificateTaskFactory(
   verifyTempServer,
   verifyDomain,
   downloadCertificate,
+  docker,
   homeDirPath,
 ) {
   /**
@@ -56,12 +57,29 @@ function createZerosslCertificateTaskFactory(
       {
         title: 'Set up temp server',
         task: async (ctx) => {
-          ctx.server = execa('http-server', [`${homeDirPath}/ssl`, '-p 8080']);
+          try {
+            ctx.nginx = await docker.createContainer({
+              name: 'mn-ssl-verification',
+              Image: 'nginx',
+              Tty: false,
+              HostConfig: {
+                AutoRemove: true,
+                Binds: [`${homeDirPath}/ssl:/usr/share/nginx/html:ro`],
+                PortBindings: { '80/tcp': [{ HostPort: '80' }] },
+              },
+            });
+
+            await ctx.nginx.start();
+          } catch (e) {
+            throw new Error(e);
+          }
+
           await verifyTempServer(
-            homeDirPath,
             ctx.challengeFile,
             config.get('externalIp'),
           );
+
+          await ctx.nginx.stop();
         },
       },
       {
