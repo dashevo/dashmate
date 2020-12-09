@@ -78,8 +78,6 @@ function createZerosslCertificateTaskFactory(
             ctx.challengeFile,
             config.get('externalIp'),
           );
-
-          await ctx.nginx.stop();
         },
       },
       {
@@ -100,8 +98,8 @@ function createZerosslCertificateTaskFactory(
       },
       {
         title: 'Stop temp server',
-        task: (ctx) => {
-          ctx.server.kill('SIGTERM', { forceKillAfterTimeout: 2000 });
+        task: async (ctx) => {
+          await ctx.nginx.stop();
           fs.rmdir(`${homeDirPath}/ssl/.well-known`, { recursive: true }, (error) => {
             if (error) {
               throw new Error(error);
