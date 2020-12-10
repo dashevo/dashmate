@@ -58,6 +58,21 @@ function createZerosslCertificateTaskFactory(
         title: 'Set up temp server',
         task: async (ctx) => {
           try {
+            // Why doesn't any of this work???
+
+            /*
+            docker.pull('nginx');
+
+            await docker.pull('nginx');
+
+            docker.pull('nginx', function (err, stream) {
+              docker.modem.followProgress(stream, onFinished);
+              function onFinished(err, output) {
+                console.log('done pulling');
+              }
+            });
+            */
+
             const opts = {
               name: 'mn-ssl-verification',
               Image: 'nginx',
@@ -69,7 +84,6 @@ function createZerosslCertificateTaskFactory(
               },
             };
 
-            await docker.pull('nginx');
             ctx.nginx = await docker.createContainer(opts);
             await ctx.nginx.start();
           } catch (e) {
