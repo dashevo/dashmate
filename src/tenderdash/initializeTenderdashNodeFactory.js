@@ -93,7 +93,7 @@ function initializeTenderdashNodeFactory(dockerCompose, docker) {
       {
         Entrypoint: ['sh', '-c', command],
         HostConfig: {
-          // AutoRemove: true,
+          AutoRemove: true,
           Binds: [`${volumeNameFullName}:/tenderdash/data`],
         },
       },
