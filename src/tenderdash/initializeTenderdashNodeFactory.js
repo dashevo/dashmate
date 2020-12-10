@@ -4,9 +4,10 @@ const { WritableStream } = require('memory-streams');
  *
  * @param {DockerCompose} dockerCompose
  * @param {Docker} docker
+ * @param {dockerPull} dockerPull
  * @return {initializeTenderdashNode}
  */
-function initializeTenderdashNodeFactory(dockerCompose, docker) {
+function initializeTenderdashNodeFactory(dockerCompose, docker, dockerPull) {
   /**
    * @typedef {initializeTenderdashNode}
    * @param {Config} config
@@ -39,7 +40,7 @@ function initializeTenderdashNodeFactory(dockerCompose, docker) {
       });
 
       // Set tmuser ownership for the volume
-      await docker.pull('alpine:latest');
+      await dockerPull('alpine:latest');
 
       const writableStream = new WritableStream();
 
@@ -71,7 +72,7 @@ function initializeTenderdashNodeFactory(dockerCompose, docker) {
 
     const tenderdashImage = config.get('platform.drive.tenderdash.docker.image');
 
-    await docker.pull(tenderdashImage);
+    await dockerPull(tenderdashImage);
 
     const writableStream = new WritableStream();
 
