@@ -1,38 +1,40 @@
 const fs = require('fs');
 const path = require('path');
 const dots = require('dot');
+const glob = require('glob');
 
 /**
- * @param {writeServiceConfigs} writeServiceConfigs
- * @param {string} homeDirPath
- *
  * @return {renderServiceTemplates}
  */
-function renderServiceTemplatesFactory(writeServiceConfigs, homeDirPath) {
+function renderServiceTemplatesFactory() {
   /**
    * Render templates for services
    *
    * @typedef {renderServiceTemplates}
    * @param {Config} config
    *
-   * @return {Promise<void>}
+   * @return {Object<string,string>}
    */
   function renderServiceTemplates(config) {
     dots.templateSettings.strip = false;
 
-    const templatesPath = path.join(__dirname, '../../templates');
+    const templatesPath = path.join(__dirname, '..', '..', 'templates');
 
-    const files = fs.readdirSync(templatesPath);
+    const templatePaths = glob.sync(`${templatesPath}/**/*.template`);
 
     const configFiles = {};
-    for (const file of files) {
-      const fileContents = fs.readFileSync(path.join(templatesPath, file), 'utf-8');
-      const fileTemplate = dots.template(fileContents);
+    for (const templatePath of templatePaths) {
+      const templateString = fs.readFileSync(templatePath, 'utf-8');
+      const template = dots.template(templateString);
 
-      configFiles[file] = fileTemplate(config.options);
+      const configPath = templatePath
+        .substring(templatesPath.length + 1)
+        .replace('.template', '');
+
+      configFiles[configPath] = template(config.options);
     }
 
-    writeServiceConfigs(configFiles, homeDirPath, config.name);
+    return configFiles;
   }
 
   return renderServiceTemplates;

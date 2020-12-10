@@ -95,17 +95,34 @@ class BaseCommand extends Command {
         config: asValue(config),
       });
 
-      // Generate Tenderdash genesis config if empty
-      if (Object.keys(config.options.platform.drive.tenderdash.genesis).length === 0) {
-        const generateGenesisConfig = this.container.resolve('generateGenesisConfig');
+      // Initialize Tenderdash
+      const isGenesisEmpty = Object.keys(config.get('platform.drive.tenderdash.genesis')).length === 0;
+      const isValidatorKeyEmpty = Object.keys(config.get('platform.drive.tenderdash.validatorKey')).length === 0;
+      const isNodeKeyEmpty = Object.keys(config.get('platform.drive.tenderdash.nodeKey')).length === 0;
 
-        const genesisConfig = await generateGenesisConfig(config);
+      if (config.getName() !== 'base' && (isGenesisEmpty || isValidatorKeyEmpty || isNodeKeyEmpty)) {
+        const initializeTenderdashNode = this.container.resolve('initializeTenderdashNode');
 
-        config.set('platform.drive.tenderdash.genesis', genesisConfig);
+        const [validatorKey, nodeKey, genesis] = await initializeTenderdashNode(config);
+
+        if (isValidatorKeyEmpty) {
+          config.set('platform.drive.tenderdash.validatorKey', validatorKey);
+        }
+
+        if (isNodeKeyEmpty) {
+          config.set('platform.drive.tenderdash.nodeKey', nodeKey);
+        }
+
+        if (isGenesisEmpty) {
+          config.set('platform.drive.tenderdash.genesis', genesis);
+        }
       }
 
       const renderServiceTemplates = this.container.resolve('renderServiceTemplates');
-      renderServiceTemplates(config);
+      const writeServiceConfigs = this.container.resolve('writeServiceConfigs');
+
+      const configFiles = renderServiceTemplates(config);
+      writeServiceConfigs(config.getName(), configFiles);
     }
 
     const params = getFunctionParams(this.runWithDependencies, 2);

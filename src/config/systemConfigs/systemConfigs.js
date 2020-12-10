@@ -93,7 +93,14 @@ const baseConfig = {
         rpc: {
           port: 26657,
         },
+        validatorKey: {
+
+        },
+        nodeKey: {
+
+        },
         genesis: {
+
         },
       },
     },

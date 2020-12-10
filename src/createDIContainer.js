@@ -18,7 +18,7 @@ const resetSystemConfigFactory = require('./config/systemConfigs/resetSystemConf
 const systemConfigs = require('./config/systemConfigs/systemConfigs');
 
 const renderServiceTemplatesFactory = require('./templates/renderServiceTemplatesFactory');
-const writeServiceConfigs = require('./templates/writeServiceConfigs');
+const writeServiceConfigsFactory = require('./templates/writeServiceConfigsFactory');
 
 const DockerCompose = require('./docker/DockerCompose');
 const StartedContainers = require('./docker/StartedContainers');
@@ -46,7 +46,7 @@ const initTaskFactory = require('./listr/tasks/platform/initTaskFactory');
 const startNodeTaskFactory = require('./listr/tasks/startNodeTaskFactory');
 
 const createTenderdashRpcClient = require('./tenderdash/createTenderdashRpcClient');
-const generateGenesisConfigFactory = require('./tenderdash/generateGenesisConfigFactory');
+const initializeTenderdashNodeFactory = require('./tenderdash/initializeTenderdashNodeFactory');
 
 async function createDIContainer(options) {
   const container = createAwilixContainer({
@@ -74,7 +74,7 @@ async function createDIContainer(options) {
    */
   container.register({
     renderServiceTemplates: asFunction(renderServiceTemplatesFactory),
-    writeServiceConfigs: asValue(writeServiceConfigs),
+    writeServiceConfigs: asFunction(writeServiceConfigsFactory),
   });
 
   /**
@@ -122,7 +122,7 @@ async function createDIContainer(options) {
    */
   container.register({
     createTenderdashRpcClient: asValue(createTenderdashRpcClient),
-    generateGenesisConfig: asFunction(generateGenesisConfigFactory),
+    initializeTenderdashNode: asFunction(initializeTenderdashNodeFactory),
   });
 
   /**

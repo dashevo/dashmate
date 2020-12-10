@@ -275,11 +275,17 @@ module.exports = {
                   required: ['port'],
                   additionalProperties: false,
                 },
+                validatorKey: {
+                  type: 'object',
+                },
+                nodeKey: {
+                  type: 'object',
+                },
                 genesis: {
                   type: 'object',
                 },
               },
-              required: ['docker', 'p2p', 'rpc', 'genesis'],
+              required: ['docker', 'p2p', 'rpc', 'validatorKey', 'nodeKey', 'genesis'],
               additionalProperties: false,
             },
           },

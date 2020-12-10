@@ -18,7 +18,7 @@ services:
       - drive_mongodb
       - core
     volumes:
-      - drive_abci_leveldb:/usr/src/app/db
+      - drive_abci_data:/usr/src/app/db
     environment:
       - CORE_JSON_RPC_USERNAME=${CORE_RPC_USER:?err}
       - CORE_JSON_RPC_PASSWORD=${CORE_RPC_PASSWORD:?err}
@@ -44,9 +44,8 @@ services:
       - ${PLATFORM_DRIVE_TENDERDASH_P2P_PORT:?err}:26656 # P2P
       - 127.0.0.1:${PLATFORM_DRIVE_TENDERDASH_RPC_PORT:?err}:26657 # RPC
     volumes:
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/genesis.json:/tenderdash/config/genesis.json
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/config.toml:/tenderdash/config/config.toml
-      - drive_tenderdash_homedir:/tenderdash
+      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/tenderdash/config:/tenderdash/config
+      - drive_tenderdash_data:/tenderdash/data
 
   dapi_insight:
     image: ${PLATFORM_DAPI_INSIGHT_DOCKER_IMAGE:?err}
@@ -130,6 +129,6 @@ services:
       - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/errors.grpc_conf:/etc/nginx/conf.d/errors.grpc_conf
 
 volumes:
-  drive_abci_leveldb:
+  drive_abci_data:
   drive_mongodb_data:
-  drive_tenderdash_homedir:
+  drive_tenderdash_data:
