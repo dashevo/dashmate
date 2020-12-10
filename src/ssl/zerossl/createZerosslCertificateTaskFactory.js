@@ -58,7 +58,7 @@ function createZerosslCertificateTaskFactory(
         title: 'Set up temp server',
         task: async (ctx) => {
           try {
-            ctx.nginx = await docker.createContainer({
+            const opts = {
               name: 'mn-ssl-verification',
               Image: 'nginx',
               Tty: false,
@@ -67,8 +67,10 @@ function createZerosslCertificateTaskFactory(
                 Binds: [`${homeDirPath}/ssl:/usr/share/nginx/html:ro`],
                 PortBindings: { '80/tcp': [{ HostPort: '80' }] },
               },
-            });
+            };
 
+            await docker.pull('nginx');
+            ctx.nginx = await docker.createContainer(opts);
             await ctx.nginx.start();
           } catch (e) {
             throw new Error(e);
