@@ -48,7 +48,7 @@ class ConfigJsonFileRepository {
       throw new InvalidConfigFileFormatError(this.configFilePath, error);
     }
 
-    if (packageJson.version !== configFileData.configVersion) {
+    if (packageJson.version !== configFileData.configFormatVersion) {
       // do config upgrade
     }
 
@@ -60,7 +60,7 @@ class ConfigJsonFileRepository {
       throw new InvalidConfigFileFormatError(this.configFilePath, e);
     }
 
-    return new ConfigCollection(configs, configFileData.defaultConfigName);
+    return new ConfigCollection(configs, configFileData.defaultConfigName, packageJson.version);
   }
 
   /**
@@ -72,7 +72,7 @@ class ConfigJsonFileRepository {
   async write(configCollection) {
     const configFileData = {
       defaultConfigName: configCollection.getDefaultConfigName(),
-      configVersion: configCollection.getConfigVersion(),
+      configFormatVersion: configCollection.getConfigFormatVersion(),
     };
 
     configFileData.configs = configCollection.getAllConfigs().reduce((configsMap, config) => {
