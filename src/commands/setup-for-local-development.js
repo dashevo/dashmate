@@ -56,6 +56,12 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
               task: () => registerMasternodeTask(config),
             },
             {
+              title: 'Set initial core chain locked height',
+              task: async () => {
+                config.set('platform.drive.tenderdash.genesis.initial_core_chain_locked_height', 1000);
+              },
+            },
+            {
               title: 'Start masternode',
               task: async (ctx) => startNodeTask(
                 config,
