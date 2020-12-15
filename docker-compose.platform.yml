@@ -43,10 +43,8 @@ services:
       - ${PLATFORM_DRIVE_TENDERMINT_P2P_PORT:?err}:26656 # P2P
       - 127.0.0.1:${PLATFORM_DRIVE_TENDERMINT_RPC_PORT:?err}:26657 # RPC
     volumes:
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/genesis.json:/tendermint/config/genesis.json
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/config.toml:/tendermint/config/config.toml
-      - drive_tendermint_homedir:/tendermint
-    entrypoint: sh -c "/usr/bin/tendermint init && /usr/bin/tendermint node"
+      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/tenderdash:/tenderdash/config
+      - drive_tenderdash_data:/tenderdash
 
   dapi_insight:
     image: ${PLATFORM_DAPI_INSIGHT_DOCKER_IMAGE:?err}
