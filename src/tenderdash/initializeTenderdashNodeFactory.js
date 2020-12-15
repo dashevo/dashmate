@@ -19,9 +19,8 @@ function initializeTenderdashNodeFactory(dockerCompose, docker, dockerPull) {
     }
 
     const { COMPOSE_PROJECT_NAME: composeProjectName } = config.toEnvs();
-    const volumeName = 'drive_tenderdash_data';
+    const volumeName = 'drive_tenderdash';
     const volumeNameFullName = `${composeProjectName}_${volumeName}`;
-    const tempVolumeNameFullName = `${composeProjectName}_tempvol`;
 
     const volume = docker.getVolume(volumeNameFullName);
 
@@ -39,43 +38,6 @@ function initializeTenderdashNodeFactory(dockerCompose, docker, dockerPull) {
           'com.docker.compose.volume': volumeName,
         },
       });
-
-      await docker.createVolume({
-        Name: tempVolumeNameFullName,
-        Labels: {
-          'com.docker.compose.project': composeProjectName,
-          'com.docker.compose.version': '1.27.4',
-          'com.docker.compose.volume': 'tempvol',
-        },
-      });
-
-      // Set tmuser ownership for the volume
-      /*await dockerPull('alpine:latest');
-
-      const writableStream = new WritableStream();
-
-      const command = [
-        'addgroup tmuser',
-        'adduser -S -G tmuser tmuser',
-        'chown -R tmuser:tmuser /tenderdash',
-      ].join('&&');
-
-      const [result] = await docker.run(
-        'alpine:latest',
-        ['sh', '-c', command],
-        writableStream,
-        {
-          HostConfig: {
-            //AutoRemove: true,
-            Binds: [`${volumeNameFullName}:/tenderdash`, 'tempvol:/tenderdash/config'],
-          },
-        },
-        {},
-      );
-
-      if (result.StatusCode !== 0) {
-        throw new Error(result.Error || writableStream.toString());
-      }*/
     }
 
     // Initialize Tenderdash
@@ -95,6 +57,7 @@ function initializeTenderdashNodeFactory(dockerCompose, docker, dockerPull) {
       'echo ","',
       'cat $TMHOME/config/genesis.json',
       'echo "]"',
+      'rm -rf $TMHOME/config',
     ].join('&&');
 
     const [result] = await docker.run(
@@ -104,8 +67,8 @@ function initializeTenderdashNodeFactory(dockerCompose, docker, dockerPull) {
       {
         Entrypoint: ['sh', '-c', command],
         HostConfig: {
-          //AutoRemove: true,
-          Binds: [`${volumeNameFullName}:/tenderdash`, '/home/strophy/Code/mn-bootstrap/tempdir:/tenderdash/config'],
+          AutoRemove: true,
+          Binds: [`${volumeNameFullName}:/tenderdash`],
         },
       },
     );
