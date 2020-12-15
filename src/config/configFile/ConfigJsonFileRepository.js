@@ -16,8 +16,9 @@ class ConfigJsonFileRepository {
   /**
    * @param configFilePath
    */
-  constructor(configFilePath) {
+  constructor(configFilePath, migrateConfigOptions) {
     this.configFilePath = configFilePath;
+    this.migrateConfigOptions = migrateConfigOptions;
     this.ajv = new Ajv();
   }
 
@@ -48,14 +49,19 @@ class ConfigJsonFileRepository {
       throw new InvalidConfigFileFormatError(this.configFilePath, error);
     }
 
-    if (packageJson.version !== configFileData.configFormatVersion) {
-      // do config upgrade
-    }
-
     let configs;
     try {
       configs = Object.entries(configFileData.configs)
-        .map(([name, options]) => new Config(name, options));
+        .map(([name, options]) => {
+          const migratedOptions = this.migrateConfigOptions(
+            name,
+            options,
+            configFileData.configFormatVersion,
+            packageJson.version,
+          );
+
+          return new Config(name, migratedOptions);
+        });
     } catch (e) {
       throw new InvalidConfigFileFormatError(this.configFilePath, e);
     }
