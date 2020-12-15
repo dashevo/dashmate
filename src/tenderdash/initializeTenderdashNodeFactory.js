@@ -19,7 +19,7 @@ function initializeTenderdashNodeFactory(dockerCompose, docker, dockerPull) {
     }
 
     const { COMPOSE_PROJECT_NAME: composeProjectName } = config.toEnvs();
-    const volumeName = 'drive_tenderdash_data';
+    const volumeName = 'drive_tenderdash';
     const volumeNameFullName = `${composeProjectName}_${volumeName}`;
 
     const volume = docker.getVolume(volumeNameFullName);
@@ -38,34 +38,6 @@ function initializeTenderdashNodeFactory(dockerCompose, docker, dockerPull) {
           'com.docker.compose.volume': volumeName,
         },
       });
-
-      // Set tmuser ownership for the volume
-      await dockerPull('alpine:latest');
-
-      const writableStream = new WritableStream();
-
-      const command = [
-        'addgroup tmuser',
-        'adduser -S -G tmuser tmuser',
-        'chown -R tmuser:tmuser /tenderdash',
-      ].join('&&');
-
-      const [result] = await docker.run(
-        'alpine:latest',
-        ['sh', '-c', command],
-        writableStream,
-        {
-          HostConfig: {
-            AutoRemove: true,
-            Binds: [`${volumeNameFullName}:/tenderdash/data`],
-          },
-        },
-        {},
-      );
-
-      if (result.StatusCode !== 0) {
-        throw new Error(result.Error || writableStream.toString());
-      }
     }
 
     // Initialize Tenderdash
@@ -85,6 +57,7 @@ function initializeTenderdashNodeFactory(dockerCompose, docker, dockerPull) {
       'echo ","',
       'cat $TMHOME/config/genesis.json',
       'echo "]"',
+      'rm -rf $TMHOME/config',
     ].join('&&');
 
     const [result] = await docker.run(
@@ -95,7 +68,7 @@ function initializeTenderdashNodeFactory(dockerCompose, docker, dockerPull) {
         Entrypoint: ['sh', '-c', command],
         HostConfig: {
           AutoRemove: true,
-          Binds: [`${volumeNameFullName}:/tenderdash/data`],
+          Binds: [`${volumeNameFullName}:/tenderdash`],
         },
       },
     );
