@@ -116,7 +116,7 @@ class CoreStatusCommand extends BaseCommand {
         status = 'not started';
       }
     }
-    if (status === 'running' && platformCatchingUp === true) {
+    if (status === 'running' && platformCatchingUp === true && explorerURLs[config.options.network]) {
       status = `syncing ${((platformLatestBlockHeight / explorerLatestBlockHeight) * 100).toFixed(2)}%`;
     }
 
@@ -130,10 +130,14 @@ class CoreStatusCommand extends BaseCommand {
     }
 
     let blocks;
-    if (platformLatestBlockHeight >= explorerLatestBlockHeight) {
-      blocks = chalk.green(platformLatestBlockHeight);
+    if (explorerURLs[config.options.network]) {
+      if (platformLatestBlockHeight >= explorerLatestBlockHeight) {
+        blocks = chalk.green(platformLatestBlockHeight);
+      } else {
+        blocks = chalk.red(platformLatestBlockHeight);
+      }
     } else {
-      blocks = chalk.red(platformLatestBlockHeight);
+      blocks = platformLatestBlockHeight;
     }
 
     if (httpPortState === 'OPEN') {
