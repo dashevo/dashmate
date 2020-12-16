@@ -42,6 +42,10 @@ class CoreStatusCommand extends BaseCommand {
       dockerCompose.docker.getContainer('core'),
     );
 
+    const explorerURLs = {
+      evonet: 'https://rpc.cloudwheels.net:26657/status',
+    };
+
     // Collect core data
     const {
       result: {
@@ -79,14 +83,17 @@ class CoreStatusCommand extends BaseCommand {
       },
     } = await tendermintNetInfoRes.json();
 
-    const explorerBlockHeightRes = await fetch('https://rpc.cloudwheels.net:26657/status');
-    const {
-      result: {
-        sync_info: {
-          latest_block_height: explorerLatestBlockHeight,
+    let explorerLatestBlockHeight;
+    if (explorerURLs[config.options.network]) {
+      const explorerBlockHeightRes = await fetch(explorerURLs[config.options.network]);
+      ({
+        result: {
+          sync_info: {
+            latest_block_height: explorerLatestBlockHeight,
+          },
         },
-      },
-    } = await explorerBlockHeightRes.json();
+      } = await explorerBlockHeightRes.json());
+    }
 
     // Check ports
     const httpPortStateRes = await fetch(`https://mnowatch.org/${config.options.platform.dapi.nginx.http.port}/`);
@@ -150,7 +157,9 @@ class CoreStatusCommand extends BaseCommand {
     rows.push(['Network', platformNetwork]);
     rows.push(['Status', status]);
     rows.push(['Block height', blocks]);
-    rows.push(['Remote block height', explorerLatestBlockHeight]);
+    if (explorerURLs[config.options.network]) {
+      rows.push(['Remote block height', explorerLatestBlockHeight]);
+    }
     rows.push(['Peer count', platformPeers]);
     rows.push(['App hash', platformLatestAppHash]);
     rows.push(['HTTP service', `${config.options.externalIp}:${config.options.platform.dapi.nginx.http.port}`]);
