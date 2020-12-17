@@ -59,9 +59,9 @@ class StartCommand extends BaseCommand {
   }
 }
 
-StartCommand.description = `Start masternode
+StartCommand.description = `Start node
 ...
-Start masternode with specific preset
+Start node
 `;
 
 StartCommand.flags = {
