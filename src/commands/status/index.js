@@ -3,6 +3,7 @@ const fetch = require('node-fetch');
 const chalk = require('chalk');
 
 const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
+const ServiceIsNotRunningError = require('../../docker/errors/ServiceIsNotRunningError');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
 const CoreService = require('../../core/CoreService');
@@ -37,6 +38,10 @@ class StatusCommand extends BaseCommand {
       ),
       dockerCompose.docker.getContainer('core'),
     );
+
+    if (!(await dockerCompose.isServiceRunning(config.toEnvs(), 'core'))) {
+      throw new ServiceIsNotRunningError(config.options.network, 'core');
+    }
 
     // Collect core data
     const {
@@ -83,20 +88,36 @@ class StatusCommand extends BaseCommand {
     let platformVersion;
     let platformBlockHeight;
     let platformCatchingUp;
-    // Collecting platform data fails if Tenderdash is waiting for core to sync
-    if (config.options.network !== 'testnet' && coreIsSynced === true) {
-      const platformStatusRes = await fetch(`http://localhost:${config.options.platform.drive.tendermint.rpc.port}/status`);
-      ({
-        result: {
-          node_info: {
-            version: platformVersion,
+    let platformStatus;
+
+    if (config.options.network !== 'testnet') {
+      if (!(await dockerCompose.isServiceRunning(config.toEnvs(), 'drive_tenderdash'))) {
+        try {
+          ({
+            State: {
+              Status: platformStatus,
+            },
+          } = await dockerCompose.inspectService(config.toEnvs(), 'drive_tenderdash'));
+        } catch (e) {
+          if (e instanceof ContainerIsNotPresentError) {
+            platformStatus = 'not started';
+          }
+        }
+      } else if (coreIsSynced === true) {
+        // Collecting platform data fails if Tenderdash is waiting for core to sync
+        const platformStatusRes = await fetch(`http://localhost:${config.options.platform.drive.tenderdash.rpc.port}/status`);
+        ({
+          result: {
+            node_info: {
+              version: platformVersion,
+            },
+            sync_info: {
+              latest_block_height: platformBlockHeight,
+              catching_up: platformCatchingUp,
+            },
           },
-          sync_info: {
-            latest_block_height: platformBlockHeight,
-            catching_up: platformCatchingUp,
-          },
-        },
-      } = await platformStatusRes.json());
+        } = await platformStatusRes.json());
+      }
     }
 
     const explorerBlockHeightRes = await fetch('https://rpc.cloudwheels.net:26657/status');
@@ -125,19 +146,7 @@ class StatusCommand extends BaseCommand {
       coreStatus = `syncing ${(coreVerificationProgress * 100).toFixed(2)}%`;
     }
 
-    let platformStatus;
     if (config.options.network !== 'testnet') {
-      try {
-        ({
-          State: {
-            Status: platformStatus,
-          },
-        } = await dockerCompose.inspectService(config.toEnvs(), 'drive_tendermint'));
-      } catch (e) {
-        if (e instanceof ContainerIsNotPresentError) {
-          platformStatus = 'not started';
-        }
-      }
       if (platformStatus === 'running' && coreIsSynced === false) {
         platformStatus = 'waiting for core sync';
       } else if (platformStatus === 'running' && platformCatchingUp === true) {
@@ -186,7 +195,9 @@ class StatusCommand extends BaseCommand {
       rows.push(['Masternode Status', (masternodeStatus)]);
     }
     if (config.options.network !== 'testnet') {
-      if (coreIsSynced === true) {
+      if (coreIsSynced === true
+        && platformStatus !== chalk.red('not started')
+        && platformStatus !== chalk.red('restarting')) {
         rows.push(['Platform Version', platformVersion]);
       }
       rows.push(['Platform Status', platformStatus]);
