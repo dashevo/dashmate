@@ -76,8 +76,8 @@ services:
       - DASHCORE_P2P_PORT=${CORE_P2P_PORT:?err}
       - DASHCORE_P2P_NETWORK=devnet
       - NETWORK=devnet
-      - TENDERDASH_RPC_HOST=drive_tenderdash
-      - TENDERDASH_RPC_PORT=26657
+      - TENDERMINT_RPC_HOST=drive_tenderdash
+      - TENDERMINT_RPC_PORT=26657
       - NODE_ENV=${ENVIRONMENT:?err}
     command: npm run api
 
@@ -100,8 +100,8 @@ services:
       - DASHCORE_P2P_PORT=${CORE_P2P_PORT:?err}
       - DASHCORE_P2P_NETWORK=devnet
       - NETWORK=devnet
-      - TENDERDASH_RPC_HOST=drive_tenderdash
-      - TENDERDASH_RPC_PORT=26657
+      - TENDERMINT_RPC_HOST=drive_tenderdash
+      - TENDERMINT_RPC_PORT=26657
     command: npm run tx-filter-stream
 
   dapi_envoy:
