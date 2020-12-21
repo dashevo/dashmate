@@ -9,7 +9,7 @@ function migrateConfigOptions(name, options, fromVersion, toVersion) {
 
   return Object.keys(configOptionMigrations)
     .filter((version) => (semver.gt(version, fromVersion) && semver.lte(version, toVersion)))
-    .sort((v1, v2) => semver.compare(v1, v2))
+    .sort(semver.compare)
     .reduce((migratedOptions, version) => {
       const migrationFunction = configOptionMigrations[version];
       return migrationFunction(name, migratedOptions);
