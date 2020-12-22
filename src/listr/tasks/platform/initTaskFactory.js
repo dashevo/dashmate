@@ -46,8 +46,6 @@ function initTaskFactory(
             network: config.get('network'),
           };
 
-          console.dir(ctx, { depth: 100 })
-
           if (ctx.dapiAddress) {
             clientOpts.dapiAddresses = [ctx.dapiAddress];
           }
