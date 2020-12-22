@@ -6,7 +6,7 @@ const baseConfig = {
   description: 'base config for use as template',
   core: {
     docker: {
-      image: 'dashpay/dashd:0.16',
+      image: 'dashpay/dashd-develop:latest',
     },
     p2p: {
       port: 20001,
@@ -38,7 +38,7 @@ const baseConfig = {
     dapi: {
       envoy: {
         docker: {
-          image: 'envoyproxy/envoy:v1.14-latest',
+          image: 'envoyproxy/envoy:v1.16-latest',
         },
       },
       nginx: {
@@ -51,15 +51,20 @@ const baseConfig = {
         docker: {
           image: 'nginx:latest',
         },
+        rateLimiter: {
+          enable: true,
+          rate: 120,
+          burst: 300,
+        },
       },
       api: {
         docker: {
-          image: 'dashpay/dapi:0.16',
+          image: 'dashpay/dapi:0.17-dev',
         },
       },
       insight: {
         docker: {
-          image: 'dashpay/insight-api:3.0.1',
+          image: 'dashpay/insight-api:3.1.1',
         },
       },
     },
@@ -71,15 +76,15 @@ const baseConfig = {
       },
       abci: {
         docker: {
-          image: 'dashpay/drive:0.16',
+          image: 'dashpay/drive:0.17-dev',
         },
         log: {
           level: 'info',
         },
       },
-      tendermint: {
+      tenderdash: {
         docker: {
-          image: 'dashpay/tendermint:v0.32.12',
+          image: 'dashpay/tenderdash',
         },
         p2p: {
           port: 26656,
@@ -88,9 +93,17 @@ const baseConfig = {
         rpc: {
           port: 26657,
         },
+        validatorKey: {
+
+        },
+        nodeKey: {
+
+        },
         genesis: {
+
         },
       },
+      skipAssetLockConfirmationValidation: false,
     },
     dpns: {
       contract: {
@@ -112,6 +125,18 @@ module.exports = {
   base: baseConfig,
   local: lodashMerge({}, baseConfig, {
     description: 'standalone node for local development',
+    platform: {
+      dapi: {
+        nginx: {
+          rateLimiter: {
+            enable: false,
+          },
+        },
+      },
+      drive: {
+        skipAssetLockConfirmationValidation: true,
+      },
+    },
     externalIp: '127.0.0.1',
     environment: 'development',
     network: NETWORKS.LOCAL,
@@ -160,7 +185,7 @@ module.exports = {
         ownerId: 'Gxiu28Lzfj66aPBCxD7AgTbbauLf68jFLNibWGU39Fuh',
       },
       drive: {
-        tendermint: {
+        tenderdash: {
           p2p: {
             persistentPeers: [
               {

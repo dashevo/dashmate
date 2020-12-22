@@ -172,8 +172,26 @@ module.exports = {
                   required: ['port'],
                   additionalProperties: false,
                 },
+                rateLimiter: {
+                  type: 'object',
+                  properties: {
+                    enable: {
+                      type: 'boolean',
+                    },
+                    rate: {
+                      type: 'integer',
+                      minimum: 0,
+                    },
+                    burst: {
+                      type: 'integer',
+                      minimum: 0,
+                    },
+                  },
+                  required: ['enable', 'rate', 'burst'],
+                  additionalProperties: false,
+                },
               },
-              required: ['docker', 'http', 'grpc'],
+              required: ['docker', 'http', 'grpc', 'rateLimiter'],
               additionalProperties: false,
             },
             api: {
@@ -211,7 +229,7 @@ module.exports = {
               additionalProperties: false,
               required: ['docker', 'log'],
             },
-            tendermint: {
+            tenderdash: {
               properties: {
                 docker: {
                   $ref: '#/definitions/docker/properties/docker',
@@ -257,15 +275,24 @@ module.exports = {
                   required: ['port'],
                   additionalProperties: false,
                 },
+                validatorKey: {
+                  type: 'object',
+                },
+                nodeKey: {
+                  type: 'object',
+                },
                 genesis: {
                   type: 'object',
                 },
               },
-              required: ['docker', 'p2p', 'rpc', 'genesis'],
+              required: ['docker', 'p2p', 'rpc', 'validatorKey', 'nodeKey', 'genesis'],
               additionalProperties: false,
             },
+            skipAssetLockConfirmationValidation: {
+              type: 'boolean',
+            },
           },
-          required: ['mongodb', 'abci', 'tendermint'],
+          required: ['mongodb', 'abci', 'tenderdash', 'skipAssetLockConfirmationValidation'],
           additionalProperties: false,
         },
         dpns: {

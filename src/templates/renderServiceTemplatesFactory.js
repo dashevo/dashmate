@@ -1,32 +1,40 @@
 const fs = require('fs');
+const path = require('path');
 const dots = require('dot');
+const glob = require('glob');
 
 /**
  * @return {renderServiceTemplates}
  */
-function renderServiceTemplatesFactory(writeServiceConfigs) {
+function renderServiceTemplatesFactory() {
   /**
    * Render templates for services
+   *
    * @typedef {renderServiceTemplates}
    * @param {Config} config
-   * @param {String} homeDirPath
-   * @returns {Promise<void>}
+   *
+   * @return {Object<string,string>}
    */
-  async function renderServiceTemplates(config, homeDirPath) {
-    const files = fs.readdirSync('./templates');
-
+  function renderServiceTemplates(config) {
     dots.templateSettings.strip = false;
+
+    const templatesPath = path.join(__dirname, '..', '..', 'templates');
+
+    const templatePaths = glob.sync(`${templatesPath}/**/*.template`);
+
     const configFiles = {};
-    for (const file of files) {
-      const fileContents = fs.readFileSync(`./templates/${file}`, 'utf-8');
-      const fileTemplate = dots.template(fileContents);
-      if (file === 'genesis.json.template' && Object.keys(config.options.platform.drive.tendermint.genesis).length === 0) {
-        continue;
-      }
-      const fileOutput = fileTemplate(config.options);
-      configFiles[file] = fileOutput;
+    for (const templatePath of templatePaths) {
+      const templateString = fs.readFileSync(templatePath, 'utf-8');
+      const template = dots.template(templateString);
+
+      const configPath = templatePath
+        .substring(templatesPath.length + 1)
+        .replace('.template', '');
+
+      configFiles[configPath] = template(config.options);
     }
-    writeServiceConfigs(configFiles, homeDirPath, config.name);
+
+    return configFiles;
   }
 
   return renderServiceTemplates;

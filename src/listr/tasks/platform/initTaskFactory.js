@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const fundWallet = require('@dashevo/wallet-lib/src/utils/fundWallet');
 
 const dpnsDocumentSchema = require('@dashevo/dpns-contract/schema/dpns-contract-documents.json');
+const dashpayDocumentSchema = require('@dashevo/dashpay-contract/schema/dashpay.schema.json');
 
 const NETWORKS = require('../../../networks');
 
@@ -63,6 +64,7 @@ function initTaskFactory(
             wallet: {
               mnemonic: null,
             },
+            passFakeAssetLockProofForTests: true,
           });
 
           const amount = 40000;
@@ -122,11 +124,11 @@ function initTaskFactory(
             return;
           }
 
-          const tendermintRpcClient = createTenderdashRpcClient();
+          const tenderdashRpcClient = createTenderdashRpcClient();
 
           const params = { hash: stateTransitionHash.toString('base64') };
 
-          const response = await tendermintRpcClient.request('tx', params);
+          const response = await tenderdashRpcClient.request('tx', params);
 
           if (response.error) {
             throw new Error(`Tendermint error: ${response.error.message}: ${response.error.data}`);
@@ -153,6 +155,33 @@ function initTaskFactory(
             dashAliasIdentityId: ctx.identity.getId(),
           }, ctx.identity);
         },
+      },
+      {
+        title: 'Register identity for Dashpay',
+        task: async (ctx, task) => {
+          ctx.identity = await ctx.client.platform.identities.register(5);
+
+          // eslint-disable-next-line no-param-reassign
+          task.output = `Dashpay's owner identity: ${ctx.identity.getId()}`;
+        },
+        options: { persistentOutput: true },
+      },
+      {
+        title: 'Register Dashpay Contract',
+        task: async (ctx, task) => {
+          ctx.dataContract = await ctx.client.platform.contracts.create(
+            dashpayDocumentSchema, ctx.identity,
+          );
+
+          await ctx.client.platform.contracts.broadcast(
+            ctx.dataContract,
+            ctx.identity,
+          );
+
+          // eslint-disable-next-line no-param-reassign
+          task.output = `Dashpay contract ID: ${ctx.dataContract.getId()}`;
+        },
+        options: { persistentOutput: true },
       },
       {
         title: 'Disconnect SDK',

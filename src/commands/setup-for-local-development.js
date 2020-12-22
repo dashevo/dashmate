@@ -18,6 +18,9 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
    * @param {initTask} initTask
    * @param {startNodeTask} startNodeTask
    * @param {DockerCompose} dockerCompose
+   * @param {renderServiceTemplates} renderServiceTemplates
+   * @param {writeServiceConfigs} writeServiceConfigs
+   * @param {initializeTenderdashNode} initializeTenderdashNode
    * @param {Config} config
    * @return {Promise<void>}
    */
@@ -27,12 +30,16 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
       update: isUpdate,
       'drive-image-build-path': driveImageBuildPath,
       'dapi-image-build-path': dapiImageBuildPath,
+      verbose: isVerbose,
     },
     generateToAddressTask,
     registerMasternodeTask,
     initTask,
     startNodeTask,
     dockerCompose,
+    renderServiceTemplates,
+    writeServiceConfigs,
+    initializeTenderdashNode,
     config,
   ) {
     if (config.get('network') !== NETWORKS.LOCAL) {
@@ -53,6 +60,22 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
             {
               title: 'Register masternode',
               task: () => registerMasternodeTask(config),
+            },
+            {
+              title: 'Initialize Tenderdash',
+              task: async () => {
+                const [validatorKey, nodeKey, genesis] = await initializeTenderdashNode(config);
+
+                config.set('platform.drive.tenderdash.validatorKey', validatorKey);
+                config.set('platform.drive.tenderdash.nodeKey', nodeKey);
+
+                genesis.initial_core_chain_locked_height = 1000;
+
+                config.set('platform.drive.tenderdash.genesis', genesis);
+
+                const configFiles = renderServiceTemplates(config);
+                writeServiceConfigs(config.getName(), configFiles);
+              },
             },
             {
               title: 'Start masternode',
@@ -84,6 +107,7 @@ class SetupForLocalDevelopmentCommand extends BaseCommand {
         },
       ],
       {
+        renderer: isVerbose ? 'verbose' : 'default',
         rendererOptions: {
           clearOutput: false,
           collapse: false,
@@ -113,6 +137,7 @@ SetupForLocalDevelopmentCommand.flags = {
   update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
   'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
   'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),
+  verbose: flagTypes.boolean({ char: 'v', description: 'use verbose mode for output', default: false }),
 };
 
 module.exports = SetupForLocalDevelopmentCommand;

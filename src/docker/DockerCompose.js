@@ -266,11 +266,11 @@ class DockerCompose {
     const env = {
       ...process.env,
       ...envs,
-      MN_HOME_DIR: this.homeDirPath
+      MN_HOME_DIR: this.homeDirPath,
     };
 
     return {
-      cwd: path.join(__dirname, '../../'),
+      cwd: path.join(__dirname, '..', '..'),
       env,
     };
   }
