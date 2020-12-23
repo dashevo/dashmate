@@ -320,6 +320,27 @@ module.exports = {
           required: ['contract', 'ownerId'],
           additionalProperties: false,
         },
+        dashpay: {
+          type: 'object',
+          properties: {
+            contract: {
+              properties: {
+                id: {
+                  type: ['string', 'null'],
+                  minLength: 1,
+                },
+                blockHeight: {
+                  type: ['integer', 'null'],
+                  minimum: 1,
+                },
+              },
+              required: ['id', 'blockHeight'],
+              additionalProperties: false,
+            },
+          },
+          required: ['contract'],
+          additionalProperties: false,
+        },
       },
       required: ['dapi', 'drive', 'dpns'],
       additionalProperties: false,

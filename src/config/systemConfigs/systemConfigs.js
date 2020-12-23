@@ -112,6 +112,12 @@ const baseConfig = {
       },
       ownerId: null,
     },
+    dashpay: {
+      contract: {
+        id: null,
+        blockHeight: null,
+      },
+    },
   },
   externalIp: null,
   network: NETWORKS.TESTNET,
