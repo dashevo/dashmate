@@ -28,12 +28,14 @@ addressindex=1
 timestampindex=1
 spentindex=1
 
-{{? it.network === 'testnet'}}testnet=1
-[test]{{??}}# ZeroMQ notifications (required for Insight)
+# ZeroMQ notifications (required for Insight)
 zmqpubrawtx=tcp://0.0.0.0:29998
 zmqpubrawtxlock=tcp://0.0.0.0:29998
 zmqpubhashblock=tcp://0.0.0.0:29998
-zmqpubrawchainlock=tcp://0.0.0.0:29998{{?}}
+zmqpubrawchainlocksig=tcp://0.0.0.0:29998
+
+{{? it.network === 'testnet'}}testnet=1
+[test]{{?}}
 {{? it.network === 'local'}}
 regtest=1
 [regtest]{{?? it.network === 'evonet'}}
