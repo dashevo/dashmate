@@ -35,8 +35,8 @@ zmqpubhashblock=tcp://0.0.0.0:29998
 zmqpubrawchainlocksig=tcp://0.0.0.0:29998
 
 {{? it.network === 'testnet'}}testnet=1
-[test]{{?}}
-{{? it.network === 'local'}}
+[test]
+{{?? it.network === 'local'}}
 regtest=1
 [regtest]{{?? it.network === 'evonet'}}
 devnet={{=it.core.devnetName}}
