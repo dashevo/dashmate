@@ -342,7 +342,7 @@ module.exports = {
           additionalProperties: false,
         },
       },
-      required: ['dapi', 'drive', 'dpns'],
+      required: ['dapi', 'drive', 'dpns', 'dashpay'],
       additionalProperties: false,
     },
     externalIp: {
