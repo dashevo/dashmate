@@ -6,7 +6,7 @@ const baseConfig = {
   description: 'base config for use as template',
   core: {
     docker: {
-      image: 'dashpay/dashd-develop:latest',
+      image: 'dashpay/dashd:0.17.0.0-rc2',
     },
     p2p: {
       port: 20001,
@@ -915,9 +915,6 @@ module.exports = {
   testnet: lodashMerge({}, baseConfig, {
     description: 'node with testnet configuration',
     core: {
-      docker: {
-        image: 'dashpay/dashd:0.17.0.0-rc2',
-      },
       p2p: {
         port: 19999,
       },
