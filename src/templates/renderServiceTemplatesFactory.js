@@ -34,15 +34,6 @@ function renderServiceTemplatesFactory(homeDirPath) {
       return Object.values(option).length === 0;
     }).join('|');
 
-    // Remove existing template outputs if present
-    if (emptyConfigsMask !== '') {
-      const configOutputsPath = path.join(homeDirPath, config.getName());
-      const blankPaths = glob.sync(`${configOutputsPath}/tenderdash/*(${emptyConfigsMask}).json`);
-      for (const blankPath of blankPaths) {
-        fs.unlinkSync(blankPath);
-      }
-    }
-
     const templatePaths = glob.sync(`${templatesPath}/**/!(${emptyConfigsMask}).*.template`);
 
     const configFiles = {};
