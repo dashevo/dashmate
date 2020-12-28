@@ -93,10 +93,11 @@ class SetupCommand extends BaseCommand {
 
           configCollection.setDefaultConfigName(ctx.preset);
 
-          // eslint-disable-next-line no-param-reassign
-          task.output = `Selected ${configCollection.getDefaultConfigName()} as default config\n`;
-
           config = configCollection.getDefaultConfig();
+
+          // eslint-disable-next-line no-param-reassign
+          task.output = `Selected ${config.getName()} as default config\n`;
+
         },
         options: { persistentOutput: true },
       },
