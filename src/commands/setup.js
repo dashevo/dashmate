@@ -1,13 +1,24 @@
 const { Listr } = require('listr2');
 const publicIp = require('public-ip');
 
-const { flags: flagTypes } = require('@oclif/command');
+const { PrivateKey: BlsPrivateKey } = require('bls-signatures');
 
-const NETWORKS = require('../networks');
+const { flags: flagTypes } = require('@oclif/command');
 
 const BaseCommand = require('../oclif/command/BaseCommand');
 
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
+
+const wait = require('../util/wait');
+
+const PRESET_TESETNET = 'testnet';
+const PRESET_LOCAL = 'local';
+const PRESET_EVONET = 'evonet';
+const PRESETS = [PRESET_TESETNET, PRESET_EVONET, PRESET_LOCAL];
+
+const NODE_TYPE_MASTERNODE = 'masternode';
+const NODE_TYPE_FULLNODE = 'fullnode';
+const NODE_TYPES = [NODE_TYPE_MASTERNODE, NODE_TYPE_FULLNODE];
 
 class SetupCommand extends BaseCommand {
   /**
@@ -17,130 +28,232 @@ class SetupCommand extends BaseCommand {
    * @param {generateBlsKeys} generateBlsKeys
    * @param {ConfigCollection} configCollection
    * @param {initializeTenderdashNode} initializeTenderdashNode
-   * @param {Config} config
+   * @param {generateToAddressTask} generateToAddressTask
+   * @param {registerMasternodeTask} registerMasternodeTask
+   * @param {renderServiceTemplates} renderServiceTemplates
+   * @param {writeServiceConfigs} writeServiceConfigs
+   * @param {startNodeTask} startNodeTask
+   * @param {initTask} initTask
+   *
    * @return {Promise<void>}
    */
   async runWithDependencies(
-    args,
+    {
+      preset,
+      'node-type': nodeType,
+    },
     {
       'external-ip': externalIp,
       'operator-bls-private-key': operatorBlsPrivateKey,
-      network,
+      update: isUpdate,
+      'drive-image-build-path': driveImageBuildPath,
+      'dapi-image-build-path': dapiImageBuildPath,
+      verbose: isVerbose,
     },
     dockerCompose,
     generateBlsKeys,
     configCollection,
     initializeTenderdashNode,
-    config,
+    generateToAddressTask,
+    registerMasternodeTask,
+    renderServiceTemplates,
+    writeServiceConfigs,
+    startNodeTask,
+    initTask,
   ) {
+    let config;
+
+    if (preset === PRESET_LOCAL) {
+      if (nodeType === undefined) {
+        // eslint-disable-next-line no-param-reassign
+        nodeType = 'masternode';
+      }
+
+      if (nodeType !== NODE_TYPE_MASTERNODE) {
+        throw new Error('Local development preset uses only masternode type of node');
+      }
+    }
+
+    const amount = 10000;
+
     const tasks = new Listr([
       {
-        title: 'Select network',
+        title: 'Set configuration preset',
         task: async (ctx, task) => {
-          if (network === null) {
-            const input = await task.prompt([
+          if (ctx.preset === undefined) {
+            ctx.preset = await task.prompt([
               {
                 type: 'select',
-                name: 'network',
-                message: 'Select network to configure',
-                choices: [...Object.values(NETWORKS)],
+                message: 'Select configuration preset',
+                choices: PRESETS,
                 initial: 'testnet',
               },
             ]);
-            ctx.network = input;
-          } else {
-            ctx.network = network;
           }
-          configCollection.setDefaultConfigName(ctx.network);
+
+          configCollection.setDefaultConfigName(ctx.preset);
+
           // eslint-disable-next-line no-param-reassign
           task.output = `Selected ${configCollection.getDefaultConfigName()} config\n`;
-          // eslint-disable-next-line no-param-reassign
+
           config = configCollection.getDefaultConfig();
-          // eslint-disable-next-line no-param-reassign
-          task.output += `Loaded ${config.getName()} config`;
         },
         options: { persistentOutput: true },
       },
       {
-        title: 'Configure external IP address',
-        enabled: () => externalIp === null,
+        title: 'Set node type',
+        enabled: (ctx) => ctx.preset !== PRESET_LOCAL,
         task: async (ctx, task) => {
-          const input = await task.prompt([
-            {
-              type: 'input',
-              name: 'externalIp',
-              message: 'Enter node public IP (Enter to accept detected IP)',
-              initial: async () => ((config.externalIp) ? config.externalIp : publicIp.v4()),
-            },
-          ]);
-          ctx.externalIp = input;
-        },
-      },
-      {
-        title: 'Configure external IP address',
-        enabled: () => externalIp !== null,
-        task: async (ctx, task) => {
-          ctx.externalIp = externalIp;
-          // eslint-disable-next-line no-param-reassign
-          task.output = `Using ${externalIp}`;
-        },
-        options: { persistentOutput: true },
-      },
-      {
-        title: 'Configure BLS private key',
-        enabled: () => operatorBlsPrivateKey === null,
-        task: async (ctx, task) => {
-          const generatedBls = await generateBlsKeys();
-          const input = await task.prompt([
-            {
-              type: 'input',
-              name: 'blsPrivKey',
-              message: 'Enter operator BLS private key (Enter to accept generated key)',
-              initial: generatedBls.privateKey,
-            },
-          ]);
-          if (input === generatedBls.privateKey) {
-            // eslint-disable-next-line no-param-reassign
-            task.output = `BLS public key: ${generatedBls.publicKey}\nBLS private key: ${generatedBls.privateKey}`;
+          if (ctx.nodeType === undefined) {
+            ctx.nodeType = await task.prompt([
+              {
+                type: 'select',
+                message: 'Select node type',
+                choices: NODE_TYPES,
+                initial: 'masternode',
+              },
+            ]);
           }
-          ctx.blsPrivKey = input;
+
+          // eslint-disable-next-line no-param-reassign
+          task.output = `Selected ${ctx.nodeType} type\n`;
+        },
+        options: { persistentOutput: true },
+      },
+      {
+        title: 'Configure external IP address',
+        enabled: (ctx) => ctx.preset !== PRESET_LOCAL,
+        task: async (ctx, task) => {
+          if (ctx.externalIp === undefined) {
+            ctx.externalIp = await task.prompt([
+              {
+                type: 'input',
+                message: 'Enter node public IP (Enter to accept detected IP)',
+                initial: () => publicIp.v4(),
+              },
+            ]);
+          }
+
+          config.set('externalIp', ctx.externalIp);
+
+          // eslint-disable-next-line no-param-reassign
+          task.output = `${ctx.externalIp} is set\n`;
         },
         options: { persistentOutput: true },
       },
       {
         title: 'Configure BLS private key',
-        enabled: () => operatorBlsPrivateKey !== null,
+        enabled: (ctx) => ctx.preset !== PRESET_LOCAL && ctx.nodeType === NODE_TYPE_MASTERNODE,
         task: async (ctx, task) => {
-          ctx.blsPrivKey = operatorBlsPrivateKey;
+          if (ctx.operatorBlsPrivateKey === undefined) {
+            const { privateKey: generatedPrivateKeyHex } = await generateBlsKeys();
+
+            ctx.operatorBlsPrivateKey = await task.prompt([
+              {
+                type: 'input',
+                message: 'Enter operator BLS private key (Enter to accept generated key)',
+                initial: generatedPrivateKeyHex,
+              },
+            ]);
+          }
+
+          const operatorBlsPrivateKeyBuffer = Buffer.from(ctx.operatorBlsPrivateKey, 'hex');
+          const privateKey = BlsPrivateKey.fromBytes(operatorBlsPrivateKeyBuffer, true);
+          const publicKey = privateKey.getPublicKey();
+          const publicKeyHex = Buffer.from(publicKey.serialize()).toString('hex');
+
+          config.set('core.masternode.operator.privateKey', ctx.operatorBlsPrivateKey);
+
           // eslint-disable-next-line no-param-reassign
-          task.output = `Using ${operatorBlsPrivateKey.slice(0, 8)}...`;
+          task.output = `BLS public key: ${publicKeyHex}\nBLS private key: ${ctx.operatorBlsPrivateKey}`;
         },
         options: { persistentOutput: true },
+      },
+      {
+        title: 'Update config',
+        task: () => {
+          const configFiles = renderServiceTemplates(config);
+          writeServiceConfigs(config.getName(), configFiles);
+        },
+      },
+      {
+        title: `Generate ${amount} dash to local wallet`,
+        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
+        task: () => generateToAddressTask(config, amount),
+      },
+      {
+        title: 'Register masternode',
+        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
+        task: () => registerMasternodeTask(config),
       },
       {
         title: 'Initialize Tenderdash',
         task: async (ctx) => {
-          const [validatorKey, nodeKey, genesis] = await initializeTenderdashNode(config);
-          ctx.validatorKey = validatorKey;
-          ctx.nodeKey = nodeKey;
+          const isValidatorKeyEmpty = Object.keys(config.get('platform.drive.tenderdash.validatorKey')).length === 0;
+          const isNodeKeyEmpty = Object.keys(config.get('platform.drive.tenderdash.nodeKey')).length === 0;
+          const isGenesisEmpty = Object.keys(config.get('platform.drive.tenderdash.genesis')).length === 0;
 
-          // Don't overwrite existing genesis in config
-          ctx.isGenesisEmpty = Object.keys(config.get('platform.drive.tenderdash.genesis')).length === 0;
-          ctx.genesis = ctx.isGenesisEmpty ? genesis : config.get('platform.drive.tenderdash.genesis');
+          if (isValidatorKeyEmpty || isNodeKeyEmpty || isNodeKeyEmpty) {
+            const [validatorKey, nodeKey, genesis] = await initializeTenderdashNode(config);
+
+            if (isValidatorKeyEmpty) {
+              config.set('platform.drive.tenderdash.validatorKey', validatorKey);
+            }
+
+            if (isNodeKeyEmpty) {
+              config.set('platform.drive.tenderdash.nodeKey', nodeKey);
+            }
+
+            if (isGenesisEmpty) {
+              if (ctx.preset === PRESET_LOCAL) {
+                genesis.initial_core_chain_locked_height = 1000;
+              }
+
+              config.set('platform.drive.tenderdash.genesis', genesis);
+            }
+          }
         },
       },
       {
         title: 'Update config',
-        task: (ctx) => {
-          // eslint-disable-next-line no-param-reassign
-          config.set('externalIp', ctx.externalIp);
-          config.set('core.masternode.operator.privateKey', ctx.blsPrivKey);
-          config.set('platform.drive.tenderdash.validatorKey', ctx.validatorKey);
-          config.set('platform.drive.tenderdash.nodeKey', ctx.nodeKey);
+        task: () => {
+          const configFiles = renderServiceTemplates(config);
+          writeServiceConfigs(config.getName(), configFiles);
         },
+      },
+      {
+        title: 'Start masternode',
+        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
+        task: async (ctx) => startNodeTask(
+          config,
+          {
+            driveImageBuildPath: ctx.driveImageBuildPath,
+            dapiImageBuildPath: ctx.dapiImageBuildPath,
+            isUpdate,
+            isMinerEnabled: true,
+          },
+        ),
+      },
+      {
+        title: 'Wait 20 seconds to ensure all services are running',
+        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
+        task: async () => {
+          await wait(20000);
+        },
+      },
+      {
+        title: 'Initialize Platform',
+        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
+        task: () => initTask(config),
+      },
+      {
+        title: 'Stop node',
+        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
+        task: async () => dockerCompose.stop(config.toEnvs()),
       },
     ],
     {
+      renderer: isVerbose ? 'verbose' : 'default',
       rendererOptions: {
         clearOutput: false,
         collapse: false,
@@ -149,7 +262,14 @@ class SetupCommand extends BaseCommand {
     });
 
     try {
-      await tasks.run();
+      await tasks.run({
+        driveImageBuildPath,
+        dapiImageBuildPath,
+        preset,
+        nodeType,
+        externalIp,
+        operatorBlsPrivateKey,
+      });
     } catch (e) {
       throw new MuteOneLineError(e);
     }
@@ -161,11 +281,27 @@ SetupCommand.description = `Set up node config
 Set up node config
 `;
 
+SetupCommand.args = [{
+  name: 'preset',
+  required: false,
+  description: 'Node configuration preset',
+  options: PRESETS,
+},
+{
+  name: 'node-type',
+  required: false,
+  description: 'Node type',
+  options: NODE_TYPES,
+}];
+
 SetupCommand.flags = {
-  ...BaseCommand.flags,
-  network: flagTypes.string({ char: 'n', description: 'network name', default: null }),
-  'external-ip': flagTypes.string({ char: 'i', description: 'external ip', default: null }),
-  'operator-bls-private-key': flagTypes.string({ char: 'k', description: 'operator bls private key', default: null }),
+  'external-ip': flagTypes.string({ char: 'i', description: 'external ip' }),
+  'operator-bls-private-key': flagTypes.string({ char: 'k', description: 'operator bls private key' }),
+  update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
+  'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
+  'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),
+  verbose: flagTypes.boolean({ char: 'v', description: 'use verbose mode for output', default: false }),
+
 };
 
 module.exports = SetupCommand;
