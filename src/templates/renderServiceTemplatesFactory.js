@@ -4,9 +4,10 @@ const dots = require('dot');
 const glob = require('glob');
 
 /**
+ * @param {string} homeDirPath
  * @return {renderServiceTemplates}
  */
-function renderServiceTemplatesFactory() {
+function renderServiceTemplatesFactory(homeDirPath) {
   /**
    * Render templates for services
    *
@@ -33,6 +34,14 @@ function renderServiceTemplatesFactory() {
         omitString += `${key}|`;
       }
     }
+
+    // Remove existing template outputs if present
+    const configOutputsPath = path.join(homeDirPath, config.getName());
+    const blankPaths = glob.sync(`${configOutputsPath}/tenderdash/*(${omitString.slice(0, -1)}).json`);
+    for (const blankPath of blankPaths) {
+      fs.unlinkSync(blankPath);
+    }
+
     const templatePaths = glob.sync(`${templatesPath}/**/!(${omitString.slice(0, -1)}).*.template`);
 
     const configFiles = {};
