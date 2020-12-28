@@ -110,10 +110,12 @@ class SetupCommand extends BaseCommand {
                 type: 'select',
                 message: 'Select node type',
                 choices: NODE_TYPES,
-                initial: 'masternode',
+                initial: NODE_TYPE_MASTERNODE,
               },
             ]);
           }
+
+          config.set('core.masternode.enable', ctx.nodeType === NODE_TYPE_MASTERNODE);
 
           // eslint-disable-next-line no-param-reassign
           task.output = `Selected ${ctx.nodeType} type\n`;
