@@ -21,14 +21,15 @@ function renderServiceTemplatesFactory() {
     const templatesPath = path.join(__dirname, '..', '..', 'templates');
 
     // Don't create blank node config objects for tenderdash init
-    const isEmpty = {};
-    isEmpty.genesis = Object.keys(config.get('platform.drive.tenderdash.genesis')).length === 0;
-    isEmpty.priv_validator_key = Object.keys(config.get('platform.drive.tenderdash.validatorKey')).length === 0;
-    isEmpty.node_key = Object.keys(config.get('platform.drive.tenderdash.nodeKey')).length === 0;
+    const skipEmpty = {
+      genesis: 'platform.drive.tenderdash.genesis',
+      node_key: 'platform.drive.tenderdash.nodeKey',
+      priv_validator_key: 'platform.drive.tenderdash.validatorKey',
+    };
 
     let omitString = '';
-    for (const key in isEmpty) {
-      if (isEmpty[key]) {
+    for (const key in skipEmpty) {
+      if (Object.values(config.get(skipEmpty[key])).length === 0) {
         omitString += `${key}|`;
       }
     }
