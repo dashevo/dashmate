@@ -173,6 +173,7 @@ class SetupCommand extends BaseCommand {
       },
       {
         title: 'Update config',
+        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
         task: () => {
           const configFiles = renderServiceTemplates(config);
           writeServiceConfigs(config.getName(), configFiles);
