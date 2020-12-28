@@ -104,6 +104,7 @@ const baseConfig = {
         },
       },
       skipAssetLockConfirmationValidation: false,
+      passFakeAssetLockProofForTests: false,
     },
     dpns: {
       contract: {
@@ -111,6 +112,12 @@ const baseConfig = {
         blockHeight: null,
       },
       ownerId: null,
+    },
+    dashpay: {
+      contract: {
+        id: null,
+        blockHeight: null,
+      },
     },
   },
   externalIp: null,
@@ -135,6 +142,7 @@ module.exports = {
       },
       drive: {
         skipAssetLockConfirmationValidation: true,
+        passFakeAssetLockProofForTests: true,
       },
     },
     externalIp: '127.0.0.1',
