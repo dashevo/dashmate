@@ -21,28 +21,29 @@ function renderServiceTemplatesFactory(homeDirPath) {
 
     const templatesPath = path.join(__dirname, '..', '..', 'templates');
 
-    // Don't create blank node config objects for tenderdash init
+    // Don't create blank tenderdash config objects for tenderdash init
     const skipEmpty = {
-      genesis: 'platform.drive.tenderdash.genesis',
-      node_key: 'platform.drive.tenderdash.nodeKey',
-      priv_validator_key: 'platform.drive.tenderdash.validatorKey',
+      genesis: 'genesis',
+      node_key: 'nodeKey',
+      priv_validator_key: 'validatorKey',
     };
 
-    let omitString = '';
-    for (const key in skipEmpty) {
-      if (Object.values(config.get(skipEmpty[key])).length === 0) {
-        omitString += `${key}|`;
+    const emptyConfigsMask = Object.keys(skipEmpty).filter((key) => {
+      const option = config.get(`platform.drive.tenderdash.${skipEmpty[key]}`);
+
+      return Object.values(option).length === 0;
+    }).join('|');
+
+    // Remove existing template outputs if present
+    if (emptyConfigsMask !== '') {
+      const configOutputsPath = path.join(homeDirPath, config.getName());
+      const blankPaths = glob.sync(`${configOutputsPath}/tenderdash/*(${emptyConfigsMask}).json`);
+      for (const blankPath of blankPaths) {
+        fs.unlinkSync(blankPath);
       }
     }
 
-    // Remove existing template outputs if present
-    const configOutputsPath = path.join(homeDirPath, config.getName());
-    const blankPaths = glob.sync(`${configOutputsPath}/tenderdash/*(${omitString.slice(0, -1)}).json`);
-    for (const blankPath of blankPaths) {
-      fs.unlinkSync(blankPath);
-    }
-
-    const templatePaths = glob.sync(`${templatesPath}/**/!(${omitString.slice(0, -1)}).*.template`);
+    const templatePaths = glob.sync(`${templatesPath}/**/!(${emptyConfigsMask}).*.template`);
 
     const configFiles = {};
     for (const templatePath of templatePaths) {
