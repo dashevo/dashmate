@@ -90,7 +90,7 @@ class StatusCommand extends BaseCommand {
     let platformCatchingUp;
     let platformStatus;
 
-    if (config.options.network !== 'testnet') {
+    if (config.options.network !== 'mainnet') {
       if (!(await dockerCompose.isServiceRunning(config.toEnvs(), 'drive_tenderdash'))) {
         try {
           ({
@@ -105,7 +105,8 @@ class StatusCommand extends BaseCommand {
         }
       } else if (coreIsSynced === true) {
         // Collecting platform data fails if Tenderdash is waiting for core to sync
-        const platformStatusRes = await fetch(`http://localhost:${config.options.platform.drive.tenderdash.rpc.port}/status`);
+        const platformStatusRes = await fetch(`http://localhost:${config.get('platform.drive.tenderdash.rpc.port')}/status`);
+
         ({
           result: {
             node_info: {
@@ -146,7 +147,18 @@ class StatusCommand extends BaseCommand {
       coreStatus = `syncing ${(coreVerificationProgress * 100).toFixed(2)}%`;
     }
 
-    if (config.options.network !== 'testnet') {
+    if (config.options.network !== 'mainnet') {
+      try {
+        ({
+          State: {
+            Status: platformStatus,
+          },
+        } = await dockerCompose.inspectService(config.toEnvs(), 'drive_tenderdash'));
+      } catch (e) {
+        if (e instanceof ContainerIsNotPresentError) {
+          platformStatus = 'not started';
+        }
+      }
       if (platformStatus === 'running' && coreIsSynced === false) {
         platformStatus = 'waiting for core sync';
       } else if (platformStatus === 'running' && platformCatchingUp === true) {
@@ -171,7 +183,7 @@ class StatusCommand extends BaseCommand {
       coreStatus = chalk.red(coreStatus);
     }
 
-    if (config.options.network !== 'testnet') {
+    if (config.options.network !== 'mainnet') {
       if (platformStatus === 'running') {
         platformStatus = chalk.green(platformStatus);
       } else if (platformStatus.startsWith('syncing')) {
@@ -194,7 +206,8 @@ class StatusCommand extends BaseCommand {
     if (config.options.core.masternode.enable === true) {
       rows.push(['Masternode Status', (masternodeStatus)]);
     }
-    if (config.options.network !== 'testnet') {
+
+    if (config.options.network !== 'mainnet') {
       if (coreIsSynced === true
         && platformStatus !== chalk.red('not started')
         && platformStatus !== chalk.red('restarting')) {

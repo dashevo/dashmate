@@ -6,7 +6,7 @@ const baseConfig = {
   description: 'base config for use as template',
   core: {
     docker: {
-      image: 'dashpay/dashd-develop:latest',
+      image: 'dashpay/dashd:0.17.0.0-rc2',
     },
     p2p: {
       port: 20001,
@@ -103,6 +103,8 @@ const baseConfig = {
 
         },
       },
+      skipAssetLockConfirmationValidation: false,
+      passFakeAssetLockProofForTests: false,
     },
     dpns: {
       contract: {
@@ -110,6 +112,12 @@ const baseConfig = {
         blockHeight: null,
       },
       ownerId: null,
+    },
+    dashpay: {
+      contract: {
+        id: null,
+        blockHeight: null,
+      },
     },
   },
   externalIp: null,
@@ -131,6 +139,10 @@ module.exports = {
             enable: false,
           },
         },
+      },
+      drive: {
+        skipAssetLockConfirmationValidation: true,
+        passFakeAssetLockProofForTests: true,
       },
     },
     externalIp: '127.0.0.1',
@@ -919,8 +931,5 @@ module.exports = {
       },
     },
     network: NETWORKS.TESTNET,
-    compose: {
-      file: 'docker-compose.yml',
-    },
   }),
 };

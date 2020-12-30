@@ -30,9 +30,12 @@ services:
       - DPNS_CONTRACT_ID=${PLATFORM_DPNS_CONTRACT_ID}
       - DPNS_CONTRACT_BLOCK_HEIGHT=${PLATFORM_DPNS_CONTRACT_BLOCK_HEIGHT}
       - DPNS_TOP_LEVEL_IDENTITY=${PLATFORM_DPNS_OWNER_ID}
+      - DASHPAY_CONTRACT_ID=${PLATFORM_DASHPAY_CONTRACT_ID}
+      - DASHPAY_CONTRACT_BLOCK_HEIGHT=${PLATFORM_DASHPAY_CONTRACT_BLOCK_HEIGHT}
       - NODE_ENV=${ENVIRONMENT:?err}
       - LOGGING_LEVEL=${PLATFORM_DRIVE_ABCI_LOG_LEVEL:?err}
       - INITIAL_CORE_CHAINLOCKED_HEIGHT=${PLATFORM_DRIVE_TENDERDASH_GENESIS_INITIAL_CORE_CHAIN_LOCKED_HEIGHT:-1}
+      - IDENTITY_SKIP_ASSET_LOCK_CONFIRMATION_VALIDATION=${PLATFORM_DRIVE_SKIP_ASSET_LOCK_CONFIRMATION_VALIDATION:?err}
     command: npm run abci
 
   drive_tenderdash:
@@ -45,7 +48,7 @@ services:
       - 127.0.0.1:${PLATFORM_DRIVE_TENDERDASH_RPC_PORT:?err}:26657 # RPC
     volumes:
       - drive_tenderdash:/tenderdash
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/tenderdash:/tenderdash/config:ro
+      - ${DASHMAN_HOME_DIR:?err}/${CONFIG_NAME:?err}/tenderdash:/tenderdash/config:ro
 
   dapi_insight:
     image: ${PLATFORM_DAPI_INSIGHT_DOCKER_IMAGE:?err}
@@ -53,7 +56,7 @@ services:
     depends_on:
       - core
     volumes:
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/dashcore-node.json:/insight/dashcore-node.json
+      - ${DASHMAN_HOME_DIR:?err}/${CONFIG_NAME:?err}/dashcore-node.json:/insight/dashcore-node.json
 
   dapi_api:
     image: ${PLATFORM_DAPI_API_DOCKER_IMAGE:?err}
@@ -111,7 +114,7 @@ services:
       - dapi_api
       - dapi_tx_filter_stream
     volumes:
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/grpc.yaml:/etc/envoy/envoy.yaml
+      - ${DASHMAN_HOME_DIR:?err}/${CONFIG_NAME:?err}/grpc.yaml:/etc/envoy/envoy.yaml
 
   dapi_nginx:
     image: ${PLATFORM_DAPI_NGINX_DOCKER_IMAGE:?err}
@@ -124,9 +127,9 @@ services:
       - ${PLATFORM_DAPI_NGINX_HTTP_PORT:?err}:80 # JSON RPC and gRPC Web
       - ${PLATFORM_DAPI_NGINX_GRPC_PORT:?err}:50051 # gRPC Native
     volumes:
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/default.conf:/etc/nginx/conf.d/default.conf
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/grpc.conf:/etc/nginx/conf.d/grpc.conf
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/errors.grpc_conf:/etc/nginx/conf.d/errors.grpc_conf
+      - ${DASHMAN_HOME_DIR:?err}/${CONFIG_NAME:?err}/default.conf:/etc/nginx/conf.d/default.conf
+      - ${DASHMAN_HOME_DIR:?err}/${CONFIG_NAME:?err}/grpc.conf:/etc/nginx/conf.d/grpc.conf
+      - ${DASHMAN_HOME_DIR:?err}/${CONFIG_NAME:?err}/errors.grpc_conf:/etc/nginx/conf.d/errors.grpc_conf
 
 volumes:
   drive_abci_data:

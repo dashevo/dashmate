@@ -288,8 +288,14 @@ module.exports = {
               required: ['docker', 'p2p', 'rpc', 'validatorKey', 'nodeKey', 'genesis'],
               additionalProperties: false,
             },
+            skipAssetLockConfirmationValidation: {
+              type: 'boolean',
+            },
+            passFakeAssetLockProofForTests: {
+              type: 'boolean',
+            },
           },
-          required: ['mongodb', 'abci', 'tenderdash'],
+          required: ['mongodb', 'abci', 'tenderdash', 'skipAssetLockConfirmationValidation'],
           additionalProperties: false,
         },
         dpns: {
@@ -317,8 +323,29 @@ module.exports = {
           required: ['contract', 'ownerId'],
           additionalProperties: false,
         },
+        dashpay: {
+          type: 'object',
+          properties: {
+            contract: {
+              properties: {
+                id: {
+                  type: ['string', 'null'],
+                  minLength: 1,
+                },
+                blockHeight: {
+                  type: ['integer', 'null'],
+                  minimum: 1,
+                },
+              },
+              required: ['id', 'blockHeight'],
+              additionalProperties: false,
+            },
+          },
+          required: ['contract'],
+          additionalProperties: false,
+        },
       },
-      required: ['dapi', 'drive', 'dpns'],
+      required: ['dapi', 'drive', 'dpns', 'dashpay'],
       additionalProperties: false,
     },
     externalIp: {
