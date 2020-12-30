@@ -2,23 +2,23 @@ const AbstractError = require('../../errors/AbstractError');
 
 class ServiceIsNotRunningError extends AbstractError {
   /**
-   * @param {string} network
+   * @param {string} configName
    * @param {string} serviceName
    */
-  constructor(network, serviceName) {
-    super(`Service ${serviceName} for ${network} is not running. Please run the service first.`);
+  constructor(configName, serviceName) {
+    super(`Service ${serviceName} for ${configName} is not running. Please run the service first.`);
 
-    this.network = network;
+    this.configName = configName;
     this.serviceName = serviceName;
   }
 
   /**
-   * Get network
+   * Get config name
    *
    * @return {string}
    */
-  getNetwork() {
-    return this.network;
+  getConfigName() {
+    return this.configName;
   }
 
   /**
