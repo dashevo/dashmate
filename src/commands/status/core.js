@@ -60,18 +60,30 @@ class CoreStatusCommand extends BaseCommand {
       tag_name: latestVersion,
     } = await latestVersionRes.json();
     latestVersion = latestVersion.substring(1);
-    const corePortStateRes = await fetch(`https://mnowatch.org/${config.options.core.p2p.port}/`);
-    let corePortState = await corePortStateRes.text();
+
+    let corePortStateRes;
+    let corePortState;
+    try {
+      corePortStateRes = await fetch(`https://mnowatch.org/${config.options.core.p2p.port}/`);
+      corePortState = await corePortStateRes.text();
+    } catch (e) {
+      corePortState = 'ERROR';
+    }
+
     let coreVersion = networkInfo.subversion.replace(/\/|\(.*?\)|Dash Core:/g, '');
     let explorerBlockHeightRes;
     let explorerBlockHeight;
     if (insightURLs[config.options.network]) {
-      explorerBlockHeightRes = await fetch(`${insightURLs[config.options.network]}/status`);
-      ({
-        info: {
-          blocks: explorerBlockHeight,
-        },
-      } = await explorerBlockHeightRes.json());
+      try {
+        explorerBlockHeightRes = await fetch(`${insightURLs[config.options.network]}/status`);
+        ({
+          info: {
+            blocks: explorerBlockHeight,
+          },
+        } = await explorerBlockHeightRes.json());
+      } catch (e) {
+        explorerBlockHeight = 0;
+      }
     }
     const sentinelVersion = (await dockerCompose.execCommand(
       config.toEnvs(),
