@@ -119,9 +119,13 @@ class StatusCommand extends BaseCommand {
             },
           } = await platformStatusRes.json());
         } catch (e) {
-          platformVersion = 'unknown';
-          platformBlockHeight = 0;
-          platformCatchingUp = false;
+          if (e.name === 'FetchError') {
+            platformVersion = 'unknown';
+            platformBlockHeight = 0;
+            platformCatchingUp = false;
+          } else {
+            throw new Error(e);
+          }
         }
       }
     }
@@ -132,10 +136,9 @@ class StatusCommand extends BaseCommand {
       mainnet: '',
     };
 
-    let explorerBlockHeightRes;
     let explorerBlockHeight;
     try {
-      explorerBlockHeightRes = await fetch(`${platformExplorerURLs[config.options.network]}/status`);
+      const explorerBlockHeightRes = await fetch(`${platformExplorerURLs[config.options.network]}/status`);
       ({
         result: {
           sync_info: {
@@ -144,7 +147,11 @@ class StatusCommand extends BaseCommand {
         },
       } = await explorerBlockHeightRes.json());
     } catch (e) {
-      explorerBlockHeightRes = 0;
+      if (e.name === 'FetchError') {
+        explorerBlockHeight = 0;
+      } else {
+        throw new Error(e);
+      }
     }
 
     // Determine status

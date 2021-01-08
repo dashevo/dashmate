@@ -55,34 +55,47 @@ class CoreStatusCommand extends BaseCommand {
     const { result: networkInfo } = await coreService.getRpcClient().getNetworkInfo();
     const { result: mnsyncStatus } = await coreService.getRpcClient().mnsync('status');
     const { result: peerInfo } = await coreService.getRpcClient().getPeerInfo();
-    const latestVersionRes = await fetch('https://api.github.com/repos/dashpay/dash/releases/latest');
-    let {
-      tag_name: latestVersion,
-    } = await latestVersionRes.json();
-    latestVersion = latestVersion.substring(1);
 
-    let corePortStateRes;
+    let latestVersion;
+    try {
+      const latestVersionRes = await fetch('https://api.github.com/repos/dashpay/dash/releases/latest');
+      latestVersion = (await latestVersionRes.json()).tag_name.substring(1);
+    } catch (e) {
+      if (e.name === 'FetchError') {
+        latestVersion = '0';
+      } else {
+        throw new Error(e);
+      }
+    }
+
     let corePortState;
     try {
-      corePortStateRes = await fetch(`https://mnowatch.org/${config.options.core.p2p.port}/`);
+      const corePortStateRes = await fetch(`https://mnowatch.org/${config.options.core.p2p.port}/`);
       corePortState = await corePortStateRes.text();
     } catch (e) {
-      corePortState = 'ERROR';
+      if (e.name === 'FetchError') {
+        corePortState = 'ERROR';
+      } else {
+        throw new Error(e);
+      }
     }
 
     let coreVersion = networkInfo.subversion.replace(/\/|\(.*?\)|Dash Core:/g, '');
-    let explorerBlockHeightRes;
     let explorerBlockHeight;
     if (insightURLs[config.options.network]) {
       try {
-        explorerBlockHeightRes = await fetch(`${insightURLs[config.options.network]}/status`);
+        const explorerBlockHeightRes = await fetch(`${insightURLs[config.options.network]}/status`);
         ({
           info: {
             blocks: explorerBlockHeight,
           },
         } = await explorerBlockHeightRes.json());
       } catch (e) {
-        explorerBlockHeight = 0;
+        if (e.name === 'FetchError') {
+          explorerBlockHeight = 0;
+        } else {
+          throw new Error(e);
+        }
       }
     }
     const sentinelVersion = (await dockerCompose.execCommand(
