@@ -103,7 +103,7 @@ class CoreStatusCommand extends BaseCommand {
         if (e.name === 'FetchError') {
           explorerLatestBlockHeight = 0;
         } else {
-          throw new Error(e);
+          throw e;
         }
       }
     }
@@ -125,7 +125,7 @@ class CoreStatusCommand extends BaseCommand {
         gRpcPortState = 'ERROR';
         p2pPortState = 'ERROR';
       } else {
-        throw new Error(e);
+        throw e;
       }
     }
 
