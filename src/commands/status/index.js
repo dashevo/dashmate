@@ -124,7 +124,7 @@ class StatusCommand extends BaseCommand {
             platformBlockHeight = 0;
             platformCatchingUp = false;
           } else {
-            throw new Error(e);
+            throw e;
           }
         }
       }
@@ -150,7 +150,7 @@ class StatusCommand extends BaseCommand {
       if (e.name === 'FetchError') {
         explorerBlockHeight = 0;
       } else {
-        throw new Error(e);
+        throw e;
       }
     }
 

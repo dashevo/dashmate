@@ -64,7 +64,7 @@ class CoreStatusCommand extends BaseCommand {
       if (e.name === 'FetchError') {
         latestVersion = '0';
       } else {
-        throw new Error(e);
+        throw e;
       }
     }
 
@@ -76,7 +76,7 @@ class CoreStatusCommand extends BaseCommand {
       if (e.name === 'FetchError') {
         corePortState = 'ERROR';
       } else {
-        throw new Error(e);
+        throw e;
       }
     }
 
@@ -94,7 +94,7 @@ class CoreStatusCommand extends BaseCommand {
         if (e.name === 'FetchError') {
           explorerBlockHeight = 0;
         } else {
-          throw new Error(e);
+          throw e;
         }
       }
     }
