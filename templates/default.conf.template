@@ -1,6 +1,6 @@
-limit_req_zone $binary_remote_addr zone=protect_api:15m rate=120r/m;
+{{? it.platform.dapi.nginx.rateLimiter.enable}}limit_req_zone $binary_remote_addr zone=protect_api:15m rate={{=it.platform.dapi.nginx.rateLimiter.rate}}r/m;
 
-server {
+{{?}}server {
     listen 80 default_server;
     {{? it.platform.dapi.nginx.ssl.enable}}listen 443 ssl http2;
     listen [::]:443 ssl http2;
@@ -11,9 +11,11 @@ server {
 
     ssl_protocols TLSv1.2 TLSv1.3;
     {{?}}
-    limit_req zone=protect_api burst=300 nodelay;
-    limit_req_status 429;
 
+    {{? it.platform.dapi.nginx.rateLimiter.enable}}
+    limit_req zone=protect_api burst={{=it.platform.dapi.nginx.rateLimiter.burst}} nodelay;
+    limit_req_status 429;
+    {{?}}
     access_log /tmp/access_log.log;
     error_log /tmp/error.log debug;
 

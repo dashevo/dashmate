@@ -217,8 +217,26 @@ module.exports = {
                   required: ['provider', 'zerossl', 'enable'],
                   additionalProperties: false,
                 },
+                rateLimiter: {
+                  type: 'object',
+                  properties: {
+                    enable: {
+                      type: 'boolean',
+                    },
+                    rate: {
+                      type: 'integer',
+                      minimum: 0,
+                    },
+                    burst: {
+                      type: 'integer',
+                      minimum: 0,
+                    },
+                  },
+                  required: ['enable', 'rate', 'burst'],
+                  additionalProperties: false,
+                },
               },
-              required: ['docker', 'http', 'https', 'grpc', 'grpcs', 'ssl'],
+              required: ['docker', 'http', 'https', 'grpc', 'grpcs', 'ssl', 'rateLimiter'],
               additionalProperties: false,
             },
             api: {
@@ -256,7 +274,7 @@ module.exports = {
               additionalProperties: false,
               required: ['docker', 'log'],
             },
-            tendermint: {
+            tenderdash: {
               properties: {
                 docker: {
                   $ref: '#/definitions/docker/properties/docker',
@@ -302,15 +320,27 @@ module.exports = {
                   required: ['port'],
                   additionalProperties: false,
                 },
+                validatorKey: {
+                  type: 'object',
+                },
+                nodeKey: {
+                  type: 'object',
+                },
                 genesis: {
                   type: 'object',
                 },
               },
-              required: ['docker', 'p2p', 'rpc', 'genesis'],
+              required: ['docker', 'p2p', 'rpc', 'validatorKey', 'nodeKey', 'genesis'],
               additionalProperties: false,
             },
+            skipAssetLockConfirmationValidation: {
+              type: 'boolean',
+            },
+            passFakeAssetLockProofForTests: {
+              type: 'boolean',
+            },
           },
-          required: ['mongodb', 'abci', 'tendermint'],
+          required: ['mongodb', 'abci', 'tenderdash', 'skipAssetLockConfirmationValidation'],
           additionalProperties: false,
         },
         dpns: {
@@ -338,8 +368,29 @@ module.exports = {
           required: ['contract', 'ownerId'],
           additionalProperties: false,
         },
+        dashpay: {
+          type: 'object',
+          properties: {
+            contract: {
+              properties: {
+                id: {
+                  type: ['string', 'null'],
+                  minLength: 1,
+                },
+                blockHeight: {
+                  type: ['integer', 'null'],
+                  minimum: 1,
+                },
+              },
+              required: ['id', 'blockHeight'],
+              additionalProperties: false,
+            },
+          },
+          required: ['contract'],
+          additionalProperties: false,
+        },
       },
-      required: ['dapi', 'drive', 'dpns'],
+      required: ['dapi', 'drive', 'dpns', 'dashpay'],
       additionalProperties: false,
     },
     externalIp: {

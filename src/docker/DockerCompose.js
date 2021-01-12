@@ -152,7 +152,7 @@ class DockerCompose {
     await this.throwErrorIfNotInstalled();
 
     if (!(await this.isServiceRunning(envs, serviceName))) {
-      throw new ServiceIsNotRunningError(envs, serviceName);
+      throw new ServiceIsNotRunningError(envs.CONFIG_NAME, serviceName);
     }
 
     let commandOutput;
@@ -266,11 +266,11 @@ class DockerCompose {
     const env = {
       ...process.env,
       ...envs,
-      MN_HOME_DIR: this.homeDirPath
+      MN_HOME_DIR: this.homeDirPath,
     };
 
     return {
-      cwd: path.join(__dirname, '../../'),
+      cwd: path.join(__dirname, '..', '..'),
       env,
     };
   }

@@ -19,7 +19,9 @@ class RegisterCommand extends BaseCommand {
     {
       'funding-private-key': fundingPrivateKeyString,
     },
-    flags,
+    {
+      verbose: isVerbose,
+    },
     registerMasternodeTask,
     config,
   ) {
@@ -39,6 +41,7 @@ class RegisterCommand extends BaseCommand {
       },
     ],
     {
+      renderer: isVerbose ? 'verbose' : 'default',
       rendererOptions: {
         clearOutput: false,
         collapse: false,

@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const fundWallet = require('@dashevo/wallet-lib/src/utils/fundWallet');
 
 const dpnsDocumentSchema = require('@dashevo/dpns-contract/schema/dpns-contract-documents.json');
+const dashpayDocumentSchema = require('@dashevo/dashpay-contract/schema/dashpay.schema.json');
 
 const NETWORKS = require('../../../networks');
 
@@ -45,8 +46,8 @@ function initTaskFactory(
             network: config.get('network'),
           };
 
-          if (ctx.seed) {
-            clientOpts.seeds = [ctx.seed];
+          if (ctx.dapiAddress) {
+            clientOpts.dapiAddresses = [ctx.dapiAddress];
           }
 
           const faucetClient = new Dash.Client({
@@ -61,6 +62,8 @@ function initTaskFactory(
             wallet: {
               mnemonic: null,
             },
+            passFakeAssetLockProofForTests:
+              config.get('platform.drive.passFakeAssetLockProofForTests', true),
           });
 
           const amount = 40000;
@@ -112,7 +115,7 @@ function initTaskFactory(
             .update(ctx.dataContractStateTransition.toBuffer())
             .digest();
 
-          if (ctx.seed || config.get('network') !== NETWORKS.LOCAL) {
+          if (ctx.dapiAddress || config.get('network') !== NETWORKS.LOCAL) {
             task.skip('Can\'t obtain DPNS contract commit block height from remote node.'
               + `Please, get block height manually using state transition hash "0x${stateTransitionHash.toString('hex')}"`
               + 'and set it to "platform.dpns.contract.id" config option');
@@ -120,14 +123,14 @@ function initTaskFactory(
             return;
           }
 
-          const tendermintRpcClient = createTenderdashRpcClient();
+          const tenderdashRpcClient = createTenderdashRpcClient();
 
           const params = { hash: stateTransitionHash.toString('base64') };
 
-          const response = await tendermintRpcClient.request('tx', params);
+          const response = await tenderdashRpcClient.request('tx', params);
 
           if (response.error) {
-            throw new Error(`Tendermint error: ${response.error.message}: ${response.error.data}`);
+            throw new Error(`Tenderdash error: ${response.error.message}: ${response.error.data}`);
           }
 
           const { result: { height: contractBlockHeight } } = response;
@@ -151,6 +154,69 @@ function initTaskFactory(
             dashAliasIdentityId: ctx.identity.getId(),
           }, ctx.identity);
         },
+      },
+      {
+        title: 'Register identity for Dashpay',
+        task: async (ctx, task) => {
+          ctx.identity = await ctx.client.platform.identities.register(5);
+
+          // eslint-disable-next-line no-param-reassign
+          task.output = `Dashpay's owner identity: ${ctx.identity.getId()}`;
+        },
+        options: { persistentOutput: true },
+      },
+      {
+        title: 'Register Dashpay Contract',
+        task: async (ctx, task) => {
+          ctx.dataContract = await ctx.client.platform.contracts.create(
+            dashpayDocumentSchema, ctx.identity,
+          );
+
+          ctx.dashpayStateTransition = await ctx.client.platform.contracts.broadcast(
+            ctx.dataContract,
+            ctx.identity,
+          );
+
+          config.set('platform.dashpay.contract.id', ctx.dataContract.getId().toString());
+
+          // eslint-disable-next-line no-param-reassign
+          task.output = `Dashpay contract ID: ${ctx.dataContract.getId()}`;
+        },
+        options: { persistentOutput: true },
+      },
+      {
+        title: 'Obtain Dashpay contract commit block height',
+        task: async (ctx, task) => {
+          const stateTransitionHash = crypto.createHash('sha256')
+            .update(ctx.dashpayStateTransition.toBuffer())
+            .digest();
+
+          if (ctx.dapiAddress || config.get('network') !== NETWORKS.LOCAL) {
+            task.skip('Can\'t obtain Dashpay contract commit block height from remote node.'
+              + `Please, get block height manually using state transition hash "0x${stateTransitionHash.toString('hex')}"`
+              + 'and set it to "platform.dashpay.contract.id" config option');
+
+            return;
+          }
+
+          const tenderdashRpcClient = createTenderdashRpcClient();
+
+          const params = { hash: stateTransitionHash.toString('base64') };
+
+          const response = await tenderdashRpcClient.request('tx', params);
+
+          if (response.error) {
+            throw new Error(`Tenderdash error: ${response.error.message}: ${response.error.data}`);
+          }
+
+          const { result: { height: contractBlockHeight } } = response;
+
+          config.set('platform.dashpay.contract.blockHeight', contractBlockHeight);
+
+          // eslint-disable-next-line no-param-reassign
+          task.output = `Dashpay contract block height: ${contractBlockHeight}`;
+        },
+        options: { persistentOutput: true },
       },
       {
         title: 'Disconnect SDK',

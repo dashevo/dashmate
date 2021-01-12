@@ -21,17 +21,19 @@ class StartCommand extends BaseCommand {
       update: isUpdate,
       'drive-image-build-path': driveImageBuildPath,
       'dapi-image-build-path': dapiImageBuildPath,
+      verbose: isVerbose,
     },
     dockerCompose,
     startNodeTask,
     config,
   ) {
     const isMasternode = config.get('core.masternode.enable');
+    const network = config.get('network');
 
     const tasks = new Listr(
       [
         {
-          title: `Start ${isMasternode ? 'masternode' : 'full node'}`,
+          title: `Start ${network} ${isMasternode ? 'masternode' : 'full node'}`,
           task: () => startNodeTask(
             config,
             {
@@ -43,6 +45,7 @@ class StartCommand extends BaseCommand {
         },
       ],
       {
+        renderer: isVerbose ? 'verbose' : 'default',
         rendererOptions: {
           clearOutput: false,
           collapse: false,
@@ -59,9 +62,9 @@ class StartCommand extends BaseCommand {
   }
 }
 
-StartCommand.description = `Start masternode
+StartCommand.description = `Start node
 ...
-Start masternode with specific preset
+Start node
 `;
 
 StartCommand.flags = {

@@ -28,12 +28,16 @@ addressindex=1
 timestampindex=1
 spentindex=1
 
-{{? it.network === 'testnet'}}testnet=1
-[test]{{??}}# ZeroMQ notifications (required for Insight)
+# ZeroMQ notifications
 zmqpubrawtx=tcp://0.0.0.0:29998
 zmqpubrawtxlock=tcp://0.0.0.0:29998
-zmqpubhashblock=tcp://0.0.0.0:29998{{?}}
-{{? it.network === 'local'}}
+zmqpubhashblock=tcp://0.0.0.0:29998
+zmqpubrawchainlocksig=tcp://0.0.0.0:29998
+zmqpubrawtxlocksig=tcp://0.0.0.0:29998
+
+{{? it.network === 'testnet'}}testnet=1
+[test]
+{{?? it.network === 'local'}}
 regtest=1
 [regtest]{{?? it.network === 'evonet'}}
 devnet={{=it.core.devnetName}}
@@ -49,4 +53,5 @@ highsubsidyfactor=10{{?}}
 # network
 port={{=it.core.p2p.port}}
 bind=0.0.0.0
+rpcbind=0.0.0.0
 rpcport={{=it.core.rpc.port}}
