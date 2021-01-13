@@ -89,6 +89,7 @@ const baseConfig = {
         p2p: {
           port: 26656,
           persistentPeers: [],
+          seeds: [],
         },
         rpc: {
           port: 26657,
