@@ -93,10 +93,11 @@ class DockerCompose {
     await this.throwErrorIfNotInstalled();
 
     try {
-      await dockerCompose.upAll({
+      return dockerCompose.upAll({
         ...this.getOptions(envs),
+        log: true,
         commandOptions: ['--build'],
-      });
+      }).out;
     } catch (e) {
       throw new DockerComposeError(e);
     }

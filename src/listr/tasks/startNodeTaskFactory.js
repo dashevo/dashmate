@@ -57,7 +57,7 @@ function startNodeTaskFactory(dockerCompose) {
       },
       {
         title: 'Start services',
-        task: async () => {
+        task: async (task) => {
           const isMasternode = config.get('core.masternode.enable');
           if (isMasternode) {
             // Check operatorPrivateKey is set
@@ -82,7 +82,8 @@ function startNodeTaskFactory(dockerCompose) {
             }
           }
 
-          await dockerCompose.up(envs);
+          // eslint-disable-next-line no-param-reassign
+          task.output = dockerCompose.up(envs);
         },
       },
       {
