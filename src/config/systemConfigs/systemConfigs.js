@@ -939,6 +939,12 @@ module.exports = {
         },
         ownerId: 'G7sYtiobAP2eq79uYR9Pd6u2b6mapf4q6Pq2Q3BHiBK8',
       },
+      dashpay: {
+        contract: {
+          id: 'matk8g1YRpzZskecRfpG5GCAgRmWCGJfjUemrsLkFDg',
+          blockHeight: 42,
+        },
+      },
       drive: {
         tenderdash: {
           p2p: {
