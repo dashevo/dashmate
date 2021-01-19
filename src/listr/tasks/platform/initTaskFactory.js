@@ -13,17 +13,17 @@ const NETWORKS = require('../../../networks');
 
 /**
  *
- * @return {initTask}
+ * @return {platformInitTask}
  */
-function initTaskFactory(
+function platformInitTaskFactory(
   createTenderdashRpcClient,
 ) {
   /**
-   * @typedef {initTask}
+   * @typedef {platformInitTask}
    * @param {Config} config
    * @return {Listr}
    */
-  function initTask(
+  function platformInitTask(
     config,
   ) {
     const dpnsOwnerId = config.get('platform.dpns.ownerId');
@@ -225,7 +225,7 @@ function initTaskFactory(
     ]);
   }
 
-  return initTask;
+  return platformInitTask;
 }
 
-module.exports = initTaskFactory;
+module.exports = platformInitTaskFactory;
