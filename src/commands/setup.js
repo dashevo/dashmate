@@ -13,10 +13,10 @@ const wait = require('../util/wait');
 
 const packageJson = require('../../package.json');
 
-const PRESET_TESETNET = 'testnet';
+const PRESET_TESTNET = 'testnet';
 const PRESET_LOCAL = 'local';
 const PRESET_EVONET = 'evonet';
-const PRESETS = [PRESET_TESETNET, PRESET_EVONET, PRESET_LOCAL];
+const PRESETS = [PRESET_TESTNET, PRESET_EVONET, PRESET_LOCAL];
 
 const NODE_TYPE_MASTERNODE = 'masternode';
 const NODE_TYPE_FULLNODE = 'fullnode';
