@@ -179,16 +179,30 @@ class DockerCompose {
    * Get list of Docker containers
    *
    * @param {Object} envs
-   * @param {string} [filterServiceName]
+   * @param {string} [filterServiceNames]
+   * @param {boolean} returnServiceNames
    * @return {string[]}
    */
-  async getContainersList(envs, filterServiceName = undefined) {
+  async getContainersList(
+    envs,
+    filterServiceNames = undefined,
+    returnServiceNames = false,
+  ) {
     let psOutput;
+    const commandOptions = [];
+
+    if (returnServiceNames) {
+      commandOptions.push('--services');
+    } else {
+      commandOptions.push('--quiet');
+    }
+
+    commandOptions.push(filterServiceNames);
 
     try {
       ({ out: psOutput } = await dockerCompose.ps({
         ...this.getOptions(envs),
-        commandOptions: ['-q', filterServiceName],
+        commandOptions,
       }));
     } catch (e) {
       throw new DockerComposeError(e);
@@ -198,6 +212,21 @@ class DockerCompose {
       .trim()
       .split('\n')
       .filter(Boolean);
+  }
+
+  /**
+   * Invert list of Docker service names
+   *
+   * @private
+   * @param {Object} envs
+   * @param {string} [invertServiceName]
+   * @return {string[]}
+   */
+  async invertContainerNamesList(envs, invertServiceId = undefined) {
+    const containerIds = await this.getContainersList(envs, undefined, true);
+    const invertedContainerIds = containerIds
+      .filter((containerId) => !invertServiceId.includes(containerId));
+    return invertedContainerIds;
   }
 
   /**
@@ -217,6 +246,42 @@ class DockerCompose {
     } catch (e) {
       throw new DockerComposeError(e);
     }
+  }
+
+  /**
+   * Remove docker compose
+   *
+   * @param {Object} envs
+   * @param {string[]} [serviceNames]
+   * @return {Promise<void>}
+   */
+  async rm(envs, serviceNames) {
+    await this.throwErrorIfNotInstalled();
+
+    try {
+      await dockerCompose.rm({
+        ...this.getOptions(envs),
+        commandOptions: ['--stop', '-v'],
+      }, ...serviceNames);
+    } catch (e) {
+      throw new DockerComposeError(e);
+    }
+  }
+
+  /**
+   * Remove docker compose platform containers only
+   *
+   * @param {Object} envs
+   * @return {Promise<void>}
+   */
+  async rmPlatformOnly(envs) {
+    const coreContainerNames = ['core', 'sentinel'];
+    const platformContainerNames = await this.invertContainerNamesList(
+      envs,
+      coreContainerNames,
+      true,
+    );
+    await this.rm(envs, platformContainerNames);
   }
 
   /**

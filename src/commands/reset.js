@@ -32,11 +32,21 @@ class ResetCommand extends BaseCommand {
   ) {
     const tasks = new Listr([
       {
+        title: 'Stop services',
+        task: async () => dockerCompose.stop(config.toEnvs()),
+      },
+      {
         title: 'Reset node data',
         task: () => (
           new Listr([
             {
-              title: 'Remove Docker containers and associated data',
+              title: 'Remove platform services and associated data',
+              enabled: () => isPlatformOnlyReset,
+              task: async () => dockerCompose.rmPlatformOnly(config.toEnvs()),
+            },
+            {
+              title: 'Remove all services and associated data',
+              enabled: () => !isPlatformOnlyReset,
               task: async () => dockerCompose.down(config.toEnvs()),
             },
             {
