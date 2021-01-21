@@ -223,10 +223,10 @@ class DockerCompose {
    * @return {string[]}
    */
   async invertContainerNamesList(envs, invertServiceId = undefined) {
-    const containerIds = await this.getContainersList(envs, undefined, true);
-    const invertedContainerIds = containerIds
-      .filter((containerId) => !invertServiceId.includes(containerId));
-    return invertedContainerIds;
+    const containerNames = await this.getContainersList(envs, undefined, true);
+    const invertedContainerNames = containerNames
+      .filter((containerName) => !invertServiceId.includes(containerName));
+    return invertedContainerNames;
   }
 
   /**
@@ -279,7 +279,6 @@ class DockerCompose {
     const platformContainerNames = await this.invertContainerNamesList(
       envs,
       coreContainerNames,
-      true,
     );
     await this.rm(envs, platformContainerNames);
   }
