@@ -14,6 +14,7 @@ class ResetCommand extends BaseCommand {
    * @param {Config} config
    * @param {ConfigCollection} configCollection
    * @param {DockerCompose} dockerCompose
+   * @param {Docker} docker
    * @param {tenderdashInitTask} tenderdashInitTask
    * @return {Promise<void>}
    */
@@ -28,6 +29,7 @@ class ResetCommand extends BaseCommand {
     config,
     configCollection,
     dockerCompose,
+    docker,
     tenderdashInitTask,
   ) {
     const tasks = new Listr([
@@ -36,28 +38,39 @@ class ResetCommand extends BaseCommand {
         task: async () => dockerCompose.stop(config.toEnvs()),
       },
       {
-        title: 'Reset node data',
+        title: 'Reset platform data',
+        enabled: () => isPlatformOnlyReset,
         task: () => (
           new Listr([
             {
               title: 'Remove platform services and associated data',
-              enabled: () => isPlatformOnlyReset,
               task: async () => dockerCompose.rmPlatformOnly(config.toEnvs()),
             },
             {
+              title: 'Clean up platform volumes',
+              task: async () => docker.pruneVolumes(),
+            },
+            {
+              title: 'Reset platform config',
+              enabled: () => isHardReset,
+              task: async () => resetSystemConfig(configCollection, config.getName(), true),
+            },
+          ])
+        ),
+      },
+      {
+        title: 'Reset node data',
+        enabled: () => !isPlatformOnlyReset,
+        task: () => (
+          new Listr([
+            {
               title: 'Remove all services and associated data',
-              enabled: () => !isPlatformOnlyReset,
               task: async () => dockerCompose.down(config.toEnvs()),
             },
             {
               title: 'Reset config',
               enabled: () => isHardReset,
-              task: async (task) => {
-                resetSystemConfig(configCollection, config.getName());
-                // eslint-disable-next-line no-param-reassign
-                task.output = `${config.getName()} is reset to factory settings`;
-              },
-              options: { persistentOutput: true },
+              task: async () => resetSystemConfig(configCollection, config.getName()),
             },
           ])
         ),
