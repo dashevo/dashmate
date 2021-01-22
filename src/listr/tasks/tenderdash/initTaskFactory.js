@@ -18,28 +18,31 @@ function tenderdashInitTaskFactory(
   ) {
     return new Listr([
       {
-        title: 'Validate keys and volumes',
-        task: async () => {
-          const isValidatorKeyEmpty = Object.keys(config.get('platform.drive.tenderdash.validatorKey')).length === 0;
-          const isNodeKeyEmpty = Object.keys(config.get('platform.drive.tenderdash.nodeKey')).length === 0;
-          const isGenesisEmpty = Object.keys(config.get('platform.drive.tenderdash.genesis')).length === 0;
+        title: 'Generate node keys and data',
+        task: async (ctx, task) => {
+          const isValidatorKeyPresent = Object.keys(config.get('platform.drive.tenderdash.validatorKey')).length !== 0;
+          const isNodeKeyPresent = Object.keys(config.get('platform.drive.tenderdash.nodeKey')).length !== 0;
+          const isGenesisPresent = Object.keys(config.get('platform.drive.tenderdash.genesis')).length !== 0;
 
           const { Volumes: existingVolumes } = await docker.listVolumes();
           const { COMPOSE_PROJECT_NAME: composeProjectName } = config.toEnvs();
-          const isDataVolumeMissing = !existingVolumes.find((v) => v.Name === `${composeProjectName}_drive_tenderdash`);
+          const isDataVolumePresent = existingVolumes.find((v) => v.Name === `${composeProjectName}_drive_tenderdash`);
 
-          if (isValidatorKeyEmpty || isNodeKeyEmpty || isNodeKeyEmpty || isDataVolumeMissing) {
+          if (isValidatorKeyPresent && isNodeKeyPresent
+            && isGenesisPresent && isDataVolumePresent) {
+            task.skip('Node already initialized');
+          } else {
             const [validatorKey, nodeKey, genesis] = await initializeTenderdashNode(config);
 
-            if (isValidatorKeyEmpty) {
+            if (!isValidatorKeyPresent) {
               config.set('platform.drive.tenderdash.validatorKey', validatorKey);
             }
 
-            if (isNodeKeyEmpty) {
+            if (!isNodeKeyPresent) {
               config.set('platform.drive.tenderdash.nodeKey', nodeKey);
             }
 
-            if (isGenesisEmpty) {
+            if (!isGenesisPresent) {
               if (config.network === 'local') {
                 genesis.initial_core_chain_locked_height = 1000;
               }
