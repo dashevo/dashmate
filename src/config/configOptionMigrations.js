@@ -25,4 +25,18 @@ module.exports = {
 
     return options;
   },
+  '0.17.4': (name, options) => {
+    if (options.network !== NETWORKS.TESTNET) {
+      return options;
+    }
+
+    // Set Drive's new logging variables
+    lodashSet(options, 'platform.drive.abci.log.stdout.level', systemConfigs.baseConfig.platform.drive.abci.log.stdout.level);
+    lodashSet(options, 'platform.drive.abci.log.pretty.level', systemConfigs.baseConfig.platform.drive.abci.log.pretty.level);
+    lodashSet(options, 'platform.drive.abci.log.pretty.filePath', systemConfigs.baseConfig.platform.drive.abci.log.pretty.filePath);
+    lodashSet(options, 'platform.drive.abci.log.json.level', systemConfigs.baseConfig.platform.drive.abci.log.json.level);
+    lodashSet(options, 'platform.drive.abci.log.json.filePath', systemConfigs.baseConfig.platform.drive.abci.log.json.filePath);
+
+    return options;
+  },
 };

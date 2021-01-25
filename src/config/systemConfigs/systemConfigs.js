@@ -79,7 +79,17 @@ const baseConfig = {
           image: 'dashpay/drive:0.17',
         },
         log: {
-          level: 'info',
+          stdout: {
+            level: 'info',
+          },
+          pretty: {
+            level: 'silent',
+            filePath: '/tmp/drive_pretty.log',
+          },
+          json: {
+            level: 'silent',
+            filePath: '/tmp/drive_json.log',
+          },
         },
       },
       tenderdash: {

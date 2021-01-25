@@ -235,13 +235,51 @@ module.exports = {
                 },
                 log: {
                   properties: {
+                    stdout: {
+                      properties: {
+                        level: {
+                          type: 'string',
+                          enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
+                        },
+                      },
+                      additionalProperties: false,
+                      required: ['level'],
+                    },
+                    pretty: {
+                      properties: {
+                        level: {
+                          type: 'string',
+                          enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
+                        },
+                        filePath: {
+                          type: 'string',
+                          pattern: '^(/[^/ ]*)+/?$',
+                        },
+                      },
+                      additionalProperties: false,
+                      required: ['level', 'filePath'],
+                    },
+                    json: {
+                      properties: {
+                        level: {
+                          type: 'string',
+                          enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
+                        },
+                        filePath: {
+                          type: 'string',
+                          pattern: '^(/[^/ ]*)+/?$',
+                        },
+                      },
+                      additionalProperties: false,
+                      required: ['level', 'filePath'],
+                    },
                     level: {
                       type: 'string',
                       enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
                     },
                   },
                   additionalProperties: false,
-                  required: ['level'],
+                  required: ['stdout', 'pretty', 'json'],
                 },
               },
               additionalProperties: false,
