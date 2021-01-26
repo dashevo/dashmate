@@ -76,7 +76,7 @@ class ResetCommand extends BaseCommand {
             resetSystemConfig(configCollection, config.getName(), isPlatformOnlyReset);
           } else {
             // eslint-disable-next-line no-param-reassign
-            task.skip('config reset failed, only system configs can be reset');
+            task.skip('config reset skipped, only system configs can be reset');
           }
         },
         options: { persistentOutput: true },
