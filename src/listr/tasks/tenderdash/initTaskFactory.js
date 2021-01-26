@@ -31,24 +31,25 @@ function tenderdashInitTaskFactory(
           if (isValidatorKeyPresent && isNodeKeyPresent
             && isGenesisPresent && isDataVolumePresent) {
             task.skip('Node already initialized');
-          } else {
-            const [validatorKey, nodeKey, genesis] = await initializeTenderdashNode(config);
+            return;
+          }
 
-            if (!isValidatorKeyPresent) {
-              config.set('platform.drive.tenderdash.validatorKey', validatorKey);
+          const [validatorKey, nodeKey, genesis] = await initializeTenderdashNode(config);
+
+          if (!isValidatorKeyPresent) {
+            config.set('platform.drive.tenderdash.validatorKey', validatorKey);
+          }
+
+          if (!isNodeKeyPresent) {
+            config.set('platform.drive.tenderdash.nodeKey', nodeKey);
+          }
+
+          if (!isGenesisPresent) {
+            if (config.network === 'local') {
+              genesis.initial_core_chain_locked_height = 1000;
             }
 
-            if (!isNodeKeyPresent) {
-              config.set('platform.drive.tenderdash.nodeKey', nodeKey);
-            }
-
-            if (!isGenesisPresent) {
-              if (config.network === 'local') {
-                genesis.initial_core_chain_locked_height = 1000;
-              }
-
-              config.set('platform.drive.tenderdash.genesis', genesis);
-            }
+            config.set('platform.drive.tenderdash.genesis', genesis);
           }
         },
       },
