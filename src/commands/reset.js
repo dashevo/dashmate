@@ -11,7 +11,7 @@ class ResetCommand extends BaseCommand {
    * @param {Object} args
    * @param {Object} flags
    * @param {resetSystemConfig} resetSystemConfig
-   * @param {checkSystemConfig} checkSystemConfig
+   * @param {isSystemConfig} isSystemConfig
    * @param {Config} config
    * @param {ConfigCollection} configCollection
    * @param {DockerCompose} dockerCompose
@@ -27,7 +27,7 @@ class ResetCommand extends BaseCommand {
       'platform-only': isPlatformOnlyReset,
     },
     resetSystemConfig,
-    checkSystemConfig,
+    isSystemConfig,
     config,
     configCollection,
     dockerCompose,
@@ -72,7 +72,7 @@ class ResetCommand extends BaseCommand {
         title: `Reset config ${config.getName()}`,
         enabled: () => isHardReset,
         task: async (ctx, task) => {
-          if (checkSystemConfig(config.getName())) {
+          if (isSystemConfig(config.getName())) {
             resetSystemConfig(configCollection, config.getName(), isPlatformOnlyReset);
           } else {
             // eslint-disable-next-line no-param-reassign
