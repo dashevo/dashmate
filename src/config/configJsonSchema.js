@@ -42,6 +42,20 @@ module.exports = {
       required: ['id', 'host', 'port'],
       additionalProperties: false,
     },
+    logFile: {
+      properties: {
+        level: {
+          type: 'string',
+          enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
+        },
+        path: {
+          type: 'string',
+          minLength: 1,
+        },
+      },
+      additionalProperties: false,
+      required: ['level', 'path'],
+    },
   },
   properties: {
     description: {
@@ -238,48 +252,21 @@ module.exports = {
                     stdout: {
                       properties: {
                         level: {
-                          type: 'string',
-                          enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
+                          $ref: '#/definitions/logFile/properties/level',
                         },
                       },
                       additionalProperties: false,
                       required: ['level'],
                     },
-                    pretty: {
-                      properties: {
-                        level: {
-                          type: 'string',
-                          enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
-                        },
-                        filePath: {
-                          type: 'string',
-                          pattern: '^(/[^/ ]*)+/?$',
-                        },
-                      },
-                      additionalProperties: false,
-                      required: ['level', 'filePath'],
+                    prettyFile: {
+                      $ref: '#/definitions/logFile',
                     },
-                    json: {
-                      properties: {
-                        level: {
-                          type: 'string',
-                          enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
-                        },
-                        filePath: {
-                          type: 'string',
-                          pattern: '^(/[^/ ]*)+/?$',
-                        },
-                      },
-                      additionalProperties: false,
-                      required: ['level', 'filePath'],
-                    },
-                    level: {
-                      type: 'string',
-                      enum: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
+                    jsonFile: {
+                      $ref: '#/definitions/logFile',
                     },
                   },
                   additionalProperties: false,
-                  required: ['stdout', 'pretty', 'json'],
+                  required: ['stdout', 'prettyFile', 'jsonFile'],
                 },
               },
               additionalProperties: false,

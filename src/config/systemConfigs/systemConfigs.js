@@ -82,13 +82,13 @@ const baseConfig = {
           stdout: {
             level: 'info',
           },
-          pretty: {
+          prettyFile: {
             level: 'silent',
-            filePath: '/tmp/drive_pretty.log',
+            path: '/tmp/base-drive-pretty.log',
           },
-          json: {
+          jsonFile: {
             level: 'silent',
-            filePath: '/tmp/drive_json.log',
+            path: '/tmp/base-drive-json.json',
           },
         },
       },
@@ -154,6 +154,16 @@ module.exports = {
       drive: {
         skipAssetLockConfirmationValidation: true,
         passFakeAssetLockProofForTests: true,
+        abci: {
+          log: {
+            prettyFile: {
+              path: '/tmp/local-drive-pretty.log',
+            },
+            jsonFile: {
+              path: '/tmp/local-drive-json.log',
+            },
+          },
+        },
       },
     },
     externalIp: '127.0.0.1',
@@ -204,6 +214,16 @@ module.exports = {
         ownerId: 'Gxiu28Lzfj66aPBCxD7AgTbbauLf68jFLNibWGU39Fuh',
       },
       drive: {
+        abci: {
+          log: {
+            prettyFile: {
+              path: '/tmp/evonet-drive-pretty.log',
+            },
+            jsonFile: {
+              path: '/tmp/evonet-drive-json.log',
+            },
+          },
+        },
         tenderdash: {
           p2p: {
             persistentPeers: [
@@ -956,6 +976,16 @@ module.exports = {
         },
       },
       drive: {
+        abci: {
+          log: {
+            prettyFile: {
+              path: '/tmp/testnet-drive-pretty.log',
+            },
+            jsonFile: {
+              path: '/tmp/testnet-drive-json.log',
+            },
+          },
+        },
         tenderdash: {
           p2p: {
             seeds: [

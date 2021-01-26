@@ -1,9 +1,9 @@
+const fs = require('fs');
+
 const { Listr } = require('listr2');
 
 const { PrivateKey } = require('@dashevo/dashcore-lib');
-
 const NETWORKS = require('../../networks');
-const touchFile = require('../../util/touchFile');
 
 /**
  *
@@ -43,11 +43,17 @@ function startNodeTaskFactory(dockerCompose) {
     }
 
     // Check Drive log files are created
-    const prettyFilePath = config.get('platform.drive.abci.log.pretty.filePath');
-    const jsonFilePath = config.get('platform.drive.abci.log.json.filePath');
+    const prettyFilePath = config.get('platform.drive.abci.log.prettyFile.path');
 
-    touchFile(prettyFilePath);
-    touchFile(jsonFilePath);
+    if (!fs.existsSync(prettyFilePath)) {
+      fs.writeFileSync(prettyFilePath, '');
+    }
+
+    const jsonFilePath = config.get('platform.drive.abci.log.jsonFile.path');
+
+    if (!fs.existsSync(jsonFilePath)) {
+      fs.writeFileSync(jsonFilePath, '');
+    }
 
     return new Listr([
       {
