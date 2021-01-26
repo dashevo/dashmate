@@ -11,7 +11,7 @@ class InitCommand extends BaseCommand {
    * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
-   * @param {platformInitTask} platformInitTask
+   * @param {initTask} initTask
    * @param {Config} config
    * @return {Promise<void>}
    */
@@ -26,13 +26,13 @@ class InitCommand extends BaseCommand {
       verbose: isVerbose,
     },
     dockerCompose,
-    platformInitTask,
+    initTask,
     config,
   ) {
     const tasks = new Listr([
       {
         title: 'Initialize Platform',
-        task: () => platformInitTask(config),
+        task: () => initTask(config),
       },
     ],
     {

@@ -45,8 +45,8 @@ const registerMasternode = require('./core/wallet/registerMasternode');
 
 const generateToAddressTaskFactory = require('./listr/tasks/wallet/generateToAddressTaskFactory');
 const registerMasternodeTaskFactory = require('./listr/tasks/registerMasternodeTaskFactory');
-const platformInitTaskFactory = require('./listr/tasks/platform/initTaskFactory');
-const tenderdashInitTaskFactory = require('./listr/tasks/tenderdash/initTaskFactory');
+const initTaskFactory = require('./listr/tasks/platform/initTaskFactory');
+const tenderdashInitTaskFactory = require('./listr/tasks/platform/tenderdashInitTaskFactory');
 const startNodeTaskFactory = require('./listr/tasks/startNodeTaskFactory');
 
 const createTenderdashRpcClient = require('./tenderdash/createTenderdashRpcClient');
@@ -138,7 +138,7 @@ async function createDIContainer(options) {
   container.register({
     generateToAddressTask: asFunction(generateToAddressTaskFactory),
     registerMasternodeTask: asFunction(registerMasternodeTaskFactory),
-    platformInitTask: asFunction(platformInitTaskFactory),
+    initTask: asFunction(initTaskFactory),
     tenderdashInitTask: asFunction(tenderdashInitTaskFactory),
     startNodeTask: asFunction(startNodeTaskFactory),
   });

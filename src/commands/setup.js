@@ -35,7 +35,7 @@ class SetupCommand extends BaseCommand {
    * @param {renderServiceTemplates} renderServiceTemplates
    * @param {writeServiceConfigs} writeServiceConfigs
    * @param {startNodeTask} startNodeTask
-   * @param {platformInitTask} platformInitTask
+   * @param {initTask} initTask
    * @param {tenderdashInitTask} tenderdashInitTask
    * @return {Promise<void>}
    */
@@ -61,7 +61,7 @@ class SetupCommand extends BaseCommand {
     renderServiceTemplates,
     writeServiceConfigs,
     startNodeTask,
-    platformInitTask,
+    initTask,
     tenderdashInitTask,
   ) {
     let config;
@@ -229,7 +229,7 @@ class SetupCommand extends BaseCommand {
       {
         title: 'Initialize Platform',
         enabled: (ctx) => ctx.preset === PRESET_LOCAL,
-        task: () => platformInitTask(config),
+        task: () => initTask(config),
       },
       {
         title: 'Stop node',
