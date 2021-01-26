@@ -215,21 +215,6 @@ class DockerCompose {
   }
 
   /**
-   * Invert list of Docker service names
-   *
-   * @private
-   * @param {Object} envs
-   * @param {string} [invertServiceName]
-   * @return {string[]}
-   */
-  async invertContainerNamesList(envs, invertServiceId = undefined) {
-    const containerNames = await this.getContainersList(envs, undefined, true);
-    const invertedContainerNames = containerNames
-      .filter((containerName) => !invertServiceId.includes(containerName));
-    return invertedContainerNames;
-  }
-
-  /**
    * Down docker compose
    *
    * @param {Object} envs
@@ -266,21 +251,6 @@ class DockerCompose {
     } catch (e) {
       throw new DockerComposeError(e);
     }
-  }
-
-  /**
-   * Remove docker compose platform containers only
-   *
-   * @param {Object} envs
-   * @return {Promise<void>}
-   */
-  async rmPlatformOnly(envs) {
-    const coreContainerNames = ['core', 'sentinel'];
-    const platformContainerNames = await this.invertContainerNamesList(
-      envs,
-      coreContainerNames,
-    );
-    await this.rm(envs, platformContainerNames);
   }
 
   /**

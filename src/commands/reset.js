@@ -44,7 +44,15 @@ class ResetCommand extends BaseCommand {
           new Listr([
             {
               title: 'Remove platform services and associated data',
-              task: async () => dockerCompose.rmPlatformOnly(config.toEnvs()),
+              task: async () => {
+                const coreContainerNames = ['core', 'sentinel'];
+                const containerNames = await dockerCompose
+                  .getContainersList(config.toEnvs(), undefined, true);
+                const platformContainerNames = containerNames
+                  .filter((containerName) => !coreContainerNames.includes(containerName));
+
+                await dockerCompose.rm(config.toEnvs(), platformContainerNames);
+              },
             },
             {
               title: 'Clean up platform volumes',
