@@ -11,6 +11,7 @@ class ResetCommand extends BaseCommand {
    * @param {Object} args
    * @param {Object} flags
    * @param {resetSystemConfig} resetSystemConfig
+   * @param {checkSystemConfig} checkSystemConfig
    * @param {Config} config
    * @param {ConfigCollection} configCollection
    * @param {DockerCompose} dockerCompose
@@ -26,6 +27,7 @@ class ResetCommand extends BaseCommand {
       'platform-only': isPlatformOnlyReset,
     },
     resetSystemConfig,
+    checkSystemConfig,
     config,
     configCollection,
     dockerCompose,
@@ -58,30 +60,26 @@ class ResetCommand extends BaseCommand {
               title: 'Clean up platform volumes',
               task: async () => docker.pruneVolumes(),
             },
-            {
-              title: 'Reset platform config',
-              enabled: () => isHardReset,
-              task: async () => resetSystemConfig(configCollection, config.getName(), true),
-            },
           ])
         ),
       },
       {
-        title: 'Reset node data',
+        title: 'Remove all services and associated data',
         enabled: () => !isPlatformOnlyReset,
-        task: () => (
-          new Listr([
-            {
-              title: 'Remove all services and associated data',
-              task: async () => dockerCompose.down(config.toEnvs()),
-            },
-            {
-              title: 'Reset config',
-              enabled: () => isHardReset,
-              task: async () => resetSystemConfig(configCollection, config.getName()),
-            },
-          ])
-        ),
+        task: async () => dockerCompose.down(config.toEnvs()),
+      },
+      {
+        title: `Reset config ${config.getName()}`,
+        enabled: () => isHardReset,
+        task: async (ctx, task) => {
+          if (checkSystemConfig(config.getName())) {
+            resetSystemConfig(configCollection, config.getName(), isPlatformOnlyReset);
+          } else {
+            // eslint-disable-next-line no-param-reassign
+            task.skip('config reset failed, only system configs can be reset');
+          }
+        },
+        options: { persistentOutput: true },
       },
       {
         title: 'Initialize Tenderdash',
@@ -95,6 +93,7 @@ class ResetCommand extends BaseCommand {
         clearOutput: false,
         collapse: false,
         showSubtasks: true,
+        collapseSkips: false,
       },
     });
 
