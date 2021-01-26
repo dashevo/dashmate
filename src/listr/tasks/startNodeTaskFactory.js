@@ -1,6 +1,10 @@
+const { from, Observable } = require('rxjs');
+
 const { Listr } = require('listr2');
 
 const { PrivateKey } = require('@dashevo/dashcore-lib');
+
+const { Readable } = require('stream');
 
 const NETWORKS = require('../../networks');
 
@@ -16,7 +20,6 @@ function startNodeTaskFactory(dockerCompose) {
    * @param {Object} options
    * @param {string} [options.driveImageBuildPath]
    * @param {string} [options.dapiImageBuildPath]
-   * @param {boolean} [options.isUpdate]
    * @param {boolean} [options.isMinerEnabled]
    * @return {Object}
    */
@@ -25,7 +28,6 @@ function startNodeTaskFactory(dockerCompose) {
     {
       driveImageBuildPath = undefined,
       dapiImageBuildPath = undefined,
-      isUpdate = undefined,
       isMinerEnabled = undefined,
     },
   ) {
@@ -43,11 +45,6 @@ function startNodeTaskFactory(dockerCompose) {
 
     return new Listr([
       {
-        title: 'Download updated services',
-        enabled: () => isUpdate === true,
-        task: async () => dockerCompose.pull(config.toEnvs()),
-      },
-      {
         title: 'Check node is not started',
         task: async () => {
           if (await dockerCompose.isServiceRunning(config.toEnvs())) {
@@ -56,7 +53,74 @@ function startNodeTaskFactory(dockerCompose) {
         },
       },
       {
+        title: 'Download updated services',
+        task: async (ctx, task) => {
+          // async function waitStream() {
+          //   // eslint-disable-next-line no-new
+          //   new Promise((resolve, reject) => {
+          //     const pullCommand = dockerCompose.pull(config.toEnvs());
+          //     // eslint-disable-next-line no-param-reassign
+          //     task.output = pullCommand.out;
+          //     pullCommand.then(resolve)
+          //       .catch(() => reject(new Error('Updating services failed')));
+          //   });
+          // }
+          // await waitStream();
+
+          // Doesn't wait
+
+          // ---------------------------------------------------------------------
+
+          // await new Promise((resolve, reject) => {
+          //   const readable = Readable.from(dockerCompose.pull(config.toEnvs()));
+          //   readable.on('data', (chunk) => {
+          //     // eslint-disable-next-line no-param-reassign
+          //     task.output = chunk;
+          //   });
+          //   readable.on('end', resolve);
+          //   readable.on('error', (error) => {
+          //     throw new Error(error);
+          //   });
+          // });
+
+          // The "iterable" argument must be an instance of Iterable. Received an instance of Promise
+
+          // ---------------------------------------------------------------------
+
+          // let streamy = '';
+          // const theObserver = new Observable((observer) => {
+          //   streamy = from(dockerCompose.pull(config.toEnvs()));
+          // });
+          // theObserver.subscribe(task.output);
+          // streamy.pipe(task.output);
+
+          // pipe_1.pipeFromArray(...) is not a function
+
+          // ---------------------------------------------------------------------
+
+          // eslint-disable-next-line no-new
+          // await new Promise((resolve, reject) => {
+          //   const pullCommand = dockerCompose.pull(config.toEnvs());
+          //   const streamy = from(pullCommand);
+          //   streamy.pipe(task.output);
+          //   pullCommand.then(resolve)
+          //     .catch(() => reject(new Error('Updating services failed')));
+          //   // pullCommand.stdout.pipe(task.output);
+          // });
+          // eslint-disable-next-line no-param-reassign
+          // task.output = await dockerCompose.pull(config.toEnvs());
+
+          // pipe_1.pipeFromArray(...) is not a function
+        },
+      },
+      // Why do we need to build if images are already available on Docker Hub?
+      // {
+      //   title: 'Build services',
+      //   task: async () => dockerCompose.(config.toEnvs()),
+      // },
+      {
         title: 'Start services',
+        // enabled: () => false,
         task: async (task) => {
           const isMasternode = config.get('core.masternode.enable');
           if (isMasternode) {
@@ -112,7 +176,8 @@ function startNodeTaskFactory(dockerCompose) {
             ['--detach'],
           );
         },
-      }]);
+      }],
+    { rendererOptions: { collapse: true, bottomBar: true } });
   }
 
   return startNodeTask;

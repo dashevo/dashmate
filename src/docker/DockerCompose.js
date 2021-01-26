@@ -230,10 +230,10 @@ class DockerCompose {
     await this.throwErrorIfNotInstalled();
 
     try {
-      await dockerCompose.pullAll({
+      return dockerCompose.pullAll({
         ...this.getOptions(envs),
-        commandOptions: ['-q'],
-      });
+        log: true,
+      }).out;
     } catch (e) {
       throw new DockerComposeError(e);
     }
