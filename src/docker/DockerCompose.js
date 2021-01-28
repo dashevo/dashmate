@@ -233,7 +233,7 @@ class DockerCompose {
       return dockerCompose.pullAll({
         ...this.getOptions(envs),
         log: true,
-      }).out;
+      });
     } catch (e) {
       throw new DockerComposeError(e);
     }

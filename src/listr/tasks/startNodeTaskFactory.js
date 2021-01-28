@@ -55,62 +55,15 @@ function startNodeTaskFactory(dockerCompose) {
       {
         title: 'Download updated services',
         task: async (ctx, task) => {
-          // async function waitStream() {
-          //   // eslint-disable-next-line no-new
-          //   new Promise((resolve, reject) => {
-          //     const pullCommand = dockerCompose.pull(config.toEnvs());
-          //     // eslint-disable-next-line no-param-reassign
-          //     task.output = pullCommand.out;
-          //     pullCommand.then(resolve)
-          //       .catch(() => reject(new Error('Updating services failed')));
-          //   });
-          // }
-          // await waitStream();
+          async function logChunks(readable) {
+            for await (const chunk of readable) {
+              task.output = chunk.out;
+            }
+          }
 
-          // Doesn't wait
+          const log = await dockerCompose.pull(config.toEnvs());
 
-          // ---------------------------------------------------------------------
-
-          // await new Promise((resolve, reject) => {
-          //   const readable = Readable.from(dockerCompose.pull(config.toEnvs()));
-          //   readable.on('data', (chunk) => {
-          //     // eslint-disable-next-line no-param-reassign
-          //     task.output = chunk;
-          //   });
-          //   readable.on('end', resolve);
-          //   readable.on('error', (error) => {
-          //     throw new Error(error);
-          //   });
-          // });
-
-          // The "iterable" argument must be an instance of Iterable. Received an instance of Promise
-
-          // ---------------------------------------------------------------------
-
-          // let streamy = '';
-          // const theObserver = new Observable((observer) => {
-          //   streamy = from(dockerCompose.pull(config.toEnvs()));
-          // });
-          // theObserver.subscribe(task.output);
-          // streamy.pipe(task.output);
-
-          // pipe_1.pipeFromArray(...) is not a function
-
-          // ---------------------------------------------------------------------
-
-          // eslint-disable-next-line no-new
-          // await new Promise((resolve, reject) => {
-          //   const pullCommand = dockerCompose.pull(config.toEnvs());
-          //   const streamy = from(pullCommand);
-          //   streamy.pipe(task.output);
-          //   pullCommand.then(resolve)
-          //     .catch(() => reject(new Error('Updating services failed')));
-          //   // pullCommand.stdout.pipe(task.output);
-          // });
-          // eslint-disable-next-line no-param-reassign
-          // task.output = await dockerCompose.pull(config.toEnvs());
-
-          // pipe_1.pipeFromArray(...) is not a function
+          logChunks(log);
         },
       },
       // Why do we need to build if images are already available on Docker Hub?
