@@ -34,6 +34,10 @@ class ResetCommand extends BaseCommand {
     docker,
     tenderdashInitTask,
   ) {
+    if (isHardReset && !isSystemConfig(config.getName())) {
+      throw new Error(`Cannot hard reset non-system config "${config.getName()}"`);
+    }
+
     const tasks = new Listr([
       {
         title: 'Stop services',
@@ -71,15 +75,7 @@ class ResetCommand extends BaseCommand {
       {
         title: `Reset config ${config.getName()}`,
         enabled: () => isHardReset,
-        task: async (ctx, task) => {
-          if (isSystemConfig(config.getName())) {
-            resetSystemConfig(configCollection, config.getName(), isPlatformOnlyReset);
-          } else {
-            // eslint-disable-next-line no-param-reassign
-            task.skip('config reset skipped, only system configs can be reset');
-          }
-        },
-        options: { persistentOutput: true },
+        task: () => resetSystemConfig(configCollection, config.getName(), isPlatformOnlyReset),
       },
       {
         title: 'Initialize Tenderdash',
