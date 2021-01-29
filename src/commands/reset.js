@@ -44,33 +44,34 @@ class ResetCommand extends BaseCommand {
         task: async () => dockerCompose.stop(config.toEnvs()),
       },
       {
-        title: 'Reset platform data',
-        enabled: () => isPlatformOnlyReset,
-        task: () => (
-          new Listr([
-            {
-              title: 'Remove platform services and associated data',
-              task: async () => {
-                const coreContainerNames = ['core', 'sentinel'];
-                const containerNames = await dockerCompose
-                  .getContainersList(config.toEnvs(), undefined, true);
-                const platformContainerNames = containerNames
-                  .filter((containerName) => !coreContainerNames.includes(containerName));
-
-                await dockerCompose.rm(config.toEnvs(), platformContainerNames);
-              },
-            },
-            {
-              title: 'Clean up platform volumes',
-              task: async () => docker.pruneVolumes(),
-            },
-          ])
-        ),
-      },
-      {
         title: 'Remove all services and associated data',
         enabled: () => !isPlatformOnlyReset,
         task: async () => dockerCompose.down(config.toEnvs()),
+      },
+      {
+        title: 'Remove platform services and associated data',
+        enabled: () => isPlatformOnlyReset,
+        task: async () => {
+          // Remove containers
+          const coreContainerNames = ['core', 'sentinel'];
+          const containerNames = await dockerCompose
+            .getContainersList(config.toEnvs(), undefined, true);
+          const platformContainerNames = containerNames
+            .filter((containerName) => !coreContainerNames.includes(containerName));
+
+          await dockerCompose.rm(config.toEnvs(), platformContainerNames);
+
+          // Remove volumes
+          const coreVolumeNames = ['core_data'];
+          const { COMPOSE_PROJECT_NAME: composeProjectName } = config.toEnvs();
+
+          const projectvolumeNames = await dockerCompose.getVolumeNames(config.toEnvs());
+
+          await projectvolumeNames
+            .filter((volumeName) => !coreVolumeNames.includes(volumeName))
+            .map((volumeName) => `${composeProjectName}_${volumeName}`)
+            .forEach(async (volumeName) => docker.getVolume(volumeName).remove());
+        },
       },
       {
         title: `Reset config ${config.getName()}`,
@@ -89,7 +90,6 @@ class ResetCommand extends BaseCommand {
         clearOutput: false,
         collapse: false,
         showSubtasks: true,
-        collapseSkips: false,
       },
     });
 

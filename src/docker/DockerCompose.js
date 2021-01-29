@@ -215,6 +215,26 @@ class DockerCompose {
   }
 
   /**
+   * Get list of Docker volumes
+   * @param {Object} envs
+   * @return {string[]}
+   */
+  async getVolumeNames(envs) {
+    let volumeOutput;
+    try {
+      ({ out: volumeOutput } = await dockerCompose.configVolumes({
+        ...this.getOptions(envs),
+      }));
+    } catch (e) {
+      throw new DockerComposeError(e);
+    }
+
+    return volumeOutput
+      .trim()
+      .split('\n');
+  }
+
+  /**
    * Down docker compose
    *
    * @param {Object} envs
