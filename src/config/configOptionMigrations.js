@@ -27,19 +27,19 @@ module.exports = {
     return options;
   },
   '0.17.4': (name, options) => {
-    // Skip if it's not a system config
-    if (!systemConfigs[name]) {
-      return options;
+    let baseConfig = systemConfigs.base;
+    if (systemConfigs[name]) {
+      baseConfig = systemConfigs[name];
     }
 
     const previousStdoutLogLevel = lodashGet(
       options,
       'platform.drive.abci.log.level',
-      systemConfigs[name].platform.drive.abci.log,
+      baseConfig.platform.drive.abci.log,
     );
 
     // Set Drive's new logging variables
-    lodashSet(options, 'platform.drive.abci.log', systemConfigs[name].platform.drive.abci.log);
+    lodashSet(options, 'platform.drive.abci.log', baseConfig.platform.drive.abci.log);
 
     // Keep previous log level for stdout
     lodashSet(options, 'platform.drive.abci.log.stdout.level', previousStdoutLogLevel);
