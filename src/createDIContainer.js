@@ -70,7 +70,7 @@ async function createDIContainer(options) {
     systemConfigs: asValue(systemConfigs),
     createSystemConfigs: asFunction(createSystemConfigsFactory),
     resetSystemConfig: asFunction(resetSystemConfigFactory),
-    checkSystemConfig: asFunction(isSystemConfigFactory),
+    isSystemConfig: asFunction(isSystemConfigFactory),
     migrateConfigOptions: asValue(migrateConfigOptions),
     // `configCollection` and `config` are registering on command init
   });
