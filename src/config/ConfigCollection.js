@@ -5,10 +5,11 @@ const ConfigIsNotPresentError = require('./errors/ConfigIsNotPresentError');
 
 class ConfigCollection {
   /**
-   * @param {Config[]} [configs]
-   * @param {string|null} [currentConfigName=null]
+   * @param {Config[]} configs
+   * @param {string} currentConfigName
+   * @param {string} currentConfigFormatVersion
    */
-  constructor(configs = [], currentConfigName = null, currentConfigFormatVersion) {
+  constructor(configs = [], currentConfigName, currentConfigFormatVersion) {
     this.configsMap = configs.reduce((configsMap, config) => {
       // eslint-disable-next-line no-param-reassign
       configsMap[config.getName()] = config;

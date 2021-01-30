@@ -4,6 +4,7 @@ const NETWORKS = require('../../networks');
 
 const baseConfig = {
   description: 'base config for use as template',
+  group: null,
   core: {
     docker: {
       image: 'dashpay/dashd:0.17.0.0-rc2',
@@ -129,26 +130,119 @@ const baseConfig = {
   environment: 'production',
 };
 
+`
+mn setup local
+mn config:default local1
+
+mn setup local (should output info that you must use group prefix)
+
+mn group:default local
+mn group:start --group=local
+mn group:restart
+mn group:reset
+mn group:stop
+mn group:status
+`
+
+const local = lodashMerge({}, baseConfig, {
+  group: 'local',
+  platform: {
+    dapi: {
+      nginx: {
+        rateLimiter: {
+          enable: false,
+        },
+      },
+    },
+    drive: {
+      skipAssetLockConfirmationValidation: true,
+      passFakeAssetLockProofForTests: true,
+    },
+  },
+  externalIp: '127.0.0.1',
+  environment: 'development',
+  network: NETWORKS.LOCAL,
+});
+
 module.exports = {
   base: baseConfig,
-  local: lodashMerge({}, baseConfig, {
-    description: 'standalone node for local development',
+  local1: lodashMerge({}, local, {
+    description: 'first node for local development',
+    core: {
+      p2p: {
+        port: 20001,
+        seeds: [
+          {
+            host: 'host.docker.internal',
+            port: 20011,
+          },
+        ],
+      },
+      rpc: {
+        port: 20002,
+      },
+    },
     platform: {
       dapi: {
         nginx: {
-          rateLimiter: {
-            enable: false,
+          http: {
+            port: 3000,
+          },
+          grpc: {
+            port: 3010,
           },
         },
       },
       drive: {
-        skipAssetLockConfirmationValidation: true,
-        passFakeAssetLockProofForTests: true,
+        tenderdash: {
+          p2p: {
+            port: 26656,
+          },
+          rpc: {
+            port: 26657,
+          },
+        },
       },
     },
-    externalIp: '127.0.0.1',
-    environment: 'development',
-    network: NETWORKS.LOCAL,
+  }),
+  local2: lodashMerge({}, local, {
+    description: 'second node for local development',
+    core: {
+      p2p: {
+        port: 20011,
+        seeds: [
+          {
+            host: 'host.docker.internal',
+            port: 20001,
+          },
+        ],
+      },
+      rpc: {
+        port: 20012,
+      },
+    },
+    platform: {
+      dapi: {
+        nginx: {
+          http: {
+            port: 3020,
+          },
+          grpc: {
+            port: 3030,
+          },
+        },
+      },
+      drive: {
+        tenderdash: {
+          p2p: {
+            port: 26666,
+          },
+          rpc: {
+            port: 26667,
+          },
+        },
+      },
+    },
   }),
   evonet: lodashMerge({}, baseConfig, {
     description: 'node with Evonet configuration',

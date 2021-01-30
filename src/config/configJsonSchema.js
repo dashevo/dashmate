@@ -47,6 +47,9 @@ module.exports = {
     description: {
       type: ['string', 'null'],
     },
+    group: {
+      type: ['string', 'null'],
+    },
     core: {
       type: 'object',
       properties: {
@@ -380,6 +383,6 @@ module.exports = {
       enum: ['development', 'production'],
     },
   },
-  required: ['description', 'core', 'platform', 'externalIp', 'network', 'compose', 'environment'],
+  required: ['description', 'group', 'core', 'platform', 'externalIp', 'network', 'compose', 'environment'],
   additionalProperties: false,
 };

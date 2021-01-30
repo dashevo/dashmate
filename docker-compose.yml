@@ -13,6 +13,8 @@ services:
     command:
       - dashd
       - -masternodeblsprivkey=${CORE_MASTERNODE_OPERATOR_PRIVATE_KEY}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   sentinel:
     image: dashpay/sentinel
