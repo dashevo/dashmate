@@ -197,7 +197,9 @@ class SetupCommand extends BaseCommand {
       },
       {
         title: 'Initialize Tenderdash',
-        task: () => tenderdashInitTask(config),
+        task: async (ctx, task) => {
+          await tenderdashInitTask(config)(ctx, task);
+        },
       },
       {
         title: 'Update config',
