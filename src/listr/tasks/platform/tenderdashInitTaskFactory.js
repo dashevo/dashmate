@@ -17,7 +17,6 @@ function tenderdashInitTaskFactory(
     config,
   ) {
     return async (ctx, task) => {
-      //console.dir(config, { depth: 5 });
       const isValidatorKeyPresent = Object.keys(config.get('platform.drive.tenderdash.validatorKey')).length !== 0;
       const isNodeKeyPresent = Object.keys(config.get('platform.drive.tenderdash.nodeKey')).length !== 0;
       const isGenesisPresent = Object.keys(config.get('platform.drive.tenderdash.genesis')).length !== 0;
