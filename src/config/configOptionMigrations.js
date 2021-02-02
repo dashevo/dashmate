@@ -37,10 +37,6 @@ module.exports = {
       'platform.drive.abci.log.level',
     );
 
-    // delete an option that should not exist after the migration
-    // eslint-disable-next-line no-param-reassign
-    delete options.platform.drive.abci.log.level;
-
     // Set Drive's new logging variables
     lodashSet(options, 'platform.drive.abci.log', baseConfig.platform.drive.abci.log);
 
