@@ -35,7 +35,6 @@ module.exports = {
     const previousStdoutLogLevel = lodashGet(
       options,
       'platform.drive.abci.log.level',
-      baseConfig.platform.drive.abci.log,
     );
 
     // Set Drive's new logging variables
