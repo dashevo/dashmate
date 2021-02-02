@@ -45,7 +45,7 @@ function tenderdashInitTaskFactory(
           }
 
           if (!isGenesisPresent) {
-            if (config.options.network === 'local') {
+            if (config.get('network') === 'local') {
               genesis.initial_core_chain_locked_height = 1000;
             }
 

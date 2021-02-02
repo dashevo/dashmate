@@ -80,7 +80,7 @@ class ResetCommand extends BaseCommand {
       },
       {
         title: 'Initialize Tenderdash',
-        enabled: () => isHardReset,
+        enabled: () => !isHardReset,
         task: () => tenderdashInitTask(config),
       },
     ],
