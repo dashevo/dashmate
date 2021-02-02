@@ -41,7 +41,9 @@ module.exports = {
     lodashSet(options, 'platform.drive.abci.log', baseConfig.platform.drive.abci.log);
 
     // Keep previous log level for stdout
-    lodashSet(options, 'platform.drive.abci.log.stdout.level', previousStdoutLogLevel);
+    if (previousStdoutLogLevel) {
+      lodashSet(options, 'platform.drive.abci.log.stdout.level', previousStdoutLogLevel);
+    }
 
     return options;
   },
