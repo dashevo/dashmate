@@ -7,8 +7,8 @@ class ConfigFile {
   /**
    * @param {Config[]} configs
    * @param {string} configFormatVersion
-   * @param {string} defaultConfigName
-   * @param {string} defaultGroupName
+   * @param {string|null} defaultConfigName
+   * @param {string|null} defaultGroupName
    */
   constructor(configs, configFormatVersion, defaultConfigName, defaultGroupName) {
     this.configsMap = configs.reduce((configsMap, config) => {
@@ -178,6 +178,30 @@ class ConfigFile {
     delete this.configsMap[name];
 
     return this;
+  }
+
+  /**
+   * Get config file as plain object
+   *
+   * @return {{
+   *     configs: Object<string, Object>,
+   *     defaultGroupName: string,
+   *     configFormatVersion: (string|null),
+   *     defaultConfigName: (string|null)
+   * }}
+   */
+  toObject() {
+    return {
+      configFormatVersion: this.getConfigFormatVersion(),
+      defaultConfigName: this.getDefaultConfigName(),
+      defaultGroupName: this.getDefaultGroupName(),
+      configs: this.getAllConfigs().reduce((configsMap, config) => {
+        // eslint-disable-next-line no-param-reassign
+        configsMap[config.getName()] = config.getOptions();
+
+        return configsMap;
+      }, {}),
+    };
   }
 }
 

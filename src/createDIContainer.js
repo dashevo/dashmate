@@ -12,11 +12,11 @@ const path = require('path');
 const os = require('os');
 
 const ensureHomeDirFactory = require('./ensureHomeDirFactory');
-const ConfigJsonFileRepository = require('./config/configFile/ConfigFileJsonRepository');
+const ConfigFileJsonRepository = require('./config/configFile/ConfigFileJsonRepository');
 const createSystemConfigsFactory = require('./config/systemConfigs/createSystemConfigsFactory');
 const resetSystemConfigFactory = require('./config/systemConfigs/resetSystemConfigFactory');
 const isSystemConfigFactory = require('./config/systemConfigs/isSystemConfigFactory');
-const migrateConfigOptions = require('./config/configFile/migrateConfigFile');
+const migrateConfigFile = require('./config/configFile/migrateConfigFile');
 const systemConfigs = require('../configs/systemConfigs');
 
 const renderServiceTemplatesFactory = require('./templates/renderServiceTemplatesFactory');
@@ -66,13 +66,13 @@ async function createDIContainer(options) {
     homeDirPath: asValue(homeDirPath),
     configFilePath: asValue(path.join(homeDirPath, 'config.json')),
     ensureHomeDir: asFunction(ensureHomeDirFactory),
-    configRepository: asClass(ConfigJsonFileRepository),
+    configFileRepository: asClass(ConfigFileJsonRepository),
     systemConfigs: asValue(systemConfigs),
     createSystemConfigs: asFunction(createSystemConfigsFactory),
     resetSystemConfig: asFunction(resetSystemConfigFactory),
     isSystemConfig: asFunction(isSystemConfigFactory),
-    migrateConfigOptions: asValue(migrateConfigOptions),
-    // `configCollection` and `config` are registering on command init
+    migrateConfigFile: asValue(migrateConfigFile),
+    // `configFile` and `config` are registering on command init
   });
 
   /**

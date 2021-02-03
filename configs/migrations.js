@@ -47,8 +47,29 @@ module.exports = {
       }
     });
   },
-  '0.18.0': (configFile) => {
-    configFile.defaultGroupName = null;
+  '0.19.0-dev': (configFile) => {
+    // Add default group name if not present
+    if (typeof configFile.defaultGroupName === 'undefined') {
+      configFile.defaultGroupName = null;
+    }
+
+    // Add groups to existing configs
+    Object.entries(configFile.configs)
+      .forEach(([, config]) => {
+        if (typeof config.group === 'undefined') {
+          config.group = null;
+        }
+      });
+
+    // Add local1 config if not present
+    if (typeof configFile.configs.local1 === 'undefined') {
+      configFile.configs.local1 = systemConfigs.local1;
+    }
+
+    // Add local2 config if not present
+    if (typeof configFile.configs.local2 === 'undefined') {
+      configFile.configs.local2 = systemConfigs.local2;
+    }
 
     return configFile;
   },

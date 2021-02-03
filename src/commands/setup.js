@@ -28,7 +28,7 @@ class SetupCommand extends BaseCommand {
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
    * @param {generateBlsKeys} generateBlsKeys
-   * @param {ConfigCollection} configCollection
+   * @param {ConfigFile} configFile
    * @param {initializeTenderdashNode} initializeTenderdashNode
    * @param {generateToAddressTask} generateToAddressTask
    * @param {registerMasternodeTask} registerMasternodeTask
@@ -54,7 +54,7 @@ class SetupCommand extends BaseCommand {
     },
     dockerCompose,
     generateBlsKeys,
-    configCollection,
+    configFile,
     initializeTenderdashNode,
     generateToAddressTask,
     registerMasternodeTask,
@@ -97,9 +97,9 @@ class SetupCommand extends BaseCommand {
             ]);
           }
 
-          configCollection.setDefaultConfigName(ctx.preset);
+          configFile.setDefaultConfigName(ctx.preset);
 
-          config = configCollection.getDefaultConfig();
+          config = configFile.getDefaultConfig();
 
           // eslint-disable-next-line no-param-reassign
           task.output = `Selected ${config.getName()} as default config\n`;

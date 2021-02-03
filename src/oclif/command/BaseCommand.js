@@ -27,14 +27,14 @@ class BaseCommand extends Command {
 
     // Load configs
     /**
-     * @type {ConfigJsonFileRepository}
+     * @type {ConfigFileJsonRepository}
      */
-    const configManager = this.container.resolve('configRepository');
+    const configFileRepository = this.container.resolve('configFileRepository');
 
-    let configCollection;
+    let configFile;
     try {
       // Load config collection from config file
-      configCollection = await configManager.read();
+      configFile = await configFileRepository.read();
     } catch (e) {
       // Create default config collection if config file is not present
       // on the first start for example
@@ -48,12 +48,12 @@ class BaseCommand extends Command {
        */
       const createSystemConfigs = this.container.resolve('createSystemConfigs');
 
-      configCollection = createSystemConfigs();
+      configFile = createSystemConfigs();
     }
 
     // Register config collection in the container
     this.container.register({
-      configCollection: asValue(configCollection),
+      configFile: asValue(configFile),
     });
 
     // Graceful exit
@@ -82,10 +82,10 @@ class BaseCommand extends Command {
     const { args, flags } = this.parse(this.constructor);
 
     if (Object.prototype.hasOwnProperty.call(flags, 'config')) {
-      const configCollection = this.container.resolve('configCollection');
+      const configFile = this.container.resolve('configFile');
       const config = flags.config === null
-        ? configCollection.getDefaultConfig()
-        : configCollection.getConfig(flags.config);
+        ? configFile.getDefaultConfig()
+        : configFile.getConfig(flags.config);
 
       if (!config) {
         throw new Error('Default config is not set. Please use `--config` option or set default config');
@@ -98,8 +98,8 @@ class BaseCommand extends Command {
       const renderServiceTemplates = this.container.resolve('renderServiceTemplates');
       const writeServiceConfigs = this.container.resolve('writeServiceConfigs');
 
-      const configFiles = renderServiceTemplates(config);
-      writeServiceConfigs(config.getName(), configFiles);
+      const serviceConfigFiles = renderServiceTemplates(config);
+      writeServiceConfigs(config.getName(), serviceConfigFiles);
     }
 
     const params = getFunctionParams(this.runWithDependencies, 2);
@@ -111,12 +111,12 @@ class BaseCommand extends Command {
 
   async finally(err) {
     // Save configs collection
-    const configRepository = this.container.resolve('configRepository');
+    const configFileRepository = this.container.resolve('configFileRepository');
 
-    if (this.container.has('configCollection')) {
-      const configCollection = this.container.resolve('configCollection');
+    if (this.container.has('configFile')) {
+      const configFile = this.container.resolve('configFile');
 
-      await configRepository.write(configCollection);
+      await configFileRepository.write(configFile);
     }
 
     // Stop all running containers

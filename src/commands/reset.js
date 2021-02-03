@@ -13,7 +13,7 @@ class ResetCommand extends BaseCommand {
    * @param {resetSystemConfig} resetSystemConfig
    * @param {isSystemConfig} isSystemConfig
    * @param {Config} config
-   * @param {ConfigCollection} configCollection
+   * @param {ConfigFile} configFile
    * @param {DockerCompose} dockerCompose
    * @param {Docker} docker
    * @param {tenderdashInitTask} tenderdashInitTask
@@ -29,7 +29,7 @@ class ResetCommand extends BaseCommand {
     resetSystemConfig,
     isSystemConfig,
     config,
-    configCollection,
+    configFile,
     dockerCompose,
     docker,
     tenderdashInitTask,
@@ -76,7 +76,7 @@ class ResetCommand extends BaseCommand {
       {
         title: `Reset config ${config.getName()}`,
         enabled: () => isHardReset,
-        task: () => resetSystemConfig(configCollection, config.getName(), isPlatformOnlyReset),
+        task: () => resetSystemConfig(configFile, config.getName(), isPlatformOnlyReset),
       },
       {
         title: 'Initialize Tenderdash',

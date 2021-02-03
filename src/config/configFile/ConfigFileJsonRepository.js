@@ -79,19 +79,7 @@ class ConfigFileJsonRepository {
    * @returns {Promise<void>}
    */
   async write(configFile) {
-    const configFileData = {
-      defaultConfigName: configFile.getDefaultConfigName(),
-      configFormatVersion: configFile.getConfigFormatVersion(),
-    };
-
-    configFileData.configs = configFile.getAllConfigs().reduce((configsMap, config) => {
-      // eslint-disable-next-line no-param-reassign
-      configsMap[config.getName()] = config.getOptions();
-
-      return configsMap;
-    }, {});
-
-    const configFileJSON = JSON.stringify(configFileData, undefined, 2);
+    const configFileJSON = JSON.stringify(configFile.toObject(), undefined, 2);
 
     fs.writeFileSync(this.configFilePath, configFileJSON, 'utf8');
   }
