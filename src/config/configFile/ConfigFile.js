@@ -2,6 +2,7 @@ const Config = require('../Config');
 
 const ConfigAlreadyPresentError = require('../errors/ConfigAlreadyPresentError');
 const ConfigIsNotPresentError = require('../errors/ConfigIsNotPresentError');
+const GroupIsNotPresentError = require('../errors/GroupIsNotPresentError');
 
 class ConfigFile {
   /**
@@ -18,9 +19,9 @@ class ConfigFile {
       return configsMap;
     }, {});
 
-    this.setConfigFormatVersion(configFormatVersion);
-    this.setDefaultConfigName(defaultConfigName);
-    this.setDefaultGroupName(defaultGroupName);
+    this.configFormatVersion = configFormatVersion;
+    this.defaultConfigName = defaultConfigName;
+    this.defaultGroupName = defaultGroupName;
   }
 
   /**
@@ -94,13 +95,32 @@ class ConfigFile {
   }
 
   /**
+   * Check is group exists
+   *
+   * @param {string} name
+   * @return {boolean}
+   */
+  isGroupExists(name) {
+    return Object.entries(this.configsMap)
+      .filter(([, config]) => config.get('group') === name).length !== 0;
+  }
+
+  /**
+   * Set default group name
+   *
    * @param {string} defaultGroupName
    */
   setDefaultGroupName(defaultGroupName) {
+    if (!this.isGroupExists(defaultGroupName)) {
+      throw new GroupIsNotPresentError(defaultGroupName);
+    }
+
     this.defaultGroupName = defaultGroupName;
   }
 
   /**
+   * Get default group name
+   *
    * @return {string}
    */
   getDefaultGroupName() {
@@ -108,13 +128,18 @@ class ConfigFile {
   }
 
   /**
+   * Get group configs
    *
    * @param {string} name
    * @return {Config[]}
    */
   getGroupConfigs(name) {
+    if (!this.isGroupExists(name)) {
+      throw new GroupIsNotPresentError(name);
+    }
+
     return Object.entries(this.configsMap)
-      .filter(([, config]) => config.group === name)
+      .filter(([, config]) => config.get('group') === name)
       .map(([, config]) => config);
   }
 

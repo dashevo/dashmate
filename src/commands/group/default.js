@@ -1,6 +1,6 @@
 const BaseCommand = require('../../oclif/command/BaseCommand');
 
-class ConfigDefaultCommand extends BaseCommand {
+class GroupDefaultCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
@@ -9,33 +9,33 @@ class ConfigDefaultCommand extends BaseCommand {
    */
   async runWithDependencies(
     {
-      config: configName,
+      group: groupName,
     },
     flags,
     configFile,
   ) {
-    if (configName === null) {
+    if (groupName === null) {
       // eslint-disable-next-line no-console
-      console.log(configFile.getDefaultConfigName());
+      console.log(configFile.getDefaultGroupName());
     } else {
-      configFile.setDefaultConfigName(configName);
+      configFile.setDefaultGroupName(groupName);
 
       // eslint-disable-next-line no-console
-      console.log(`${configName} config set as default`);
+      console.log(`${groupName} group set as default`);
     }
   }
 }
 
-ConfigDefaultCommand.description = `Manage default config
+GroupDefaultCommand.description = `Manage default group
 
-Shows default config name or sets another config as default
+Shows default group name or sets another group as default
 `;
 
-ConfigDefaultCommand.args = [{
-  name: 'config',
+GroupDefaultCommand.args = [{
+  name: 'group',
   required: false,
-  description: 'config name',
+  description: 'group name',
   default: null,
 }];
 
-module.exports = ConfigDefaultCommand;
+module.exports = GroupDefaultCommand;

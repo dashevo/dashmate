@@ -5,17 +5,17 @@ const chalk = require('chalk');
 const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
 const ServiceIsNotRunningError = require('../../docker/errors/ServiceIsNotRunningError');
 
-const BaseCommand = require('../../oclif/command/BaseCommand');
+const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 const CoreService = require('../../core/CoreService');
 const blocksToTime = require('../../util/blocksToTime');
 const getPaymentQueuePosition = require('../../util/getPaymentQueuePosition');
 
-class StatusCommand extends BaseCommand {
+class StatusCommand extends ConfigBaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
-   * @param {CoreService} coreService
+   * @param {createRpcClient} createRpcClient
    * @param {Config} config
    * @return {Promise<void>}
    */
@@ -263,7 +263,7 @@ class StatusCommand extends BaseCommand {
 StatusCommand.description = 'Show status overview';
 
 StatusCommand.flags = {
-  ...BaseCommand.flags,
+  ...ConfigBaseCommand.flags,
 };
 
 module.exports = StatusCommand;

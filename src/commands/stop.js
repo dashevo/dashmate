@@ -1,10 +1,10 @@
 const { Listr } = require('listr2');
 
-const BaseCommand = require('../oclif/command/BaseCommand');
+const ConfigBaseCommand = require('../oclif/command/ConfigBaseCommand');
 
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
 
-class StopCommand extends BaseCommand {
+class StopCommand extends ConfigBaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
@@ -49,7 +49,7 @@ Stop node
 `;
 
 StopCommand.flags = {
-  ...BaseCommand.flags,
+  ...ConfigBaseCommand.flags,
 };
 
 module.exports = StopCommand;
