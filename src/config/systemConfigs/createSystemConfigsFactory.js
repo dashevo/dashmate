@@ -1,6 +1,6 @@
 const Config = require('../Config');
 
-const ConfigCollection = require('../ConfigCollection');
+const ConfigCollection = require('../configFile/ConfigFile');
 
 const packageJson = require('../../../package.json');
 

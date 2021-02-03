@@ -1,6 +1,6 @@
 const BaseCommand = require('../../oclif/command/BaseCommand');
 
-const systemConfigs = require('../../config/systemConfigs/systemConfigs');
+const systemConfigs = require('../../../configs/systemConfigs');
 
 class ConfigRemoveCommand extends BaseCommand {
   /**

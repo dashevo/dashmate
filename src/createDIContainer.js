@@ -11,13 +11,13 @@ const Docker = require('dockerode');
 const path = require('path');
 const os = require('os');
 
-const ensureHomeDirFactory = require('./config/configFile/ensureHomeDirFactory');
-const ConfigJsonFileRepository = require('./config/configFile/ConfigJsonFileRepository');
+const ensureHomeDirFactory = require('./ensureHomeDirFactory');
+const ConfigJsonFileRepository = require('./config/configFile/ConfigFileJsonRepository');
 const createSystemConfigsFactory = require('./config/systemConfigs/createSystemConfigsFactory');
 const resetSystemConfigFactory = require('./config/systemConfigs/resetSystemConfigFactory');
 const isSystemConfigFactory = require('./config/systemConfigs/isSystemConfigFactory');
-const migrateConfigOptions = require('./config/migrateConfigOptions');
-const systemConfigs = require('./config/systemConfigs/systemConfigs');
+const migrateConfigOptions = require('./config/configFile/migrateConfigFile');
+const systemConfigs = require('../configs/systemConfigs');
 
 const renderServiceTemplatesFactory = require('./templates/renderServiceTemplatesFactory');
 const writeServiceConfigsFactory = require('./templates/writeServiceConfigsFactory');

@@ -3,7 +3,7 @@ const fs = require('fs');
 const Ajv = require('ajv');
 
 const Config = require('../Config');
-const ConfigCollection = require('../ConfigCollection');
+const ConfigFile = require('./ConfigFile');
 
 const configFileJsonSchema = require('./configFileJsonSchema');
 
@@ -12,20 +12,21 @@ const InvalidConfigFileFormatError = require('../errors/InvalidConfigFileFormatE
 
 const packageJson = require('../../../package.json');
 
-class ConfigJsonFileRepository {
+class ConfigFileJsonRepository {
   /**
-   * @param configFilePath
+   * @param {string} configFilePath
+   * @param {migrateConfigFile} migrateConfigFile
    */
-  constructor(configFilePath, migrateConfigOptions) {
+  constructor(configFilePath, migrateConfigFile) {
     this.configFilePath = configFilePath;
-    this.migrateConfigOptions = migrateConfigOptions;
+    this.migrateConfigFile = migrateConfigFile;
     this.ajv = new Ajv();
   }
 
   /**
    * Load configs from file
    *
-   * @returns {Promise<ConfigCollection>}
+   * @returns {Promise<ConfigFile>}
    */
   async read() {
     if (!fs.existsSync(this.configFilePath)) {
@@ -41,7 +42,13 @@ class ConfigJsonFileRepository {
       throw new InvalidConfigFileFormatError(this.configFilePath, e);
     }
 
-    const isValid = this.ajv.validate(configFileJsonSchema, configFileData);
+    const migratedConfigFileData = this.migrateConfigFile(
+      configFileData,
+      configFileData.configFormatVersion,
+      packageJson.version,
+    );
+
+    const isValid = this.ajv.validate(configFileJsonSchema, migratedConfigFileData);
 
     if (!isValid) {
       const error = new Error(this.ajv.errorsText(undefined, { dataVar: 'configFile' }));
@@ -51,37 +58,33 @@ class ConfigJsonFileRepository {
 
     let configs;
     try {
-      configs = Object.entries(configFileData.configs)
-        .map(([name, options]) => {
-          const migratedOptions = this.migrateConfigOptions(
-            name,
-            options,
-            configFileData.configFormatVersion,
-            packageJson.version,
-          );
-
-          return new Config(name, migratedOptions);
-        });
+      configs = Object.entries(migratedConfigFileData.configs)
+        .map(([name, options]) => new Config(name, options));
     } catch (e) {
       throw new InvalidConfigFileFormatError(this.configFilePath, e);
     }
 
-    return new ConfigCollection(configs, configFileData.defaultConfigName, packageJson.version);
+    return new ConfigFile(
+      configs,
+      packageJson.version,
+      migratedConfigFileData.defaultConfigName,
+      migratedConfigFileData.defaultGroupName,
+    );
   }
 
   /**
    * Save configs to file
    *
-   * @param {ConfigCollection} configCollection
+   * @param {ConfigFile} configFile
    * @returns {Promise<void>}
    */
-  async write(configCollection) {
+  async write(configFile) {
     const configFileData = {
-      defaultConfigName: configCollection.getDefaultConfigName(),
-      configFormatVersion: configCollection.getConfigFormatVersion(),
+      defaultConfigName: configFile.getDefaultConfigName(),
+      configFormatVersion: configFile.getConfigFormatVersion(),
     };
 
-    configFileData.configs = configCollection.getAllConfigs().reduce((configsMap, config) => {
+    configFileData.configs = configFile.getAllConfigs().reduce((configsMap, config) => {
       // eslint-disable-next-line no-param-reassign
       configsMap[config.getName()] = config.getOptions();
 
@@ -94,4 +97,4 @@ class ConfigJsonFileRepository {
   }
 }
 
-module.exports = ConfigJsonFileRepository;
+module.exports = ConfigFileJsonRepository;

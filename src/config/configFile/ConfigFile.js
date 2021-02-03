@@ -1,15 +1,16 @@
-const Config = require('./Config');
+const Config = require('../Config');
 
-const ConfigAlreadyPresentError = require('./errors/ConfigAlreadyPresentError');
-const ConfigIsNotPresentError = require('./errors/ConfigIsNotPresentError');
+const ConfigAlreadyPresentError = require('../errors/ConfigAlreadyPresentError');
+const ConfigIsNotPresentError = require('../errors/ConfigIsNotPresentError');
 
-class ConfigCollection {
+class ConfigFile {
   /**
    * @param {Config[]} configs
-   * @param {string} currentConfigName
-   * @param {string} currentConfigFormatVersion
+   * @param {string} configFormatVersion
+   * @param {string} defaultConfigName
+   * @param {string} defaultGroupName
    */
-  constructor(configs = [], currentConfigName, currentConfigFormatVersion) {
+  constructor(configs, configFormatVersion, defaultConfigName, defaultGroupName) {
     this.configsMap = configs.reduce((configsMap, config) => {
       // eslint-disable-next-line no-param-reassign
       configsMap[config.getName()] = config;
@@ -17,8 +18,9 @@ class ConfigCollection {
       return configsMap;
     }, {});
 
-    this.setDefaultConfigName(currentConfigName);
-    this.setConfigFormatVersion(currentConfigFormatVersion);
+    this.setConfigFormatVersion(configFormatVersion);
+    this.setDefaultConfigName(defaultConfigName);
+    this.setDefaultGroupName(defaultGroupName);
   }
 
   /**
@@ -34,7 +36,7 @@ class ConfigCollection {
    * Set current config name
    *
    * @param {string|null} name
-   * @returns {ConfigCollection}
+   * @returns {ConfigFile}
    */
   setDefaultConfigName(name) {
     if (name !== null && !this.isConfigExists(name)) {
@@ -56,10 +58,25 @@ class ConfigCollection {
   }
 
   /**
+   * Get current config if set
+   *
+   * @returns {Config|null}
+   */
+  getDefaultConfig() {
+    if (this.getDefaultConfigName() === null) {
+      return null;
+    }
+
+    return this.getConfig(
+      this.getDefaultConfigName(),
+    );
+  }
+
+  /**
    * Set current config format version
    *
    * @param {string} version
-   * @returns {ConfigCollection}
+   * @returns {ConfigFile}
    */
   setConfigFormatVersion(version) {
     this.configFormatVersion = version;
@@ -77,18 +94,28 @@ class ConfigCollection {
   }
 
   /**
-   * Get current config if set
-   *
-   * @returns {Config|null}
+   * @param {string} defaultGroupName
    */
-  getDefaultConfig() {
-    if (this.getDefaultConfigName() === null) {
-      return null;
-    }
+  setDefaultGroupName(defaultGroupName) {
+    this.defaultGroupName = defaultGroupName;
+  }
 
-    return this.getConfig(
-      this.getDefaultConfigName(),
-    );
+  /**
+   * @return {string}
+   */
+  getDefaultGroupName() {
+    return this.defaultGroupName;
+  }
+
+  /**
+   *
+   * @param {string} name
+   * @return {Config[]}
+   */
+  getGroupConfigs(name) {
+    return Object.entries(this.configsMap)
+      .filter(([, config]) => config.group === name)
+      .map(([, config]) => config);
   }
 
   /**
@@ -119,7 +146,7 @@ class ConfigCollection {
    *
    * @param {string} name
    * @param {string} fromConfigName - Set options from another config
-   * @returns {ConfigCollection}
+   * @returns {ConfigFile}
    */
   createConfig(name, fromConfigName) {
     if (this.isConfigExists(name)) {
@@ -137,7 +164,7 @@ class ConfigCollection {
    * Remove config by name
    *
    * @param {string} name
-   * @returns {ConfigCollection}
+   * @returns {ConfigFile}
    */
   removeConfig(name) {
     if (!this.isConfigExists(name)) {
@@ -154,4 +181,4 @@ class ConfigCollection {
   }
 }
 
-module.exports = ConfigCollection;
+module.exports = ConfigFile;

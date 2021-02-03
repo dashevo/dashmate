@@ -1,6 +1,6 @@
 const lodashMerge = require('lodash.merge');
 
-const NETWORKS = require('../../networks');
+const NETWORKS = require('../src/networks');
 
 const baseConfig = {
   description: 'base config for use as template',
@@ -129,20 +129,6 @@ const baseConfig = {
   },
   environment: 'production',
 };
-
-`
-mn setup local
-mn config:default local1
-
-mn setup local (should output info that you must use group prefix)
-
-mn group:default local
-mn group:start --group=local
-mn group:restart
-mn group:reset
-mn group:stop
-mn group:status
-`
 
 const local = lodashMerge({}, baseConfig, {
   group: 'local',
