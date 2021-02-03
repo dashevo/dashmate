@@ -80,7 +80,17 @@ const baseConfig = {
           image: 'dashpay/drive:0.17',
         },
         log: {
-          level: 'info',
+          stdout: {
+            level: 'info',
+          },
+          prettyFile: {
+            level: 'silent',
+            path: '/tmp/base-drive-pretty.log',
+          },
+          jsonFile: {
+            level: 'silent',
+            path: '/tmp/base-drive-json.json',
+          },
         },
       },
       tenderdash: {
@@ -188,6 +198,16 @@ module.exports = {
             port: 26657,
           },
         },
+        abci: {
+          log: {
+            prettyFile: {
+              path: '/tmp/local1-drive-pretty.log',
+            },
+            jsonFile: {
+              path: '/tmp/local1-drive-json.log',
+            },
+          },
+        },
       },
     },
   }),
@@ -225,6 +245,16 @@ module.exports = {
           },
           rpc: {
             port: 26667,
+          },
+        },
+        abci: {
+          log: {
+            prettyFile: {
+              path: '/tmp/local2-drive-pretty.log',
+            },
+            jsonFile: {
+              path: '/tmp/local2-drive-json.log',
+            },
           },
         },
       },
@@ -274,6 +304,16 @@ module.exports = {
         ownerId: 'Gxiu28Lzfj66aPBCxD7AgTbbauLf68jFLNibWGU39Fuh',
       },
       drive: {
+        abci: {
+          log: {
+            prettyFile: {
+              path: '/tmp/evonet-drive-pretty.log',
+            },
+            jsonFile: {
+              path: '/tmp/evonet-drive-json.log',
+            },
+          },
+        },
         tenderdash: {
           p2p: {
             persistentPeers: [
@@ -1026,6 +1066,16 @@ module.exports = {
         },
       },
       drive: {
+        abci: {
+          log: {
+            prettyFile: {
+              path: '/tmp/testnet-drive-pretty.log',
+            },
+            jsonFile: {
+              path: '/tmp/testnet-drive-json.log',
+            },
+          },
+        },
         tenderdash: {
           p2p: {
             seeds: [
