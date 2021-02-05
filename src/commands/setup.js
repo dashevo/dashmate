@@ -30,9 +30,9 @@ class SetupCommand extends BaseCommand {
     {
       'external-ip': externalIp,
       'operator-bls-private-key': operatorBlsPrivateKey,
-      update: isUpdate,
       'drive-image-build-path': driveImageBuildPath,
       'dapi-image-build-path': dapiImageBuildPath,
+      'node-count': nodeCount,
       verbose: isVerbose,
     },
     generateBlsKeys,
@@ -48,6 +48,10 @@ class SetupCommand extends BaseCommand {
       if (nodeType !== NODE_TYPE_MASTERNODE) {
         throw new Error('Local development preset uses only masternode type of node');
       }
+    }
+
+    if (nodeCount !== null && (nodeCount < 1 || nodeCount > 6)) {
+      throw new Error('node-count flag should be between 1 and 6');
     }
 
     const tasks = new Listr([
@@ -69,7 +73,7 @@ class SetupCommand extends BaseCommand {
       {
         task: (ctx) => {
           if (ctx.preset === PRESET_LOCAL) {
-            return setupLocalPresetTask({ updateImages: isUpdate });
+            return setupLocalPresetTask();
           }
 
           return setupRegularPresetTask();
@@ -91,6 +95,7 @@ class SetupCommand extends BaseCommand {
         dapiImageBuildPath,
         preset,
         nodeType,
+        nodeCount,
         externalIp,
         operatorBlsPrivateKey,
       });
@@ -124,6 +129,7 @@ SetupCommand.flags = {
   update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
   'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
   'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),
+  'node-count': flagTypes.integer({ description: 'number of nodes to setup', default: null }),
   verbose: flagTypes.boolean({ char: 'v', description: 'use verbose mode for output', default: false }),
 };
 

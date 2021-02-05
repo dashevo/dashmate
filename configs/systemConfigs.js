@@ -144,125 +144,28 @@ const baseConfig = {
   environment: 'production',
 };
 
-const local = lodashMerge({}, baseConfig, {
-  group: 'local',
-  platform: {
-    dapi: {
-      nginx: {
-        rateLimiter: {
-          enable: false,
-        },
-      },
-    },
-    drive: {
-      skipAssetLockConfirmationValidation: true,
-      passFakeAssetLockProofForTests: true,
-    },
-  },
-  externalIp: '127.0.0.1',
-  environment: 'development',
-  network: NETWORK_LOCAL,
-});
-
+// TODO: split these into separate files
 module.exports = {
   base: baseConfig,
-  local1: lodashMerge({}, local, {
-    description: 'first node for local development',
-    core: {
-      p2p: {
-        port: 20001,
-        seeds: [
-          {
-            host: 'host.docker.internal',
-            port: 20011,
-          },
-        ],
-      },
-      rpc: {
-        port: 20002,
-      },
-    },
+  local: lodashMerge({}, baseConfig, {
+    description: 'template for local configs',
+    group: 'local',
     platform: {
       dapi: {
         nginx: {
-          http: {
-            port: 3000,
-          },
-          grpc: {
-            port: 3010,
+          rateLimiter: {
+            enable: false,
           },
         },
       },
       drive: {
-        tenderdash: {
-          p2p: {
-            port: 26656,
-          },
-          rpc: {
-            port: 26657,
-          },
-        },
-        abci: {
-          log: {
-            prettyFile: {
-              path: '/tmp/local1-drive-pretty.log',
-            },
-            jsonFile: {
-              path: '/tmp/local1-drive-json.log',
-            },
-          },
-        },
+        skipAssetLockConfirmationValidation: true,
+        passFakeAssetLockProofForTests: true,
       },
     },
-  }),
-  local2: lodashMerge({}, local, {
-    description: 'second node for local development',
-    core: {
-      p2p: {
-        port: 20011,
-        seeds: [
-          {
-            host: 'host.docker.internal',
-            port: 20001,
-          },
-        ],
-      },
-      rpc: {
-        port: 20012,
-      },
-    },
-    platform: {
-      dapi: {
-        nginx: {
-          http: {
-            port: 3020,
-          },
-          grpc: {
-            port: 3030,
-          },
-        },
-      },
-      drive: {
-        tenderdash: {
-          p2p: {
-            port: 26666,
-          },
-          rpc: {
-            port: 26667,
-          },
-        },
-        abci: {
-          log: {
-            prettyFile: {
-              path: '/tmp/local2-drive-pretty.log',
-            },
-            jsonFile: {
-              path: '/tmp/local2-drive-json.log',
-            },
-          },
-        },
-      },
-    },
+    externalIp: '127.0.0.1',
+    environment: 'development',
+    network: NETWORK_LOCAL,
   }),
   evonet: lodashMerge({}, baseConfig, {
     description: 'node with Evonet configuration',
