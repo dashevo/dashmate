@@ -1,6 +1,10 @@
 const lodashMerge = require('lodash.merge');
 
-const NETWORKS = require('../src/networks');
+const {
+  NETWORK_EVONET,
+  NETWORK_LOCAL,
+  NETWORK_TESTNET,
+} = require('../src/constants');
 
 const baseConfig = {
   description: 'base config for use as template',
@@ -133,7 +137,7 @@ const baseConfig = {
     },
   },
   externalIp: null,
-  network: NETWORKS.TESTNET,
+  network: NETWORK_TESTNET,
   compose: {
     file: 'docker-compose.yml:docker-compose.platform.yml',
   },
@@ -157,7 +161,7 @@ const local = lodashMerge({}, baseConfig, {
   },
   externalIp: '127.0.0.1',
   environment: 'development',
-  network: NETWORKS.LOCAL,
+  network: NETWORK_LOCAL,
 });
 
 module.exports = {
@@ -1039,7 +1043,7 @@ module.exports = {
         },
       },
     },
-    network: NETWORKS.EVONET,
+    network: NETWORK_EVONET,
   }),
   testnet: lodashMerge({}, baseConfig, {
     description: 'node with testnet configuration',
@@ -1619,6 +1623,6 @@ module.exports = {
         },
       },
     },
-    network: NETWORKS.TESTNET,
+    network: NETWORK_TESTNET,
   }),
 };

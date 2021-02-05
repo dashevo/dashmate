@@ -5,7 +5,7 @@ const { flags: flagTypes } = require('@oclif/command');
 const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 
-const NETWORKS = require('../../networks');
+const { NETWORK_LOCAL } = require('../../constants');
 
 class MintCommand extends ConfigBaseCommand {
   /**
@@ -28,7 +28,7 @@ class MintCommand extends ConfigBaseCommand {
   ) {
     const network = config.get('network');
 
-    if (network !== NETWORKS.LOCAL) {
+    if (network !== NETWORK_LOCAL) {
       throw new Error('Only local network supports generation of dash');
     }
 

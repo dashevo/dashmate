@@ -2,7 +2,7 @@ const { Listr } = require('listr2');
 
 const { Observable } = require('rxjs');
 
-const NETWORKS = require('../../networks');
+const { NETWORK_LOCAL } = require('../../constants');
 
 const masternodeDashAmount = require('../../core/masternodeDashAmount');
 
@@ -59,7 +59,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Sync Core with network',
-        enabled: () => config.get('network') !== NETWORKS.LOCAL,
+        enabled: () => config.get('network') !== NETWORK_LOCAL,
         task: async (ctx) => waitForCoreSync(ctx.coreService),
       },
       {
@@ -121,7 +121,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Wait for 15 confirmations',
-        enabled: () => config.get('network') !== NETWORKS.LOCAL,
+        enabled: () => config.get('network') !== NETWORK_LOCAL,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await waitForConfirmations(
@@ -139,7 +139,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Mine 15 blocks to confirm',
-        enabled: () => config.get('network') === NETWORKS.LOCAL,
+        enabled: () => config.get('network') === NETWORK_LOCAL,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await generateBlocks(
@@ -157,7 +157,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Reach 1000 blocks to enable DML',
-        enabled: () => config.get('network') === NETWORKS.LOCAL,
+        enabled: () => config.get('network') === NETWORK_LOCAL,
         // eslint-disable-next-line consistent-return
         task: async (ctx) => {
           const { result: height } = await ctx.coreService.getRpcClient().getBlockCount();
@@ -198,7 +198,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Wait for 1 confirmation',
-        enabled: () => config.get('network') !== NETWORKS.LOCAL,
+        enabled: () => config.get('network') !== NETWORK_LOCAL,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await waitForConfirmations(
@@ -216,7 +216,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Mine 1 block to confirm',
-        enabled: () => config.get('network') === NETWORKS.LOCAL,
+        enabled: () => config.get('network') === NETWORK_LOCAL,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await generateBlocks(

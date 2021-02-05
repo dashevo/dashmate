@@ -1,26 +1,10 @@
 const { Listr } = require('listr2');
-const publicIp = require('public-ip');
-
-const { PrivateKey: BlsPrivateKey } = require('bls-signatures');
 
 const { flags: flagTypes } = require('@oclif/command');
 
 const BaseCommand = require('../oclif/command/BaseCommand');
 
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
-
-const wait = require('../util/wait');
-
-const packageJson = require('../../package.json');
-
-const PRESET_TESTNET = 'testnet';
-const PRESET_LOCAL = 'local';
-const PRESET_EVONET = 'evonet';
-const PRESETS = [PRESET_TESTNET, PRESET_EVONET, PRESET_LOCAL];
-
-const NODE_TYPE_MASTERNODE = 'masternode';
-const NODE_TYPE_FULLNODE = 'fullnode';
-const NODE_TYPES = [NODE_TYPE_MASTERNODE, NODE_TYPE_FULLNODE];
 
 class SetupCommand extends BaseCommand {
   /**
@@ -29,14 +13,8 @@ class SetupCommand extends BaseCommand {
    * @param {DockerCompose} dockerCompose
    * @param {generateBlsKeys} generateBlsKeys
    * @param {ConfigFile} configFile
-   * @param {initializeTenderdashNode} initializeTenderdashNode
-   * @param {generateToAddressTask} generateToAddressTask
-   * @param {registerMasternodeTask} registerMasternodeTask
-   * @param {renderServiceTemplates} renderServiceTemplates
-   * @param {writeServiceConfigs} writeServiceConfigs
-   * @param {startNodeTask} startNodeTask
-   * @param {initTask} initTask
-   * @param {tenderdashInitTask} tenderdashInitTask
+   * @param {setupLocalPresetTask} setupLocalPresetTask
+   * @param {setupRegularPresetTask} setupRegularPresetTask
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -55,14 +33,8 @@ class SetupCommand extends BaseCommand {
     dockerCompose,
     generateBlsKeys,
     configFile,
-    initializeTenderdashNode,
-    generateToAddressTask,
-    registerMasternodeTask,
-    renderServiceTemplates,
-    writeServiceConfigs,
-    startNodeTask,
-    initTask,
-    tenderdashInitTask,
+    setupLocalPresetTask,
+    setupRegularPresetTask,
   ) {
     let config;
 
@@ -76,11 +48,6 @@ class SetupCommand extends BaseCommand {
         throw new Error('Local development preset uses only masternode type of node');
       }
     }
-
-    const amount = 10000;
-
-    // eslint-disable-next-line no-console
-    console.log(`mn-bootstrap ${packageJson.version}\n`);
 
     const tasks = new Listr([
       {
@@ -96,145 +63,16 @@ class SetupCommand extends BaseCommand {
               },
             ]);
           }
-
-          configFile.setDefaultConfigName(ctx.preset);
-
-          config = configFile.getDefaultConfig();
-
-          // eslint-disable-next-line no-param-reassign
-          task.output = `Selected ${config.getName()} as default config\n`;
         },
-        options: { persistentOutput: true },
       },
       {
-        title: 'Set node type',
-        enabled: (ctx) => ctx.preset !== PRESET_LOCAL,
-        task: async (ctx, task) => {
-          if (ctx.nodeType === undefined) {
-            ctx.nodeType = await task.prompt([
-              {
-                type: 'select',
-                message: 'Select node type',
-                choices: NODE_TYPES,
-                initial: NODE_TYPE_MASTERNODE,
-              },
-            ]);
+        task: (ctx) => {
+          if (ctx.preset === PRESET_LOCAL) {
+            return setupLocalPresetTask();
           }
 
-          config.set('core.masternode.enable', ctx.nodeType === NODE_TYPE_MASTERNODE);
-
-          // eslint-disable-next-line no-param-reassign
-          task.output = `Selected ${ctx.nodeType} type\n`;
+          return setupRegularPresetTask();
         },
-        options: { persistentOutput: true },
-      },
-      {
-        title: 'Configure external IP address',
-        enabled: (ctx) => ctx.preset !== PRESET_LOCAL,
-        task: async (ctx, task) => {
-          if (ctx.externalIp === undefined) {
-            ctx.externalIp = await task.prompt([
-              {
-                type: 'input',
-                message: 'Enter node public IP (Enter to accept detected IP)',
-                initial: () => publicIp.v4(),
-              },
-            ]);
-          }
-
-          config.set('externalIp', ctx.externalIp);
-
-          // eslint-disable-next-line no-param-reassign
-          task.output = `${ctx.externalIp} is set\n`;
-        },
-        options: { persistentOutput: true },
-      },
-      {
-        title: 'Configure BLS private key',
-        enabled: (ctx) => ctx.preset !== PRESET_LOCAL && ctx.nodeType === NODE_TYPE_MASTERNODE,
-        task: async (ctx, task) => {
-          if (ctx.operatorBlsPrivateKey === undefined) {
-            const { privateKey: generatedPrivateKeyHex } = await generateBlsKeys();
-
-            ctx.operatorBlsPrivateKey = await task.prompt([
-              {
-                type: 'input',
-                message: 'Enter operator BLS private key (Enter to accept generated key)',
-                initial: generatedPrivateKeyHex,
-              },
-            ]);
-          }
-
-          const operatorBlsPrivateKeyBuffer = Buffer.from(ctx.operatorBlsPrivateKey, 'hex');
-          const privateKey = BlsPrivateKey.fromBytes(operatorBlsPrivateKeyBuffer, true);
-          const publicKey = privateKey.getPublicKey();
-          const publicKeyHex = Buffer.from(publicKey.serialize()).toString('hex');
-
-          config.set('core.masternode.operator.privateKey', ctx.operatorBlsPrivateKey);
-
-          // eslint-disable-next-line no-param-reassign
-          task.output = `BLS public key: ${publicKeyHex}\nBLS private key: ${ctx.operatorBlsPrivateKey}`;
-        },
-        options: { persistentOutput: true },
-      },
-      {
-        title: 'Update config',
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
-        task: () => {
-          const configFiles = renderServiceTemplates(config);
-          writeServiceConfigs(config.getName(), configFiles);
-        },
-      },
-      {
-        title: `Generate ${amount} dash to local wallet`,
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
-        task: () => generateToAddressTask(config, amount),
-      },
-      {
-        title: 'Register masternode',
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
-        task: () => registerMasternodeTask(config),
-      },
-      {
-        title: 'Initialize Tenderdash',
-        task: () => tenderdashInitTask(config),
-      },
-      {
-        title: 'Update config',
-        task: () => {
-          const configFiles = renderServiceTemplates(config);
-          writeServiceConfigs(config.getName(), configFiles);
-        },
-      },
-      {
-        title: 'Start masternode',
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
-        task: async (ctx) => startNodeTask(
-          config,
-          {
-            driveImageBuildPath: ctx.driveImageBuildPath,
-            dapiImageBuildPath: ctx.dapiImageBuildPath,
-            isUpdate,
-            isMinerEnabled: true,
-          },
-        ),
-      },
-      {
-        title: 'Wait 20 seconds to ensure all services are running',
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
-        task: async () => {
-          await wait(20000);
-        },
-      },
-      {
-        title: 'Initialize Platform',
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
-        task: () => initTask(config),
-      },
-      {
-        title: 'Stop node',
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
-        task: async () => dockerCompose.stop(config.toEnvs()),
       },
     ],
     {

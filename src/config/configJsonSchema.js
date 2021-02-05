@@ -1,4 +1,4 @@
-const NETWORKS = require('../networks');
+const { NETWORKS } = require('../constants');
 
 module.exports = {
   $schema: 'http://json-schema.org/draft-07/schema#',
@@ -391,7 +391,7 @@ module.exports = {
     },
     network: {
       type: 'string',
-      enum: Object.values(NETWORKS),
+      enum: NETWORKS,
     },
     compose: {
       type: 'object',

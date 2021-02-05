@@ -2,9 +2,9 @@ const semver = require('semver');
 
 const configOptionMigrations = require('../../../configs/migrations');
 
-function migrateConfigFile(config, fromVersion, toVersion) {
+function migrateConfigFile(configFile, fromVersion, toVersion) {
   if (fromVersion === toVersion) {
-    return config;
+    return configFile;
   }
 
   return Object.keys(configOptionMigrations)
@@ -12,8 +12,8 @@ function migrateConfigFile(config, fromVersion, toVersion) {
     .sort(semver.compare)
     .reduce((migratedOptions, version) => {
       const migrationFunction = configOptionMigrations[version];
-      return migrationFunction(config);
-    }, config);
+      return migrationFunction(configFile);
+    }, configFile);
 }
 
 module.exports = migrateConfigFile;

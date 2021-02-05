@@ -1,5 +1,5 @@
 const { Listr } = require('listr2');
-const NETWORKS = require('../../../networks');
+const { NETWORK_LOCAL } = require('../../../constants');
 
 /**
  * @param {initializeTenderdashNode} initializeTenderdashNode
@@ -46,7 +46,7 @@ function tenderdashInitTaskFactory(
           }
 
           if (!isGenesisPresent) {
-            if (config.get('network') === NETWORKS.LOCAL) {
+            if (config.get('network') === NETWORK_LOCAL) {
               genesis.initial_core_chain_locked_height = 1000;
             }
 

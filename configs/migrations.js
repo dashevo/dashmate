@@ -3,11 +3,12 @@ const lodashSet = require('lodash.set');
 const lodashGet = require('lodash.get');
 
 const systemConfigs = require('./systemConfigs');
-const NETWORKS = require('../src/networks');
+
+const { NETWORK_TESTNET } = require('../src/constants');
 
 module.exports = {
   '0.17.2': (configFile) => {
-    Object.entries(configFile.configs).filter(([, config]) => config.network === NETWORKS.TESTNET)
+    Object.entries(configFile.configs).filter(([, config]) => config.network === NETWORK_TESTNET)
       .forEach((config) => {
         // Set DashPay contract ID and block height for testnet
         // Set seed nodes for testnet tenderdash
@@ -18,7 +19,7 @@ module.exports = {
     return configFile;
   },
   '0.17.3': (configFile) => {
-    Object.entries(configFile.configs).filter(([, config]) => config.network === NETWORKS.TESTNET)
+    Object.entries(configFile.configs).filter(([, config]) => config.network === NETWORK_TESTNET)
       .forEach((config) => {
         // Set DashPay contract ID and block height for testnet
         lodashSet(config, 'platform.dashpay', systemConfigs.testnet.platform.dashpay);
