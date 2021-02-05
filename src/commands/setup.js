@@ -6,13 +6,18 @@ const BaseCommand = require('../oclif/command/BaseCommand');
 
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
 
+const {
+  PRESET_LOCAL,
+  PRESETS,
+  NODE_TYPES,
+  NODE_TYPE_MASTERNODE,
+} = require('../constants');
+
 class SetupCommand extends BaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
-   * @param {DockerCompose} dockerCompose
    * @param {generateBlsKeys} generateBlsKeys
-   * @param {ConfigFile} configFile
    * @param {setupLocalPresetTask} setupLocalPresetTask
    * @param {setupRegularPresetTask} setupRegularPresetTask
    * @return {Promise<void>}
@@ -30,14 +35,10 @@ class SetupCommand extends BaseCommand {
       'dapi-image-build-path': dapiImageBuildPath,
       verbose: isVerbose,
     },
-    dockerCompose,
     generateBlsKeys,
-    configFile,
     setupLocalPresetTask,
     setupRegularPresetTask,
   ) {
-    let config;
-
     if (preset === PRESET_LOCAL) {
       if (nodeType === undefined) {
         // eslint-disable-next-line no-param-reassign
@@ -68,7 +69,7 @@ class SetupCommand extends BaseCommand {
       {
         task: (ctx) => {
           if (ctx.preset === PRESET_LOCAL) {
-            return setupLocalPresetTask();
+            return setupLocalPresetTask({ updateImages: isUpdate });
           }
 
           return setupRegularPresetTask();

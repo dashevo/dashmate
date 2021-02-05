@@ -1,69 +1,90 @@
 const { Listr } = require('listr2');
 
-const wait = require('../util/wait');
+const wait = require('../../../util/wait');
 
-
-function setupLocalPresetTaskFactory() {
+/**
+ * @param {registerMasternodeTask} registerMasternodeTask
+ * @param {generateToAddressTask} generateToAddressTask
+ * @param {tenderdashInitTask} tenderdashInitTask
+ * @param {initTask} initTask
+ * @param {startNodeTask} startNodeTask
+ * @param {ConfigFile} configFile
+ * @param {writeServiceConfigs} writeServiceConfigs
+ * @param {renderServiceTemplates} renderServiceTemplates
+ * @param {DockerCompose} dockerCompose
+ */
+function setupLocalPresetTaskFactory(
+  registerMasternodeTask,
+  generateToAddressTask,
+  tenderdashInitTask,
+  initTask,
+  startNodeTask,
+  configFile,
+  writeServiceConfigs,
+  renderServiceTemplates,
+  dockerCompose,
+) {
   /**
    * @typedef {setupLocalPresetTask}
+   *
+   * @param
+   * @param {Object} options
+   * @param {boolean} options.updateImages
+   *
    * @return {Listr}
    */
-  function setupLocalPresetTask() {
+  function setupLocalPresetTask({ updateImages }) {
     const amount = 10000;
-
 
     return new Listr([
       {
         title: 'Update config',
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
-        task: () => {
-          const configFiles = renderServiceTemplates(config);
-          writeServiceConfigs(config.getName(), configFiles);
+        task: (ctx) => {
+          configFile.setDefaultConfigName(ctx.preset);
+
+          ctx.config = configFile.getDefaultConfig();
+
+          const configFiles = renderServiceTemplates(ctx.config);
+          writeServiceConfigs(ctx.config.getName(), configFiles);
         },
       },
       {
         title: `Generate ${amount} dash to local wallet`,
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
-        task: () => generateToAddressTask(config, amount),
+        task: (ctx) => generateToAddressTask(ctx.config, amount),
       },
       {
         title: 'Register masternode',
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
-        task: () => registerMasternodeTask(config),
+        task: (ctx) => registerMasternodeTask(ctx.config),
       },
       {
         title: 'Initialize Tenderdash',
-        task: () => tenderdashInitTask(config),
+        task: (ctx) => tenderdashInitTask(ctx.config),
       },
       {
         title: 'Start masternode',
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
         task: async (ctx) => startNodeTask(
-          config,
+          ctx.config,
           {
             driveImageBuildPath: ctx.driveImageBuildPath,
             dapiImageBuildPath: ctx.dapiImageBuildPath,
-            isUpdate,
+            updateImages,
             isMinerEnabled: true,
           },
         ),
       },
       {
         title: 'Wait 20 seconds to ensure all services are running',
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
         task: async () => {
           await wait(20000);
         },
       },
       {
         title: 'Initialize Platform',
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
-        task: () => initTask(config),
+        task: (ctx) => initTask(ctx.config),
       },
       {
         title: 'Stop node',
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
-        task: async () => dockerCompose.stop(config.toEnvs()),
+        task: async (ctx) => dockerCompose.stop(ctx.config.toEnvs()),
       },
     ]);
   }

@@ -9,7 +9,20 @@ const {
   NODE_TYPE_MASTERNODE,
 } = require('../../../constants');
 
-function setupRegularPresetTaskFactory(configFile, generateBlsKeys, tenderdashInitTask) {
+/**
+ * @param {ConfigFile} configFile
+ * @param {generateBlsKeys} generateBlsKeys
+ * @param {tenderdashInitTask} tenderdashInitTask
+ * @param {renderServiceTemplates} renderServiceTemplates
+ * @param {writeServiceConfigs} writeServiceConfigs
+ */
+function setupRegularPresetTaskFactory(
+  configFile,
+  generateBlsKeys,
+  tenderdashInitTask,
+  renderServiceTemplates,
+  writeServiceConfigs,
+) {
   /**
    * @typedef {setupRegularPresetTask}
    * @return {Listr}
@@ -99,15 +112,13 @@ function setupRegularPresetTaskFactory(configFile, generateBlsKeys, tenderdashIn
       },
       {
         title: 'Initialize Tenderdash',
-        task: () => {
-          return tenderdashInitTask(config),
-        }
+        task: (ctx) => tenderdashInitTask(ctx.config),
       },
       {
         title: 'Update config',
-        task: () => {
-          const configFiles = renderServiceTemplates(config);
-          writeServiceConfigs(config.getName(), configFiles);
+        task: (ctx) => {
+          const configFiles = renderServiceTemplates(ctx.config);
+          writeServiceConfigs(ctx.config.getName(), configFiles);
         },
       },
     ]);
