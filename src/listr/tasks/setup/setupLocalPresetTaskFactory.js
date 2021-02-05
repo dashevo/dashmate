@@ -63,7 +63,7 @@ function setupLocalPresetTaskFactory(
           const subTasks = [];
 
           for (let i = 0; i < ctx.nodeCount; i++) {
-            const configRefernce = `config_${i}`;
+            const configRefernce = `config_${i + 1}`;
 
             subTasks.push({
               title: `Setup node #${i + 1}`,
@@ -71,13 +71,19 @@ function setupLocalPresetTaskFactory(
                 {
                   title: 'Create config',
                   task: () => {
-                    ctx[configRefernce] = configFile.createConfig(`${ctx.preset}_${i}`, PRESET_LOCAL);
+                    const configName = `${ctx.preset}_${i + 1}`;
+
+                    if (configFile.isConfigExists(configName)) {
+                      ctx[configRefernce] = configFile.getConfig(configName);
+                    } else {
+                      ctx[configRefernce] = configFile.createConfig(configName, PRESET_LOCAL);
+                    }
 
                     const config = ctx[configRefernce];
 
                     config.set('description', `config for local node #${i + 1}`);
-                    config.set('core.p2p.port', 20001 + (i * 10));
-                    config.set('core.rpc.port', 20002 + (i * 10));
+                    config.set('core.p2p.port', 20001 + (i * 100));
+                    config.set('core.rpc.port', 20002 + (i * 100));
 
                     const p2pSeeds = [];
                     for (let n = 0; n < ctx.nodeCount; n++) {
@@ -87,16 +93,16 @@ function setupLocalPresetTaskFactory(
 
                       p2pSeeds.push({
                         host: 'host.docker.internal',
-                        port: 20001 + (n * 10),
+                        port: 20001 + (n * 100),
                       });
                     }
 
                     config.set('core.p2p.seeds', p2pSeeds);
 
-                    config.set('platform.dapi.nginx.http.port', 3000 + (i * 10));
-                    config.set('platform.dapi.nginx.grpc.port', 3001 + (i * 10));
-                    config.set('platform.drive.tenderdash.p2p.port', 26656 + (i * 10));
-                    config.set('platform.drive.tenderdash.rpc.port', 26657 + (i * 10));
+                    config.set('platform.dapi.nginx.http.port', 3000 + (i * 100));
+                    config.set('platform.dapi.nginx.grpc.port', 3010 + (i * 100));
+                    config.set('platform.drive.tenderdash.p2p.port', 26656 + (i * 100));
+                    config.set('platform.drive.tenderdash.rpc.port', 26657 + (i * 100));
                     config.set('platform.drive.abci.log.prettyFile.path', `/tmp/drive_pretty_${i}.log`);
                     config.set('platform.drive.abci.log.jsonFile.path', `/tmp/drive_json_${i}.log`);
 
@@ -116,31 +122,6 @@ function setupLocalPresetTaskFactory(
                   title: 'Initialize Tenderdash',
                   task: () => tenderdashInitTask(ctx[configRefernce]),
                 },
-                {
-                  title: 'Start masternode',
-                  task: async () => startNodeTask(
-                    ctx[configRefernce],
-                    {
-                      driveImageBuildPath: ctx.driveImageBuildPath,
-                      dapiImageBuildPath: ctx.dapiImageBuildPath,
-                      isMinerEnabled: true,
-                    },
-                  ),
-                },
-                {
-                  title: 'Wait 20 seconds to ensure all services are running',
-                  task: async () => {
-                    await wait(20000);
-                  },
-                },
-                {
-                  title: 'Initialize Platform',
-                  task: () => initTask(ctx[configRefernce]),
-                },
-                {
-                  title: 'Stop node',
-                  task: async () => dockerCompose.stop(ctx[configRefernce].toEnvs()),
-                },
               ]),
             });
           }
@@ -148,7 +129,65 @@ function setupLocalPresetTaskFactory(
           return new Listr(subTasks);
         },
       },
+      {
+        title: 'Interconnect Tenderdash nodes',
+        task: (ctx) => {
+          for (let i = 0; i < ctx.nodeCount; i++) {
+            const configRefernce = `config_${i}`;
 
+            const p2pPeers = [];
+            const validators = [];
+            for (let n = 0; n < ctx.nodeCount; n++) {
+              if (n === i) {
+                continue;
+              }
+
+              p2pPeers.push({
+                // TOOD: get from show_id, should be in node_key in the config
+                id: '08dd8e2b1968c1323b9460949971132653ece7d8',
+                host: 'host.docker.internal',
+                port: 26656 + (n * 100),
+              });
+
+              // TODO: gather all validators and updated it everywhere
+              validators.push({
+
+              });
+            }
+
+            // TODO: update genesis time everywhere
+            // TODO: update chainId as well (dash_masternode_local_${random_number}) should be equal everywhere
+
+            const configFiles = renderServiceTemplates(ctx[configRefernce]);
+            writeServiceConfigs(ctx[configRefernce].getName(), configFiles);
+          }
+        },
+      },
+      {
+        title: 'Start first masternode',
+        task: async () => startNodeTask(
+          ctx[configRefernce],
+          {
+            driveImageBuildPath: ctx.driveImageBuildPath,
+            dapiImageBuildPath: ctx.dapiImageBuildPath,
+            isMinerEnabled: true,
+          },
+        ),
+      },
+      {
+        title: 'Wait 20 seconds to ensure all services are running',
+        task: async () => {
+          await wait(20000);
+        },
+      },
+      {
+        title: 'Initialize Platform',
+        task: () => initTask(ctx[configRefernce]),
+      },
+      {
+        title: 'Stop first node',
+        task: async () => dockerCompose.stop(ctx[configRefernce].toEnvs()),
+      },
     ]);
   }
 

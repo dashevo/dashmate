@@ -35,7 +35,8 @@ function tenderdashInitTaskFactory(
             return;
           }
 
-          const [validatorKey, nodeKey, genesis] = await initializeTenderdashNode(config);
+          // TODO: add optional nodeId into schema
+          const [validatorKey, nodeKey, genesis, nodeId] = await initializeTenderdashNode(config);
 
           if (!isValidatorKeyPresent) {
             config.set('platform.drive.tenderdash.validatorKey', validatorKey);
@@ -47,6 +48,7 @@ function tenderdashInitTaskFactory(
 
           if (!isGenesisPresent) {
             if (config.get('network') === NETWORK_LOCAL) {
+              // TODO: should happen in setupLocalPresetFactory
               genesis.initial_core_chain_locked_height = 1000;
             }
 
