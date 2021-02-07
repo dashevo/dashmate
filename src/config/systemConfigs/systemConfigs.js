@@ -32,6 +32,11 @@ const baseConfig = {
       interval: '2.5m',
       address: null,
     },
+    sentinel: {
+      docker: {
+        image: 'dashpay/sentinel:1.5.0',
+      },
+    },
     devnetName: null,
   },
   platform: {

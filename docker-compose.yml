@@ -15,7 +15,7 @@ services:
       - -masternodeblsprivkey=${CORE_MASTERNODE_OPERATOR_PRIVATE_KEY}
 
   sentinel:
-    image: dashpay/sentinel
+    image: ${CORE_DOCKER_IMAGE:?err}
     restart: unless-stopped
     depends_on:
       - core
