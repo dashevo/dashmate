@@ -321,6 +321,9 @@ module.exports = {
                 genesis: {
                   type: 'object',
                 },
+                nodeId: {
+                  type: 'string',
+                },
               },
               required: ['docker', 'p2p', 'rpc', 'validatorKey', 'nodeKey', 'genesis'],
               additionalProperties: false,

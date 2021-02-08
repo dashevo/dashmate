@@ -132,31 +132,51 @@ function setupLocalPresetTaskFactory(
       {
         title: 'Interconnect Tenderdash nodes',
         task: (ctx) => {
+          let genesisTime;
+          const randomChainIdPart = Math.floor(Math.random() * 60) + 1;
+          const chainId = `dash_masternode_local_${randomChainIdPart}`;
+
+          const validators = [];
           for (let i = 0; i < ctx.nodeCount; i++) {
-            const configRefernce = `config_${i}`;
+            const configRefernce = `config_${i + 1}`;
+
+            const validatorKey = ctx[configRefernce].get('platform.drive.tenderdash.validatorKey');
+
+            validators.push({
+              address: validatorKey.address,
+              pub_key: validatorKey.pub_key,
+              power: '10',
+              name: '',
+            });
+          }
+
+          for (let i = 0; i < ctx.nodeCount; i++) {
+            const configRefernce = `config_${i + 1}`;
+
+            if (i === 0) {
+              genesisTime = ctx[configRefernce].get('platform.drive.tenderdash.genesis.genesis_time');
+            }
+
+            ctx[configRefernce].set('platform.drive.tenderdash.genesis.genesis_time', genesisTime);
+            ctx[configRefernce].set('platform.drive.tenderdash.genesis.chain_id', chainId);
 
             const p2pPeers = [];
-            const validators = [];
             for (let n = 0; n < ctx.nodeCount; n++) {
               if (n === i) {
                 continue;
               }
 
+              const nodeId = ctx[configRefernce].get('platform.drive.tenderdash.nodeId');
+
               p2pPeers.push({
-                // TOOD: get from show_id, should be in node_key in the config
-                id: '08dd8e2b1968c1323b9460949971132653ece7d8',
+                id: nodeId,
                 host: 'host.docker.internal',
                 port: 26656 + (n * 100),
               });
-
-              // TODO: gather all validators and updated it everywhere
-              validators.push({
-
-              });
             }
 
-            // TODO: update genesis time everywhere
-            // TODO: update chainId as well (dash_masternode_local_${random_number}) should be equal everywhere
+            ctx[configRefernce].set('platform.drive.tenderdash.p2p.persistentPeers', p2pPeers);
+            ctx[configRefernce].set('platform.drive.tenderdash.genesis.validators', validators);
 
             const configFiles = renderServiceTemplates(ctx[configRefernce]);
             writeServiceConfigs(ctx[configRefernce].getName(), configFiles);
@@ -165,8 +185,19 @@ function setupLocalPresetTaskFactory(
       },
       {
         title: 'Start first masternode',
-        task: async () => startNodeTask(
-          ctx[configRefernce],
+        task: async (ctx) => startNodeTask(
+          ctx.config_1,
+          {
+            driveImageBuildPath: ctx.driveImageBuildPath,
+            dapiImageBuildPath: ctx.dapiImageBuildPath,
+            isMinerEnabled: true,
+          },
+        ),
+      },
+      {
+        title: 'Start secnond masternode',
+        task: async (ctx) => startNodeTask(
+          ctx.config_2,
           {
             driveImageBuildPath: ctx.driveImageBuildPath,
             dapiImageBuildPath: ctx.dapiImageBuildPath,
@@ -182,11 +213,11 @@ function setupLocalPresetTaskFactory(
       },
       {
         title: 'Initialize Platform',
-        task: () => initTask(ctx[configRefernce]),
+        task: (ctx) => initTask(ctx.config_1),
       },
       {
         title: 'Stop first node',
-        task: async () => dockerCompose.stop(ctx[configRefernce].toEnvs()),
+        task: async (ctx) => dockerCompose.stop(ctx.config_1.toEnvs()),
       },
     ]);
   }

@@ -56,7 +56,7 @@ function initializeTenderdashNodeFactory(dockerCompose, docker, dockerPull) {
       'cat $TMHOME/config/node_key.json',
       'echo ","',
       'cat $TMHOME/config/genesis.json',
-      'echo "\\""',
+      'echo ",\\""',
       '/usr/bin/tenderdash show_node_id',
       'echo "\\""',
       'echo "]"',
@@ -86,11 +86,10 @@ function initializeTenderdashNodeFactory(dockerCompose, docker, dockerPull) {
       throw new Error(`Can't initialize tenderdash: ${message}`);
     }
 
-    const parsedOutput = JSON.parse(writableStream.toString());
+    let stringifiedJSON = writableStream.toString();
+    stringifiedJSON = stringifiedJSON.replace(/\r\n/g, '');
 
-    parsedOutput[3] = parsedOutput[3].trim();
-
-    return parsedOutput;
+    return JSON.parse(stringifiedJSON);
   }
 
   return initializeTenderdashNode;

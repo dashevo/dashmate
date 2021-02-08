@@ -35,8 +35,9 @@ function tenderdashInitTaskFactory(
             return;
           }
 
-          // TODO: add optional nodeId into schema
           const [validatorKey, nodeKey, genesis, nodeId] = await initializeTenderdashNode(config);
+
+          config.set('platform.drive.tenderdash.nodeId', nodeId);
 
           if (!isValidatorKeyPresent) {
             config.set('platform.drive.tenderdash.validatorKey', validatorKey);
