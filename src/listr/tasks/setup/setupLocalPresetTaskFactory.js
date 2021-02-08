@@ -63,7 +63,7 @@ function setupLocalPresetTaskFactory(
           const subTasks = [];
 
           for (let i = 0; i < ctx.nodeCount; i++) {
-            const configRefernce = `config_${i + 1}`;
+            const configReference = `config_${i + 1}`;
 
             subTasks.push({
               title: `Setup node #${i + 1}`,
@@ -74,12 +74,12 @@ function setupLocalPresetTaskFactory(
                     const configName = `${ctx.preset}_${i + 1}`;
 
                     if (configFile.isConfigExists(configName)) {
-                      ctx[configRefernce] = configFile.getConfig(configName);
+                      ctx[configReference] = configFile.getConfig(configName);
                     } else {
-                      ctx[configRefernce] = configFile.createConfig(configName, PRESET_LOCAL);
+                      ctx[configReference] = configFile.createConfig(configName, PRESET_LOCAL);
                     }
 
-                    const config = ctx[configRefernce];
+                    const config = ctx[configReference];
 
                     config.set('description', `config for local node #${i + 1}`);
                     config.set('core.p2p.port', 20001 + (i * 100));
@@ -106,8 +106,8 @@ function setupLocalPresetTaskFactory(
                     config.set('platform.drive.abci.log.prettyFile.path', `/tmp/drive_pretty_${i}.log`);
                     config.set('platform.drive.abci.log.jsonFile.path', `/tmp/drive_json_${i}.log`);
 
-                    const configFiles = renderServiceTemplates(ctx[configRefernce]);
-                    writeServiceConfigs(ctx[configRefernce].getName(), configFiles);
+                    const configFiles = renderServiceTemplates(ctx[configReference]);
+                    writeServiceConfigs(ctx[configReference].getName(), configFiles);
                   },
                 },
                 {
@@ -138,9 +138,9 @@ function setupLocalPresetTaskFactory(
 
           const validators = [];
           for (let i = 0; i < ctx.nodeCount; i++) {
-            const configRefernce = `config_${i + 1}`;
+            const configReference = `config_${i + 1}`;
 
-            const validatorKey = ctx[configRefernce].get('platform.drive.tenderdash.validatorKey');
+            const validatorKey = ctx[configReference].get('platform.drive.tenderdash.validatorKey');
 
             validators.push({
               address: validatorKey.address,
@@ -151,14 +151,14 @@ function setupLocalPresetTaskFactory(
           }
 
           for (let i = 0; i < ctx.nodeCount; i++) {
-            const configRefernce = `config_${i + 1}`;
+            const configReference = `config_${i + 1}`;
 
             if (i === 0) {
-              genesisTime = ctx[configRefernce].get('platform.drive.tenderdash.genesis.genesis_time');
+              genesisTime = ctx[configReference].get('platform.drive.tenderdash.genesis.genesis_time');
             }
 
-            ctx[configRefernce].set('platform.drive.tenderdash.genesis.genesis_time', genesisTime);
-            ctx[configRefernce].set('platform.drive.tenderdash.genesis.chain_id', chainId);
+            ctx[configReference].set('platform.drive.tenderdash.genesis.genesis_time', genesisTime);
+            ctx[configReference].set('platform.drive.tenderdash.genesis.chain_id', chainId);
 
             const p2pPeers = [];
             for (let n = 0; n < ctx.nodeCount; n++) {
@@ -166,7 +166,7 @@ function setupLocalPresetTaskFactory(
                 continue;
               }
 
-              const nodeId = ctx[configRefernce].get('platform.drive.tenderdash.nodeId');
+              const nodeId = ctx[configReference].get('platform.drive.tenderdash.nodeId');
 
               p2pPeers.push({
                 id: nodeId,
@@ -175,11 +175,11 @@ function setupLocalPresetTaskFactory(
               });
             }
 
-            ctx[configRefernce].set('platform.drive.tenderdash.p2p.persistentPeers', p2pPeers);
-            ctx[configRefernce].set('platform.drive.tenderdash.genesis.validators', validators);
+            ctx[configReference].set('platform.drive.tenderdash.p2p.persistentPeers', p2pPeers);
+            ctx[configReference].set('platform.drive.tenderdash.genesis.validators', validators);
 
-            const configFiles = renderServiceTemplates(ctx[configRefernce]);
-            writeServiceConfigs(ctx[configRefernce].getName(), configFiles);
+            const configFiles = renderServiceTemplates(ctx[configReference]);
+            writeServiceConfigs(ctx[configReference].getName(), configFiles);
           }
         },
       },
@@ -195,7 +195,7 @@ function setupLocalPresetTaskFactory(
         ),
       },
       {
-        title: 'Start secnond masternode',
+        title: 'Start second masternode',
         task: async (ctx) => startNodeTask(
           ctx.config_2,
           {
