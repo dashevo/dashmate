@@ -184,26 +184,26 @@ function setupLocalPresetTaskFactory(
         },
       },
       {
-        title: 'Start first masternode',
-        task: async (ctx) => startNodeTask(
-          ctx.config_1,
-          {
-            driveImageBuildPath: ctx.driveImageBuildPath,
-            dapiImageBuildPath: ctx.dapiImageBuildPath,
-            isMinerEnabled: true,
-          },
-        ),
-      },
-      {
-        title: 'Start second masternode',
-        task: async (ctx) => startNodeTask(
-          ctx.config_2,
-          {
-            driveImageBuildPath: ctx.driveImageBuildPath,
-            dapiImageBuildPath: ctx.dapiImageBuildPath,
-            isMinerEnabled: true,
-          },
-        ),
+        title: 'Starting nodes',
+        task: async (ctx) => {
+          const startNodeTasks = [];
+
+          for (let i = 0; i < ctx.nodeCount; i++) {
+            startNodeTasks.push({
+              title: `Starting node #${i + 1}`,
+              task: () => startNodeTask(
+                ctx[`config_${i + 1}`],
+                {
+                  driveImageBuildPath: ctx.driveImageBuildPath,
+                  dapiImageBuildPath: ctx.dapiImageBuildPath,
+                  isMinerEnabled: true,
+                },
+              ),
+            });
+          }
+
+          return new Listr(startNodeTasks);
+        },
       },
       {
         title: 'Wait 20 seconds to ensure all services are running',
@@ -216,8 +216,21 @@ function setupLocalPresetTaskFactory(
         task: (ctx) => initTask(ctx.config_1),
       },
       {
-        title: 'Stop first node',
-        task: async (ctx) => dockerCompose.stop(ctx.config_1.toEnvs()),
+        title: 'Stopping nodes',
+        task: async (ctx) => {
+          const stopNodeTasks = [];
+
+          for (let i = 0; i < ctx.nodeCount; i++) {
+            stopNodeTasks.push({
+              title: `Stop node #${i + 1}`,
+              task: async () => {
+                await dockerCompose.stop(ctx[`config_${i + 1}`].toEnvs());
+              },
+            });
+          }
+
+          return new Listr(stopNodeTasks);
+        },
       },
     ]);
   }
