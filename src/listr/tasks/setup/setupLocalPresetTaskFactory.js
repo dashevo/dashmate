@@ -112,15 +112,15 @@ function setupLocalPresetTaskFactory(
                 },
                 {
                   title: `Generate ${amount} dash to local wallet`,
-                  task: () => generateToAddressTask(ctx[configRefernce], amount),
+                  task: () => generateToAddressTask(ctx[configReference], amount),
                 },
                 {
                   title: 'Register masternode',
-                  task: () => registerMasternodeTask(ctx[configRefernce]),
+                  task: () => registerMasternodeTask(ctx[configReference]),
                 },
                 {
                   title: 'Initialize Tenderdash',
-                  task: () => tenderdashInitTask(ctx[configRefernce]),
+                  task: () => tenderdashInitTask(ctx[configReference]),
                 },
               ]),
             });
@@ -145,8 +145,8 @@ function setupLocalPresetTaskFactory(
             validators.push({
               address: validatorKey.address,
               pub_key: validatorKey.pub_key,
-              power: '10',
-              name: '',
+              power: '1',
+              name: `node${i}`,
             });
           }
 
@@ -166,7 +166,7 @@ function setupLocalPresetTaskFactory(
                 continue;
               }
 
-              const nodeId = ctx[configReference].get('platform.drive.tenderdash.nodeId');
+              const nodeId = ctx[`config_${n + 1}`].get('platform.drive.tenderdash.nodeId');
 
               p2pPeers.push({
                 id: nodeId,

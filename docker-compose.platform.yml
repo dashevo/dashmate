@@ -59,8 +59,6 @@ services:
     volumes:
       - drive_tenderdash:/tenderdash
       - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/tenderdash:/tenderdash/config:ro
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
   dapi_insight:
     image: ${PLATFORM_DAPI_INSIGHT_DOCKER_IMAGE:?err}
