@@ -1,4 +1,5 @@
 const { Listr } = require('listr2');
+const { WritableStream } = require('memory-streams');
 const { PRESET_LOCAL } = require('../../../constants');
 
 const wait = require('../../../util/wait');
@@ -24,6 +25,7 @@ function setupLocalPresetTaskFactory(
   writeServiceConfigs,
   renderServiceTemplates,
   dockerCompose,
+  docker,
 ) {
   /**
    * @typedef {setupLocalPresetTask}
@@ -54,6 +56,35 @@ function setupLocalPresetTaskFactory(
           });
 
           // TODO: make sure validation works
+        },
+      },
+      {
+        // hidden task to dynamically get
+        // host.docker.internal ip address
+        task: async (ctx) => {
+          const writableStream = new WritableStream();
+
+          const [result] = await docker.run(
+            'alpine',
+            [],
+            writableStream,
+            {
+              Entrypoint: ['sh', '-c', 'nslookup host.docker.internal'],
+              HostConfig: {
+                AutoRemove: true,
+              },
+            },
+          );
+
+          const output = writableStream.toString();
+
+          if (result.StatusCode !== 0) {
+            throw new Error(`Can't get host.docker.internal IP address: ${output}`);
+          }
+
+          const [ipAddress] = output.match(/((?:[0-9]{1,3}\.){3}[0-9]{1,3})/g);
+
+          ctx.hostDockerInternalIp = ipAddress;
         },
       },
       {
@@ -127,6 +158,28 @@ function setupLocalPresetTaskFactory(
           }
 
           return new Listr(subTasks);
+        },
+      },
+      {
+        title: 'Interconnect Core nodes',
+        task: (ctx) => {
+          const p2pSeeds = [];
+          for (let i = 0; i < ctx.nodeCount; i++) {
+            const configReference = `config_${i + 1}`;
+
+            const p2pPort = ctx[configReference].get('core.p2p.port');
+
+            p2pSeeds.push({
+              host: ctx.hostDockerInternalIp,
+              port: p2pPort,
+            });
+          }
+
+          for (let i = 0; i < ctx.nodeCount; i++) {
+            const configReference = `config_${i + 1}`;
+
+            ctx[configReference].set('core.p2p.seeds', p2pSeeds);
+          }
         },
       },
       {

@@ -39,7 +39,10 @@ zmqpubrawtxlocksig=tcp://0.0.0.0:29998
 [test]
 {{?? it.network === 'local'}}
 regtest=1
-[regtest]{{?? it.network === 'evonet'}}
+[regtest]
+{{~it.core.p2p.seeds :seed}}
+addnode={{=seed.host}}:{{=seed.port}}{{~}}
+{{?? it.network === 'evonet'}}
 devnet={{=it.core.devnetName}}
 [devnet]
 {{~it.core.p2p.seeds :seed}}
