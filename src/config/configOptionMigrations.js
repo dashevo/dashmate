@@ -44,6 +44,9 @@ module.exports = {
     if (previousStdoutLogLevel) {
       lodashSet(options, 'platform.drive.abci.log.stdout.level', previousStdoutLogLevel);
     }
+  },
+  '0.18.0': (name, options) => {
+    lodashSet(options, 'core.sentinel', systemConfigs.base.core.sentinel);
 
     return options;
   },
