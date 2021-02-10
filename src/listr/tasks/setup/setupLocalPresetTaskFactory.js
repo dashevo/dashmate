@@ -106,8 +106,8 @@ function setupLocalPresetTaskFactory(
                     if (configFile.isConfigExists(configName)) {
                       ctx[configReference] = configFile.getConfig(configName);
                     } else {
+                      configFile.setDefaultGroupName(PRESET_LOCAL);
                       ctx[configReference] = configFile.createConfig(configName, PRESET_LOCAL);
-                      ctx[configReference].set('group', PRESET_LOCAL);
                     }
 
                     const config = ctx[configReference];
