@@ -26,7 +26,6 @@ module.exports = {
 
     return options;
   },
-
   '0.17.4': (name, options) => {
     let baseConfig = systemConfigs.base;
     if (systemConfigs[name]) {
@@ -46,7 +45,6 @@ module.exports = {
       lodashSet(options, 'platform.drive.abci.log.stdout.level', previousStdoutLogLevel);
     }
   },
-
   '0.18.0': (name, options) => {
     lodashSet(options, 'core.sentinel.docker.image', 'dashpay/sentinel:1.5.0');
 
