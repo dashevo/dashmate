@@ -14,6 +14,7 @@ const wait = require('../../../util/wait');
  * @param {writeServiceConfigs} writeServiceConfigs
  * @param {renderServiceTemplates} renderServiceTemplates
  * @param {DockerCompose} dockerCompose
+ * @param {Dockerode} docker
  */
 function setupLocalPresetTaskFactory(
   registerMasternodeTask,
@@ -47,15 +48,13 @@ function setupLocalPresetTaskFactory(
             min: 1,
             max: 6,
             validate: (state) => {
-              if (+state.value < 1 || +state.value > 6) {
+              if (+state < 1 || +state > 6) {
                 return 'You must set from 1 up to 6 nodes';
               }
 
               return true;
             },
           });
-
-          // TODO: make sure validation works
         },
       },
       {
