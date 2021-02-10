@@ -6,7 +6,7 @@ const baseConfig = {
   description: 'base config for use as template',
   core: {
     docker: {
-      image: 'dashpay/dashd:0.17.0.0-rc2',
+      image: 'dashpay/dashd:0.17.0.0-rc3',
     },
     p2p: {
       port: 20001,
@@ -31,6 +31,11 @@ const baseConfig = {
       enable: false,
       interval: '2.5m',
       address: null,
+    },
+    sentinel: {
+      docker: {
+        image: 'dashpay/sentinel:1.5.0',
+      },
     },
     devnetName: null,
   },
@@ -59,7 +64,7 @@ const baseConfig = {
       },
       api: {
         docker: {
-          image: 'dashpay/dapi:0.17',
+          image: 'dashpay/dapi:0.18-dev',
         },
       },
       insight: {
@@ -76,10 +81,20 @@ const baseConfig = {
       },
       abci: {
         docker: {
-          image: 'dashpay/drive:0.17',
+          image: 'dashpay/drive:0.18-dev',
         },
         log: {
-          level: 'info',
+          stdout: {
+            level: 'info',
+          },
+          prettyFile: {
+            level: 'silent',
+            path: '/tmp/base-drive-pretty.log',
+          },
+          jsonFile: {
+            level: 'silent',
+            path: '/tmp/base-drive-json.json',
+          },
         },
       },
       tenderdash: {
@@ -144,6 +159,16 @@ module.exports = {
       drive: {
         skipAssetLockConfirmationValidation: true,
         passFakeAssetLockProofForTests: true,
+        abci: {
+          log: {
+            prettyFile: {
+              path: '/tmp/local-drive-pretty.log',
+            },
+            jsonFile: {
+              path: '/tmp/local-drive-json.log',
+            },
+          },
+        },
       },
     },
     externalIp: '127.0.0.1',
@@ -175,6 +200,16 @@ module.exports = {
         },
       },
       drive: {
+        abci: {
+          log: {
+            prettyFile: {
+              path: '/tmp/testnet-drive-pretty.log',
+            },
+            jsonFile: {
+              path: '/tmp/testnet-drive-json.log',
+            },
+          },
+        },
         tenderdash: {
           p2p: {
             seeds: [
