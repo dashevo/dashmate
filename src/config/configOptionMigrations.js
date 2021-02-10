@@ -46,7 +46,7 @@ module.exports = {
     }
   },
   '0.18.0': (name, options) => {
-    lodashSet(options, 'core.sentinel.docker.image', 'dashpay/sentinel:1.5.0');
+    lodashSet(options, 'core.sentinel', systemConfigs.base.core.sentinel);
 
     return options;
   },
