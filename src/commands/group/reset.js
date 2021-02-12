@@ -1,7 +1,10 @@
 const { Listr } = require('listr2');
+const { WritableStream } = require('memory-streams');
 const { flags: flagTypes } = require('@oclif/command');
 const GroupBaseCommand = require('../../oclif/command/GroupBaseCommand');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
+
+const wait = require('../../util/wait');
 
 class GroupStartCommand extends GroupBaseCommand {
   async runWithDependencies(
@@ -15,12 +18,16 @@ class GroupStartCommand extends GroupBaseCommand {
     docker,
     resetSystemConfig,
     tenderdashInitTask,
+    initTask,
     startNodeTask,
+    registerMasternodeTask,
+    generateToAddressTask,
     configFile,
     configGroup,
-    writeServiceConfigs,
-    renderServiceTemplates,
+    systemConfigs,
   ) {
+    const amount = 10000;
+
     const tasks = new Listr(
       [
         {
@@ -100,12 +107,17 @@ class GroupStartCommand extends GroupBaseCommand {
 
             for (let i = 1; i < configGroup.length; ++i) {
               resetSystemConfigTasks.push({
-                title: `Removing services #${i}`,
-                task: () => resetSystemConfig(
-                  configFile,
-                  configGroup[i].getName(),
-                  isPlatformOnlyReset,
-                ),
+                title: `Reset config #${i}`,
+                task: () => {
+                  const name = configGroup[0].getName();
+
+                  if (isPlatformOnlyReset) {
+                    const { platform: systemPlatformConfig } = systemConfigs[name];
+                    configGroup[i].set('platform', systemPlatformConfig);
+                  } else {
+                    configGroup[i].setOptions(systemConfigs[name]);
+                  }
+                },
               });
             }
 
@@ -129,57 +141,139 @@ class GroupStartCommand extends GroupBaseCommand {
           },
         },
         {
-          title: 'Interconnect Tenderdash nodes',
-          task: (ctx) => {
-            let genesisTime;
-            const randomChainIdPart = Math.floor(Math.random() * 60) + 1;
-            const chainId = `dash_masternode_local_${randomChainIdPart}`;
+          // hidden task to dynamically get
+          // host.docker.internal ip address
+          enabled: () => !isHardReset,
+          task: async (ctx) => {
+            const writableStream = new WritableStream();
 
-            const validators = [];
-            for (let i = 1; i < configGroup.length; i++) {
-              const config = configGroup[i];
+            const [result] = await docker.run(
+              'alpine',
+              [],
+              writableStream,
+              {
+                Entrypoint: ['sh', '-c', 'nslookup host.docker.internal'],
+                HostConfig: {
+                  AutoRemove: true,
+                },
+              },
+            );
 
-              const validatorKey = config.get('platform.drive.tenderdash.validatorKey');
+            const output = writableStream.toString();
 
-              validators.push({
-                address: validatorKey.address,
-                pub_key: validatorKey.pub_key,
-                power: '1',
-                name: `node${i}`,
+            if (result.StatusCode !== 0) {
+              throw new Error(`Can't get host.docker.internal IP address: ${output}`);
+            }
+
+            const [ipAddress] = output.match(/((?:[0-9]{1,3}\.){3}[0-9]{1,3})/g);
+
+            ctx.hostDockerInternalIp = ipAddress;
+          },
+        },
+        {
+          title: `Generate ${amount} dash to local wallet`,
+          enabled: () => !isHardReset,
+          task: () => {
+            const subTasks = [];
+            for (let i = 1; i < configGroup.length; ++i) {
+              subTasks.push(
+                {
+                  title: `Generate ${amount} dash to node #${i}`,
+                  task: () => generateToAddressTask(configGroup[i], amount),
+                },
+              );
+            }
+
+            return new Listr(subTasks);
+          },
+        },
+        {
+          title: 'Register masternode',
+          enabled: () => !isHardReset && !isPlatformOnlyReset,
+          task: () => {
+            const subTasks = [];
+
+            for (let i = 1; i < configGroup.length; ++i) {
+              subTasks.push({
+                title: `Setup node #${i}`,
+                task: () => new Listr([
+                  {
+                    title: 'Reset config',
+                    task: () => {
+                      configGroup[i].set('core.masternode.operator.privateKey', null);
+                    },
+                  },
+                  {
+                    title: 'Register masternode',
+                    task: () => registerMasternodeTask(configGroup[i]),
+                  },
+                ]),
               });
             }
 
+            return new Listr(subTasks);
+          },
+        },
+        {
+          title: 'Starting nodes',
+          enabled: () => !isHardReset,
+          task: async (ctx) => {
+            const startNodeTasks = [];
+
             for (let i = 1; i < configGroup.length; i++) {
               const config = configGroup[i];
-
-              if (i === 0) {
-                genesisTime = config.get('platform.drive.tenderdash.genesis.genesis_time');
-              }
-
-              config.set('platform.drive.tenderdash.genesis.genesis_time', genesisTime);
-              config.set('platform.drive.tenderdash.genesis.chain_id', chainId);
-
-              const p2pPeers = [];
-              for (let n = 1; n < configGroup.length; n++) {
-                if (n === i) {
-                  continue;
-                }
-
-                const nodeId = config.get('platform.drive.tenderdash.nodeId');
-
-                p2pPeers.push({
-                  id: nodeId,
-                  host: 'host.docker.internal',
-                  port: 26656 + (n * 100),
-                });
-              }
-
-              config.set('platform.drive.tenderdash.p2p.persistentPeers', p2pPeers);
-              config.set('platform.drive.tenderdash.genesis.validators', validators);
-
-              const configFiles = renderServiceTemplates(config);
-              writeServiceConfigs(config.getName(), configFiles);
+              startNodeTasks.push({
+                title: `Starting node #${i}`,
+                task: () => startNodeTask(
+                  config,
+                  {
+                    driveImageBuildPath: ctx.driveImageBuildPath,
+                    dapiImageBuildPath: ctx.dapiImageBuildPath,
+                    isMinerEnabled: true,
+                  },
+                ),
+              });
             }
+
+            return new Listr(startNodeTasks);
+          },
+        },
+        {
+          title: 'Wait 20 seconds to ensure all services are running',
+          enabled: () => !isHardReset,
+          task: async () => {
+            await wait(20000);
+          },
+        },
+        {
+          title: 'Initialize Platform',
+          enabled: () => !isHardReset,
+          task: () => {
+            for (let i = 1; i < configGroup.length; ++i) {
+              configGroup[i].set('platform.dpns.ownerId', null);
+              configGroup[i].set('platform.dpns.contract.id', null);
+            }
+
+            return initTask(configGroup[1]);
+          },
+        },
+        {
+          title: 'Stopping nodes',
+          enabled: () => !isHardReset,
+          task: async () => {
+            const stopNodeTasks = [];
+
+            for (let i = 1; i < configGroup.length; i++) {
+              const config = configGroup[i];
+              stopNodeTasks.push({
+                title: `Stop node #${i}`,
+                task: async () => {
+                  await dockerCompose.stop(config.toEnvs());
+                },
+              });
+            }
+
+            return new Listr(stopNodeTasks);
           },
         },
       ],
