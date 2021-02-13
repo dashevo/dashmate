@@ -67,10 +67,13 @@ class ResetCommand extends BaseCommand {
 
           const projectvolumeNames = await dockerCompose.getVolumeNames(config.toEnvs());
 
-          await projectvolumeNames
+          const volumeNames = projectvolumeNames
             .filter((volumeName) => !coreVolumeNames.includes(volumeName))
-            .map((volumeName) => `${composeProjectName}_${volumeName}`)
-            .forEach(async (volumeName) => docker.getVolume(volumeName).remove());
+            .map((volumeName) => `${composeProjectName}_${volumeName}`);
+
+          for (const volumeName of volumeNames) {
+            await (docker.getVolume(volumeName)).remove();
+          }
         },
       },
       {
