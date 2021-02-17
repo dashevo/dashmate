@@ -71,9 +71,11 @@ class ResetCommand extends BaseCommand {
             .filter((volumeName) => !coreVolumeNames.includes(volumeName))
             .map((volumeName) => `${composeProjectName}_${volumeName}`);
 
+          const volumeRemovePromises = [];
           for (const volumeName of volumeNames) {
-            await (docker.getVolume(volumeName)).remove();
+            volumeRemovePromises.push(docker.getVolume(volumeName).remove());
           }
+          await Promise.all(volumeRemovePromises);
         },
       },
       {
