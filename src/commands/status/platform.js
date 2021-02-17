@@ -8,7 +8,7 @@ const CoreService = require('../../core/CoreService');
 const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
 const ServiceIsNotRunningError = require('../../docker/errors/ServiceIsNotRunningError');
 
-class CoreStatusCommand extends ConfigBaseCommand {
+class PlatformStatusCommand extends ConfigBaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
@@ -206,10 +206,10 @@ class CoreStatusCommand extends ConfigBaseCommand {
   }
 }
 
-CoreStatusCommand.description = 'Show platform status details';
+PlatformStatusCommand.description = 'Show platform status details';
 
-CoreStatusCommand.flags = {
+PlatformStatusCommand.flags = {
   ...ConfigBaseCommand.flags,
 };
 
-module.exports = CoreStatusCommand;
+module.exports = PlatformStatusCommand;

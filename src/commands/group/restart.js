@@ -2,7 +2,15 @@ const { Listr } = require('listr2');
 const GroupBaseCommand = require('../../oclif/command/GroupBaseCommand');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 
-class GroupStartCommand extends GroupBaseCommand {
+class GroupReStartCommand extends GroupBaseCommand {
+  /**
+   * @param {Object} args
+   * @param {Object} flags
+   * @param {DockerCompose} dockerCompose
+   * @param {startNodeTask} startNodeTask
+   * @param {Config[]} configGroup
+   * @return {Promise<void>}
+   */
   async runWithDependencies(
     args,
     {
@@ -71,10 +79,10 @@ class GroupStartCommand extends GroupBaseCommand {
   }
 }
 
-GroupStartCommand.description = 'Stop group';
+GroupReStartCommand.description = 'Stop restart';
 
-GroupStartCommand.flags = {
+GroupReStartCommand.flags = {
   ...GroupBaseCommand.flags,
 };
 
-module.exports = GroupStartCommand;
+module.exports = GroupReStartCommand;

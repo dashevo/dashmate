@@ -15,6 +15,9 @@ const wait = require('../../../util/wait');
  * @param {renderServiceTemplates} renderServiceTemplates
  * @param {DockerCompose} dockerCompose
  * @param {Dockerode} docker
+ * @param {startCore} startCore
+ * @param {waitForCoreSync} waitForCoreSync
+ * @param {generateBlocks} generateBlocks
  */
 function setupLocalPresetTaskFactory(
   registerMasternodeTask,
@@ -27,6 +30,9 @@ function setupLocalPresetTaskFactory(
   renderServiceTemplates,
   dockerCompose,
   docker,
+  startCore,
+  waitForCoreSync,
+  generateBlocks,
 ) {
   /**
    * @typedef {setupLocalPresetTask}
@@ -42,14 +48,14 @@ function setupLocalPresetTaskFactory(
         task: async (ctx, task) => {
           ctx.nodeCount = await task.prompt({
             type: 'Numeral',
-            message: 'Enter the number of nodes',
-            initial: 2,
+            message: 'Enter the number of masternodes',
+            initial: 3,
             float: false,
-            min: 1,
+            min: 3,
             max: 6,
             validate: (state) => {
-              if (+state < 1 || +state > 6) {
-                return 'You must set from 1 up to 6 nodes';
+              if (+state < 3 || +state > 6) {
+                return 'You must set from 3 up to 6 nodes';
               }
 
               return true;
@@ -81,18 +87,19 @@ function setupLocalPresetTaskFactory(
             throw new Error(`Can't get host.docker.internal IP address: ${output}`);
           }
 
-          const [ipAddress] = output.match(/((?:[0-9]{1,3}\.){3}[0-9]{1,3})/g);
+          const ips = output.match(/((?:[0-9]{1,3}\.){3}[0-9]{1,3})/g);
 
-          ctx.hostDockerInternalIp = ipAddress;
+          ctx.hostDockerInternalIp = ips[ips.length - 1];
         },
       },
       {
         // hidden task to dynamically create
         // multinode tasks listr
+        // we need to add one more node (number of masternodes + 1) which controls masternodes
         task: (ctx) => {
           const subTasks = [];
 
-          for (let i = 0; i < ctx.nodeCount; i++) {
+          for (let i = 0; i <= ctx.nodeCount; i++) {
             const configReference = `config_${i + 1}`;
 
             subTasks.push({
@@ -117,7 +124,7 @@ function setupLocalPresetTaskFactory(
                     config.set('core.rpc.port', 20002 + (i * 100));
 
                     const p2pSeeds = [];
-                    for (let n = 0; n < ctx.nodeCount; n++) {
+                    for (let n = 0; n <= ctx.nodeCount; n++) {
                       if (n === i) {
                         continue;
                       }
@@ -137,20 +144,20 @@ function setupLocalPresetTaskFactory(
                     config.set('platform.drive.abci.log.prettyFile.path', `/tmp/drive_pretty_${i}.log`);
                     config.set('platform.drive.abci.log.jsonFile.path', `/tmp/drive_json_${i}.log`);
 
+                    // setup controlling node
+                    if (i === ctx.nodeCount) {
+                      config.set('compose.file', 'docker-compose.yml');
+                      config.set('core.masternode.enable', false);
+                    }
+
                     const configFiles = renderServiceTemplates(ctx[configReference]);
                     writeServiceConfigs(ctx[configReference].getName(), configFiles);
                   },
                 },
                 {
-                  title: `Generate ${amount} dash to local wallet`,
-                  task: () => generateToAddressTask(ctx[configReference], amount),
-                },
-                {
-                  title: 'Register masternode',
-                  task: () => registerMasternodeTask(ctx[configReference]),
-                },
-                {
                   title: 'Initialize Tenderdash',
+                  // eslint-disable-next-line consistent-return
+                  skip: () => i === ctx.nodeCount,
                   task: () => tenderdashInitTask(ctx[configReference]),
                 },
               ]),
@@ -164,7 +171,7 @@ function setupLocalPresetTaskFactory(
         title: 'Interconnect Core nodes',
         task: (ctx) => {
           const p2pSeeds = [];
-          for (let i = 0; i < ctx.nodeCount; i++) {
+          for (let i = 0; i <= ctx.nodeCount; i++) {
             const configReference = `config_${i + 1}`;
 
             const p2pPort = ctx[configReference].get('core.p2p.port');
@@ -175,10 +182,104 @@ function setupLocalPresetTaskFactory(
             });
           }
 
+          for (let i = 0; i <= ctx.nodeCount; i++) {
+            const configReference = `config_${i + 1}`;
+
+            ctx[configReference].set('core.p2p.seeds', p2pSeeds.filter((seed, index) => index !== i));
+          }
+        },
+      },
+      {
+        title: 'Starting nodes',
+        task: async (ctx) => {
+          const coreServices = [];
+
+          for (let i = 0; i <= ctx.nodeCount; i++) {
+            const configReference = `config_${i + 1}`;
+
+            const config = ctx[configReference];
+
+            const coreService = await startCore(config, { wallet: true, addressIndex: true });
+            coreServices.push(coreService);
+
+            // need to generate 1 block to connect nodes to each other
+            if (i === 0) {
+              await generateBlocks(
+                coreService,
+                1,
+                config.get('network'),
+              );
+            }
+          }
+
+          ctx.coreServices = coreServices;
+        },
+      },
+      {
+        title: 'Register masternode',
+        task: async (ctx, task) => {
+          const subTasks = [];
+
           for (let i = 0; i < ctx.nodeCount; i++) {
             const configReference = `config_${i + 1}`;
 
-            ctx[configReference].set('core.p2p.seeds', p2pSeeds);
+            const config = ctx[configReference];
+
+            subTasks.push({
+              title: `Register masternode #${i + 1}`,
+              skip: () => {
+                if (config.get('core.masternode.operator.privateKey')) {
+                  task.skip(`Masternode operator private key ('core.masternode.operator.privateKey') is already set in ${config.getName()} config`);
+
+                  return true;
+                }
+
+                return false;
+              },
+              task: () => new Listr([
+                // hidden task to set coreService
+                {
+                  task: () => {
+                    ctx.coreService = ctx.coreServices[i];
+                  },
+                },
+                {
+                  title: 'Wait for sync',
+                  task: async () => {
+                    if (i > 0) {
+                      await waitForCoreSync(ctx.coreService);
+                    }
+                  },
+                },
+                {
+                  title: `Generate ${amount} dash to local wallet`,
+                  task: () => generateToAddressTask(config, amount),
+                },
+                {
+                  title: 'Register masternode',
+                  task: () => registerMasternodeTask(config),
+                },
+                {
+                  // hidden task to clear values
+                  task: () => {
+                    ctx.address = null;
+                    ctx.privateKey = null;
+                    ctx.coreService = null;
+                  },
+                },
+              ]),
+            });
+          }
+
+          // eslint-disable-next-line consistent-return
+          return new Listr(subTasks);
+        },
+      },
+      {
+        title: 'Stopping nodes',
+        task: async (ctx) => {
+          for (const coreService of ctx.coreServices) {
+            await coreService.stop();
           }
         },
       },
@@ -241,7 +342,7 @@ function setupLocalPresetTaskFactory(
         task: async (ctx) => {
           const startNodeTasks = [];
 
-          for (let i = 0; i < ctx.nodeCount; i++) {
+          for (let i = 0; i <= ctx.nodeCount; i++) {
             startNodeTasks.push({
               title: `Starting node #${i + 1}`,
               task: () => startNodeTask(
@@ -249,7 +350,8 @@ function setupLocalPresetTaskFactory(
                 {
                   driveImageBuildPath: ctx.driveImageBuildPath,
                   dapiImageBuildPath: ctx.dapiImageBuildPath,
-                  isMinerEnabled: true,
+                  // run miner only at controlling node
+                  isMinerEnabled: i === ctx.nodeCount,
                 },
               ),
             });
@@ -266,14 +368,14 @@ function setupLocalPresetTaskFactory(
       },
       {
         title: 'Initialize Platform',
-        task: (ctx) => initTask(ctx.config_1),
+        task: (ctx) => initTask(ctx[`config_${ctx.nodeCount - 1}`]),
       },
       {
         title: 'Stopping nodes',
         task: async (ctx) => {
           const stopNodeTasks = [];
 
-          for (let i = 0; i < ctx.nodeCount; i++) {
+          for (let i = 0; i <= ctx.nodeCount; i++) {
             stopNodeTasks.push({
               title: `Stop node #${i + 1}`,
               task: async () => {

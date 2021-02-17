@@ -6,7 +6,24 @@ const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 
 const wait = require('../../util/wait');
 
-class GroupStartCommand extends GroupBaseCommand {
+class GroupResetCommand extends GroupBaseCommand {
+  /**
+   * @param {Object} args
+   * @param {Object} flags
+   * @param {DockerCompose} dockerCompose
+   * @param {Docker} docker
+   * @param {resetSystemConfig} resetSystemConfig
+   * @param {tenderdashInitTask} tenderdashInitTask
+   * @param {initTask} initTask
+   * @param {registerMasternodeTask} registerMasternodeTask
+   * @param {generateToAddressTask} generateToAddressTask
+   * @param {Config[]} configGroup
+   * @param {systemConfigs} systemConfigs
+   * @param {startCore} startCore
+   * @param {waitForCoreSync} waitForCoreSync
+   * @param {generateBlocks} generateBlocks
+   * @return {Promise<void>}
+   */
   async runWithDependencies(
     args,
     {
@@ -22,9 +39,11 @@ class GroupStartCommand extends GroupBaseCommand {
     startNodeTask,
     registerMasternodeTask,
     generateToAddressTask,
-    configFile,
     configGroup,
     systemConfigs,
+    startCore,
+    waitForCoreSync,
+    generateBlocks,
   ) {
     const amount = 10000;
 
@@ -130,9 +149,9 @@ class GroupStartCommand extends GroupBaseCommand {
           task: () => {
             const initTenderDashTasks = [];
 
-            for (let i = 1; i < configGroup.length; ++i) {
+            for (let i = 1; i < configGroup.length - 1; ++i) {
               initTenderDashTasks.push({
-                title: `Removing services #${i}`,
+                title: `Initialize Tenderdash #${i}`,
                 task: () => tenderdashInitTask(configGroup[i]),
               });
             }
@@ -165,54 +184,119 @@ class GroupStartCommand extends GroupBaseCommand {
               throw new Error(`Can't get host.docker.internal IP address: ${output}`);
             }
 
-            const [ipAddress] = output.match(/((?:[0-9]{1,3}\.){3}[0-9]{1,3})/g);
+            const ips = output.match(/((?:[0-9]{1,3}\.){3}[0-9]{1,3})/g);
 
-            ctx.hostDockerInternalIp = ipAddress;
+            ctx.hostDockerInternalIp = ips[ips.length - 1];
           },
         },
         {
-          title: `Generate ${amount} dash to local wallet`,
-          enabled: () => !isHardReset,
-          task: () => {
-            const subTasks = [];
-            for (let i = 1; i < configGroup.length; ++i) {
-              subTasks.push(
-                {
-                  title: `Generate ${amount} dash to node #${i}`,
-                  task: () => generateToAddressTask(configGroup[i], amount),
-                },
-              );
-            }
-
-            return new Listr(subTasks);
-          },
-        },
-        {
-          title: 'Register masternode',
+          title: 'Reset private keys',
           enabled: () => !isHardReset && !isPlatformOnlyReset,
           task: () => {
             const subTasks = [];
 
-            for (let i = 1; i < configGroup.length; ++i) {
+            for (let i = 1; i < configGroup.length - 1; i++) {
               subTasks.push({
-                title: `Setup node #${i}`,
-                task: () => new Listr([
-                  {
-                    title: 'Reset config',
-                    task: () => {
-                      configGroup[i].set('core.masternode.operator.privateKey', null);
-                    },
-                  },
-                  {
-                    title: 'Register masternode',
-                    task: () => registerMasternodeTask(configGroup[i]),
-                  },
-                ]),
+                title: `Reset masternode #${i}`,
+                task: () => {
+                  configGroup[i].set('core.masternode.operator.privateKey', null);
+                },
               });
             }
 
             return new Listr(subTasks);
           },
+        },
+        {
+          title: 'Starting nodes',
+          enabled: () => !isHardReset,
+          task: async (ctx) => {
+            const coreServices = {};
+
+            for (let i = 1; i < configGroup.length; i++) {
+              const config = configGroup[i];
+
+              const coreService = await startCore(config, { wallet: true, addressIndex: true });
+              coreServices[i] = coreService;
+
+              // need to generate 1 block to connect nodes to each other
+              if (i === 0) {
+                await generateBlocks(
+                  coreService,
+                  1,
+                  config.get('network'),
+                );
+              }
+            }
+
+            ctx.coreServices = coreServices;
+          },
+        },
+        {
+          title: 'Register masternode',
+          enabled: () => !isHardReset && !isPlatformOnlyReset,
+          task: async (ctx) => {
+            const subTasks = [];
+
+            for (let i = 1; i < configGroup.length - 1; i++) {
+              const config = configGroup[i];
+
+              subTasks.push({
+                title: `Register masternode #${i}`,
+                task: () => new Listr([
+                  // hidden task to set coreService
+                  {
+                    task: () => {
+                      ctx.coreService = ctx.coreServices[i];
+                    },
+                  },
+                  {
+                    title: 'Wait for sync',
+                    task: async () => {
+                      if (i > 0) {
+                        await waitForCoreSync(ctx.coreService);
+                      }
+                    },
+                  },
+                  {
+                    title: `Generate ${amount} dash to local wallet`,
+                    task: () => generateToAddressTask(config, amount),
+                  },
+                  {
+                    title: 'Register masternode',
+                    task: () => registerMasternodeTask(config),
+                  },
+                  {
+                    // hidden task to clear values
+                    task: () => {
+                      ctx.address = null;
+                      ctx.privateKey = null;
+                      ctx.coreService = null;
+                    },
+                  },
+                ]),
+              });
+            }
+
+            // eslint-disable-next-line consistent-return
+            return new Listr(subTasks);
+          },
+        },
+        {
+          title: 'Stopping nodes',
+          enabled: () => !isHardReset,
+          task: async (ctx) => {
+            for (const coreService of Object.values(ctx.coreServices)) {
+              await coreService.stop();
+            }
+          },
+        },
+        {
+          // in case we don't need to register masternodes
+          title: `Generate ${amount} dash to local wallet`,
+          enabled: () => !isHardReset,
+          skip: (ctx) => !!ctx.fundingPrivateKeyString,
+          task: () => generateToAddressTask(configGroup[1], amount),
         },
         {
           title: 'Starting nodes',
@@ -229,7 +313,7 @@ class GroupStartCommand extends GroupBaseCommand {
                   {
                     driveImageBuildPath: ctx.driveImageBuildPath,
                     dapiImageBuildPath: ctx.dapiImageBuildPath,
-                    isMinerEnabled: true,
+                    isMinerEnabled: i === configGroup.length - 1,
                   },
                 ),
               });
@@ -239,10 +323,10 @@ class GroupStartCommand extends GroupBaseCommand {
           },
         },
         {
-          title: 'Wait 20 seconds to ensure all services are running',
+          title: 'Wait 60 seconds to ensure all services are running',
           enabled: () => !isHardReset,
           task: async () => {
-            await wait(20000);
+            await wait(60000);
           },
         },
         {
@@ -254,7 +338,7 @@ class GroupStartCommand extends GroupBaseCommand {
               configGroup[i].set('platform.dpns.contract.id', null);
             }
 
-            return initTask(configGroup[1]);
+            return initTask(configGroup[configGroup.length - 2]);
           },
         },
         {
@@ -295,12 +379,12 @@ class GroupStartCommand extends GroupBaseCommand {
   }
 }
 
-GroupStartCommand.description = 'Stop group';
+GroupResetCommand.description = 'Reset group';
 
-GroupStartCommand.flags = {
+GroupResetCommand.flags = {
   ...GroupBaseCommand.flags,
   hard: flagTypes.boolean({ char: 'h', description: 'reset config as well as data', default: false }),
   'platform-only': flagTypes.boolean({ char: 'p', description: 'reset platform data only', default: false }),
 };
 
-module.exports = GroupStartCommand;
+module.exports = GroupResetCommand;

@@ -3,6 +3,14 @@ const GroupBaseCommand = require('../../oclif/command/GroupBaseCommand');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 
 class GroupStartCommand extends GroupBaseCommand {
+  /**
+   * @param {Object} args
+   * @param {Object} flags
+   * @param {DockerCompose} dockerCompose
+   * @param {startNodeTask} startNodeTask
+   * @param {Config[]} configGroup
+   * @return {Promise<void>}
+   */
   async runWithDependencies(
     args,
     {

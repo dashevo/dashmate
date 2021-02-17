@@ -26,7 +26,16 @@ function generateToAddressTaskFactory(
     return new Listr([
       {
         title: 'Start Core',
-        task: async (ctx) => {
+        task: async (ctx, task) => {
+          if (ctx.coreService) {
+            task.skip('Core is already started');
+
+            ctx.coreServicePassed = true;
+
+            return;
+          }
+
+          ctx.coreServicePassed = false;
           ctx.coreService = await startCore(config, { wallet: true });
         },
       },
@@ -95,6 +104,7 @@ function generateToAddressTaskFactory(
       },
       {
         title: 'Stop Core',
+        skip: (ctx) => ctx.coreServicePassed,
         task: async (ctx) => ctx.coreService.stop(),
       },
     ]);
