@@ -48,6 +48,12 @@ module.exports = {
   '0.18.0': (name, options) => {
     lodashSet(options, 'core.sentinel', systemConfigs.base.core.sentinel);
 
+    lodashSet(
+      options,
+      'platform.drive.tenderdash.docker.image',
+      systemConfigs.base.platform.drive.tenderdash.docker.image,
+    );
+
     return options;
   },
 };
