@@ -99,7 +99,7 @@ const baseConfig = {
       },
       tenderdash: {
         docker: {
-          image: 'dashpay/tenderdash',
+          image: 'dashpay/tenderdash:0.34.3',
         },
         p2p: {
           port: 26656,
