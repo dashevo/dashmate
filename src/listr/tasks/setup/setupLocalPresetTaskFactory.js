@@ -1,3 +1,4 @@
+const os = require('os');
 const { Listr } = require('listr2');
 const { WritableStream } = require('memory-streams');
 const { PRESET_LOCAL } = require('../../../constants');
@@ -67,6 +68,16 @@ function setupLocalPresetTaskFactory(
         // hidden task to dynamically get
         // host.docker.internal ip address
         task: async (ctx) => {
+          const platform = os.platform();
+
+          const hostConfig = {
+            AutoRemove: true,
+          };
+
+          if (platform !== 'darwin' && platform !== 'win32') {
+            hostConfig.ExtraHosts = ['host.docker.internal:host-gateway'];
+          }
+
           const writableStream = new WritableStream();
 
           const [result] = await docker.run(
@@ -74,10 +85,8 @@ function setupLocalPresetTaskFactory(
             [],
             writableStream,
             {
-              Entrypoint: ['sh', '-c', 'nslookup host.docker.internal'],
-              HostConfig: {
-                AutoRemove: true,
-              },
+              Entrypoint: ['sh', '-c', 'ping -c1 host.docker.internal | sed -nE \'s/^PING[^(]+\\(([^)]+)\\).*/\\1/p\''],
+              HostConfig: hostConfig,
             },
           );
 
@@ -87,9 +96,7 @@ function setupLocalPresetTaskFactory(
             throw new Error(`Can't get host.docker.internal IP address: ${output}`);
           }
 
-          const ips = output.match(/((?:[0-9]{1,3}\.){3}[0-9]{1,3})/g);
-
-          ctx.hostDockerInternalIp = ips[ips.length - 1];
+          ctx.hostDockerInternalIp = output.trim();
         },
       },
       {
@@ -130,7 +137,7 @@ function setupLocalPresetTaskFactory(
                       }
 
                       p2pSeeds.push({
-                        host: 'host.docker.internal',
+                        host: ctx.hostDockerInternalIp,
                         port: 20001 + (n * 100),
                       });
                     }
@@ -324,7 +331,7 @@ function setupLocalPresetTaskFactory(
 
               p2pPeers.push({
                 id: nodeId,
-                host: 'host.docker.internal',
+                host: ctx.hostDockerInternalIp,
                 port: 26656 + (n * 100),
               });
             }

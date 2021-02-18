@@ -1,3 +1,4 @@
+const os = require('os');
 const { Listr } = require('listr2');
 const { WritableStream } = require('memory-streams');
 const { flags: flagTypes } = require('@oclif/command');
@@ -164,6 +165,16 @@ class GroupResetCommand extends GroupBaseCommand {
           // host.docker.internal ip address
           enabled: () => !isHardReset,
           task: async (ctx) => {
+            const platform = os.platform();
+
+            const hostConfig = {
+              AutoRemove: true,
+            };
+
+            if (platform !== 'darwin' && platform !== 'win32') {
+              hostConfig.ExtraHosts = ['host.docker.internal:host-gateway'];
+            }
+
             const writableStream = new WritableStream();
 
             const [result] = await docker.run(
@@ -171,10 +182,8 @@ class GroupResetCommand extends GroupBaseCommand {
               [],
               writableStream,
               {
-                Entrypoint: ['sh', '-c', 'nslookup host.docker.internal'],
-                HostConfig: {
-                  AutoRemove: true,
-                },
+                Entrypoint: ['sh', '-c', 'ping -c1 host.docker.internal | sed -nE \'s/^PING[^(]+\\(([^)]+)\\).*/\\1/p\''],
+                HostConfig: hostConfig,
               },
             );
 
@@ -184,9 +193,7 @@ class GroupResetCommand extends GroupBaseCommand {
               throw new Error(`Can't get host.docker.internal IP address: ${output}`);
             }
 
-            const ips = output.match(/((?:[0-9]{1,3}\.){3}[0-9]{1,3})/g);
-
-            ctx.hostDockerInternalIp = ips[ips.length - 1];
+            ctx.hostDockerInternalIp = output.trim();
           },
         },
         {
