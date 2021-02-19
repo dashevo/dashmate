@@ -165,6 +165,30 @@ class GroupResetCommand extends GroupBaseCommand {
           // host.docker.internal ip address
           enabled: () => !isHardReset,
           task: async (ctx) => {
+            // pulling image before run
+            // or we can get 404 error (on first run)
+            await new Promise((resolve, reject) => {
+              docker.pull('alpine', (err, stream) => {
+                if (err) {
+                  reject(new Error(`Can't pull alpine image: ${err.message}`));
+
+                  return;
+                }
+
+                const onProgress = () => {};
+
+                const onFinished = (error) => {
+                  if (!error) {
+                    resolve();
+                  } else {
+                    reject(new Error(`Can't pull alpine image: ${error.message}`));
+                  }
+                };
+
+                docker.modem.followProgress(stream, onFinished, onProgress);
+              });
+            });
+
             const platform = os.platform();
 
             const hostConfig = {
