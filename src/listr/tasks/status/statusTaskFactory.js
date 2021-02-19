@@ -130,7 +130,6 @@ function statusTaskFactory(
     }
 
     const platformExplorerURLs = {
-      evonet: 'https://rpc.cloudwheels.net:26657',
       testnet: '',
       mainnet: '',
       local: '',

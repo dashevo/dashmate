@@ -1,6 +1,6 @@
 const networks = {
   NETWORK_LOCAL: 'local',
-  NETWORK_EVONET: 'evonet',
+  NETWORK_DEVNET: 'devnet',
   NETWORK_TESTNET: 'testnet',
   NETWORK_MAINNET: 'mainnet',
 };
@@ -8,7 +8,7 @@ const networks = {
 const presets = {
   PRESET_TESTNET: 'testnet',
   PRESET_LOCAL: 'local',
-  PRESET_EVONET: 'evonet',
+  PRESET_DEVNET: 'devnet',
 };
 
 const nodeTypes = {

@@ -1,11 +1,11 @@
 const baseConfig = require('./system/base');
 const localConfig = require('./system/local');
-const evonetConfig = require('./system/evonet');
+const devnetConfig = require('./system/devnet');
 const testnetConfig = require('./system/testnet');
 
 module.exports = {
   base: baseConfig,
   local: localConfig,
-  evonet: evonetConfig,
+  devnet: devnetConfig,
   testnet: testnetConfig,
 };

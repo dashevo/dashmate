@@ -48,6 +48,17 @@ module.exports = {
       }
     });
   },
+  '0.18.0': (name, options) => {
+    lodashSet(options, 'core.sentinel', systemConfigs.base.core.sentinel);
+
+    lodashSet(
+      options,
+      'platform.drive.tenderdash.docker.image',
+      systemConfigs.base.platform.drive.tenderdash.docker.image,
+    );
+
+    return options;
+  },
   '0.19.0-dev': (configFile) => {
     // Add default group name if not present
     if (typeof configFile.defaultGroupName === 'undefined') {
@@ -61,16 +72,6 @@ module.exports = {
           config.group = null;
         }
       });
-
-    // Add local1 config if not present
-    if (typeof configFile.configs.local1 === 'undefined') {
-      configFile.configs.local1 = systemConfigs.local1;
-    }
-
-    // Add local2 config if not present
-    if (typeof configFile.configs.local2 === 'undefined') {
-      configFile.configs.local2 = systemConfigs.local2;
-    }
 
     return configFile;
   },

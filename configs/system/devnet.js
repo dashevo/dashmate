@@ -1,13 +1,13 @@
 const lodashMerge = require('lodash.merge');
 
 const {
-  NETWORK_EVONET,
+  NETWORK_DEVNET,
 } = require('../../src/constants');
 
 const baseConfig = require('./base');
 
 module.exports = lodashMerge({}, baseConfig, {
-  description: 'node with Evonet configuration',
+  description: 'node with Devnet configuration',
   core: {
     docker: {
       image: 'dashpay/dashd:0.16',
@@ -785,5 +785,5 @@ module.exports = lodashMerge({}, baseConfig, {
       },
     },
   },
-  network: NETWORK_EVONET,
+  network: NETWORK_DEVNET,
 });
