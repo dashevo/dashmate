@@ -54,6 +54,8 @@ const initializeTenderdashNodeFactory = require('./tenderdash/initializeTenderda
 const setupLocalPresetTaskFactory = require('./listr/tasks/setup/setupLocalPresetTaskFactory');
 const setupRegularPresetTaskFactory = require('./listr/tasks/setup/setupRegularPresetTaskFactory');
 const statusTaskFactory = require('./listr/tasks/status/statusTaskFactory');
+const stopNodeTaskFactory = require('./listr/tasks/stopNodeTaskFactory');
+const restartNodeTaskFactory = require('./listr/tasks/restartNodeTaskFactory');
 
 async function createDIContainer(options) {
   const container = createAwilixContainer({
@@ -144,6 +146,8 @@ async function createDIContainer(options) {
     initTask: asFunction(initTaskFactory),
     tenderdashInitTask: asFunction(tenderdashInitTaskFactory),
     startNodeTask: asFunction(startNodeTaskFactory),
+    stopNodeTask: asFunction(stopNodeTaskFactory),
+    restartNodeTask: asFunction(restartNodeTaskFactory),
     setupLocalPresetTask: asFunction(setupLocalPresetTaskFactory),
     setupRegularPresetTask: asFunction(setupRegularPresetTaskFactory),
     statusTask: asFunction(statusTaskFactory),
