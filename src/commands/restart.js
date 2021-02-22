@@ -24,7 +24,7 @@ class RestartCommand extends ConfigBaseCommand {
       verbose: isVerbose,
     },
     dockerCompose,
-    startNodeTask,
+    restartNodeTask,
     config,
   ) {
     const isMasternode = config.get('core.masternode.enable');
@@ -32,12 +32,8 @@ class RestartCommand extends ConfigBaseCommand {
     const tasks = new Listr(
       [
         {
-          title: 'Stop node',
-          task: async () => dockerCompose.stop(config.toEnvs()),
-        },
-        {
-          title: `Start ${isMasternode ? 'masternode' : 'full node'}`,
-          task: () => startNodeTask(
+          title: `Restarting ${isMasternode ? 'masternode' : 'full node'}`,
+          task: () => restartNodeTask(
             config,
             {
               driveImageBuildPath,

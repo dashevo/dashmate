@@ -19,45 +19,31 @@ class GroupReStartCommand extends GroupBaseCommand {
       verbose: isVerbose,
     },
     dockerCompose,
-    startNodeTask,
+    restartNodeTask,
     configGroup,
   ) {
     const tasks = new Listr(
       [
         {
-          title: 'Stop nodes',
+          title: 'Restart nodes',
           task: () => {
-            const stopNodeTasks = [];
+            const restartNodeTasks = [];
 
             for (let i = 1; i < configGroup.length; ++i) {
-              stopNodeTasks.push({
-                title: `Stopping node #${i}`,
-                task: async () => dockerCompose.stop(configGroup[i].toEnvs()),
-              });
-            }
-
-            return new Listr(stopNodeTasks);
-          },
-        },
-        {
-          title: 'Start nodes',
-          task: async () => {
-            const startNodeTasks = [];
-
-            for (let i = 1; i < configGroup.length; ++i) {
-              startNodeTasks.push({
-                title: `Starting node #${i}`,
-                task: () => startNodeTask(
-                  configGroup[i],
+              restartNodeTasks.push({
+                title: `Restarting node #${i}`,
+                task: async () => restartNodeTask(
+                  configGroup[i].toEnvs(),
                   {
                     driveImageBuildPath,
                     dapiImageBuildPath,
+                    isVerbose,
                   },
                 ),
               });
             }
 
-            return new Listr(startNodeTasks);
+            return new Listr(restartNodeTasks);
           },
         },
       ],
