@@ -2,7 +2,7 @@
 const lodashSet = require('lodash.set');
 const lodashGet = require('lodash.get');
 
-const systemConfigs = require('./systemConfigs');
+const systemConfigs = require('./system');
 
 const { NETWORK_TESTNET } = require('../src/constants');
 
