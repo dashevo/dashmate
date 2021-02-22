@@ -17,7 +17,7 @@ const createSystemConfigsFactory = require('./config/systemConfigs/createSystemC
 const resetSystemConfigFactory = require('./config/systemConfigs/resetSystemConfigFactory');
 const isSystemConfigFactory = require('./config/systemConfigs/isSystemConfigFactory');
 const migrateConfigFile = require('./config/configFile/migrateConfigFile');
-const systemConfigs = require('../configs/systemConfigs');
+const systemConfigs = require('../configs/system');
 
 const renderServiceTemplatesFactory = require('./templates/renderServiceTemplatesFactory');
 const writeServiceConfigsFactory = require('./templates/writeServiceConfigsFactory');
