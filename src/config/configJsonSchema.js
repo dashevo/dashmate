@@ -397,7 +397,7 @@ module.exports = {
       additionalProperties: false,
     },
     externalIp: {
-      type: ['string', 'null'],
+      type: 'string',
       format: 'ipv4',
     },
     network: {

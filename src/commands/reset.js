@@ -10,13 +10,10 @@ class ResetCommand extends ConfigBaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
-   * @param {resetSystemConfig} resetSystemConfig
    * @param {isSystemConfig} isSystemConfig
    * @param {Config} config
-   * @param {ConfigFile} configFile
-   * @param {DockerCompose} dockerCompose
-   * @param {Docker} docker
-   * @param {tenderdashInitTask} tenderdashInitTask
+   * @param {resetNodeTask} resetNodeTask
+   *
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -26,13 +23,9 @@ class ResetCommand extends ConfigBaseCommand {
       hard: isHardReset,
       'platform-only': isPlatformOnlyReset,
     },
-    resetSystemConfig,
     isSystemConfig,
     config,
-    configFile,
-    dockerCompose,
-    docker,
-    tenderdashInitTask,
+    resetNodeTask,
   ) {
     if (isHardReset && !isSystemConfig(config.getName())) {
       throw new Error(`Cannot hard reset non-system config "${config.getName()}"`);
@@ -40,50 +33,8 @@ class ResetCommand extends ConfigBaseCommand {
 
     const tasks = new Listr([
       {
-        title: 'Stop services',
-        task: async () => dockerCompose.stop(config.toEnvs()),
-      },
-      {
-        title: 'Remove all services and associated data',
-        enabled: () => !isPlatformOnlyReset,
-        task: async () => dockerCompose.down(config.toEnvs()),
-      },
-      {
-        title: 'Remove platform services and associated data',
-        enabled: () => isPlatformOnlyReset,
-        task: async () => {
-          // Remove containers
-          const coreContainerNames = ['core', 'sentinel'];
-          const containerNames = await dockerCompose
-            .getContainersList(config.toEnvs(), undefined, true);
-          const platformContainerNames = containerNames
-            .filter((containerName) => !coreContainerNames.includes(containerName));
-
-          await dockerCompose.rm(config.toEnvs(), platformContainerNames);
-
-          // Remove volumes
-          const coreVolumeNames = ['core_data'];
-          const { COMPOSE_PROJECT_NAME: composeProjectName } = config.toEnvs();
-
-          const projectvolumeNames = await dockerCompose.getVolumeNames(config.toEnvs());
-
-          const volumeRemovePromises = projectvolumeNames
-            .filter((volumeName) => !coreVolumeNames.includes(volumeName))
-            .map((volumeName) => `${composeProjectName}_${volumeName}`)
-            .map((volumeName) => docker.getVolume(volumeName).remove());
-
-          await Promise.all(volumeRemovePromises);
-        },
-      },
-      {
-        title: `Reset config ${config.getName()}`,
-        enabled: () => isHardReset,
-        task: () => resetSystemConfig(configFile, config.getName(), isPlatformOnlyReset),
-      },
-      {
-        title: 'Initialize Tenderdash',
-        enabled: () => !isHardReset,
-        task: () => tenderdashInitTask(config),
+        title: `Reset ${config.getName()} node`,
+        task: async () => resetNodeTask(config),
       },
     ],
     {
@@ -96,7 +47,10 @@ class ResetCommand extends ConfigBaseCommand {
     });
 
     try {
-      await tasks.run();
+      await tasks.run({
+        isHardReset,
+        isPlatformOnlyReset,
+      });
     } catch (e) {
       throw new MuteOneLineError(e);
     }

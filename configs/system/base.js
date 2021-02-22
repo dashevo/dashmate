@@ -137,7 +137,7 @@ module.exports = {
       },
     },
   },
-  externalIp: null,
+  externalIp: '127.0.0.1',
   network: NETWORK_TESTNET,
   compose: {
     file: 'docker-compose.yml:docker-compose.platform.yml',

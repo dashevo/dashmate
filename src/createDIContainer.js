@@ -14,7 +14,6 @@ const os = require('os');
 const ensureHomeDirFactory = require('./ensureHomeDirFactory');
 const ConfigFileJsonRepository = require('./config/configFile/ConfigFileJsonRepository');
 const createSystemConfigsFactory = require('./config/systemConfigs/createSystemConfigsFactory');
-const resetSystemConfigFactory = require('./config/systemConfigs/resetSystemConfigFactory');
 const isSystemConfigFactory = require('./config/systemConfigs/isSystemConfigFactory');
 const migrateConfigFile = require('./config/configFile/migrateConfigFile');
 const systemConfigs = require('../configs/systemConfigs');
@@ -56,6 +55,7 @@ const setupRegularPresetTaskFactory = require('./listr/tasks/setup/setupRegularP
 const statusTaskFactory = require('./listr/tasks/status/statusTaskFactory');
 const stopNodeTaskFactory = require('./listr/tasks/stopNodeTaskFactory');
 const restartNodeTaskFactory = require('./listr/tasks/restartNodeTaskFactory');
+const resetNodeTaskFactory = require('./listr/tasks/resetNodeTaskFactory');
 
 async function createDIContainer(options) {
   const container = createAwilixContainer({
@@ -74,7 +74,6 @@ async function createDIContainer(options) {
     configFileRepository: asClass(ConfigFileJsonRepository),
     systemConfigs: asValue(systemConfigs),
     createSystemConfigs: asFunction(createSystemConfigsFactory),
-    resetSystemConfig: asFunction(resetSystemConfigFactory),
     isSystemConfig: asFunction(isSystemConfigFactory),
     migrateConfigFile: asValue(migrateConfigFile),
     // `configFile` and `config` are registering on command init
@@ -148,6 +147,7 @@ async function createDIContainer(options) {
     startNodeTask: asFunction(startNodeTaskFactory),
     stopNodeTask: asFunction(stopNodeTaskFactory),
     restartNodeTask: asFunction(restartNodeTaskFactory),
+    resetNodeTask: asFunction(resetNodeTaskFactory),
     setupLocalPresetTask: asFunction(setupLocalPresetTaskFactory),
     setupRegularPresetTask: asFunction(setupRegularPresetTaskFactory),
     statusTask: asFunction(statusTaskFactory),
