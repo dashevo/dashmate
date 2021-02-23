@@ -61,7 +61,12 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Import funding private key',
-        task: async (ctx) => importPrivateKey(ctx.coreService, ctx.fundingPrivateKeyString),
+        task: async (ctx, task) => {
+          await importPrivateKey(ctx.coreService, ctx.fundingPrivateKeyString);
+
+          // eslint-disable-next-line no-param-reassign
+          task.output = `${ctx.fundingPrivateKeyString} imported.`;
+        },
       },
       {
         title: 'Sync Core with network',
@@ -70,7 +75,10 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Check funding address balance',
-        task: async (ctx) => {
+        task: async (ctx, task) => {
+          // eslint-disable-next-line no-param-reassign
+          task.title = `Check funding address ${ctx.fundingAddress} balance`;
+
           const balance = await getAddressBalance(ctx.coreService, ctx.fundingAddress);
 
           if (balance <= masternodeDashAmount) {
@@ -166,24 +174,30 @@ function registerMasternodeTaskFactory(
         title: 'Reach 1000 blocks to enable DML',
         enabled: () => config.get('network') === NETWORK_LOCAL,
         // eslint-disable-next-line consistent-return
-        task: async (ctx) => {
-          const { result: height } = await ctx.coreService.getRpcClient().getBlockCount();
+        task: async (ctx, task) => {
+          const { result: blockCount } = await ctx.coreService.getRpcClient().getBlockCount();
 
-          if (height < 1000) {
-            return new Observable(async (observer) => {
-              await generateBlocks(
-                ctx.coreService,
-                1000 - height,
-                config.get('network'),
-                (blocks) => {
-                  const remaining = 1000 - height - blocks;
-                  observer.next(`${remaining} ${remaining > 1 ? 'blocks' : 'block'} remaining`);
-                },
-              );
+          if (blockCount >= 1000) {
+            // eslint-disable-next-line no-param-reassign
+            task.skip = true;
 
-              observer.complete();
-            });
+            return;
           }
+
+          // eslint-disable-next-line consistent-return
+          return new Observable(async (observer) => {
+            await generateBlocks(
+              ctx.coreService,
+              1000 - blockCount,
+              config.get('network'),
+              (blocks) => {
+                const remaining = 1000 - blockCount - blocks;
+                observer.next(`${remaining} ${remaining > 1 ? 'blocks' : 'block'} remaining`);
+              },
+            );
+
+            observer.complete();
+          });
         },
       },
       {

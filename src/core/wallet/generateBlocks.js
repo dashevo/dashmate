@@ -27,7 +27,7 @@ async function generateBlocks(
 
     generatedBlocks += blockHashes.length;
 
-    if (blockHashes.length > 0 && progressCallback) {
+    if (blockHashes.length > 0) {
       await progressCallback(generatedBlocks);
     }
   } while (generatedBlocks < blocks);

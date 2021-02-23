@@ -58,8 +58,11 @@ function generateToAddressTaskFactory(
       },
       {
         title: `Generate ≈${amount} dash to address`,
-        task: (ctx, task) => (
-          new Observable(async (observer) => {
+        task: (ctx, task) => {
+          // eslint-disable-next-line no-param-reassign
+          task.title += ` ${ctx.address}`;
+
+          return new Observable(async (observer) => {
             await generateToAddress(
               ctx.coreService,
               amount,
@@ -78,8 +81,8 @@ function generateToAddressTaskFactory(
             ctx.fundingPrivateKeyString = ctx.privateKey;
 
             observer.complete();
-          })
-        ),
+          });
+        },
         options: { persistentOutput: true },
       },
       {

@@ -147,26 +147,32 @@ function setupLocalPresetTaskFactory(
               task: async () => {
                 const coreServices = [];
 
+                let isGenesisBlockGenerated = false;
+
                 for (const config of ctx.configGroup) {
                   const coreService = await startCore(config, { wallet: true, addressIndex: true });
                   coreServices.push(coreService);
 
                   // need to generate 1 block to connect nodes to each other
-                  if (isSeedNode(config)) {
+                  if (!isGenesisBlockGenerated) {
                     await generateBlocks(
                       coreService,
                       1,
                       config.get('network'),
                     );
+
+                    isGenesisBlockGenerated = true;
                   }
                 }
 
                 ctx.coreServices = coreServices;
+
+                await wait(5000);
               },
             },
             {
               title: 'Register masternodes',
-              task: async () => {
+              task: () => {
                 const masternodeConfigs = ctx.configGroup.slice(0, -1);
 
                 const subTasks = masternodeConfigs.map((config, i) => ({
@@ -188,30 +194,23 @@ function setupLocalPresetTaskFactory(
                     {
                       title: 'Await for Core to sync',
                       enabled: () => i > 0,
-                      task: async () => waitForCoreSync(ctx.coreService),
-                    },
-                    {
-                      title: 'huynya',
-                      task: async (__, innerTask) => {
-                        // eslint-disable-next-line no-param-reassign
-                        innerTask.output = `Config ${config.getName()}, ${isSeedNode(config)}`;
-                        await wait(10000);
-                      },
+                      task: () => waitForCoreSync(ctx.coreService),
                     },
                     {
                       title: `Generate ${amount} dash to local wallet`,
-                      task: async () => generateToAddressTask(config, amount),
+                      task: () => generateToAddressTask(config, amount),
                     },
                     {
-                      title: 'Register masternode',
                       task: () => registerMasternodeTask(config),
                     },
                     {
                       // hidden task to clear values
-                      task: () => {
+                      task: async () => {
                         ctx.address = null;
                         ctx.privateKey = null;
                         ctx.coreService = null;
+
+                        await wait(30000);
                       },
                     },
                   ]),
