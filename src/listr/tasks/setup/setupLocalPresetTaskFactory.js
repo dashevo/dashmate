@@ -1,10 +1,7 @@
-const os = require('os');
 const { Listr } = require('listr2');
-const { WritableStream } = require('memory-streams');
 const { PRESET_LOCAL } = require('../../../constants');
 
 const wait = require('../../../util/wait');
-const isWSL = require('../../../util/isWSL');
 
 /**
  * @param {registerMasternodeTask} registerMasternodeTask
@@ -20,6 +17,7 @@ const isWSL = require('../../../util/isWSL');
  * @param {startCore} startCore
  * @param {waitForCoreSync} waitForCoreSync
  * @param {generateBlocks} generateBlocks
+ * @param {resolveDockerHostIp} resolveDockerHostIp
  */
 function setupLocalPresetTaskFactory(
   registerMasternodeTask,
@@ -35,6 +33,7 @@ function setupLocalPresetTaskFactory(
   startCore,
   waitForCoreSync,
   generateBlocks,
+  resolveDockerHostIp,
 ) {
   /**
    * @param {Config} config
@@ -76,7 +75,8 @@ function setupLocalPresetTaskFactory(
       {
         title: 'Create group configs',
         task: (ctx, task) => {
-          ctx.configGroup = [...Array(ctx.nodeCount)]
+          ctx.configGroup = new Array(ctx.nodeCount)
+            .fill(undefined)
             .map((value, i) => `local_${i + 1}`)
             // we need to add one more node (number of masternodes + 1) as a seed node
             .concat(['local_seed'])
@@ -115,69 +115,10 @@ function setupLocalPresetTaskFactory(
         },
       },
       {
-        // hidden task to dynamically get
-        // host.docker.internal ip address
-        task: async (ctx) => {
-          // pulling image before run
-          // or we can get 404 error (on first run)
-          await new Promise((resolve, reject) => {
-            docker.pull('alpine', (err, stream) => {
-              if (err) {
-                reject(new Error(`Can't pull alpine image: ${err.message}`));
-
-                return;
-              }
-
-              const onProgress = () => {};
-
-              const onFinished = (error) => {
-                if (!error) {
-                  resolve();
-                } else {
-                  reject(new Error(`Can't pull alpine image: ${error.message}`));
-                }
-              };
-
-              docker.modem.followProgress(stream, onFinished, onProgress);
-            });
-          });
-
-          const platform = os.platform();
-
-          const hostConfig = {
-            AutoRemove: true,
-          };
-
-          console.log('PLATFORM', platform);
-
-          if (platform !== 'darwin' && platform !== 'win32' && !isWSL()) {
-            hostConfig.ExtraHosts = ['host.docker.internal:host-gateway'];
-          }
-
-          const writableStream = new WritableStream();
-
-          const [result] = await docker.run(
-            'alpine',
-            [],
-            writableStream,
-            {
-              Entrypoint: ['sh', '-c', 'ping -c1 host.docker.internal | sed -nE \'s/^PING[^(]+\\(([^)]+)\\).*/\\1/p\''],
-              HostConfig: hostConfig,
-            },
-          );
-
-          const output = writableStream.toString();
-
-          if (result.StatusCode !== 0) {
-            throw new Error(`Can't get host.docker.internal IP address: ${output}`);
-          }
-
-          ctx.hostDockerInternalIp = output.trim();
-        },
-      },
-      {
         title: 'Configure Core nodes',
-        task: (ctx) => {
+        task: async (ctx) => {
+          ctx.hostDockerInternalIp = await resolveDockerHostIp();
+
           const p2pSeeds = ctx.configGroup.map((config) => ({
             host: ctx.hostDockerInternalIp,
             port: config.get('core.p2p.port'),
@@ -222,6 +163,8 @@ function setupLocalPresetTaskFactory(
               task: async (_, task) => {
                 const masternodeConfigs = ctx.configGroup.slice(0, -1);
 
+                console.dir(masternodeConfigs);
+
                 const subTasks = masternodeConfigs.map((config, i) => ({
                   title: `Register ${config.getName()} masternode`,
                   skip: () => {
@@ -246,16 +189,16 @@ function setupLocalPresetTaskFactory(
                       task: async () => waitForCoreSync(ctx.coreService),
                     },
                     {
-                      title: `Generate ${amount} dash to local wallet`,
-                      task: async () => generateToAddressTask(config, amount),
-                    },
-                    {
                       title: 'huynya',
                       task: async (__, innerTask) => {
                         // eslint-disable-next-line no-param-reassign
                         innerTask.output = `Config ${config.getName()}, ${isSeedNode(config)}`;
                         await wait(10000);
                       },
+                    },
+                    {
+                      title: `Generate ${amount} dash to local wallet`,
+                      task: async () => generateToAddressTask(config, amount),
                     },
                     {
                       title: 'Register masternode',

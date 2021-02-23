@@ -49,15 +49,12 @@ function registerMasternodeTaskFactory(
     return new Listr([
       {
         title: 'Start Core',
-        task: async (ctx, task) => {
-          if (ctx.coreService) {
-            task.skip('Core is already started');
+        enabled: (ctx) => {
+          ctx.coreServicePassed = Boolean(ctx.coreService);
 
-            ctx.coreServicePassed = true;
-
-            return;
-          }
-
+          return !ctx.coreServicePassed;
+        },
+        task: async (ctx) => {
           ctx.coreServicePassed = false;
           ctx.coreService = await startCore(config, { wallet: true, addressIndex: true });
         },
@@ -75,7 +72,7 @@ function registerMasternodeTaskFactory(
         title: 'Check funding address balance',
         task: async (ctx) => {
           const balance = await getAddressBalance(ctx.coreService, ctx.fundingAddress);
-          console.log('asking address for balance', ctx.fundingAddress, balance);
+
           if (balance <= masternodeDashAmount) {
             throw new Error(`You need to have more than ${masternodeDashAmount} Dash on your funding address`);
           }
@@ -244,7 +241,7 @@ function registerMasternodeTaskFactory(
       },
       {
         title: 'Stop Core',
-        skip: (ctx) => ctx.coreServicePassed,
+        enabled: (ctx) => !ctx.coreServicePassed,
         task: async (ctx) => ctx.coreService.stop(),
       },
     ]);

@@ -25,6 +25,7 @@ const DockerCompose = require('./docker/DockerCompose');
 const StartedContainers = require('./docker/StartedContainers');
 const stopAllContainersFactory = require('./docker/stopAllContainersFactory');
 const dockerPullFactory = require('./docker/dockerPullFactory');
+const resolveDockerHostIpFactory = require('./docker/resolveDockerHostIpFactory');
 
 const startCoreFactory = require('./core/startCoreFactory');
 const createRpcClient = require('./core/createRpcClient');
@@ -100,6 +101,7 @@ async function createDIContainer(options) {
     )).singleton(),
     stopAllContainers: asFunction(stopAllContainersFactory).singleton(),
     dockerPull: asFunction(dockerPullFactory).singleton(),
+    resolveDockerHostIp: asFunction(resolveDockerHostIpFactory).singleton(),
   });
 
   /**
