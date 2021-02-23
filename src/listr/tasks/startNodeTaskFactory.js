@@ -14,7 +14,7 @@ function startNodeTaskFactory(dockerCompose) {
   /**
    * @typedef {startNodeTask}
    * @param {Config} config
-   * @param {Object} options
+   * @param {Object} [options]
    * @param {string} [options.driveImageBuildPath]
    * @param {string} [options.dapiImageBuildPath]
    * @param {boolean} [options.isUpdate]
@@ -28,7 +28,7 @@ function startNodeTaskFactory(dockerCompose) {
       dapiImageBuildPath = undefined,
       isUpdate = undefined,
       isMinerEnabled = undefined,
-    },
+    } = {},
   ) {
     // Check external IP is set
     config.get('externalIp', true);

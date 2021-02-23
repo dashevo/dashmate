@@ -12,17 +12,16 @@ function restartNodeTaskFactory(startNodeTask, stopNodeTask) {
    * @typedef {restartNodeTask}
    *
    * @param {Config} config
-   * @param {Object} options
    *
    * @return {Listr}
    */
-  function restartNodeTask(config, options) {
+  function restartNodeTask(config) {
     return new Listr([
       {
-        task: () => stopNodeTask(config, options),
+        task: () => stopNodeTask(config),
       },
       {
-        task: () => startNodeTask(config, options),
+        task: () => startNodeTask(config),
       },
     ]);
   }

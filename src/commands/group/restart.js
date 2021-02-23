@@ -7,44 +7,33 @@ class GroupReStartCommand extends GroupBaseCommand {
    * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
-   * @param {startNodeTask} startNodeTask
+   * @param {restartNodeTask} restartNodeTask
    * @param {Config[]} configGroup
    * @return {Promise<void>}
    */
   async runWithDependencies(
     args,
     {
-      'drive-image-build-path': driveImageBuildPath,
-      'dapi-image-build-path': dapiImageBuildPath,
       verbose: isVerbose,
     },
     dockerCompose,
     restartNodeTask,
     configGroup,
   ) {
+    const groupName = configGroup[0].get('group');
+
     const tasks = new Listr(
       [
         {
-          title: 'Restart nodes',
-          task: () => {
-            const restartNodeTasks = [];
-
-            for (let i = 1; i < configGroup.length; ++i) {
-              restartNodeTasks.push({
-                title: `Restarting node #${i}`,
-                task: async () => restartNodeTask(
-                  configGroup[i].toEnvs(),
-                  {
-                    driveImageBuildPath,
-                    dapiImageBuildPath,
-                    isVerbose,
-                  },
-                ),
-              });
-            }
-
-            return new Listr(restartNodeTasks);
-          },
+          title: `Restart ${groupName} nodes`,
+          task: async () => (
+            new Listr(configGroup.map((config) => (
+              {
+                title: `Restarting ${config.getName()} node`,
+                task: () => restartNodeTask(config),
+              }
+            )))
+          ),
         },
       ],
       {
