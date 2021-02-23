@@ -73,8 +73,8 @@ function setupLocalPresetTaskFactory(
         },
       },
       {
-        title: 'Create group configs',
-        task: (ctx, task) => {
+        title: 'Create local group configs',
+        task: (ctx) => {
           ctx.configGroup = new Array(ctx.nodeCount)
             .fill(undefined)
             .map((value, i) => `local_${i + 1}`)
@@ -86,34 +86,38 @@ function setupLocalPresetTaskFactory(
                 : configFile.createConfig(configName, PRESET_LOCAL)
             ));
 
-          ctx.configGroup.forEach((config, i) => {
-            const nodeIndex = i + 1;
+          const subTasks = ctx.configGroup.map((config, i) => (
+            {
+              title: `Create ${config.getName()} config`,
+              task: () => {
+                const nodeIndex = i + 1;
 
-            config.set('core.p2p.port', 20001 + (i * 100));
-            config.set('core.rpc.port', 20002 + (i * 100));
+                config.set('core.p2p.port', 20001 + (i * 100));
+                config.set('core.rpc.port', 20002 + (i * 100));
 
-            if (isSeedNode(config)) {
-              config.set('description', 'seed node for local network');
+                if (isSeedNode(config)) {
+                  config.set('description', 'seed node for local network');
 
-              config.set('compose.file', 'docker-compose.yml');
-              config.set('core.masternode.enable', false);
-            } else {
-              config.set('description', `local node #${nodeIndex}`);
+                  config.set('compose.file', 'docker-compose.yml');
+                  config.set('core.masternode.enable', false);
+                } else {
+                  config.set('description', `local node #${nodeIndex}`);
 
-              config.set('platform.dapi.nginx.http.port', 3000 + (i * 100));
-              config.set('platform.dapi.nginx.grpc.port', 3010 + (i * 100));
-              config.set('platform.drive.tenderdash.p2p.port', 26656 + (i * 100));
-              config.set('platform.drive.tenderdash.rpc.port', 26657 + (i * 100));
+                  config.set('platform.dapi.nginx.http.port', 3000 + (i * 100));
+                  config.set('platform.dapi.nginx.grpc.port', 3010 + (i * 100));
+                  config.set('platform.drive.tenderdash.p2p.port', 26656 + (i * 100));
+                  config.set('platform.drive.tenderdash.rpc.port', 26657 + (i * 100));
 
-              config.set('platform.drive.abci.log.prettyFile.path', `/tmp/drive_pretty_${nodeIndex}.log`);
-              config.set('platform.drive.abci.log.jsonFile.path', `/tmp/drive_json_${nodeIndex}.log`);
+                  config.set('platform.drive.abci.log.prettyFile.path', `/tmp/drive_pretty_${nodeIndex}.log`);
+                  config.set('platform.drive.abci.log.jsonFile.path', `/tmp/drive_json_${nodeIndex}.log`);
+                }
+              },
             }
-          });
+          ));
 
           configFile.setDefaultGroupName(PRESET_LOCAL);
 
-          // eslint-disable-next-line no-param-reassign
-          task.output = 'Set local as default group\n';
+          return new Listr(subTasks);
         },
       },
       {
