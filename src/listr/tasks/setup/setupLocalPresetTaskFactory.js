@@ -87,6 +87,8 @@ function setupLocalPresetTaskFactory(
             ));
 
           ctx.configGroup.forEach((config, i) => {
+            const nodeIndex = i + 1;
+
             config.set('core.p2p.port', 20001 + (i * 100));
             config.set('core.rpc.port', 20002 + (i * 100));
 
@@ -96,15 +98,15 @@ function setupLocalPresetTaskFactory(
               config.set('compose.file', 'docker-compose.yml');
               config.set('core.masternode.enable', false);
             } else {
-              config.set('description', `local node #${i + 1}`);
+              config.set('description', `local node #${nodeIndex}`);
 
               config.set('platform.dapi.nginx.http.port', 3000 + (i * 100));
               config.set('platform.dapi.nginx.grpc.port', 3010 + (i * 100));
               config.set('platform.drive.tenderdash.p2p.port', 26656 + (i * 100));
               config.set('platform.drive.tenderdash.rpc.port', 26657 + (i * 100));
 
-              config.set('platform.drive.abci.log.prettyFile.path', `/tmp/drive_pretty_${i}.log`);
-              config.set('platform.drive.abci.log.jsonFile.path', `/tmp/drive_json_${i}.log`);
+              config.set('platform.drive.abci.log.prettyFile.path', `/tmp/drive_pretty_${nodeIndex}.log`);
+              config.set('platform.drive.abci.log.jsonFile.path', `/tmp/drive_json_${nodeIndex}.log`);
             }
           });
 
