@@ -16,7 +16,7 @@ function stopNodeTaskFactory(dockerCompose) {
   function stopNodeTask(config) {
     return new Listr([
       {
-        title: 'Stopping node',
+        title: `Stopping ${config.getName()} node`,
         task: async () => dockerCompose.stop(config.toEnvs()),
       },
     ]);

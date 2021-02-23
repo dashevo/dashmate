@@ -57,6 +57,9 @@ const statusTaskFactory = require('./listr/tasks/status/statusTaskFactory');
 const stopNodeTaskFactory = require('./listr/tasks/stopNodeTaskFactory');
 const restartNodeTaskFactory = require('./listr/tasks/restartNodeTaskFactory');
 const resetNodeTaskFactory = require('./listr/tasks/resetNodeTaskFactory');
+const configureCoreTaskFactory = require('./listr/tasks/setup/local/configureCoreTaskFactory');
+const configureTenderdashTaskFactory = require('./listr/tasks/setup/local/configureTenderdashTaskFactory');
+const initializePlatformTaskFactory = require('./listr/tasks/setup/local/initializePlatformTaskFactory');
 
 async function createDIContainer(options) {
   const container = createAwilixContainer({
@@ -71,11 +74,11 @@ async function createDIContainer(options) {
   container.register({
     homeDirPath: asValue(homeDirPath),
     configFilePath: asValue(path.join(homeDirPath, 'config.json')),
-    ensureHomeDir: asFunction(ensureHomeDirFactory),
-    configFileRepository: asClass(ConfigFileJsonRepository),
+    ensureHomeDir: asFunction(ensureHomeDirFactory).singleton(),
+    configFileRepository: asClass(ConfigFileJsonRepository).singleton(),
     systemConfigs: asValue(systemConfigs),
-    createSystemConfigs: asFunction(createSystemConfigsFactory),
-    isSystemConfig: asFunction(isSystemConfigFactory),
+    createSystemConfigs: asFunction(createSystemConfigsFactory).singleton(),
+    isSystemConfig: asFunction(isSystemConfigFactory).singleton(),
     migrateConfigFile: asValue(migrateConfigFile),
     // `configFile` and `config` are registering on command init
   });
@@ -84,8 +87,8 @@ async function createDIContainer(options) {
    * Templates
    */
   container.register({
-    renderServiceTemplates: asFunction(renderServiceTemplatesFactory),
-    writeServiceConfigs: asFunction(writeServiceConfigsFactory),
+    renderServiceTemplates: asFunction(renderServiceTemplatesFactory).singleton(),
+    writeServiceConfigs: asFunction(writeServiceConfigsFactory).singleton(),
   });
 
   /**
@@ -95,7 +98,7 @@ async function createDIContainer(options) {
     docker: asFunction(() => (
       new Docker()
     )).singleton(),
-    dockerCompose: asClass(DockerCompose),
+    dockerCompose: asClass(DockerCompose).singleton(),
     startedContainers: asFunction(() => (
       new StartedContainers()
     )).singleton(),
@@ -135,23 +138,26 @@ async function createDIContainer(options) {
    */
   container.register({
     createTenderdashRpcClient: asValue(createTenderdashRpcClient),
-    initializeTenderdashNode: asFunction(initializeTenderdashNodeFactory),
+    initializeTenderdashNode: asFunction(initializeTenderdashNodeFactory).singleton(),
   });
 
   /**
    * Tasks
    */
   container.register({
-    generateToAddressTask: asFunction(generateToAddressTaskFactory),
-    registerMasternodeTask: asFunction(registerMasternodeTaskFactory),
-    initTask: asFunction(initTaskFactory),
-    tenderdashInitTask: asFunction(tenderdashInitTaskFactory),
-    startNodeTask: asFunction(startNodeTaskFactory),
-    stopNodeTask: asFunction(stopNodeTaskFactory),
-    restartNodeTask: asFunction(restartNodeTaskFactory),
-    resetNodeTask: asFunction(resetNodeTaskFactory),
-    setupLocalPresetTask: asFunction(setupLocalPresetTaskFactory),
-    setupRegularPresetTask: asFunction(setupRegularPresetTaskFactory),
+    generateToAddressTask: asFunction(generateToAddressTaskFactory).singleton(),
+    registerMasternodeTask: asFunction(registerMasternodeTaskFactory).singleton(),
+    initTask: asFunction(initTaskFactory).singleton(),
+    tenderdashInitTask: asFunction(tenderdashInitTaskFactory).singleton(),
+    startNodeTask: asFunction(startNodeTaskFactory).singleton(),
+    stopNodeTask: asFunction(stopNodeTaskFactory).singleton(),
+    restartNodeTask: asFunction(restartNodeTaskFactory).singleton(),
+    resetNodeTask: asFunction(resetNodeTaskFactory).singleton(),
+    setupLocalPresetTask: asFunction(setupLocalPresetTaskFactory).singleton(),
+    setupRegularPresetTask: asFunction(setupRegularPresetTaskFactory).singleton(),
+    configureCoreTask: asFunction(configureCoreTaskFactory).singleton(),
+    configureTenderdashTask: asFunction(configureTenderdashTaskFactory).singleton(),
+    initializePlatformTask: asFunction(initializePlatformTaskFactory).singleton(),
     statusTask: asFunction(statusTaskFactory),
   });
 

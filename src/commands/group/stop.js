@@ -7,7 +7,7 @@ class GroupStopCommand extends GroupBaseCommand {
    * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
-   * @param {startNodeTask} startNodeTask
+   * @param {stopNodeTask} stopNodeTask
    * @param {Config[]} configGroup
    * @return {Promise<void>}
    */
@@ -17,25 +17,20 @@ class GroupStopCommand extends GroupBaseCommand {
       verbose: isVerbose,
     },
     dockerCompose,
-    startNodeTask,
+    stopNodeTask,
     configGroup,
   ) {
+    const groupName = configGroup[0].get('group');
+
     const tasks = new Listr(
       [
         {
-          title: 'Stop nodes',
-          task: () => {
-            const stopNodeTasks = [];
-
-            for (let i = 1; i < configGroup.length; ++i) {
-              stopNodeTasks.push({
-                title: `Stopping node #${i}`,
-                task: async () => dockerCompose.stop(configGroup[i].toEnvs()),
-              });
-            }
-
-            return new Listr(stopNodeTasks);
-          },
+          title: `Stop ${groupName} nodes`,
+          task: () => (
+            new Listr(configGroup.map((config) => ({
+              task: () => stopNodeTask(config),
+            })))
+          ),
         },
       ],
       {

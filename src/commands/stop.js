@@ -8,7 +8,7 @@ class StopCommand extends ConfigBaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
-   * @param {DockerCompose} dockerCompose
+   * @param {stopNodeTask} stopNodeTask
    * @param {Config} config
    * @return {Promise<void>}
    */
@@ -17,13 +17,12 @@ class StopCommand extends ConfigBaseCommand {
     {
       verbose: isVerbose,
     },
-    dockerCompose,
+    stopNodeTask,
     config,
   ) {
     const tasks = new Listr([
       {
-        title: 'Stop node',
-        task: async () => dockerCompose.stop(config.toEnvs()),
+        task: async () => stopNodeTask(config),
       },
     ],
     {

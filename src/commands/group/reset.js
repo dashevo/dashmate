@@ -9,9 +9,12 @@ class GroupResetCommand extends GroupBaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
+   * @param {isSystemConfig} isSystemConfig
    * @param {resetNodeTask} resetNodeTask
    * @param {Config[]} configGroup
-   *
+   * @param {configureCoreTask} configureCoreTask
+   * @param {configureTenderdashTask} configureTenderdashTask
+   * @param {initializePlatformTask} initializePlatformTask
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -23,32 +26,44 @@ class GroupResetCommand extends GroupBaseCommand {
     },
     isSystemConfig,
     resetNodeTask,
-    stopNodeTask,
     configGroup,
+    configureCoreTask,
+    configureTenderdashTask,
+    initializePlatformTask,
   ) {
-    if (isHardReset && !isSystemConfig(configGroup[0].get('group'))) {
+    const groupName = configGroup[0].get('group');
+
+    if (isHardReset && !isSystemConfig(groupName)) {
       throw new Error(`Cannot hard reset non-system config group "${configGroup[0].get('group')}"`);
     }
 
     const tasks = new Listr(
       [
         {
-          title: `Reset ${configGroup[0].get('group')} nodes`,
-          task: () => new Listr(configGroup.map((config, index) => ({
+          title: `Reset ${groupName} nodes`,
+          task: () => new Listr(configGroup.map((config) => ({
             title: `Reset ${config.getName()} node`,
             task: (ctx) => {
-              ctx.skipPlatformInitialization = index !== configGroup.length - 1;
+              ctx.skipPlatformInitialization = true;
 
               return resetNodeTask(config);
             },
           }))),
         },
         {
-          title: `Stop ${configGroup[0].get('group')} nodes`,
-          task: () => new Listr(configGroup.map((config) => ({
-            title: `Stop ${config.getName()} node`,
-            task: () => stopNodeTask(config),
-          }))),
+          enabled: (ctx) => !ctx.isHardReset && !ctx.isPlatformOnlyReset,
+          title: 'Configure Core nodes',
+          task: () => configureCoreTask(configGroup),
+        },
+        {
+          enabled: (ctx) => !ctx.isHardReset,
+          title: 'Configure Tenderdash nodes',
+          task: () => configureTenderdashTask(configGroup),
+        },
+        {
+          enabled: (ctx) => !ctx.isHardReset,
+          title: 'Initialize Platform',
+          task: () => initializePlatformTask(configGroup),
         },
       ],
       {
