@@ -22,28 +22,26 @@ class GroupStartCommand extends GroupBaseCommand {
     startNodeTask,
     configGroup,
   ) {
+    const groupName = configGroup[0].get('group');
+
     const tasks = new Listr(
       [
         {
-          title: 'Start nodes',
-          task: async () => {
-            const startNodeTasks = [];
-
-            for (let i = 1; i < configGroup.length; ++i) {
-              startNodeTasks.push({
-                title: `Starting node #${i}`,
+          title: `Start ${groupName} nodes`,
+          task: async () => (
+            new Listr(configGroup.map((config) => (
+              {
+                title: `Starting ${config.getName()} node`,
                 task: () => startNodeTask(
-                  configGroup[i],
+                  config,
                   {
                     driveImageBuildPath,
                     dapiImageBuildPath,
                   },
                 ),
-              });
-            }
-
-            return new Listr(startNodeTasks);
-          },
+              }
+            )))
+          ),
         },
       ],
       {

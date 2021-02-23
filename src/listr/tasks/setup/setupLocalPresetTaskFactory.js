@@ -68,6 +68,7 @@ function setupLocalPresetTaskFactory(
               task: () => {
                 const nodeIndex = i + 1;
 
+                config.set('group', 'local');
                 config.set('core.p2p.port', 20001 + (i * 100));
                 config.set('core.rpc.port', 20002 + (i * 100));
 
@@ -91,8 +92,6 @@ function setupLocalPresetTaskFactory(
             }
           ));
 
-          configFile.setDefaultGroupName(PRESET_LOCAL);
-
           return new Listr(subTasks);
         },
       },
@@ -107,6 +106,15 @@ function setupLocalPresetTaskFactory(
       {
         title: 'Initialize Platform',
         task: (ctx) => initializePlatformTask(ctx.configGroup),
+      },
+      {
+        title: 'Set default config group',
+        task: (ctx, task) => {
+          configFile.setDefaultGroupName(PRESET_LOCAL);
+
+          // eslint-disable-next-line no-param-reassign
+          task.output = `${PRESET_LOCAL} set as default group`;
+        },
       },
     ]);
   }

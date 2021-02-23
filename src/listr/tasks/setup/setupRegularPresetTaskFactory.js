@@ -30,16 +30,9 @@ function setupRegularPresetTaskFactory(
   function setupRegularPresetTask() {
     return new Listr([
       {
-        title: 'Set default config',
-        task: (ctx, task) => {
-          configFile.setDefaultConfigName(ctx.preset);
-
-          ctx.config = configFile.getDefaultConfig();
-
-          // eslint-disable-next-line no-param-reassign
-          task.output = `Set ${ctx.config.getName()} as default config\n`;
+        task: (ctx) => {
+          ctx.config = configFile.getConfig(ctx.preset);
         },
-        options: { persistentOutput: true },
       },
       {
         title: 'Set node type',
@@ -115,9 +108,12 @@ function setupRegularPresetTaskFactory(
         task: (ctx) => tenderdashInitTask(ctx.config),
       },
       {
-        task: (ctx) => {
-          const configFiles = renderServiceTemplates(ctx.config);
-          writeServiceConfigs(ctx.config.getName(), configFiles);
+        title: 'Set default config',
+        task: (ctx, task) => {
+          configFile.setDefaultConfigName(ctx.preset);
+
+          // eslint-disable-next-line no-param-reassign
+          task.output = `${ctx.config.getName()} set as default config\n`;
         },
       },
     ]);

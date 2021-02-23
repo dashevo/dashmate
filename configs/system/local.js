@@ -8,7 +8,6 @@ const baseConfig = require('./base');
 
 module.exports = lodashMerge({}, baseConfig, {
   description: 'template for local configs',
-  group: 'local',
   platform: {
     dapi: {
       nginx: {
