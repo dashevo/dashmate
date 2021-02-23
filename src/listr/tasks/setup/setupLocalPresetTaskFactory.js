@@ -166,18 +166,14 @@ function setupLocalPresetTaskFactory(
             },
             {
               title: 'Register masternodes',
-              task: async (_, task) => {
+              task: async () => {
                 const masternodeConfigs = ctx.configGroup.slice(0, -1);
-
-                console.dir(masternodeConfigs);
 
                 const subTasks = masternodeConfigs.map((config, i) => ({
                   title: `Register ${config.getName()} masternode`,
                   skip: () => {
                     if (config.get('core.masternode.operator.privateKey')) {
-                      task.skip(`Masternode operator private key ('core.masternode.operator.privateKey') is already set in ${config.getName()} config`);
-
-                      return true;
+                      return `Masternode operator private key ('core.masternode.operator.privateKey') is already set in ${config.getName()} config`;
                     }
 
                     return false;
