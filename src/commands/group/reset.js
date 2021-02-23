@@ -37,6 +37,8 @@ class GroupResetCommand extends GroupBaseCommand {
       throw new Error(`Cannot hard reset non-system config group "${configGroup[0].get('group')}"`);
     }
 
+    // TODO: We need to reset platform.dpns and platform.dashpay
+
     const tasks = new Listr(
       [
         {
