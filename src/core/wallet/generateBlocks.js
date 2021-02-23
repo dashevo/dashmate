@@ -6,7 +6,7 @@ const { PrivateKey } = require('@dashevo/dashcore-lib');
  * @param {CoreService} coreService
  * @param {number} blocks
  * @param {string} network
- * @param {function(balance: number)} progressCallback
+ * @param {function(balance: number)} [progressCallback]
  * @returns {Promise<void>}
  */
 async function generateBlocks(
@@ -27,7 +27,7 @@ async function generateBlocks(
 
     generatedBlocks += blockHashes.length;
 
-    if (blockHashes.length > 0) {
+    if (blockHashes.length > 0 && progressCallback) {
       await progressCallback(generatedBlocks);
     }
   } while (generatedBlocks < blocks);

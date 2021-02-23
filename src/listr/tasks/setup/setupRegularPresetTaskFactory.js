@@ -83,7 +83,7 @@ function setupRegularPresetTaskFactory(
         options: { persistentOutput: true },
       },
       {
-        title: 'Configure BLS private key',
+        title: 'Set masternode operator private key',
         enabled: (ctx) => ctx.nodeType === NODE_TYPE_MASTERNODE,
         task: async (ctx, task) => {
           if (ctx.operatorBlsPrivateKey === undefined) {
@@ -115,7 +115,6 @@ function setupRegularPresetTaskFactory(
         task: (ctx) => tenderdashInitTask(ctx.config),
       },
       {
-        title: 'Update config',
         task: (ctx) => {
           const configFiles = renderServiceTemplates(ctx.config);
           writeServiceConfigs(ctx.config.getName(), configFiles);

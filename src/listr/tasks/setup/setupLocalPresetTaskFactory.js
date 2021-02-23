@@ -36,6 +36,14 @@ function setupLocalPresetTaskFactory(
   generateBlocks,
 ) {
   /**
+   * @param {Config} config
+   * @return {boolean}
+   */
+  function isSeedNode(config) {
+    return config.getName() === 'local_seed';
+  }
+
+  /**
    * @typedef {setupLocalPresetTask}
    * @return {Listr}
    */
@@ -50,18 +58,58 @@ function setupLocalPresetTaskFactory(
           ctx.nodeCount = await task.prompt({
             type: 'Numeral',
             message: 'Enter the number of masternodes',
-            initial: 3,
+            initial: 2,
             float: false,
-            min: 3,
+            min: 2,
             max: 6,
             validate: (state) => {
-              if (+state < 3 || +state > 6) {
+              if (+state < 2 || +state > 6) {
                 return 'You must set from 3 up to 6 nodes';
               }
 
               return true;
             },
           });
+        },
+      },
+      {
+        title: 'Create group configs',
+        task: (ctx, task) => {
+          ctx.configGroup = new Array(ctx.nodeCount)
+            .map((value, i) => `local_${i}`)
+            // we need to add one more node (number of masternodes + 1) as a seed node
+            .concat(['local_seed']).map((configName) => (
+              configFile.isConfigExists(configName)
+                ? configFile.getConfig(configName)
+                : configFile.createConfig(configName, PRESET_LOCAL)
+            ));
+
+          ctx.configGroup.forEach((config, i) => {
+            config.set('core.p2p.port', 20001 + (i * 100));
+            config.set('core.rpc.port', 20002 + (i * 100));
+
+            if (isSeedNode(config)) {
+              config.set('description', 'seed node for local network');
+
+              config.set('compose.file', 'docker-compose.yml');
+              config.set('core.masternode.enable', false);
+            } else {
+              config.set('description', `local node #${i + 1}`);
+
+              config.set('platform.dapi.nginx.http.port', 3000 + (i * 100));
+              config.set('platform.dapi.nginx.grpc.port', 3010 + (i * 100));
+              config.set('platform.drive.tenderdash.p2p.port', 26656 + (i * 100));
+              config.set('platform.drive.tenderdash.rpc.port', 26657 + (i * 100));
+
+              config.set('platform.drive.abci.log.prettyFile.path', `/tmp/drive_pretty_${i}.log`);
+              config.set('platform.drive.abci.log.jsonFile.path', `/tmp/drive_json_${i}.log`);
+            }
+          });
+
+          configFile.setDefaultGroupName(PRESET_LOCAL);
+
+          // eslint-disable-next-line no-param-reassign
+          task.output = 'Set local as default group\n';
         },
       },
       {
@@ -124,196 +172,127 @@ function setupLocalPresetTaskFactory(
         },
       },
       {
-        // hidden task to dynamically create
-        // multinode tasks listr
-        // we need to add one more node (number of masternodes + 1) which controls masternodes
+        title: 'Configure Core nodes',
         task: (ctx) => {
-          const subTasks = [];
-
-          for (let i = 0; i <= ctx.nodeCount; i++) {
-            const configReference = `config_${i + 1}`;
-
-            subTasks.push({
-              title: `Setup node #${i + 1}`,
-              task: () => new Listr([
-                {
-                  title: 'Create config',
-                  task: () => {
-                    const configName = `${ctx.preset}_${i + 1}`;
-
-                    if (configFile.isConfigExists(configName)) {
-                      ctx[configReference] = configFile.getConfig(configName);
-                    } else {
-                      configFile.setDefaultGroupName(PRESET_LOCAL);
-                      ctx[configReference] = configFile.createConfig(configName, PRESET_LOCAL);
-                    }
-
-                    const config = ctx[configReference];
-
-                    config.set('description', `config for local node #${i + 1}`);
-                    config.set('core.p2p.port', 20001 + (i * 100));
-                    config.set('core.rpc.port', 20002 + (i * 100));
-
-                    const p2pSeeds = [];
-                    for (let n = 0; n <= ctx.nodeCount; n++) {
-                      if (n === i) {
-                        continue;
-                      }
-
-                      p2pSeeds.push({
-                        host: ctx.hostDockerInternalIp,
-                        port: 20001 + (n * 100),
-                      });
-                    }
-
-                    config.set('core.p2p.seeds', p2pSeeds);
-
-                    config.set('platform.dapi.nginx.http.port', 3000 + (i * 100));
-                    config.set('platform.dapi.nginx.grpc.port', 3010 + (i * 100));
-                    config.set('platform.drive.tenderdash.p2p.port', 26656 + (i * 100));
-                    config.set('platform.drive.tenderdash.rpc.port', 26657 + (i * 100));
-                    config.set('platform.drive.abci.log.prettyFile.path', `/tmp/drive_pretty_${i}.log`);
-                    config.set('platform.drive.abci.log.jsonFile.path', `/tmp/drive_json_${i}.log`);
-
-                    // setup controlling node
-                    if (i === ctx.nodeCount) {
-                      config.set('compose.file', 'docker-compose.yml');
-                      config.set('core.masternode.enable', false);
-                    }
-
-                    const configFiles = renderServiceTemplates(ctx[configReference]);
-                    writeServiceConfigs(ctx[configReference].getName(), configFiles);
-                  },
-                },
-                {
-                  title: 'Initialize Tenderdash',
-                  // eslint-disable-next-line consistent-return
-                  skip: () => i === ctx.nodeCount,
-                  task: () => tenderdashInitTask(ctx[configReference]),
-                },
-              ]),
-            });
-          }
-
-          return new Listr(subTasks);
-        },
-      },
-      {
-        title: 'Interconnect Core nodes',
-        task: (ctx) => {
-          const p2pSeeds = [];
-          for (let i = 0; i <= ctx.nodeCount; i++) {
-            const configReference = `config_${i + 1}`;
-
-            const p2pPort = ctx[configReference].get('core.p2p.port');
-
-            p2pSeeds.push({
+          const p2pSeeds = ctx.configGroup.map((config) => {
+            return {
               host: ctx.hostDockerInternalIp,
-              port: p2pPort,
-            });
-          }
+              port: config.get('core.p2p.port'),
+            };
+          });
 
-          for (let i = 0; i <= ctx.nodeCount; i++) {
-            const configReference = `config_${i + 1}`;
+          ctx.configGroup.forEach((config, i) => {
+            config.set(
+              'core.p2p.seeds',
+              p2pSeeds.filter((seed, index) => index !== i),
+            );
 
-            ctx[configReference].set('core.p2p.seeds', p2pSeeds.filter((seed, index) => index !== i));
-          }
-        },
-      },
-      {
-        title: 'Starting nodes',
-        task: async (ctx) => {
-          const coreServices = [];
+            // Write configs
+            const configFiles = renderServiceTemplates(config);
+            writeServiceConfigs(config.getName(), configFiles);
+          });
 
-          for (let i = 0; i <= ctx.nodeCount; i++) {
-            const configReference = `config_${i + 1}`;
+          return new Listr([
+            {
+              title: 'Starting Core nodes',
+              task: async () => {
+                const coreServices = [];
 
-            const config = ctx[configReference];
+                for (const config of ctx.configGroup) {
+                  const coreService = await startCore(config, { wallet: true, addressIndex: true });
+                  coreServices.push(coreService);
 
-            const coreService = await startCore(config, { wallet: true, addressIndex: true });
-            coreServices.push(coreService);
-
-            // need to generate 1 block to connect nodes to each other
-            if (i === 0) {
-              await generateBlocks(
-                coreService,
-                1,
-                config.get('network'),
-              );
-            }
-          }
-
-          ctx.coreServices = coreServices;
-        },
-      },
-      {
-        title: 'Register masternode',
-        task: async (ctx, task) => {
-          const subTasks = [];
-
-          for (let i = 0; i < ctx.nodeCount; i++) {
-            const configReference = `config_${i + 1}`;
-
-            const config = ctx[configReference];
-
-            subTasks.push({
-              title: `Register masternode #${i + 1}`,
-              skip: () => {
-                if (config.get('core.masternode.operator.privateKey')) {
-                  task.skip(`Masternode operator private key ('core.masternode.operator.privateKey') is already set in ${config.getName()} config`);
-
-                  return true;
+                  // need to generate 1 block to connect nodes to each other
+                  if (isSeedNode(config)) {
+                    await generateBlocks(
+                      coreService,
+                      1,
+                      config.get('network'),
+                    );
+                  }
                 }
 
-                return false;
+                ctx.coreServices = coreServices;
               },
-              task: () => new Listr([
-                // hidden task to set coreService
-                {
-                  task: () => {
-                    ctx.coreService = ctx.coreServices[i];
-                  },
-                },
-                {
-                  title: 'Wait for sync',
-                  task: async () => {
-                    if (i > 0) {
-                      await waitForCoreSync(ctx.coreService);
-                    }
-                  },
-                },
-                {
-                  title: `Generate ${amount} dash to local wallet`,
-                  task: () => generateToAddressTask(config, amount),
-                },
-                {
-                  title: 'Register masternode',
-                  task: () => registerMasternodeTask(config),
-                },
-                {
-                  // hidden task to clear values
-                  task: () => {
-                    ctx.address = null;
-                    ctx.privateKey = null;
-                    ctx.coreService = null;
-                  },
-                },
-              ]),
-            });
-          }
+            },
+            {
+              title: 'Register masternodes',
+              task: async (_, task) => {
+                const masternodeConfigs = ctx.configGroup.slice(0, -1);
 
-          // eslint-disable-next-line consistent-return
-          return new Listr(subTasks);
+                const subTasks = masternodeConfigs.map((config, i) => ({
+                  title: `Register ${config.getName()} masternode`,
+                  skip: () => {
+                    if (config.get('core.masternode.operator.privateKey')) {
+                      task.skip(`Masternode operator private key ('core.masternode.operator.privateKey') is already set in ${config.getName()} config`);
+
+                      return true;
+                    }
+
+                    return false;
+                  },
+                  task: () => new Listr([
+                    // hidden task to set coreService
+                    {
+                      task: () => {
+                        ctx.coreService = ctx.coreServices[i];
+                      },
+                    },
+                    {
+                      title: 'Await for Core to sync',
+                      enabled: i > 0,
+                      task: async () => waitForCoreSync(ctx.coreService),
+                    },
+                    {
+                      title: `Generate ${amount} dash to local wallet`,
+                      task: () => generateToAddressTask(config, amount),
+                    },
+                    {
+                      title: 'Register masternode',
+                      task: () => registerMasternodeTask(config),
+                    },
+                    {
+                      // hidden task to clear values
+                      task: () => {
+                        ctx.address = null;
+                        ctx.privateKey = null;
+                        ctx.coreService = null;
+                      },
+                    },
+                  ]),
+                }));
+
+                // eslint-disable-next-line consistent-return
+                return new Listr(subTasks);
+              },
+            },
+            {
+              title: 'Stopping nodes',
+              task: async () => (Promise.all(
+                ctx.coreServices.map((coreService) => coreService.stop()),
+              )),
+            },
+          ]);
         },
       },
       {
-        title: 'Stopping nodes',
-        task: async (ctx) => {
-          for (const coreService of ctx.coreServices) {
-            await coreService.stop();
-          }
-        },
-      },
+        title: 'Configure Tenderdash nodes',
+        task: (ctx) => {
+          const masternodeConfigs = ctx.configGroup.slice(0, -1);
+
+          const subTasks = masternodeConfigs.map((config) => {
+            {
+              title: `Initialize ${config.getName()} Tenderdash`,
+                // eslint-disable-next-line consistent-return
+                skip: () => isSeedNode,
+              task: () => tenderdashInitTask(config),
+            }
+          })
+
+          return new Listr(subTasks);
+        }
+      }
+      ,
       {
         title: 'Interconnect Tenderdash nodes',
         task: (ctx) => {
