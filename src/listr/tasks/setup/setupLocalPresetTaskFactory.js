@@ -4,6 +4,7 @@ const { WritableStream } = require('memory-streams');
 const { PRESET_LOCAL } = require('../../../constants');
 
 const wait = require('../../../util/wait');
+const isWSL = require('../../../util/isWSL');
 
 /**
  * @param {registerMasternodeTask} registerMasternodeTask
@@ -48,7 +49,7 @@ function setupLocalPresetTaskFactory(
    * @return {Listr}
    */
   function setupLocalPresetTask() {
-    const amount = 10000;
+    const amount = 1010;
 
     return new Listr([
       {
@@ -58,12 +59,12 @@ function setupLocalPresetTaskFactory(
           ctx.nodeCount = await task.prompt({
             type: 'Numeral',
             message: 'Enter the number of masternodes',
-            initial: 2,
+            initial: 3,
             float: false,
-            min: 2,
+            min: 3,
             max: 6,
             validate: (state) => {
-              if (+state < 2 || +state > 6) {
+              if (+state < 3 || +state > 6) {
                 return 'You must set from 3 up to 6 nodes';
               }
 
@@ -75,10 +76,11 @@ function setupLocalPresetTaskFactory(
       {
         title: 'Create group configs',
         task: (ctx, task) => {
-          ctx.configGroup = new Array(ctx.nodeCount)
-            .map((value, i) => `local_${i}`)
+          ctx.configGroup = [...Array(ctx.nodeCount)]
+            .map((value, i) => `local_${i + 1}`)
             // we need to add one more node (number of masternodes + 1) as a seed node
-            .concat(['local_seed']).map((configName) => (
+            .concat(['local_seed'])
+            .map((configName) => (
               configFile.isConfigExists(configName)
                 ? configFile.getConfig(configName)
                 : configFile.createConfig(configName, PRESET_LOCAL)
@@ -146,7 +148,9 @@ function setupLocalPresetTaskFactory(
             AutoRemove: true,
           };
 
-          if (platform !== 'darwin' && platform !== 'win32') {
+          console.log('PLATFORM', platform);
+
+          if (platform !== 'darwin' && platform !== 'win32' && !isWSL()) {
             hostConfig.ExtraHosts = ['host.docker.internal:host-gateway'];
           }
 
@@ -174,12 +178,10 @@ function setupLocalPresetTaskFactory(
       {
         title: 'Configure Core nodes',
         task: (ctx) => {
-          const p2pSeeds = ctx.configGroup.map((config) => {
-            return {
-              host: ctx.hostDockerInternalIp,
-              port: config.get('core.p2p.port'),
-            };
-          });
+          const p2pSeeds = ctx.configGroup.map((config) => ({
+            host: ctx.hostDockerInternalIp,
+            port: config.get('core.p2p.port'),
+          }));
 
           ctx.configGroup.forEach((config, i) => {
             config.set(
@@ -240,12 +242,20 @@ function setupLocalPresetTaskFactory(
                     },
                     {
                       title: 'Await for Core to sync',
-                      enabled: i > 0,
+                      enabled: () => i > 0,
                       task: async () => waitForCoreSync(ctx.coreService),
                     },
                     {
                       title: `Generate ${amount} dash to local wallet`,
-                      task: () => generateToAddressTask(config, amount),
+                      task: async () => generateToAddressTask(config, amount),
+                    },
+                    {
+                      title: 'huynya',
+                      task: async (__, innerTask) => {
+                        // eslint-disable-next-line no-param-reassign
+                        innerTask.output = `Config ${config.getName()}, ${isSeedNode(config)}`;
+                        await wait(10000);
+                      },
                     },
                     {
                       title: 'Register masternode',
@@ -280,19 +290,14 @@ function setupLocalPresetTaskFactory(
         task: (ctx) => {
           const masternodeConfigs = ctx.configGroup.slice(0, -1);
 
-          const subTasks = masternodeConfigs.map((config) => {
-            {
-              title: `Initialize ${config.getName()} Tenderdash`,
-                // eslint-disable-next-line consistent-return
-                skip: () => isSeedNode,
-              task: () => tenderdashInitTask(config),
-            }
-          })
+          const subTasks = masternodeConfigs.map((config) => ({
+            title: `Initialize ${config.getName()} Tenderdash`,
+            task: () => tenderdashInitTask(config),
+          }));
 
           return new Listr(subTasks);
-        }
-      }
-      ,
+        },
+      },
       {
         title: 'Interconnect Tenderdash nodes',
         task: (ctx) => {
@@ -300,99 +305,93 @@ function setupLocalPresetTaskFactory(
           const randomChainIdPart = Math.floor(Math.random() * 60) + 1;
           const chainId = `dash_masternode_local_${randomChainIdPart}`;
 
-          const validators = [];
-          for (let i = 0; i < ctx.nodeCount; i++) {
-            const configReference = `config_${i + 1}`;
+          const masternodeConfigs = ctx.configGroup.slice(0, -1);
 
-            const validatorKey = ctx[configReference].get('platform.drive.tenderdash.validatorKey');
+          const validators = masternodeConfigs.map((config, index) => {
+            const validatorKey = config.get('platform.drive.tenderdash.validatorKey');
 
-            validators.push({
+            return {
               address: validatorKey.address,
               pub_key: validatorKey.pub_key,
               power: '1',
-              name: `node${i}`,
-            });
-          }
+              name: `node${index}`,
+            };
+          });
 
-          for (let i = 0; i < ctx.nodeCount; i++) {
-            const configReference = `config_${i + 1}`;
-
-            if (i === 0) {
-              genesisTime = ctx[configReference].get('platform.drive.tenderdash.genesis.genesis_time');
+          masternodeConfigs.forEach((config, index) => {
+            if (index === 0) {
+              genesisTime = config.get('platform.drive.tenderdash.genesis.genesis_time');
             }
 
-            ctx[configReference].set('platform.drive.tenderdash.genesis.genesis_time', genesisTime);
-            ctx[configReference].set('platform.drive.tenderdash.genesis.chain_id', chainId);
+            config.set('platform.drive.tenderdash.genesis.genesis_time', genesisTime);
+            config.set('platform.drive.tenderdash.genesis.chain_id', chainId);
 
-            const p2pPeers = [];
-            for (let n = 0; n < ctx.nodeCount; n++) {
-              if (n === i) {
-                continue;
+            const p2pPeers = masternodeConfigs.map((innerConfig, i) => {
+              if (index === i) {
+                return null;
               }
 
-              const nodeId = ctx[`config_${n + 1}`].get('platform.drive.tenderdash.nodeId');
+              const nodeId = innerConfig.get('platform.drive.tenderdash.nodeId');
 
-              p2pPeers.push({
+              return {
                 id: nodeId,
                 host: ctx.hostDockerInternalIp,
-                port: 26656 + (n * 100),
-              });
-            }
+                port: 26656 + (i * 100),
+              };
+            }).filter((p2pPeer) => p2pPeer !== null);
 
-            ctx[configReference].set('platform.drive.tenderdash.p2p.persistentPeers', p2pPeers);
-            ctx[configReference].set('platform.drive.tenderdash.genesis.validators', validators);
+            console.dir(p2pPeers);
 
-            const configFiles = renderServiceTemplates(ctx[configReference]);
-            writeServiceConfigs(ctx[configReference].getName(), configFiles);
-          }
+            throw new Error('zalupa');
+
+            config.set('platform.drive.tenderdash.p2p.persistentPeers', p2pPeers);
+            config.set('platform.drive.tenderdash.genesis.validators', validators);
+
+            const configFiles = renderServiceTemplates(config);
+            writeServiceConfigs(config.getName(), configFiles);
+          });
         },
       },
       {
         title: 'Starting nodes',
         task: async (ctx) => {
-          const startNodeTasks = [];
+          const masternodeConfigs = ctx.configGroup.slice(0, -1);
 
-          for (let i = 0; i <= ctx.nodeCount; i++) {
-            startNodeTasks.push({
-              title: `Starting node #${i + 1}`,
-              task: () => startNodeTask(
-                ctx[`config_${i + 1}`],
-                {
-                  driveImageBuildPath: ctx.driveImageBuildPath,
-                  dapiImageBuildPath: ctx.dapiImageBuildPath,
-                  // run miner only at controlling node
-                  isMinerEnabled: i === ctx.nodeCount,
-                },
-              ),
-            });
-          }
+          const startNodeTasks = masternodeConfigs.map((config, i) => ({
+            title: `Starting ${config.getName()} node #${i + 1}`,
+            task: () => startNodeTask(
+              config,
+              {
+                driveImageBuildPath: ctx.driveImageBuildPath,
+                dapiImageBuildPath: ctx.dapiImageBuildPath,
+                // run miner only at controlling node
+                isMinerEnabled: i === ctx.nodeCount,
+              },
+            ),
+          }));
 
           return new Listr(startNodeTasks);
         },
       },
       {
         title: 'Wait 20 seconds to ensure all services are running',
-        task: async () => {
-          await wait(20000);
-        },
+        task: async () => wait(20000),
       },
       {
         title: 'Initialize Platform',
-        task: (ctx) => initTask(ctx[`config_${ctx.nodeCount - 1}`]),
+        task: (ctx) => {
+          const masternodeConfigs = ctx.configGroup.slice(0, -1);
+          const [lastMasternodeConfig] = masternodeConfigs.slice(-1);
+          return initTask(lastMasternodeConfig);
+        },
       },
       {
         title: 'Stopping nodes',
         task: async (ctx) => {
-          const stopNodeTasks = [];
-
-          for (let i = 0; i <= ctx.nodeCount; i++) {
-            stopNodeTasks.push({
-              title: `Stop node #${i + 1}`,
-              task: async () => {
-                await dockerCompose.stop(ctx[`config_${i + 1}`].toEnvs());
-              },
-            });
-          }
+          const stopNodeTasks = ctx.configGroup.map((config, i) => ({
+            title: `Stop ${config.getName()} node #${i + 1}`,
+            task: async () => dockerCompose.stop(config.toEnvs()),
+          }));
 
           return new Listr(stopNodeTasks);
         },

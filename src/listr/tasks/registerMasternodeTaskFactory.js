@@ -75,6 +75,7 @@ function registerMasternodeTaskFactory(
         title: 'Check funding address balance',
         task: async (ctx) => {
           const balance = await getAddressBalance(ctx.coreService, ctx.fundingAddress);
+          console.log('asking address for balance', ctx.fundingAddress, balance);
           if (balance <= masternodeDashAmount) {
             throw new Error(`You need to have more than ${masternodeDashAmount} Dash on your funding address`);
           }
