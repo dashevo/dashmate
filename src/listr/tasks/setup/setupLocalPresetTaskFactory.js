@@ -209,8 +209,6 @@ function setupLocalPresetTaskFactory(
                         ctx.address = null;
                         ctx.privateKey = null;
                         ctx.coreService = null;
-
-                        await wait(30000);
                       },
                     },
                   ]),
