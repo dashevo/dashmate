@@ -324,7 +324,7 @@ OPTIONS
 
 #### Stop group nodes
 
-The `group:stop` command is used to stop a group nodes belongs to default or specified group.
+The `group:stop` command is used to stop group nodes belonging to the default group or a specified group.
 
 ```
 USAGE
