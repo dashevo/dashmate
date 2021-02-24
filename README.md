@@ -411,7 +411,7 @@ If you want to use Docker Compose directly, you will need to pass a configuratio
 $ mn config:envs --config=testnet --output-file .env.testnet
 ```
 
-Then specify the created dotenv file as an option for `docker-compose` command:
+Then specify the created dotenv file as an option for the `docker-compose` command:
 
 ```bash
 $ docker-compose --env-file=<filename>
