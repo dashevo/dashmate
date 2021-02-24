@@ -1,4 +1,7 @@
 const { Listr } = require('listr2');
+
+const { flags: flagTypes } = require('@oclif/command');
+
 const GroupBaseCommand = require('../../oclif/command/GroupBaseCommand');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 
@@ -14,6 +17,7 @@ class GroupStartCommand extends GroupBaseCommand {
   async runWithDependencies(
     args,
     {
+      update: isUpdate,
       'drive-image-build-path': driveImageBuildPath,
       'dapi-image-build-path': dapiImageBuildPath,
       verbose: isVerbose,
@@ -37,6 +41,7 @@ class GroupStartCommand extends GroupBaseCommand {
                   {
                     driveImageBuildPath,
                     dapiImageBuildPath,
+                    isUpdate,
                   },
                 ),
               }
@@ -66,6 +71,9 @@ GroupStartCommand.description = 'Start group nodes';
 
 GroupStartCommand.flags = {
   ...GroupBaseCommand.flags,
+  update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
+  'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
+  'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),
 };
 
 module.exports = GroupStartCommand;
