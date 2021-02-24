@@ -17,6 +17,7 @@ class GroupResetCommand extends GroupBaseCommand {
    * @param {configureCoreTask} configureCoreTask
    * @param {configureTenderdashTask} configureTenderdashTask
    * @param {initializePlatformTask} initializePlatformTask
+   * @param {generateToAddressTask} generateToAddressTask
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -32,12 +33,15 @@ class GroupResetCommand extends GroupBaseCommand {
     configureCoreTask,
     configureTenderdashTask,
     initializePlatformTask,
+    generateToAddressTask,
   ) {
     const groupName = configGroup[0].get('group');
 
     if (isHardReset && !isSystemConfig(groupName)) {
       throw new Error(`Cannot hard reset non-system config group "${configGroup[0].get('group')}"`);
     }
+
+    const amount = 100;
 
     const tasks = new Listr(
       [
@@ -64,6 +68,13 @@ class GroupResetCommand extends GroupBaseCommand {
           enabled: (ctx) => !ctx.isHardReset,
           title: 'Configure Tenderdash nodes',
           task: () => configureTenderdashTask(configGroup),
+        },
+        {
+          // in case we don't need to register masternodes
+          title: `Generate ${amount} dash to local wallet`,
+          enabled: () => !isHardReset,
+          skip: (ctx) => !!ctx.fundingPrivateKeyString,
+          task: () => generateToAddressTask(configGroup[0], amount),
         },
         {
           enabled: (ctx) => !ctx.isHardReset,
