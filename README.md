@@ -206,7 +206,7 @@ USAGE
 ARGUMENTS
   AMOUNT  amount of dash to be generated to address
 
-PTIONS
+OPTIONS
   -v, --verbose          use verbose mode for output
   --config=config        configuration name to use
   -a, --address=address  recipient address instead of a new one
@@ -377,7 +377,7 @@ With the hard reset mode enabled, corresponding configs will be reset as well. T
 To group nodes together, set a group name to `group` option in corresponding configs.
 
 Create a group of two testnet nodes:
-```
+```bash
 # create a new config using `testnet` config as template
 mn config:create testnet_2 testnet
 
