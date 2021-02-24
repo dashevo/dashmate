@@ -172,11 +172,17 @@ The `status` command outputs status information relating to either the host, mas
 
 ```
 USAGE
-  $ mn status:COMMAND
+  $ mn status
+
+OPTIONS
+  -v, --verbose    use verbose mode for output
+  --config=config  configuration name to use
 
 COMMANDS
+  status:core        Show core status details
   status:host        Show host status details
   status:masternode  Show masternode status details
+  status:platform    Show platform status details
   status:services    Show service status details
 ```
 

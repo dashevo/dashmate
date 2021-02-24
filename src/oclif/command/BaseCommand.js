@@ -93,19 +93,21 @@ class BaseCommand extends Command {
 
   async finally(err) {
     // Save configs collection
-    const configFileRepository = this.container.resolve('configFileRepository');
+    if (this.container) {
+      const configFileRepository = this.container.resolve('configFileRepository');
 
-    if (this.container.has('configFile')) {
-      const configFile = this.container.resolve('configFile');
+      if (this.container.has('configFile')) {
+        const configFile = this.container.resolve('configFile');
 
-      await configFileRepository.write(configFile);
+        await configFileRepository.write(configFile);
+      }
+
+      // Stop all running containers
+      const stopAllContainers = this.container.resolve('stopAllContainers');
+      const startedContainers = this.container.resolve('startedContainers');
+
+      await stopAllContainers(startedContainers.getContainers());
     }
-
-    // Stop all running containers
-    const stopAllContainers = this.container.resolve('stopAllContainers');
-    const startedContainers = this.container.resolve('startedContainers');
-
-    await stopAllContainers(startedContainers.getContainers());
 
     return super.finally(err);
   }
