@@ -2,6 +2,8 @@ const { Listr } = require('listr2');
 
 const { flags: flagTypes } = require('@oclif/command');
 
+const baseConfig = require('../../../configs/system/base');
+
 const GroupBaseCommand = require('../../oclif/command/GroupBaseCommand');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 
@@ -37,8 +39,6 @@ class GroupResetCommand extends GroupBaseCommand {
       throw new Error(`Cannot hard reset non-system config group "${configGroup[0].get('group')}"`);
     }
 
-    // TODO: We need to reset platform.dpns and platform.dashpay
-
     const tasks = new Listr(
       [
         {
@@ -47,6 +47,9 @@ class GroupResetCommand extends GroupBaseCommand {
             title: `Reset ${config.getName()} node`,
             task: (ctx) => {
               ctx.skipPlatformInitialization = true;
+
+              config.set('platform.dpns', baseConfig.platform.dpns);
+              config.set('platform.dashpay', baseConfig.platform.dashpay);
 
               return resetNodeTask(config);
             },

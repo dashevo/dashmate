@@ -73,6 +73,7 @@ function resetNodeTaskFactory(
           const name = config.get('group') || config.getName();
 
           if (ctx.isPlatformOnlyReset) {
+            // TODO: This won't work for user created configs
             const { platform: systemPlatformConfig } = systemConfigs[name];
             config.set('platform', systemPlatformConfig);
           } else {

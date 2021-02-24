@@ -31,6 +31,7 @@ function tenderdashInitTaskFactory(
           if (isValidatorKeyPresent && isNodeKeyPresent
             && isGenesisPresent && isDataVolumePresent) {
             task.skip('Node already initialized');
+
             return;
           }
 
