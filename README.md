@@ -337,7 +337,7 @@ OPTIONS
 
 #### Restart group nodes
 
-The `group:restart` command is used to restart a group nodes belongs to default or specified group.
+The `group:restart` command is used to restart group nodes belonging to the default group or a specified group.
 
 ```
 USAGE
