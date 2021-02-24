@@ -1,4 +1,4 @@
-const { NETWORKS } = require('../constants');
+const { NETWORKS } = require('../../src/constants');
 
 module.exports = {
   $schema: 'http://json-schema.org/draft-07/schema#',
