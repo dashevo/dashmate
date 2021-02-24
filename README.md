@@ -76,7 +76,7 @@ OPTIONS
 
 Supported presets:
  * `testnet` - a masternode or full node for testnet
- * `local` - a node group to run local dash network with specified number of masternodes. To operate with group of nodes, use [group commands](#node-groups)
+ * `local` - a node group to run a local dash network with the specified number of masternodes. To operate a group of nodes, use the [group commands](#node-groups)
 
 To setup a testnet masternode:
 ```bash
