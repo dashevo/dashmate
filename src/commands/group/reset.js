@@ -54,20 +54,28 @@ class GroupResetCommand extends GroupBaseCommand {
 
               config.set('platform.dpns', baseConfig.platform.dpns);
               config.set('platform.dashpay', baseConfig.platform.dashpay);
+              config.set('platform.drive.tenderdash.nodeId', baseConfig.platform.drive.tenderdash.nodeId);
+              config.set('platform.drive.tenderdash.validatorKey', baseConfig.platform.drive.tenderdash.validatorKey);
+              config.set('platform.drive.tenderdash.nodeKey', baseConfig.platform.drive.tenderdash.nodeKey);
+              config.set('platform.drive.tenderdash.genesis', baseConfig.platform.drive.tenderdash.genesis);
+
+              if (!ctx.isPlatformOnlyReset) {
+                config.set('core.masternode.operator.privateKey', baseConfig.core.masternode.operator.privateKey);
+              }
 
               return resetNodeTask(config);
             },
           }))),
         },
         {
-          enabled: (ctx) => !ctx.isHardReset && !ctx.isPlatformOnlyReset,
-          title: 'Configure Core nodes',
-          task: () => configureCoreTask(configGroup),
-        },
-        {
           enabled: (ctx) => !ctx.isHardReset,
           title: 'Configure Tenderdash nodes',
           task: () => configureTenderdashTask(configGroup),
+        },
+        {
+          enabled: (ctx) => !ctx.isHardReset && !ctx.isPlatformOnlyReset,
+          title: 'Configure Core nodes',
+          task: () => configureCoreTask(configGroup),
         },
         {
           // in case we don't need to register masternodes

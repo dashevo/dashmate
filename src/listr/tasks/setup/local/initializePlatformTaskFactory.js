@@ -20,9 +20,7 @@ function initializePlatformTaskFactory(
       {
         title: 'Starting nodes',
         task: async (ctx) => {
-          const masternodeConfigs = configGroup.filter((config) => config.get('core.masternode.enable'));
-
-          const startNodeTasks = masternodeConfigs.map((config) => ({
+          const startNodeTasks = configGroup.map((config) => ({
             title: `Starting ${config.getName()} node`,
             task: () => startNodeTask(
               config,
