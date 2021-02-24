@@ -50,8 +50,8 @@ class SetupCommand extends BaseCommand {
       }
     }
 
-    if (nodeCount !== null && (nodeCount < 2 || nodeCount > 6)) {
-      throw new Error('node-count flag should be between 2 and 6');
+    if (nodeCount !== null && (nodeCount < 3)) {
+      throw new Error('node-count flag should be not less than 3');
     }
 
     const tasks = new Listr([

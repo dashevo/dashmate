@@ -37,10 +37,9 @@ function setupLocalPresetTaskFactory(
             initial: 3,
             float: false,
             min: 3,
-            max: 6,
             validate: (state) => {
-              if (+state < 3 || +state > 6) {
-                return 'You must set from 3 up to 6 nodes';
+              if (+state < 3) {
+                return 'You must set not less than 3';
               }
 
               return true;
