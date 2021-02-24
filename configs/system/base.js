@@ -119,6 +119,7 @@ module.exports = {
         genesis: {
 
         },
+        nodeId: null,
       },
       skipAssetLockConfirmationValidation: false,
       passFakeAssetLockProofForTests: false,

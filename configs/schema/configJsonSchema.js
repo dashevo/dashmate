@@ -330,10 +330,10 @@ module.exports = {
                   type: 'object',
                 },
                 nodeId: {
-                  type: 'string',
+                  type: ['string', 'null'],
                 },
               },
-              required: ['docker', 'p2p', 'rpc', 'validatorKey', 'nodeKey', 'genesis'],
+              required: ['docker', 'p2p', 'rpc', 'validatorKey', 'nodeKey', 'genesis', 'nodeId'],
               additionalProperties: false,
             },
             skipAssetLockConfirmationValidation: {

@@ -89,6 +89,8 @@ module.exports = {
         if (typeof config.group === 'undefined') {
           config.group = null;
         }
+
+        config.platform.drive.tenderdash.nodeId = null;
       });
 
     // Replace local config to group template
