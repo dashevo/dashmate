@@ -2,7 +2,7 @@ const { Listr } = require('listr2');
 const GroupBaseCommand = require('../../oclif/command/GroupBaseCommand');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 
-class GroupReStartCommand extends GroupBaseCommand {
+class GroupRestartCommand extends GroupBaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
@@ -54,10 +54,10 @@ class GroupReStartCommand extends GroupBaseCommand {
   }
 }
 
-GroupReStartCommand.description = 'Stop restart';
+GroupRestartCommand.description = 'Stop restart';
 
-GroupReStartCommand.flags = {
+GroupRestartCommand.flags = {
   ...GroupBaseCommand.flags,
 };
 
-module.exports = GroupReStartCommand;
+module.exports = GroupRestartCommand;
