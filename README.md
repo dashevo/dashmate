@@ -276,7 +276,7 @@ mn config:set core.masternode.enable false
 
 ### Node groups
 
-CLI allows to [setup](#setup-node) and operate multiple nodes. Only `local` preset is supported at the moment.
+CLI allows to [setup](#setup-node) and operate multiple nodes. Only the `local` preset is supported at the moment.
 
 #### Default group
 
