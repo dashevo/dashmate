@@ -259,7 +259,7 @@ OPTIONS
   -p, --platform-only  reset platform data only
 ```
 
-With the hard reset mode enabled, corresponding config will be reset as well. To proceed running the node [setup](#setup-node) is required.
+With the hard reset mode enabled, the corresponding config will be reset as well. To proceed, running the node [setup](#setup-node) is required.
 
 To reset a node:
 ```bash
