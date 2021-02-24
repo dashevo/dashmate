@@ -59,13 +59,14 @@ function configureTenderdashTaskFactory(
 
                 const p2pPeers = masternodeConfigs
                   .filter((_, i) => i !== index)
-                  .map((innerConfig, i) => {
+                  .map((innerConfig) => {
                     const nodeId = innerConfig.get('platform.drive.tenderdash.nodeId');
+                    const port = innerConfig.get('platform.drive.tenderdash.p2p.port');
 
                     return {
                       id: nodeId,
                       host: ctx.hostDockerInternalIp,
-                      port: 26656 + (i * 100),
+                      port,
                     };
                   });
 
