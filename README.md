@@ -333,7 +333,7 @@ OPTIONS
 
 The `group:restart` command is used to restart a group nodes belongs to default or specified group.
 
-```bazaar
+```
 USAGE
   $ mn group:restart
 
