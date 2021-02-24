@@ -4,17 +4,17 @@ class StatusCommand extends ConfigBaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
-   * @param {statusTask} statusTask
+   * @param {outputStatusOverview} outputStatusOverview
    * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
     args,
     flags,
-    statusTask,
+    outputStatusOverview,
     config,
   ) {
-    await statusTask(config);
+    await outputStatusOverview(config);
   }
 }
 

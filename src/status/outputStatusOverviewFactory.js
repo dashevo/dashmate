@@ -2,29 +2,29 @@ const { table } = require('table');
 const fetch = require('node-fetch');
 const chalk = require('chalk');
 
-const ContainerIsNotPresentError = require('../../../docker/errors/ContainerIsNotPresentError');
-const ServiceIsNotRunningError = require('../../../docker/errors/ServiceIsNotRunningError');
+const ContainerIsNotPresentError = require('../docker/errors/ContainerIsNotPresentError');
+const ServiceIsNotRunningError = require('../docker/errors/ServiceIsNotRunningError');
 
-const CoreService = require('../../../core/CoreService');
-const blocksToTime = require('../../../util/blocksToTime');
-const getPaymentQueuePosition = require('../../../util/getPaymentQueuePosition');
+const CoreService = require('../core/CoreService');
+const blocksToTime = require('../util/blocksToTime');
+const getPaymentQueuePosition = require('../util/getPaymentQueuePosition');
 
 /**
  *
  * @param {DockerCompose} dockerCompose
  * @param {createRpcClient} createRpcClient
- * @return {statusTask}
+ * @return {outputStatusOverview}
  */
-function statusTaskFactory(
+function outputStatusOverviewFactory(
   dockerCompose,
   createRpcClient,
 ) {
   /**
-   * @typedef {statusTask}
+   * @typedef {outputStatusOverview}
    * @param {Config} config
    * @return void
    */
-  async function statusTask(config) {
+  async function outputStatusOverview(config) {
     const rows = [];
 
     const coreService = new CoreService(
@@ -258,7 +258,7 @@ function statusTaskFactory(
     console.log(output);
   }
 
-  return statusTask;
+  return outputStatusOverview;
 }
 
-module.exports = statusTaskFactory;
+module.exports = outputStatusOverviewFactory;

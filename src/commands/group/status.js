@@ -4,23 +4,21 @@ class GroupStatusCommand extends GroupBaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
-   * @param {statusTask} statusTask
+   * @param {outputStatusOverview} outputStatusOverview
    * @param {Config[]} configGroup
    * @return {Promise<void>}
    */
   async runWithDependencies(
     args,
     flags,
-    statusTask,
+    outputStatusOverview,
     configGroup,
   ) {
-    for (let i = 1; i < configGroup.length; ++i) {
-      const config = configGroup[1];
-
+    for (const config of configGroup) {
       // eslint-disable-next-line no-console
-      console.log(`Node #${i}`);
+      console.log(`Node ${config.getName()}`);
 
-      await statusTask(config);
+      await outputStatusOverview(config);
     }
   }
 }

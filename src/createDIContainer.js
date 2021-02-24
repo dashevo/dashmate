@@ -53,7 +53,7 @@ const createTenderdashRpcClient = require('./tenderdash/createTenderdashRpcClien
 const initializeTenderdashNodeFactory = require('./tenderdash/initializeTenderdashNodeFactory');
 const setupLocalPresetTaskFactory = require('./listr/tasks/setup/setupLocalPresetTaskFactory');
 const setupRegularPresetTaskFactory = require('./listr/tasks/setup/setupRegularPresetTaskFactory');
-const statusTaskFactory = require('./listr/tasks/status/statusTaskFactory');
+const outputStatusOverviewFactory = require('./status/outputStatusOverviewFactory');
 const stopNodeTaskFactory = require('./listr/tasks/stopNodeTaskFactory');
 const restartNodeTaskFactory = require('./listr/tasks/restartNodeTaskFactory');
 const resetNodeTaskFactory = require('./listr/tasks/resetNodeTaskFactory');
@@ -158,7 +158,7 @@ async function createDIContainer(options) {
     configureCoreTask: asFunction(configureCoreTaskFactory).singleton(),
     configureTenderdashTask: asFunction(configureTenderdashTaskFactory).singleton(),
     initializePlatformTask: asFunction(initializePlatformTaskFactory).singleton(),
-    statusTask: asFunction(statusTaskFactory),
+    outputStatusOverview: asFunction(outputStatusOverviewFactory),
   });
 
   return container;
