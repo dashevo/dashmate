@@ -125,7 +125,7 @@ USAGE
 OPTIONS
   -v, --verbose                                    use verbose mode for output
   --config=config                                  configuration name to use
-  -u, --update                                     download updated services before start
+  -u, --update                                     download updated services before starting
   --dapi-image-build-path=dapi-image-build-path    dapi's docker image build path
   --drive-image-build-path=drive-image-build-path  drive's docker image build path
 ```
