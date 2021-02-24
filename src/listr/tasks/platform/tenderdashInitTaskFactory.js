@@ -1,5 +1,4 @@
 const { Listr } = require('listr2');
-const { NETWORK_LOCAL } = require('../../../constants');
 
 /**
  * @param {initializeTenderdashNode} initializeTenderdashNode
@@ -48,11 +47,6 @@ function tenderdashInitTaskFactory(
           }
 
           if (!isGenesisPresent) {
-            if (config.get('network') === NETWORK_LOCAL) {
-              // TODO: should happen in setupLocalPresetFactory
-              genesis.initial_core_chain_locked_height = 1000;
-            }
-
             config.set('platform.drive.tenderdash.genesis', genesis);
           }
         },
