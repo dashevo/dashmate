@@ -48,16 +48,34 @@ module.exports = {
       }
     });
   },
-  '0.18.0': (name, options) => {
-    lodashSet(options, 'core.sentinel', systemConfigs.base.core.sentinel);
+  '0.18.0': (configFile) => {
+    // Update docker images
+    Object.entries(configFile.configs)
+      .forEach(([, config]) => {
+        lodashSet(config, 'core.sentinel', systemConfigs.base.core.sentinel);
 
-    lodashSet(
-      options,
-      'platform.drive.tenderdash.docker.image',
-      systemConfigs.base.platform.drive.tenderdash.docker.image,
-    );
+        lodashSet(config, 'core.docker.image', systemConfigs.base.core.docker.image);
 
-    return options;
+        lodashSet(
+          config,
+          'platform.drive.tenderdash.docker.image',
+          systemConfigs.base.platform.drive.tenderdash.docker.image,
+        );
+
+        lodashSet(
+          config,
+          'platform.drive.abci.docker.image',
+          systemConfigs.base.platform.drive.abci.docker.image,
+        );
+
+        lodashSet(
+          config,
+          'platform.dapi.api.docker.image',
+          systemConfigs.base.platform.dapi.api.docker.image,
+        );
+      });
+
+    return configFile;
   },
   '0.19.0-dev': (configFile) => {
     // Add default group name if not present
@@ -72,6 +90,9 @@ module.exports = {
           config.group = null;
         }
       });
+
+    // Replace local config to group template
+    configFile.configs.local = systemConfigs.local;
 
     return configFile;
   },
