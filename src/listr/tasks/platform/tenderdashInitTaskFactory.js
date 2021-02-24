@@ -3,13 +3,14 @@ const { Listr } = require('listr2');
 /**
  * @param {initializeTenderdashNode} initializeTenderdashNode
  * @param {Docker} docker
- * @return tenderdashInitTask
+ * @return {tenderdashInitTask}
  */
 function tenderdashInitTaskFactory(
   initializeTenderdashNode,
   docker,
 ) {
   /**
+   * @typedef {tenderdashInitTask}
    * @param {Config} config
    * @return {Listr}
    */

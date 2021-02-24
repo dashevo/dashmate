@@ -5,7 +5,7 @@ const Ajv = require('ajv');
 const Config = require('../Config');
 const ConfigFile = require('./ConfigFile');
 
-const configFileJsonSchema = require('./configFileJsonSchema');
+const configFileJsonSchema = require('../../../configs/schema/configFileJsonSchema');
 
 const ConfigFileNotFoundError = require('../errors/ConfigFileNotFoundError');
 const InvalidConfigFileFormatError = require('../errors/InvalidConfigFileFormatError');

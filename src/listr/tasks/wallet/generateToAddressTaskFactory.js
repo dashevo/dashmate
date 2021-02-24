@@ -81,6 +81,8 @@ function generateToAddressTaskFactory(
             ctx.fundingPrivateKeyString = ctx.privateKey;
 
             observer.complete();
+
+            return this;
           });
         },
         options: { persistentOutput: true },
@@ -99,6 +101,8 @@ function generateToAddressTaskFactory(
             );
 
             observer.complete();
+
+            return this;
           })
         ),
       },

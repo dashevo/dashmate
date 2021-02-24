@@ -13,15 +13,11 @@ const {
  * @param {ConfigFile} configFile
  * @param {generateBlsKeys} generateBlsKeys
  * @param {tenderdashInitTask} tenderdashInitTask
- * @param {renderServiceTemplates} renderServiceTemplates
- * @param {writeServiceConfigs} writeServiceConfigs
  */
 function setupRegularPresetTaskFactory(
   configFile,
   generateBlsKeys,
   tenderdashInitTask,
-  renderServiceTemplates,
-  writeServiceConfigs,
 ) {
   /**
    * @typedef {setupRegularPresetTask}

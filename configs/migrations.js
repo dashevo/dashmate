@@ -71,10 +71,6 @@ module.exports = {
         if (typeof config.group === 'undefined') {
           config.group = null;
         }
-
-        if (config.externalIp === null) {
-          config.externalIp = systemConfigs.base.externalIp;
-        }
       });
 
     return configFile;

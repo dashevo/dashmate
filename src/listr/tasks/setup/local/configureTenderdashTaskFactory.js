@@ -1,11 +1,23 @@
 const { Listr } = require('listr2');
 
+/**
+ * @param {tenderdashInitTask} tenderdashInitTask
+ * @param {renderServiceTemplates} renderServiceTemplates
+ * @param {writeServiceConfigs} writeServiceConfigs
+ * @param {resolveDockerHostIp} resolveDockerHostIp
+ * @return {configureTenderdashTask}
+ */
 function configureTenderdashTaskFactory(
   tenderdashInitTask,
   renderServiceTemplates,
   writeServiceConfigs,
   resolveDockerHostIp,
 ) {
+  /**
+   * @typedef {configureTenderdashTask}
+   * @param {Config[]} configGroup
+   * @return {Listr}
+   */
   function configureTenderdashTask(configGroup) {
     return new Listr([
       {
@@ -45,19 +57,17 @@ function configureTenderdashTaskFactory(
                 config.set('platform.drive.tenderdash.genesis.chain_id', chainId);
                 config.set('platform.drive.tenderdash.genesis.initial_core_chain_locked_height', 1000);
 
-                const p2pPeers = masternodeConfigs.map((innerConfig, i) => {
-                  if (index === i) {
-                    return null;
-                  }
+                const p2pPeers = masternodeConfigs
+                  .filter((_, i) => i !== index)
+                  .map((innerConfig, i) => {
+                    const nodeId = innerConfig.get('platform.drive.tenderdash.nodeId');
 
-                  const nodeId = innerConfig.get('platform.drive.tenderdash.nodeId');
-
-                  return {
-                    id: nodeId,
-                    host: ctx.hostDockerInternalIp,
-                    port: 26656 + (i * 100),
-                  };
-                }).filter((p2pPeer) => p2pPeer !== null);
+                    return {
+                      id: nodeId,
+                      host: ctx.hostDockerInternalIp,
+                      port: 26656 + (i * 100),
+                    };
+                  });
 
                 config.set('platform.drive.tenderdash.p2p.persistentPeers', p2pPeers);
                 config.set('platform.drive.tenderdash.genesis.validators', validators);

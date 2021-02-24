@@ -82,7 +82,7 @@ function configureCoreTaskFactory(
             {
               title: 'Register masternodes',
               task: () => {
-                const masternodeConfigs = configGroup.filter((config) => config.get('core.masternode.enable'));;
+                const masternodeConfigs = configGroup.filter((config) => config.get('core.masternode.enable'));
 
                 const subTasks = masternodeConfigs.map((config, i) => ({
                   title: `Register ${config.getName()} masternode`,

@@ -71,6 +71,7 @@ function setupLocalPresetTaskFactory(
                 config.set('group', 'local');
                 config.set('core.p2p.port', 20001 + (i * 100));
                 config.set('core.rpc.port', 20002 + (i * 100));
+                config.set('externalIp', '127.0.0.1');
 
                 if (isSeedNode(config)) {
                   config.set('description', 'seed node for local network');

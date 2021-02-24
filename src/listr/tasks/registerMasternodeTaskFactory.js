@@ -149,6 +149,8 @@ function registerMasternodeTaskFactory(
             );
 
             observer.complete();
+
+            return this;
           })
         ),
       },
@@ -167,6 +169,8 @@ function registerMasternodeTaskFactory(
             );
 
             observer.complete();
+
+            return this;
           })
         ),
       },
@@ -197,6 +201,8 @@ function registerMasternodeTaskFactory(
             );
 
             observer.complete();
+
+            return this;
           });
         },
       },
@@ -232,6 +238,8 @@ function registerMasternodeTaskFactory(
             );
 
             observer.complete();
+
+            return this;
           })
         ),
       },
@@ -250,6 +258,8 @@ function registerMasternodeTaskFactory(
             );
 
             observer.complete();
+
+            return this;
           })
         ),
       },

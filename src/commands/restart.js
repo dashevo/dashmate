@@ -1,7 +1,5 @@
 const { Listr } = require('listr2');
 
-const { flags: flagTypes } = require('@oclif/command');
-
 const ConfigBaseCommand = require('../oclif/command/ConfigBaseCommand');
 
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');

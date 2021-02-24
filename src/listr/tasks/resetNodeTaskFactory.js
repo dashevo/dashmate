@@ -58,9 +58,9 @@ function resetNodeTaskFactory(
           const coreVolumeNames = ['core_data'];
           const { COMPOSE_PROJECT_NAME: composeProjectName } = config.toEnvs();
 
-          const projectvolumeNames = await dockerCompose.getVolumeNames(config.toEnvs());
+          const projectVolumeNames = await dockerCompose.getVolumeNames(config.toEnvs());
 
-          await projectvolumeNames
+          await projectVolumeNames
             .filter((volumeName) => !coreVolumeNames.includes(volumeName))
             .map((volumeName) => `${composeProjectName}_${volumeName}`)
             .map(async (volumeName) => docker.getVolume(volumeName).remove());
