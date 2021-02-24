@@ -93,7 +93,7 @@ The `config` command is used to manage your node configuration before starting t
 
 You can modify and use the system configs directly, or create your own. You can base your own configs on one of the system configs using the `mn config:create CONFIG [FROM]` command. You must set a default config with `mn config:default CONFIG` or specify a config with the `--config=<config>` option when running commands. The `base` config is initially set as default.
 
-```
+```bash
 USAGE
   $ mn config
 
@@ -193,7 +193,7 @@ The `register` command creates a collateral funding transaction and then uses it
 
 Before registering the masternode, you must have access to an address on the network you intend to use with a balance of more than 1000 Dash. 1000 Dash is used for the collateral transaction, and the remainder will be used for transaction fees. Make sure you have access to the private key for this address, since you will need to provide it in the next step. If using Dash Core, you can get the private key for a given address using the following command:
 
-```
+```bash
 dumpprivkey "address"
 ```
 
