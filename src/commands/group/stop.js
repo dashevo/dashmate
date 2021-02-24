@@ -51,7 +51,7 @@ class GroupStopCommand extends GroupBaseCommand {
   }
 }
 
-GroupStopCommand.description = 'Stop group';
+GroupStopCommand.description = 'Stop group nodes';
 
 GroupStopCommand.flags = {
   ...GroupBaseCommand.flags,

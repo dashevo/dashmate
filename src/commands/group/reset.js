@@ -92,7 +92,7 @@ class GroupResetCommand extends GroupBaseCommand {
   }
 }
 
-GroupResetCommand.description = 'Reset group';
+GroupResetCommand.description = 'Reset group nodes';
 
 GroupResetCommand.flags = {
   ...GroupBaseCommand.flags,

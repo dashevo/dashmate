@@ -62,7 +62,7 @@ class GroupStartCommand extends GroupBaseCommand {
   }
 }
 
-GroupStartCommand.description = 'Start group';
+GroupStartCommand.description = 'Start group nodes';
 
 GroupStartCommand.flags = {
   ...GroupBaseCommand.flags,

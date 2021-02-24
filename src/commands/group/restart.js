@@ -54,7 +54,7 @@ class GroupRestartCommand extends GroupBaseCommand {
   }
 }
 
-GroupRestartCommand.description = 'Stop restart';
+GroupRestartCommand.description = 'Restart group nodes';
 
 GroupRestartCommand.flags = {
   ...GroupBaseCommand.flags,
