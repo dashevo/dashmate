@@ -308,7 +308,7 @@ OPTIONS
 
 #### Start group nodes
 
-The `group:start` command is used to start a group of nodes belongs to default or specified group.
+The `group:start` command is used to start a group of nodes belonging to the default group or a specified group.
 
 ```
 USAGE
