@@ -399,7 +399,7 @@ To start the group of nodes, ports and other required options need to be updated
 
 ### Development
 
-To start a local dash network, `setup` command with `local` preset can be used to generate configs, some dash, register masternodes and populate the nodes with the data required for local development.
+To start a local dash network, the `setup` command with the `local` preset can be used to generate configs, mine some dash, register masternodes and populate the nodes with the data required for local development.
 
 To allow developers quickly test changes to DAPI and Drive, a local path for DAPI or Drive may be specified via the `--drive-image-build-path` and `--dapi-image-build-path` options of the `group:start` command. A Docker image will be built from the provided path and then used by mn-bootstrap.
 
