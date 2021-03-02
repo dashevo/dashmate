@@ -3,7 +3,13 @@ const publicIp = require('public-ip');
 
 const { PrivateKey: BlsPrivateKey } = require('bls-signatures');
 
+const { PrivateKey } = require('@dashevo/dashcore-lib');
+
 const { flags: flagTypes } = require('@oclif/command');
+
+const masternodeDashAmount = require('../core/masternodeDashAmount');
+
+const NETWORKS = require('../networks');
 
 const BaseCommand = require('../oclif/command/BaseCommand');
 
@@ -46,6 +52,7 @@ class SetupCommand extends BaseCommand {
     {
       'external-ip': externalIp,
       'operator-bls-private-key': operatorBlsPrivateKey,
+      'funding-private-key': fundingPrivateKeyString,
       update: isUpdate,
       'drive-image-build-path': driveImageBuildPath,
       'dapi-image-build-path': dapiImageBuildPath,
@@ -150,7 +157,7 @@ class SetupCommand extends BaseCommand {
       },
       {
         title: 'Configure BLS private key',
-        enabled: (ctx) => ctx.preset !== PRESET_LOCAL && ctx.nodeType === NODE_TYPE_MASTERNODE,
+        enabled: (ctx) => ctx.nodeType === NODE_TYPE_MASTERNODE,
         task: async (ctx, task) => {
           if (ctx.operatorBlsPrivateKey === undefined) {
             const { privateKey: generatedPrivateKeyHex } = await generateBlsKeys();
@@ -171,14 +178,35 @@ class SetupCommand extends BaseCommand {
 
           config.set('core.masternode.operator.privateKey', ctx.operatorBlsPrivateKey);
 
+          ctx.operator = {};
+          ctx.operator.publicKey = publicKeyHex;
+          ctx.operator.privateKey = ctx.operatorBlsPrivateKey;
+
           // eslint-disable-next-line no-param-reassign
           task.output = `BLS public key: ${publicKeyHex}\nBLS private key: ${ctx.operatorBlsPrivateKey}`;
         },
         options: { persistentOutput: true },
       },
       {
+        title: 'Inspect funding private key',
+        enabled: (ctx) => (ctx.fundingPrivateKeyString !== undefined),
+        task: (ctx) => {
+          const network = config.get('network');
+
+          if (network === NETWORKS.MAINNET) {
+            throw new Error('For your own security, this tool will not process mainnet private keys. You should consider the private key you entered to be comprimised.');
+          }
+
+          const fundingPrivateKey = new PrivateKey(
+            fundingPrivateKeyString,
+            network,
+          );
+
+          ctx.fundingAddress = fundingPrivateKey.toAddress(network).toString();
+        },
+      },
+      {
         title: 'Update config',
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
         task: () => {
           const configFiles = renderServiceTemplates(config);
           writeServiceConfigs(config.getName(), configFiles);
@@ -191,7 +219,7 @@ class SetupCommand extends BaseCommand {
       },
       {
         title: 'Register masternode',
-        enabled: (ctx) => ctx.preset === PRESET_LOCAL,
+        enabled: (ctx) => ctx.fundingPrivateKeyString !== undefined,
         task: () => registerMasternodeTask(config),
       },
       {
@@ -253,6 +281,7 @@ class SetupCommand extends BaseCommand {
         nodeType,
         externalIp,
         operatorBlsPrivateKey,
+        fundingPrivateKeyString,
       });
     } catch (e) {
       throw new MuteOneLineError(e);
@@ -281,6 +310,7 @@ SetupCommand.args = [{
 SetupCommand.flags = {
   'external-ip': flagTypes.string({ char: 'i', description: 'external ip' }),
   'operator-bls-private-key': flagTypes.string({ char: 'k', description: 'operator bls private key' }),
+  'funding-private-key': flagTypes.string({ char: 'p', description: `private key with more than ${masternodeDashAmount} dash for funding collateral` }),
   update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
   'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
   'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),

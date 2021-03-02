@@ -40,12 +40,6 @@ function registerMasternodeTaskFactory(
    * @return {Listr}
    */
   function registerMasternodeTask(config) {
-    const operatorPrivateKey = config.get('core.masternode.operator.privateKey');
-
-    if (operatorPrivateKey !== null) {
-      throw new Error(`Masternode operator private key ('core.masternode.operator.privateKey') is already set in ${config.getName()} config`);
-    }
-
     return new Listr([
       {
         title: 'Start Core',
@@ -60,7 +54,8 @@ function registerMasternodeTaskFactory(
       {
         title: 'Sync Core with network',
         enabled: () => config.get('network') !== NETWORKS.LOCAL,
-        task: async (ctx) => waitForCoreSync(ctx.coreService),
+        task: async (ctx, task) => waitForCoreSync(ctx.coreService, task),
+        options: { persistentOutput: true },
       },
       {
         title: 'Check funding address balance',
@@ -70,18 +65,6 @@ function registerMasternodeTaskFactory(
             throw new Error(`You need to have more than ${masternodeDashAmount} Dash on your funding address`);
           }
         },
-      },
-      {
-        title: 'Generate a masternode operator key',
-        task: async (ctx, task) => {
-          ctx.operator = await generateBlsKeys();
-
-          config.set('core.masternode.operator.privateKey', ctx.operator.privateKey);
-
-          // eslint-disable-next-line no-param-reassign
-          task.output = `Public key: ${ctx.operator.publicKey}\nPrivate key: ${ctx.operator.privateKey}`;
-        },
-        options: { persistentOutput: true },
       },
       {
         title: 'Create a new collateral address',
@@ -120,14 +103,14 @@ function registerMasternodeTaskFactory(
         options: { persistentOutput: true },
       },
       {
-        title: 'Wait for 15 confirmations',
+        title: 'Wait for 1 confirmation',
         enabled: () => config.get('network') !== NETWORKS.LOCAL,
         task: async (ctx) => (
           new Observable(async (observer) => {
             await waitForConfirmations(
               ctx.coreService,
               ctx.collateralTxId,
-              15,
+              1,
               (confirmations) => {
                 observer.next(`${confirmations} ${confirmations > 1 ? 'confirmations' : 'confirmation'}`);
               },
