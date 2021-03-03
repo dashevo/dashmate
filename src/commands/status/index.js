@@ -131,7 +131,7 @@ class StatusCommand extends BaseCommand {
     }
 
     const platformExplorerURLs = {
-      testnet: '',
+      testnet: 'https://rpc.cloudwheels.net:26657',
       mainnet: '',
     };
 
