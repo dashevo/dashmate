@@ -4,20 +4,29 @@ const publicIp = require('public-ip');
 
 const { PrivateKey: BlsPrivateKey } = require('bls-signatures');
 
+const { PrivateKey } = require('@dashevo/dashcore-lib');
+
 const {
   NODE_TYPES,
   NODE_TYPE_MASTERNODE,
+  PRESET_MAINNET,
 } = require('../../../constants');
 
 /**
  * @param {ConfigFile} configFile
  * @param {generateBlsKeys} generateBlsKeys
  * @param {tenderdashInitTask} tenderdashInitTask
+ * @param {registerMasternodeTask} registerMasternodeTask
+ * @param {renderServiceTemplates} renderServiceTemplates
+ * @param {writeServiceConfigs} writeServiceConfigs
  */
 function setupRegularPresetTaskFactory(
   configFile,
   generateBlsKeys,
   tenderdashInitTask,
+  registerMasternodeTask,
+  renderServiceTemplates,
+  writeServiceConfigs,
 ) {
   /**
    * @typedef {setupRegularPresetTask}
@@ -94,9 +103,39 @@ function setupRegularPresetTaskFactory(
 
           ctx.config.set('core.masternode.operator.privateKey', ctx.operatorBlsPrivateKey);
 
+          ctx.operator = {};
+          ctx.operator.publicKey = publicKeyHex;
+
           // eslint-disable-next-line no-param-reassign
           task.output = `BLS public key: ${publicKeyHex}\nBLS private key: ${ctx.operatorBlsPrivateKey}`;
         },
+        options: { persistentOutput: true },
+      },
+      {
+        title: 'Set up funding key',
+        enabled: (ctx) => (
+          ctx.nodeType === NODE_TYPE_MASTERNODE
+          && ctx.fundingPrivateKeyString !== undefined
+        ),
+        task: (ctx) => {
+          if (ctx.preset === PRESET_MAINNET) {
+            throw new Error('For your own security, this tool will not process mainnet private keys. You should consider the private key you entered to be compromised.');
+          }
+          const fundingPrivateKey = new PrivateKey(ctx.fundingPrivateKeyString, ctx.preset);
+          ctx.fundingAddress = fundingPrivateKey.toAddress(ctx.preset).toString();
+
+          // Write configs
+          const configFiles = renderServiceTemplates(ctx.config);
+          writeServiceConfigs(ctx.config.getName(), configFiles);
+        },
+      },
+      {
+        title: 'Register masternode',
+        enabled: (ctx) => (
+          ctx.nodeType === NODE_TYPE_MASTERNODE
+          && ctx.fundingPrivateKeyString !== undefined
+        ),
+        task: (ctx) => registerMasternodeTask(ctx.config),
         options: { persistentOutput: true },
       },
       {

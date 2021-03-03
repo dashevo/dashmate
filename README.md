@@ -68,6 +68,7 @@ ARGUMENTS
 OPTIONS
   -i, --external-ip=external-ip                            external ip
   -k, --operator-bls-private-key=operator-bls-private-key  operator bls private key
+  -p, --funding-private-key=funding-private-key            private key with more than 1000 dash for funding collateral
   -u, --update                                             download updated services before start
   -v, --verbose                                            use verbose mode for output
   --dapi-image-build-path=dapi-image-build-path            dapi's docker image build path
