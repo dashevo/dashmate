@@ -4,6 +4,7 @@ const { flags: flagTypes } = require('@oclif/command');
 
 const GroupBaseCommand = require('../../oclif/command/GroupBaseCommand');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
+const wait = require('../../util/wait');
 
 class GroupStartCommand extends GroupBaseCommand {
   /**
@@ -12,6 +13,7 @@ class GroupStartCommand extends GroupBaseCommand {
    * @param {DockerCompose} dockerCompose
    * @param {startNodeTask} startNodeTask
    * @param {Config[]} configGroup
+   * @param {function} createTenderdashRpcClient
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -25,6 +27,7 @@ class GroupStartCommand extends GroupBaseCommand {
     dockerCompose,
     startNodeTask,
     configGroup,
+    createTenderdashRpcClient,
   ) {
     const groupName = configGroup[0].get('group');
 
@@ -47,6 +50,22 @@ class GroupStartCommand extends GroupBaseCommand {
               }
             )))
           ),
+        },
+        {
+          title: 'Wait for Tenderdash',
+          task: async () => {
+            const tenderdashRpcClient = createTenderdashRpcClient();
+
+            let success = false;
+            do {
+              await wait(2000);
+              const response = await tenderdashRpcClient.request('status', {}).catch(() => {});
+
+              if (response) {
+                success = !response.error;
+              }
+            } while (!success);
+          },
         },
       ],
       {
