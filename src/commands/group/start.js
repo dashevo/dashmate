@@ -58,11 +58,14 @@ class GroupStartCommand extends GroupBaseCommand {
 
             let success = false;
             do {
-              await wait(2000);
               const response = await tenderdashRpcClient.request('status', {}).catch(() => {});
 
               if (response) {
                 success = !response.error;
+              }
+
+              if (!success) {
+                await wait(2000);
               }
             } while (!success);
           },
