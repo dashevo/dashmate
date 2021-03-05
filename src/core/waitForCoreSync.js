@@ -5,10 +5,10 @@ const wait = require('../util/wait');
  *
  * @typedef {waitForCoreSync}
  * @param {CoreService} coreService
- * @param {task} task
+ * @param {updateSyncStatus} updateSyncStatus
  * @return {Promise<void>}
  */
-async function waitForCoreSync(coreService, task) {
+async function waitForCoreSync(coreService, updateSyncStatus) {
   let isSynced = false;
   let verificationProgress = 0.0;
 
@@ -22,9 +22,7 @@ async function waitForCoreSync(coreService, task) {
 
     if (!isSynced) {
       await wait(10000);
-
-      // eslint-disable-next-line no-param-reassign
-      task.output = `${(verificationProgress * 100).toFixed(2)}% complete`;
+      updateSyncStatus(verificationProgress);
     }
   } while (!isSynced);
 }

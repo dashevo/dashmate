@@ -60,11 +60,18 @@ function registerMasternodeTaskFactory(
           // eslint-disable-next-line no-param-reassign
           task.output = `${ctx.fundingPrivateKeyString} imported.`;
         },
+        options: { persistentOutput: true },
       },
       {
         title: 'Sync Core with network',
         enabled: () => config.get('network') !== NETWORK_LOCAL,
-        task: async (ctx, task) => waitForCoreSync(ctx.coreService, task),
+        task: async (ctx, task) => {
+          function updateSyncStatus(verificationProgress) {
+            // eslint-disable-next-line no-param-reassign
+            task.output = `${(verificationProgress * 100).toFixed(2)}% complete`;
+          }
+          await waitForCoreSync(ctx.coreService, updateSyncStatus);
+        },
         options: { persistentOutput: true },
       },
       {
