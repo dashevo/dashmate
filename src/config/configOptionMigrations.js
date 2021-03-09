@@ -70,4 +70,19 @@ module.exports = {
 
     return options;
   },
+  '0.18.1': (name, options) => {
+    lodashSet(
+      options,
+      'platform.drive.abci.docker.image',
+      systemConfigs.base.platform.drive.abci.docker.image,
+    );
+
+    lodashSet(
+      options,
+      'platform.dapi.api.docker.image',
+      systemConfigs.base.platform.dapi.api.docker.image,
+    );
+
+    return options;
+  },
 };

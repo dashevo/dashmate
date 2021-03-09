@@ -64,7 +64,7 @@ const baseConfig = {
       },
       api: {
         docker: {
-          image: 'dashpay/dapi:0.18-dev',
+          image: 'dashpay/dapi:0.18',
         },
       },
       insight: {
@@ -81,7 +81,7 @@ const baseConfig = {
       },
       abci: {
         docker: {
-          image: 'dashpay/drive:0.18-dev',
+          image: 'dashpay/drive:0.18',
         },
         log: {
           stdout: {
