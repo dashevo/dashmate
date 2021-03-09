@@ -240,11 +240,8 @@ module.exports = {
             api: {
               $ref: '#/definitions/docker',
             },
-            insight: {
-              $ref: '#/definitions/docker',
-            },
           },
-          required: ['envoy', 'nginx', 'api', 'insight'],
+          required: ['envoy', 'nginx', 'api'],
           additionalProperties: false,
         },
         drive: {

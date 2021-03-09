@@ -68,11 +68,6 @@ module.exports = {
           image: 'dashpay/dapi:0.18-dev',
         },
       },
-      insight: {
-        docker: {
-          image: 'dashpay/insight-api:3.1.1',
-        },
-      },
     },
     drive: {
       mongodb: {

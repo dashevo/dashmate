@@ -83,14 +83,20 @@ module.exports = {
       configFile.defaultGroupName = null;
     }
 
-    // Add groups to existing configs
     Object.entries(configFile.configs)
       .forEach(([, config]) => {
+        // Add groups
         if (typeof config.group === 'undefined') {
           config.group = null;
         }
 
+        // Add Tenderdash nodeId
         config.platform.drive.tenderdash.nodeId = null;
+
+        // Remove Insight API configuration
+        if (config.platform.dapi.insight) {
+          delete config.platform.dapi.insight;
+        }
       });
 
     // Replace local config to group template
