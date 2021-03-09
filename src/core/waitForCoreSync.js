@@ -8,7 +8,7 @@ const wait = require('../util/wait');
  * @param {updateSyncStatus} updateSyncStatus
  * @return {Promise<void>}
  */
-async function waitForCoreSync(coreService, updateSyncStatus) {
+async function waitForCoreSync(coreService, progressCallback) {
   let isSynced = false;
   let verificationProgress = 0.0;
 
@@ -22,7 +22,7 @@ async function waitForCoreSync(coreService, updateSyncStatus) {
 
     if (!isSynced) {
       await wait(10000);
-      updateSyncStatus(verificationProgress);
+      progressCallback(verificationProgress);
     }
   } while (!isSynced);
 }

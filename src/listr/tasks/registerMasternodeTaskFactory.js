@@ -65,14 +65,20 @@ function registerMasternodeTaskFactory(
       {
         title: 'Sync Core with network',
         enabled: () => config.get('network') !== NETWORK_LOCAL,
-        task: async (ctx, task) => {
-          function updateSyncStatus(verificationProgress) {
-            // eslint-disable-next-line no-param-reassign
-            task.output = `${(verificationProgress * 100).toFixed(2)}% complete`;
-          }
-          await waitForCoreSync(ctx.coreService, updateSyncStatus);
-        },
-        options: { persistentOutput: true },
+        task: async (ctx) => (
+          new Observable(async (observer) => {
+            await waitForCoreSync(
+              ctx.coreService,
+              (verificationProgress) => {
+                observer.next(`${(verificationProgress * 100).toFixed(2)}% complete`);
+              },
+            );
+
+            observer.complete();
+
+            return this;
+          })
+        ),
       },
       {
         title: 'Check funding address balance',
