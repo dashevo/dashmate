@@ -57,8 +57,6 @@ The CLI can be used to perform routine tasks. Invoke the CLI with `mn` if linked
 
 The `setup` command is used to quickly configure common node configurations. Arguments may be provided as options, otherwise they will be queried interactively with sensible values suggested.
 
-If a funding private key is provided with the `--funding-private-key` option, the tool will additionally sync a full node and verify sufficient balance on the address associated with the provided private key. If the balance is sufficient, it will then generate new addresses for the collateral, owner and operator and display the addresses and associated private keys as output. The collateral of exactly 1000 Dash will be sent from the funding address to the collateral address, and after 1 block has been mined, the registration transaction will be broadcast on the network. You should then be able to start the masternode with the correct configuration with `mn start` when the setup process is complete.
-
 ```
 USAGE
   $ mn setup [PRESET] [NODE-TYPE]
@@ -85,6 +83,10 @@ To setup a testnet masternode:
 ```bash
 $ mn setup testnet masternode
 ```
+
+#### Masternode registration
+
+If a funding private key is provided with the `--funding-private-key` option, the tool will automatically register your node on the network as a masternode. This functionality is only available when using the `testnet` preset.
 
 ### Configure node
 
