@@ -51,11 +51,13 @@ The package contains a CLI, Docker Compose and configuration files.
 
 ### CLI
 
-The CLI can be used to perform routine tasks. Invoke the CLI with `mn` if linked during installation, or with `node bin/mn` if not linked. To list available commands, either run `mn` with no parameters or execute `mn help`. To list the help on any command just execute the command, followed by the `--help` option
+The CLI can be used to perform routine tasks. Invoke the CLI with `mn` if linked during installation, or with `node bin/mn` if not linked. To list available commands, either run `mn` with no parameters or execute `mn help`. To list the help on any command just execute the command, followed by the `--help` option.
 
 ### Setup node
 
 The `setup` command is used to quickly configure common node configurations. Arguments may be provided as options, otherwise they will be queried interactively with sensible values suggested.
+
+If a funding private key is provided with the `--funding-private-key` option, the tool will additionally sync a full node and verify sufficient balance on the address associated with the provided private key. If the balance is sufficient, it will then generate new addresses for the collateral, owner and operator and display the addresses and associated private keys as output. The collateral of exactly 1000 Dash will be sent from the funding address to the collateral address, and after 1 block has been mined, the registration transaction will be broadcast on the network. You should then be able to start the masternode with the correct configuration with `mn start` when the setup process is complete.
 
 ```
 USAGE
@@ -190,59 +192,6 @@ COMMANDS
 To show the host status:
 ```bash
 $ mn status:host
-```
-
-### Register masternode
-
-The `register` command creates a collateral funding transaction and then uses it to register a masternode on the specified network. It does not configure or start a masternode on the host.
-
-#### Funding collateral
-
-Before registering the masternode, you must have access to an address on the network you intend to use with a balance of more than 1000 Dash. 1000 Dash is used for the collateral transaction, and the remainder will be used for transaction fees. Make sure you have access to the private key for this address, since you will need to provide it in the next step. If using Dash Core, you can get the private key for a given address using the following command:
-
-```bash
-dumpprivkey "address"
-```
-
-If using a config specifying the `local` network, you can create and fund a new address using the `wallet` command as shown below.
-
-```
-USAGE
-  $ mn wallet:mint AMOUNT
-
-ARGUMENTS
-  AMOUNT  amount of dash to be generated to address
-
-OPTIONS
-  -v, --verbose          use verbose mode for output
-  --config=config        configuration name to use
-  -a, --address=address  recipient address instead of a new one
-```
-
-To generate 1001 Dash to a new address:
-```bash
-mn wallet:mint 1001
-```
-
-#### Masternode registration
-
-Run the `register` command as described below. The command will first verify sufficient balance on the funding address from the previous step. It will then generate new addresses for the collateral, owner and operator and display the addresses and associated private keys as output. The collateral of exactly 1000 Dash will be sent from the funding address to the collateral address, and after 15 blocks have been mined, the registration transaction will be broadcast on the network. Assuming a properly configured and running masternode exists at the specified IP address and port, it should become active after the registration transaction has been mined to a block on the network.
-
-```
-USAGE
-  $ mn register FUNDING-PRIVATE-KEY
-
-ARGUMENTS
-  FUNDING-PRIVATE-KEY  private key with more than 1000 dash for funding collateral
-
-OPTIONS
-  -v, --verbose    use verbose mode for output
-  --config=config  configuration name to use
-```
-
-To register a masternode:
-```bash
-$ mn register cVdEfkXLHqftgXzRYZW4EdwtcnJ8Mktw9L4vcEcqbVDs3e2qdzCf
 ```
 
 ### Reset node data
