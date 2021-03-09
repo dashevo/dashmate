@@ -103,8 +103,9 @@ function setupRegularPresetTaskFactory(
 
           ctx.config.set('core.masternode.operator.privateKey', ctx.operatorBlsPrivateKey);
 
-          ctx.operator = {};
-          ctx.operator.publicKey = publicKeyHex;
+          ctx.operator = {
+            publicKey: publicKeyHex,
+          };
 
           // eslint-disable-next-line no-param-reassign
           task.output = `BLS public key: ${publicKeyHex}\nBLS private key: ${ctx.operatorBlsPrivateKey}`;
