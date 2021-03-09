@@ -1,6 +1,5 @@
 const { Listr } = require('listr2');
 
-const wait = require('../../../../util/wait');
 const baseConfig = require('../../../../../configs/system/base');
 const isSeedNode = require('../../../../util/isSeedNode');
 const getSeedNodeConfig = require('../../../../util/getSeedNodeConfig');
@@ -10,6 +9,7 @@ const getSeedNodeConfig = require('../../../../util/getSeedNodeConfig');
  * @param {startNodeTask} startNodeTask
  * @param {initTask} initTask
  * @param {activateSporksTask} activateSporksTask
+ * @param {waitForTenderdashTask} waitForTenderdashTask
  * @param {DockerCompose} dockerCompose
  * @return {initializePlatformTask}
  */
@@ -17,6 +17,7 @@ function initializePlatformTaskFactory(
   startNodeTask,
   initTask,
   activateSporksTask,
+  waitForTenderdashTask,
   dockerCompose,
 ) {
   /**
@@ -53,8 +54,8 @@ function initializePlatformTaskFactory(
         },
       },
       {
-        title: 'Wait 20 seconds to ensure all services are running',
-        task: () => wait(20000),
+        title: 'Wait for tenderdash to start',
+        task: () => waitForTenderdashTask(configGroup[configGroup.length - 2]),
       },
       {
         title: 'Activate sporks',
@@ -65,7 +66,17 @@ function initializePlatformTaskFactory(
       },
       {
         task: () => {
-          // back to default
+          // set platform data contracts
+          const [initializedConfig, ...otherConfigs] = configGroup;
+
+          otherConfigs
+            .filter((config) => !isSeedNode(config))
+            .forEach((config) => {
+              config.set('platform.dpns', initializedConfig.get('platform.dpns'));
+              config.set('platform.dashpay', initializedConfig.get('platform.dashpay'));
+            });
+
+          // set miner interval to default value
           const seedNodeConfig = getSeedNodeConfig(configGroup);
           seedNodeConfig.set('core.miner.interval', baseConfig.core.miner.interval);
         },

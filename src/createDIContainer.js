@@ -63,6 +63,7 @@ const configureCoreTaskFactory = require('./listr/tasks/setup/local/configureCor
 const configureTenderdashTaskFactory = require('./listr/tasks/setup/local/configureTenderdashTaskFactory');
 const initializePlatformTaskFactory = require('./listr/tasks/setup/local/initializePlatformTaskFactory');
 const activateSporksTaskFactory = require('./listr/tasks/setup/local/activateSporksTaskFactory');
+const waitForTenderdashTaskFactory = require('./listr/tasks/platform/waitForTenderdashTaskFactory');
 
 async function createDIContainer(options) {
   const container = createAwilixContainer({
@@ -165,6 +166,7 @@ async function createDIContainer(options) {
     initializePlatformTask: asFunction(initializePlatformTaskFactory).singleton(),
     outputStatusOverview: asFunction(outputStatusOverviewFactory),
     activateSporksTask: asFunction(activateSporksTaskFactory).singleton(),
+    waitForTenderdashTask: asFunction(waitForTenderdashTaskFactory).singleton(),
   });
 
   return container;

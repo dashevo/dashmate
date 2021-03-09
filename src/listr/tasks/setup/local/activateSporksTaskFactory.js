@@ -47,11 +47,7 @@ function activateSporksTaskFactory(
       },
       {
         title: 'Waiting for quorums',
-        task: async (ctx) => {
-          const seedConfig = getSeedNodeConfig(configGroup);
-
-          await waitForCoreQuorum(ctx.rpcClient, seedConfig.get('network'));
-        },
+        task: async (ctx) => waitForCoreQuorum(ctx.rpcClient),
       },
     ]);
   }
