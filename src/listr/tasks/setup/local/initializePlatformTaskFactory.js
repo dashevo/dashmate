@@ -28,13 +28,6 @@ function initializePlatformTaskFactory(
   function initializePlatformTask(configGroup) {
     return new Listr([
       {
-        task: () => {
-          // to activate sporks faster, set miner interval to 2s
-          const seedNodeConfig = getSeedNodeConfig(configGroup);
-          seedNodeConfig.set('core.miner.interval', '10s');
-        },
-      },
-      {
         title: 'Starting nodes',
         task: async (ctx) => {
           const startNodeTasks = configGroup.map((config) => ({
@@ -75,10 +68,6 @@ function initializePlatformTaskFactory(
               config.set('platform.dpns', initializedConfig.get('platform.dpns'));
               config.set('platform.dashpay', initializedConfig.get('platform.dashpay'));
             });
-
-          // set miner interval to default value
-          const seedNodeConfig = getSeedNodeConfig(configGroup);
-          seedNodeConfig.set('core.miner.interval', baseConfig.core.miner.interval);
         },
       },
       {
