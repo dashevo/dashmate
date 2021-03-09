@@ -5,7 +5,7 @@ const wait = require('../util/wait');
  *
  * @typedef {waitForCoreSync}
  * @param {CoreService} coreService
- * @param {updateSyncStatus} updateSyncStatus
+ * @param {function(progress: number)} progressCallback
  * @return {Promise<void>}
  */
 async function waitForCoreSync(coreService, progressCallback) {
