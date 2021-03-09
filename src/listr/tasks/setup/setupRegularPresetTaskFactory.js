@@ -121,6 +121,7 @@ function setupRegularPresetTaskFactory(
           if (ctx.preset === PRESET_MAINNET) {
             throw new Error('For your own security, this tool will not process mainnet private keys. You should consider the private key you entered to be compromised.');
           }
+
           const fundingPrivateKey = new PrivateKey(ctx.fundingPrivateKeyString, ctx.preset);
           ctx.fundingAddress = fundingPrivateKey.toAddress(ctx.preset).toString();
 
