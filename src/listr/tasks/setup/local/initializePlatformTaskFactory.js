@@ -31,7 +31,7 @@ function initializePlatformTaskFactory(
         task: () => {
           // to activate sporks faster, set miner interval to 2s
           const seedNodeConfig = getSeedNodeConfig(configGroup);
-          seedNodeConfig.set('core.miner.interval', '2s');
+          seedNodeConfig.set('core.miner.interval', '10s');
         },
       },
       {

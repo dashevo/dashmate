@@ -36,6 +36,7 @@ const waitForConfirmations = require('./core/waitForConfirmations');
 const generateBlsKeys = require('./core/generateBlsKeys');
 const activateCoreSpork = require('./core/activateCoreSpork');
 const waitForCoreQuorum = require('./core/waitForCoreQuorum');
+const waitForCorePeers = require('./core/waitForCorePeers');
 
 const createNewAddress = require('./core/wallet/createNewAddress');
 const generateBlocks = require('./core/wallet/generateBlocks');
@@ -124,6 +125,7 @@ async function createDIContainer(options) {
     generateBlsKeys: asValue(generateBlsKeys),
     activateCoreSpork: asValue(activateCoreSpork),
     waitForCoreQuorum: asValue(waitForCoreQuorum),
+    waitForCorePeers: asValue(waitForCorePeers),
   });
 
   /**

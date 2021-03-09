@@ -9,14 +9,15 @@ const wait = require('../util/wait');
  */
 async function waitForCoreSync(coreService) {
   let isSynced = false;
+  let isBlockchainSynced = false;
 
   do {
-    ({ result: { IsSynced: isSynced } } = await coreService.getRpcClient().mnsync('status'));
+    ({ result: { IsSynced: isSynced, IsBlockchainSynced: isBlockchainSynced } } = await coreService.getRpcClient().mnsync('status'));
 
-    if (!isSynced) {
+    if (!isSynced || !isBlockchainSynced) {
       await wait(10000);
     }
-  } while (!isSynced);
+  } while (!isSynced || !isBlockchainSynced);
 }
 
 module.exports = waitForCoreSync;
