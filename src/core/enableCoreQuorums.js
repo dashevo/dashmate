@@ -4,12 +4,12 @@ const wait = require('../util/wait');
 /**
  * Wait Core to set quorum
  *
- * @typedef {waitForCoreQuorum}
+ * @typedef {enableCoreQuorums}
  * @param {RpcClient} rpcClient
  * @param {string} network
  * @return {Promise<void>}
  */
-async function waitForCoreQuorum(rpcClient, network) {
+async function enableCoreQuorums(rpcClient, network) {
   const privateKey = new PrivateKey();
   const address = privateKey.toAddress(network).toString();
 
@@ -33,4 +33,4 @@ async function waitForCoreQuorum(rpcClient, network) {
   } while (!hasQuorums);
 }
 
-module.exports = waitForCoreQuorum;
+module.exports = enableCoreQuorums;

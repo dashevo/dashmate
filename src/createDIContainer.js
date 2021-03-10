@@ -35,8 +35,8 @@ const waitForBlocks = require('./core/waitForBlocks');
 const waitForConfirmations = require('./core/waitForConfirmations');
 const generateBlsKeys = require('./core/generateBlsKeys');
 const activateCoreSpork = require('./core/activateCoreSpork');
-const waitForCoreQuorum = require('./core/waitForCoreQuorum');
-const waitForCorePeers = require('./core/waitForCorePeers');
+const enableCoreQuorums = require('./core/enableCoreQuorums');
+const waitForCorePeersConnected = require('./core/waitForCorePeersConnected');
 
 const createNewAddress = require('./core/wallet/createNewAddress');
 const generateBlocks = require('./core/wallet/generateBlocks');
@@ -63,8 +63,7 @@ const resetNodeTaskFactory = require('./listr/tasks/resetNodeTaskFactory');
 const configureCoreTaskFactory = require('./listr/tasks/setup/local/configureCoreTaskFactory');
 const configureTenderdashTaskFactory = require('./listr/tasks/setup/local/configureTenderdashTaskFactory');
 const initializePlatformTaskFactory = require('./listr/tasks/setup/local/initializePlatformTaskFactory');
-const activateSporksTaskFactory = require('./listr/tasks/setup/local/activateSporksTaskFactory');
-const waitForTenderdashTaskFactory = require('./listr/tasks/platform/waitForTenderdashTaskFactory');
+const waitForNodeToBeReadyTaskFactory = require('./listr/tasks/platform/waitForNodeToBeReadyTaskFactory');
 
 async function createDIContainer(options) {
   const container = createAwilixContainer({
@@ -124,8 +123,8 @@ async function createDIContainer(options) {
     waitForConfirmations: asValue(waitForConfirmations),
     generateBlsKeys: asValue(generateBlsKeys),
     activateCoreSpork: asValue(activateCoreSpork),
-    waitForCoreQuorum: asValue(waitForCoreQuorum),
-    waitForCorePeers: asValue(waitForCorePeers),
+    enableCoreQuorums: asValue(enableCoreQuorums),
+    waitForCorePeersConnected: asValue(waitForCorePeersConnected),
   });
 
   /**
@@ -167,8 +166,7 @@ async function createDIContainer(options) {
     configureTenderdashTask: asFunction(configureTenderdashTaskFactory).singleton(),
     initializePlatformTask: asFunction(initializePlatformTaskFactory).singleton(),
     outputStatusOverview: asFunction(outputStatusOverviewFactory),
-    activateSporksTask: asFunction(activateSporksTaskFactory).singleton(),
-    waitForTenderdashTask: asFunction(waitForTenderdashTaskFactory).singleton(),
+    waitForNodeToBeReadyTask: asFunction(waitForNodeToBeReadyTaskFactory).singleton(),
   });
 
   return container;

@@ -4,20 +4,19 @@ const wait = require('../../../util/wait');
 /**
  *
  * @param {createTenderdashRpcClient} createTenderdashRpcClient
- * @return {waitForTenderdashTask}
+ * @return {waitForNodeToBeReadyTask}
  */
-function waitForTenderdashTaskFactory(
+function waitForNodeToBeReadyTaskFactory(
   createTenderdashRpcClient,
 ) {
   /**
-   * @typedef waitForTenderdashTask
+   * @typedef waitForNodeToBeReadyTask
    * @param {Config} config
    * @return {Promise<void>}
    */
-  async function waitForTenderdashTask(config) {
+  async function waitForNodeToBeReadyTask(config) {
     return new Listr([
       {
-        title: 'Wating for tenderdash',
         task: async () => {
           const port = config.get('platform.drive.tenderdash.rpc.port');
 
@@ -40,7 +39,7 @@ function waitForTenderdashTaskFactory(
     ]);
   }
 
-  return waitForTenderdashTask;
+  return waitForNodeToBeReadyTask;
 }
 
-module.exports = waitForTenderdashTaskFactory;
+module.exports = waitForNodeToBeReadyTaskFactory;

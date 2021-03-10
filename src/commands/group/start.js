@@ -4,6 +4,7 @@ const { flags: flagTypes } = require('@oclif/command');
 
 const GroupBaseCommand = require('../../oclif/command/GroupBaseCommand');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
+const isPlatformServicesEnabled = require('../../util/isPlatformServicesEnabled');
 
 class GroupStartCommand extends GroupBaseCommand {
   /**
@@ -12,7 +13,7 @@ class GroupStartCommand extends GroupBaseCommand {
    * @param {DockerCompose} dockerCompose
    * @param {startNodeTask} startNodeTask
    * @param {Config[]} configGroup
-   * @param {waitForTenderdashTask} waitForTenderdashTask
+   * @param {waitForNodeToBeReadyTask} waitForNodeToBeReadyTask
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -21,13 +22,13 @@ class GroupStartCommand extends GroupBaseCommand {
       update: isUpdate,
       'drive-image-build-path': driveImageBuildPath,
       'dapi-image-build-path': dapiImageBuildPath,
-      'wait-for-tenderdash': waitForTenderdash,
+      'wait-for-readiness': waitForReadiness,
       verbose: isVerbose,
     },
     dockerCompose,
     startNodeTask,
     configGroup,
-    waitForTenderdashTask,
+    waitForNodeToBeReadyTask,
   ) {
     const groupName = configGroup[0].get('group');
 
@@ -52,9 +53,15 @@ class GroupStartCommand extends GroupBaseCommand {
           ),
         },
         {
-          title: 'Wait for Tenderdash',
-          skip: !waitForTenderdash,
-          task: () => waitForTenderdashTask(configGroup[configGroup.length - 2]),
+          title: 'Await for nodes to be ready',
+          enabled: waitForReadiness,
+          task: async () => {
+            await Promise.all(
+              configGroup
+                .filter(isPlatformServicesEnabled)
+                .map(waitForNodeToBeReadyTask),
+            );
+          },
         },
       ],
       {
@@ -82,7 +89,7 @@ GroupStartCommand.flags = {
   update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
   'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
   'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),
-  'wait-for-tenderdash': flagTypes.boolean({ description: 'wait for tenderdash to start', default: false }),
+  'wait-for-readiness': flagTypes.boolean({ description: 'await for nodes to be ready', default: false }),
 };
 
 module.exports = GroupStartCommand;

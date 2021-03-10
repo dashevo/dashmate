@@ -8,13 +8,13 @@ const { NETWORK_LOCAL, NETWORK_MAINNET } = require('../../constants');
 /**
  *
  * @param {DockerCompose} dockerCompose
- * @param {waitForCorePeers} waitForCorePeers
+ * @param {waitForCorePeersConnected} waitForCorePeersConnected
  * @param {createRpcClient} createRpcClient
  * @return {startNodeTask}
  */
 function startNodeTaskFactory(
   dockerCompose,
-  waitForCorePeers,
+  waitForCorePeersConnected,
   createRpcClient,
 ) {
   /**
@@ -106,18 +106,22 @@ function startNodeTaskFactory(
         },
       },
       {
-        title: 'Start a miner',
+        title: 'Await for peer to be connected',
         enabled: () => isMinerEnabled === true,
         task: async () => {
-          // wait for peers
           const rpcClient = createRpcClient({
             port: config.get('core.rpc.port'),
             user: config.get('core.rpc.user'),
             pass: config.get('core.rpc.password'),
           });
 
-          await waitForCorePeers(rpcClient);
-
+          await waitForCorePeersConnected(rpcClient);
+        },
+      },
+      {
+        title: 'Start a miner',
+        enabled: () => isMinerEnabled === true,
+        task: async () => {
           let minerAddress = config.get('core.miner.address');
 
           if (minerAddress === null) {

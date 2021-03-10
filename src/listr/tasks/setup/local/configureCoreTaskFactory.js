@@ -12,7 +12,7 @@ const isSeedNode = require('../../../../util/isSeedNode');
  * @param {generateBlocks} generateBlocks
  * @param {waitForCoreSync} waitForCoreSync
  * @param {activateCoreSpork} activateCoreSpork
- * @param {waitForCoreQuorum} waitForCoreQuorum
+ * @param {enableCoreQuorums} enableCoreQuorums
  * @param {generateToAddressTask} generateToAddressTask
  * @param {registerMasternodeTask} registerMasternodeTask
  * @return {configureCoreTask}
@@ -25,7 +25,7 @@ function configureCoreTaskFactory(
   generateBlocks,
   waitForCoreSync,
   activateCoreSpork,
-  waitForCoreQuorum,
+  enableCoreQuorums,
   generateToAddressTask,
   registerMasternodeTask,
 ) {

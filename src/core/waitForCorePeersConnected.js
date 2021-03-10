@@ -3,11 +3,11 @@ const wait = require('../util/wait');
 /**
  * Wait Core to connect to peers
  *
- * @typedef {waitForCorePeers}
+ * @typedef {waitForCorePeersConnected}
  * @param {RpcClient} rpcClient
  * @return {Promise<void>}
  */
-async function waitForCorePeers(rpcClient) {
+async function waitForCorePeersConnected(rpcClient) {
   let hasPeers = false;
 
   do {
@@ -21,4 +21,4 @@ async function waitForCorePeers(rpcClient) {
   } while (!hasPeers);
 }
 
-module.exports = waitForCorePeers;
+module.exports = waitForCorePeersConnected;

@@ -1,4 +1,5 @@
 const { Listr } = require('listr2');
+const isPlatformServicesEnabled = require('../../util/isPlatformServicesEnabled');
 
 /**
  * @param {DockerCompose} dockerCompose
@@ -26,8 +27,6 @@ function resetNodeTaskFactory(
    * @param {Config} config
    */
   function resetNodeTask(config) {
-    const isPlatformServicesEnabled = config.get('compose.file').includes('docker-compose.platform.yml');
-
     return new Listr([
       {
         title: 'Check services are not running',
