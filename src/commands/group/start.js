@@ -4,7 +4,6 @@ const { flags: flagTypes } = require('@oclif/command');
 
 const GroupBaseCommand = require('../../oclif/command/GroupBaseCommand');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
-const isPlatformServicesEnabled = require('../../util/isPlatformServicesEnabled');
 
 class GroupStartCommand extends GroupBaseCommand {
   /**
@@ -58,7 +57,7 @@ class GroupStartCommand extends GroupBaseCommand {
           task: async () => {
             await Promise.all(
               configGroup
-                .filter(isPlatformServicesEnabled)
+                .filter((config) => config.isPlatformServicesEnabled())
                 .map(waitForNodeToBeReadyTask),
             );
           },

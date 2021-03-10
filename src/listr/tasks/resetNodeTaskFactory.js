@@ -1,5 +1,4 @@
 const { Listr } = require('listr2');
-const isPlatformServicesEnabled = require('../../util/isPlatformServicesEnabled');
 
 /**
  * @param {DockerCompose} dockerCompose
@@ -43,7 +42,7 @@ function resetNodeTaskFactory(
       },
       {
         title: 'Remove platform services and associated data',
-        enabled: (ctx) => ctx.isPlatformOnlyReset && isPlatformServicesEnabled,
+        enabled: (ctx) => ctx.isPlatformOnlyReset && config.isPlatformServicesEnabled(),
         task: async () => {
           // Remove containers
           const coreContainerNames = ['core', 'sentinel'];
@@ -86,7 +85,7 @@ function resetNodeTaskFactory(
       {
         title: 'Initialize Tenderdash',
         enabled: (ctx) => (
-          !ctx.isHardReset && !ctx.skipPlatformInitialization && isPlatformServicesEnabled
+          !ctx.isHardReset && !ctx.skipPlatformInitialization && config.isPlatformServicesEnabled()
         ),
         task: () => tenderdashInitTask(config),
       },

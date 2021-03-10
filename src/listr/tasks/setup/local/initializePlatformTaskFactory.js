@@ -1,9 +1,5 @@
 const { Listr } = require('listr2');
 
-const isSeedNode = require('../../../../util/isSeedNode');
-const getSeedNodeConfig = require('../../../../util/getSeedNodeConfig');
-const isPlatformServicesEnabled = require('../../../../util/isPlatformServicesEnabled');
-
 /**
  *
  * @param {startNodeTask} startNodeTask
@@ -30,6 +26,8 @@ function initializePlatformTaskFactory(
    * @return {Listr}
    */
   function initializePlatformTask(configGroup) {
+    const seedConfig = configGroup.find((config) => !config.isPlatformServicesEnabled());
+
     return new Listr([
       {
         title: 'Starting nodes',
@@ -42,7 +40,7 @@ function initializePlatformTaskFactory(
                 driveImageBuildPath: ctx.driveImageBuildPath,
                 dapiImageBuildPath: ctx.dapiImageBuildPath,
                 // run miner only at seed node
-                isMinerEnabled: isSeedNode(config),
+                isMinerEnabled: !config.isPlatformServicesEnabled(),
               },
             ),
           }));
@@ -55,7 +53,7 @@ function initializePlatformTaskFactory(
         task: async () => {
           await Promise.all(
             configGroup
-              .filter(isPlatformServicesEnabled)
+              .filter((config) => config.isPlatformServicesEnabled())
               .map(waitForNodeToBeReadyTask),
           );
         },
@@ -63,8 +61,6 @@ function initializePlatformTaskFactory(
       {
         title: 'Enable sporks',
         task: async (ctx) => {
-          const seedConfig = getSeedNodeConfig(configGroup);
-
           ctx.rpcClient = createRpcClient({
             port: seedConfig.get('core.rpc.port'),
             user: seedConfig.get('core.rpc.user'),
@@ -88,7 +84,6 @@ function initializePlatformTaskFactory(
       {
         title: 'Wait for quorums to be enabled',
         task: async (ctx) => {
-          const seedConfig = getSeedNodeConfig(configGroup);
           const network = seedConfig.get('network');
 
           await enableCoreQuorums(ctx.rpcClient, network);
@@ -103,7 +98,7 @@ function initializePlatformTaskFactory(
           const [initializedConfig, ...otherConfigs] = configGroup;
 
           otherConfigs
-            .filter((config) => !isSeedNode(config))
+            .filter((config) => config.isPlatformServicesEnabled())
             .forEach((config) => {
               config.set('platform.dpns', initializedConfig.get('platform.dpns'));
               config.set('platform.dashpay', initializedConfig.get('platform.dashpay'));
