@@ -68,7 +68,7 @@ function configureCoreTaskFactory(
             );
 
             // Set private key to seed node
-            if (!config.isPlatformServicesEnabled()) {
+            if (!config.has('platform')) {
               config.set(
                 'core.spork.privateKey',
                 sporkPrivKey.toWIF(),

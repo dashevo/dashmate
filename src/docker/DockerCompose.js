@@ -95,8 +95,32 @@ class DockerCompose {
     try {
       await dockerCompose.upAll({
         ...this.getOptions(envs),
-        commandOptions: ['--build'],
       });
+    } catch (e) {
+      throw new DockerComposeError(e);
+    }
+  }
+
+  /**
+   * Build docker compose images
+   *
+   * @param {Object} envs
+   * @param {string} [serviceName]
+   * @return {Promise<void>}
+   */
+  async build(envs, serviceName = undefined) {
+    await this.throwErrorIfNotInstalled();
+
+    try {
+      if (serviceName) {
+        await dockerCompose.buildOne(serviceName, {
+          ...this.getOptions(envs),
+        });
+      } else {
+        await dockerCompose.buildAll({
+          ...this.getOptions(envs),
+        });
+      }
     } catch (e) {
       throw new DockerComposeError(e);
     }

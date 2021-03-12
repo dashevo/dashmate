@@ -67,7 +67,7 @@ function setupLocalPresetTaskFactory(
                 if (config.getName() === 'local_seed') {
                   config.set('description', 'seed node for local network');
 
-                  config.set('compose.file', 'docker-compose.yml');
+                  config.set('platform', undefined);
                   config.set('core.masternode.enable', false);
                 } else {
                   config.set('description', `local node #${nodeIndex}`);

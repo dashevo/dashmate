@@ -3,7 +3,7 @@ const fs = require('fs');
 const { Listr } = require('listr2');
 
 const { PrivateKey } = require('@dashevo/dashcore-lib');
-const { NETWORK_LOCAL, NETWORK_MAINNET } = require('../../constants');
+const { NETWORK_LOCAL } = require('../../constants');
 
 /**
  *
@@ -21,8 +21,6 @@ function startNodeTaskFactory(
    * @typedef {startNodeTask}
    * @param {Config} config
    * @param {Object} [options]
-   * @param {string} [options.driveImageBuildPath]
-   * @param {string} [options.dapiImageBuildPath]
    * @param {boolean} [options.isUpdate]
    * @param {boolean} [options.isMinerEnabled]
    * @return {Object}
@@ -30,8 +28,6 @@ function startNodeTaskFactory(
   function startNodeTask(
     config,
     {
-      driveImageBuildPath = undefined,
-      dapiImageBuildPath = undefined,
       isUpdate = undefined,
       isMinerEnabled = undefined,
     } = {},
@@ -63,16 +59,36 @@ function startNodeTaskFactory(
 
     return new Listr([
       {
-        title: 'Download updated services',
-        enabled: () => isUpdate === true,
-        task: async () => dockerCompose.pull(config.toEnvs()),
-      },
-      {
         title: 'Check node is not started',
         task: async () => {
           if (await dockerCompose.isServiceRunning(config.toEnvs())) {
             throw new Error('Running services detected. Please ensure all services are stopped for this config before starting');
           }
+        },
+      },
+      {
+        title: 'Download updates',
+        enabled: () => isUpdate === true,
+        task: async () => dockerCompose.pull(config.toEnvs()),
+      },
+      {
+        title: 'Build DAPI from sources',
+        enabled: config.has('platform')
+          && config.get('platform.dapi.api.docker.build') != null,
+        task: async () => {
+          const envs = config.toEnvs();
+
+          await dockerCompose.build(envs, 'dapi_api');
+        },
+      },
+      {
+        title: 'Build Drive from sources',
+        enabled: config.has('platform')
+          && config.get('platform.drive.abci.docker.build.path') !== null,
+        task: async () => {
+          const envs = config.toEnvs();
+
+          await dockerCompose.build(envs, 'drive_abci');
         },
       },
       {
@@ -85,22 +101,6 @@ function startNodeTaskFactory(
           }
 
           const envs = config.toEnvs();
-
-          if (driveImageBuildPath || dapiImageBuildPath) {
-            if (config.get('network') === NETWORK_MAINNET) {
-              throw new Error('You can\'t use drive-image-build-path and dapi-image-build-path options with mainnet network');
-            }
-
-            if (driveImageBuildPath) {
-              envs.COMPOSE_FILE += ':docker-compose.platform.build-drive.yml';
-              envs.PLATFORM_DRIVE_DOCKER_IMAGE_BUILD_PATH = driveImageBuildPath;
-            }
-
-            if (dapiImageBuildPath) {
-              envs.COMPOSE_FILE += ':docker-compose.platform.build-dapi.yml';
-              envs.PLATFORM_DAPI_DOCKER_IMAGE_BUILD_PATH = dapiImageBuildPath;
-            }
-          }
 
           await dockerCompose.up(envs);
         },

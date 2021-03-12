@@ -83,14 +83,27 @@ module.exports = {
       configFile.defaultGroupName = null;
     }
 
-    // Add groups to existing configs
     Object.entries(configFile.configs)
       .forEach(([, config]) => {
+        // Add groups
         if (typeof config.group === 'undefined') {
           config.group = null;
         }
 
-        config.platform.drive.tenderdash.nodeId = null;
+        // Add Tenderdash node ID
+        if (typeof config.platform !== 'undefined') {
+          config.platform.drive.tenderdash.nodeId = null;
+        }
+
+        if (typeof config.compose !== 'undefined') {
+          // Remove platform option for non platform configs
+          if (!config.compose.file.includes('docker-compose.platform.yml')) {
+            delete config.platform;
+          }
+
+          // Remove compose option
+          delete config.compose;
+        }
       });
 
     // Replace local config to group template
