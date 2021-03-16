@@ -106,15 +106,17 @@ class DockerCompose {
    *
    * @param {Object} envs
    * @param {string} [serviceName]
+   * @param {string[]} [options]
    * @return {Promise<void>}
    */
-  async build(envs, serviceName = undefined) {
+  async build(envs, serviceName = undefined, options = []) {
     await this.throwErrorIfNotInstalled();
 
     try {
       if (serviceName) {
         await dockerCompose.buildOne(serviceName, {
           ...this.getOptions(envs),
+          commandOptions: options,
         });
       } else {
         await dockerCompose.buildAll({

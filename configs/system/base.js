@@ -68,7 +68,6 @@ module.exports = {
           image: 'dashpay/dapi:0.18',
           build: {
             path: null,
-            npmCachePath: null,
           },
         },
       },
@@ -89,7 +88,6 @@ module.exports = {
           image: 'dashpay/drive:0.18',
           build: {
             path: null,
-            npmCachePath: null,
           },
         },
         log: {

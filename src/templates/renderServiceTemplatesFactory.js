@@ -55,7 +55,7 @@ function renderServiceTemplatesFactory() {
 
       const configPath = templatePath
         .substring(templatesPath.length + 1)
-        .replace('.template', '');
+        .replace('.dot', '');
 
       configFiles[configPath] = template(config.options);
     }

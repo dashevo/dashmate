@@ -150,7 +150,7 @@ class Config {
         dockerComposeFiles.push('docker-compose.platform.build-drive.yml');
       }
 
-      if (this.has('platform.dapi.api.docker.build')) {
+      if (this.get('platform.dapi.api.docker.build.path') !== null) {
         dockerComposeFiles.push('docker-compose.platform.build-dapi.yml');
       }
     }

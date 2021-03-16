@@ -1,4 +1,6 @@
 const fs = require('fs');
+const { exec } = require('child_process');
+const { promisify } = require('util');
 
 const { Listr } = require('listr2');
 
@@ -10,13 +12,18 @@ const { NETWORK_LOCAL } = require('../../constants');
  * @param {DockerCompose} dockerCompose
  * @param {waitForCorePeersConnected} waitForCorePeersConnected
  * @param {createRpcClient} createRpcClient
+ * @param {Docker} docker
  * @return {startNodeTask}
  */
 function startNodeTaskFactory(
   dockerCompose,
   waitForCorePeersConnected,
   createRpcClient,
+  docker,
 ) {
+  const execAsync = promisify(exec);
+  const followDockerProgress = promisify(docker.modem.followProgress.bind(docker.modem));
+
   /**
    * @typedef {startNodeTask}
    * @param {Config} config
@@ -45,16 +52,18 @@ function startNodeTaskFactory(
     }
 
     // Check Drive log files are created
-    const prettyFilePath = config.get('platform.drive.abci.log.prettyFile.path');
+    if (config.has('platform')) {
+      const prettyFilePath = config.get('platform.drive.abci.log.prettyFile.path');
 
-    if (!fs.existsSync(prettyFilePath)) {
-      fs.writeFileSync(prettyFilePath, '');
-    }
+      if (!fs.existsSync(prettyFilePath)) {
+        fs.writeFileSync(prettyFilePath, '');
+      }
 
-    const jsonFilePath = config.get('platform.drive.abci.log.jsonFile.path');
+      const jsonFilePath = config.get('platform.drive.abci.log.jsonFile.path');
 
-    if (!fs.existsSync(jsonFilePath)) {
-      fs.writeFileSync(jsonFilePath, '');
+      if (!fs.existsSync(jsonFilePath)) {
+        fs.writeFileSync(jsonFilePath, '');
+      }
     }
 
     return new Listr([
@@ -72,23 +81,91 @@ function startNodeTaskFactory(
         task: async () => dockerCompose.pull(config.toEnvs()),
       },
       {
-        title: 'Build DAPI from sources',
+        title: 'Build services',
         enabled: config.has('platform')
-          && config.get('platform.dapi.api.docker.build') != null,
-        task: async () => {
-          const envs = config.toEnvs();
+          && (
+            config.get('platform.dapi.api.docker.build.path') !== null
+            || config.get('platform.drive.abci.docker.build.path') !== null
+          ),
+        task: () => {
+          const serviceBuildConfigs = [
+            {
+              name: 'Drive',
+              buildOptions: config.get('platform.drive.abci.docker.build'),
+              serviceName: 'drive_abci',
+            },
+            {
+              name: 'DAPI',
+              buildOptions: config.get('platform.dapi.api.docker.build'),
+              serviceName: 'dapi_api',
+            },
+          ];
 
-          await dockerCompose.build(envs, 'dapi_api');
-        },
-      },
-      {
-        title: 'Build Drive from sources',
-        enabled: config.has('platform')
-          && config.get('platform.drive.abci.docker.build.path') !== null,
-        task: async () => {
-          const envs = config.toEnvs();
+          const buildTasks = serviceBuildConfigs
+            .filter(({ buildOptions }) => buildOptions.path !== null)
+            .map(({
+              name,
+              buildOptions,
+              serviceName,
+            }) => ({
+              title: `Build ${name}`,
+              task: () => (
+                new Listr([
+                  {
+                    title: 'Build Docker image',
+                    task: async () => {
+                      const envs = config.toEnvs();
 
-          await dockerCompose.build(envs, 'drive_abci');
+                      await dockerCompose.build(envs, serviceName);
+                    },
+                  },
+                  {
+                    title: 'Update NPM cache',
+                    task: async () => {
+                      // Build node_modules stage only to access to npm cache
+                      const buildStream = await docker.buildImage({
+                        context: buildOptions.path,
+                        src: ['Dockerfile', 'docker/cache', 'package.json', 'package-lock.json'],
+                      }, {
+                        target: 'node_modules',
+                      });
+
+                      const output = await followDockerProgress(buildStream);
+
+                      const buildError = output.find(({ error }) => error);
+
+                      if (buildError) {
+                        throw new Error(buildError.error);
+                      }
+
+                      const {
+                        aux: {
+                          ID: nodeModulesImageId,
+                        },
+                      } = output.find(({ aux }) => aux && aux.ID);
+
+                      // Copy npm cache from node_modules stage image back to cache dir
+                      const container = await docker.createContainer({
+                        Image: nodeModulesImageId,
+                      });
+
+                      await Promise.all([
+                        execAsync(`docker cp ${container.id}:/root/.cache ${buildOptions.path}/docker/cache`),
+                        execAsync(`docker cp ${container.id}:/root/.npm ${buildOptions.path}/docker/cache`),
+                      ]);
+
+                      // Remove node_modules stage container and image
+                      await container.remove();
+
+                      const nodeModulesImage = docker.getImage(nodeModulesImageId);
+                      await nodeModulesImage.remove();
+                    },
+                  },
+                ])
+              ),
+            }));
+
+          return new Listr(buildTasks);
         },
       },
       {
