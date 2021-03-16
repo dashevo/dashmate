@@ -90,11 +90,6 @@ module.exports = {
           config.group = null;
         }
 
-        // Add Tenderdash node ID
-        if (typeof config.platform !== 'undefined') {
-          config.platform.drive.tenderdash.nodeId = null;
-        }
-
         if (typeof config.compose !== 'undefined') {
           // Remove platform option for non platform configs
           if (!config.compose.file.includes('docker-compose.platform.yml')) {
@@ -103,6 +98,20 @@ module.exports = {
 
           // Remove compose option
           delete config.compose;
+        }
+
+        if (typeof config.platform !== 'undefined') {
+          // Add Tenderdash node ID
+          config.platform.drive.tenderdash.nodeId = null;
+
+          // Add build options for DAPI and Drive
+          config.platform.drive.abci.docker.build = {
+            path: null,
+          };
+
+          config.platform.dapi.api.docker.build = {
+            path: null,
+          };
         }
       });
 
