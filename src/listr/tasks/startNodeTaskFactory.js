@@ -82,7 +82,7 @@ function startNodeTaskFactory(
       },
       {
         title: 'Build services',
-        enabled: config.has('platform')
+        enabled: () => config.has('platform')
           && (
             config.get('platform.dapi.api.docker.build.path') !== null
             || config.get('platform.drive.abci.docker.build.path') !== null
@@ -183,7 +183,7 @@ function startNodeTaskFactory(
         },
       },
       {
-        title: 'Await for peer to be connected',
+        title: 'Await for peers to be connected',
         enabled: () => isMinerEnabled === true,
         task: async () => {
           const rpcClient = createRpcClient({

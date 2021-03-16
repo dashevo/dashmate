@@ -41,7 +41,7 @@ class StartCommand extends ConfigBaseCommand {
         },
         {
           title: 'Await for nodes to be ready',
-          enabled: waitForReadiness,
+          enabled: () => waitForReadiness,
           task: () => waitForNodeToBeReadyTask(config),
         },
       ],

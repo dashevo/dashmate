@@ -49,7 +49,7 @@ class GroupStartCommand extends GroupBaseCommand {
         },
         {
           title: 'Await for nodes to be ready',
-          enabled: waitForReadiness,
+          enabled: () => waitForReadiness,
           task: () => {
             const waitForNodeToBeReadyTasks = configGroup
               .filter((config) => config.has('platform'))
