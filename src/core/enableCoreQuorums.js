@@ -73,7 +73,7 @@ async function mineQuorum(rpcClient) {
     await generate(blocksUntilNextDKG);
   }
 
-  await waitForAllNodesToSync(nodes);
+  await waitForAllNodesToSyncBlocks(nodes);
 
   const { result: bestBlockHash } = await rpcClient.getBestBlockHash();
 
@@ -91,31 +91,31 @@ async function mineQuorum(rpcClient) {
 
   await bumpMockTimeForNodes(1, nodes);
   await generate(2);
-  await waitForAllNodesToSync(nodes);
+  await waitForAllNodesToSyncBlocks(nodes);
 
   console.log("Waiting for phase 2 (contribute)")
   await waitForQuorumPhase(q, 2, expectedMembers, "receivedContributions", expectedContributions, mninfos)
   await bumpMockTimeForNodes(1, nodes);
   await generate(2);
-  await waitForAllNodesToSync(nodes);
+  await waitForAllNodesToSyncBlocks(nodes);
 
   console.log("Waiting for phase 3 (complain)")
   await waitForQuorumPhase(q, 3, expectedMembers, "receivedComplaints", expectedComplaints, mninfos)
   await bumpMockTimeForNodes(1, nodes);
   await generate(2);
-  await waitForAllNodesToSync(nodes);
+  await waitForAllNodesToSyncBlocks(nodes);
 
   console.log("Waiting for phase 4 (justify)")
   await waitForQuorumPhase(q, 4, expectedMembers, "receivedJustifications", expectedJustifications, mninfos);
   await bumpMockTimeForNodes(1, nodes);
   await generate(2);
-  await waitForAllNodesToSync(nodes);
+  await waitForAllNodesToSyncBlocks(nodes);
 
   console.log("Waiting for phase 5 (commit)")
   await waitForQuorumPhase(q, 5, expectedMembers, "receivedPrematureCommitments", expectedCommitments, mninfos);
   await bumpMockTimeForNodes(1, nodes);
   await generate(2);
-  await waitForAllNodesToSync(nodes);
+  await waitForAllNodesToSyncBlocks(nodes);
 
   console.log("Waiting for phase 6 (mining)");
   await waitForQuorumPhase(q, 6, expectedMembers, null, 0, mninfos);
@@ -134,7 +134,7 @@ async function mineQuorum(rpcClient) {
     await wait(2000);
     await bumpMockTimeForNodes(1, nodes);
     await generate(1);
-    await waitForAllNodesToSync(nodes);
+    await waitForAllNodesToSyncBlocks(nodes);
     newQuorumList = await rpcClient.quorum('list');
   }
 
@@ -144,7 +144,7 @@ async function mineQuorum(rpcClient) {
   // Mine 8 (SIGN_HEIGHT_OFFSET) more blocks to make sure that the new quorum gets eligable for signing sessions
   await generate(8);
 
-  await waitForAllNodesToSync(nodes);
+  await waitForAllNodesToSyncBlocks(nodes);
 
   console.log("New quorum: height=%d, quorumHash=%s, minedBlock=%s" % (quorum_info["height"], new_quorum, quorum_info["minedBlock"]));
 
@@ -251,11 +251,81 @@ async function checkDKGSessionPhase(rpcClients, quorumHash, phase, expectedMembe
   return allOk;
 }
 
-async function waitForAllNodesToSync(rpcClients) {
+/**
+ *
+ * Wait until everybody has the same tip.
+ * ync_blocks needs to be called with an rpc_connections set that has least
+ * one node already synced to the latest, stable tip, otherwise there's a
+ * chance it might return before all nodes are stably synced.
+ *
+ * Use getblockcount() instead of waitforblockheight() to determine the
+ * initial max height because the two RPCs look at different internal global
+ * variables (chainActive vs latestBlock) and the former gets updated
+ * earlier.
+ *
+ * @param {RpcClient[]} rpcClients
+ * @param {number} wait
+ * @param {number} timeout
+ * @return {Promise<*>}
+ */
+async function waitForAllNodesToSyncBlocks(rpcClients, wait= 1000, timeout= 60000) {
+  const heights = await Promise.all(
+    rpcClients.map(rpc => {
+      return getBlockCount(rpc);
+    })
+  );
 
+  const maxHeight = Math.max(...heights);
+
+  const deadline = Date.now() + timeout;
+  let isReady = false;
+
+  while (!isReady) {
+    const tips = await Promise.all(rpcClients.map(rpc => {
+      return waitForBlockHeight(rpc, maxHeight, wait);
+    }));
+
+    const allTipsAreSameHeight = tips
+      .filter(tip => {
+        return tip.height !== maxHeight;
+      }).length === 0;
+
+    let allTipsAreSameHash = false;
+
+    if (allTipsAreSameHeight) {
+      allTipsAreSameHash = tips
+        .filter(tip => {
+          return tip.hash !== tip[0].hash;
+        }).length === 0;
+
+      if (!allTipsAreSameHash) {
+        throw new Error('Block sync failed, mismatched block hashes');
+      }
+
+      isReady = true;
+    }
+
+    if (Date.now() > deadline) {
+      throw new Error(`Syncing blocks to height ${maxHeight} timed out`);
+    }
+  }
 }
 
-async function waitForQuorumCommitmnets() {
+/**
+ * @param {RpcClient} rpcClient
+ * @return {Promise<number>}
+ */
+async function getBlockCount(rpcClient) {
+  const { result } = rpcClient.getBlockCount;
+  return result;
+}
+
+async function waitForBlockHeight(rpcClient, maxHeight, wait) {
+  const { result } = await rpcClient.waitForBlockHeight(maxHeight, wait);
+  return result;
+}
+
+async function waitForQuorumCommitments() {
 
 }
 
