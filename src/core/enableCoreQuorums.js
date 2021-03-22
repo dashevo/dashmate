@@ -320,8 +320,15 @@ async function getBlockCount(rpcClient) {
   return result;
 }
 
-async function waitForBlockHeight(rpcClient, maxHeight, wait) {
-  const { result } = await rpcClient.waitForBlockHeight(maxHeight, wait);
+/**
+ *
+ * @param {RpcClient} rpcClient
+ * @param {number} maxHeight
+ * @param {number} timeout
+ * @return {Promise<*>}
+ */
+async function waitForBlockHeight(rpcClient, maxHeight, timeout) {
+  const { result } = await rpcClient.waitForBlockHeight(maxHeight, timeout);
   return result;
 }
 
