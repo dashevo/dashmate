@@ -386,7 +386,7 @@ async function checkQuorumConnections(rpcClients, expectedConnectionsCount) {
  * @param {number} [timeout]
  * @return {Promise<boolean>}
  */
-async function waitForQuorumConnections(expectedConnectionsCount, rpcClients, timeout= 60000, sleep= 1000) {
+async function waitForQuorumConnections(expectedConnectionsCount, rpcClients, timeout= 60000) {
   let isReady = false;
   let isOk = false;
   const deadline = Date.now() + timeout;
