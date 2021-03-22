@@ -113,12 +113,12 @@ function setupRegularPresetTaskFactory(
         options: { persistentOutput: true },
       },
       {
-        title: 'Register masternode',
+        title: 'Prepare keys',
         enabled: (ctx) => (
           ctx.nodeType === NODE_TYPE_MASTERNODE
           && ctx.fundingPrivateKeyString !== undefined
         ),
-        task: async (ctx) => {
+        task: (ctx) => {
           if (ctx.preset === PRESET_MAINNET) {
             throw new Error('For your own security, this tool will not process mainnet private keys. You should consider the private key you entered to be compromised.');
           }
@@ -129,9 +129,16 @@ function setupRegularPresetTaskFactory(
           // Write configs
           const configFiles = renderServiceTemplates(ctx.config);
           writeServiceConfigs(ctx.config.getName(), configFiles);
-
-          await registerMasternodeTask(ctx.config);
         },
+        options: { persistentOutput: true },
+      },
+      {
+        title: 'Register masternode',
+        enabled: (ctx) => (
+          ctx.nodeType === NODE_TYPE_MASTERNODE
+          && ctx.fundingPrivateKeyString !== undefined
+        ),
+        task: (ctx) => registerMasternodeTask(ctx.config),
         options: { persistentOutput: true },
       },
       {
