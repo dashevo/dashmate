@@ -344,7 +344,6 @@ async function checkQuorumConnections(rpcClients, expectedConnectionsCount) {
   for (const rpc of rpcClients) {
     const { result: status } = await rpc.quorum('dkgstatus');
 
-    // TODO: check if it is empty
     if (Object.keys(status.session).length === 0) {
       continue;
     }
