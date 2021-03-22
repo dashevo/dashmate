@@ -79,8 +79,8 @@ async function mineQuorum(rpcClient) {
 
   console.log("Waiting for phase 1 (init)");
 
-  await waitForQuorumPhase(q, 1, expectedMembers, null, 0, mninfos)
-  await waitForQuorumConnections(expectedConnections, nodes, wait_proc=lambda: self.bump_mocktime(1, nodes=nodes))
+  await waitForQuorumPhase(q, 1, expectedMembers, null, 0, mninfos);
+  await waitForQuorumConnections(expectedConnections, nodes);
 
   const { result: sporks } = await rpcClient.spork('show');
   const isSpork21Active = sporks['SPORK_21_QUORUM_ALL_CONNECTED'] === 0;
@@ -332,15 +332,87 @@ async function waitForBlockHeight(rpcClient, maxHeight, timeout) {
   return result;
 }
 
+/**
+ *
+ * @param {RpcClient[]} rpcClients
+ * @param {number} expectedConnectionsCount
+ * @return {Promise<boolean>}
+ */
+async function checkQuorumConnections(rpcClients, expectedConnectionsCount) {
+  let allOk = true;
+
+  for (const rpc of rpcClients) {
+    const { result: status } = await rpc.quorum('dkgstatus');
+
+    // TODO: check if it is empty
+    if (Object.keys(status.session).length === 0) {
+      continue;
+    }
+
+    const noConnections = status.quorumConnections == null;
+    const llmqConnections = status.quorumConnections;
+    const noLlmqTestConnections = noConnections || llmqConnections['llmq_test'] == null;
+
+    if (noLlmqTestConnections) {
+      allOk = false;
+      break;
+    }
+
+    let connectionsCount = 0;
+
+    for (let connection of llmqConnections['llmq_test']) {
+      if (connection.connected) {
+        connectionsCount += 1;
+      }
+    }
+
+    if (connectionsCount < expectedConnectionsCount) {
+      allOk = false;
+      break;
+    }
+  }
+
+  if (!allOk) {
+    await bumpMockTimeForNodes(1, rpcClients);
+    await wait(1000);
+  }
+
+  return allOk;
+}
+
+/**
+ *
+ * @param {number} expectedConnectionsCount
+ * @param {RpcClient[]} rpcClients
+ * @param {number} [timeout]
+ * @return {Promise<boolean>}
+ */
+async function waitForQuorumConnections(expectedConnectionsCount, rpcClients, timeout= 60000, sleep= 1000) {
+  let isReady = false;
+  let isOk = false;
+  const deadline = Date.now() + timeout;
+
+  while (!isReady) {
+    isOk = await checkQuorumConnections(rpcClients, expectedConnectionsCount);
+    isReady = isOk;
+
+    if (Date.now() > deadline) {
+      isReady = true;
+    }
+  }
+
+  return isOk;
+}
+
+async function checkDKGSessionCommitments() {
+
+}
+
 async function waitForQuorumCommitments() {
 
 }
 
 async function waitForMasternodeProbes() {
-
-}
-
-async function waitForQuorumConnections() {
 
 }
 
