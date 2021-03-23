@@ -135,15 +135,6 @@ function setupRegularPresetTaskFactory(
         options: { persistentOutput: true },
       },
       {
-        title: 'Register masternode',
-        enabled: (ctx) => (
-          ctx.nodeType === NODE_TYPE_MASTERNODE
-          && ctx.fundingPrivateKeyString !== undefined
-        ),
-        task: (ctx) => registerMasternodeTask(ctx.config),
-        options: { persistentOutput: true },
-      },
-      {
         title: 'Initialize Tenderdash',
         task: (ctx) => tenderdashInitTask(ctx.config),
       },
