@@ -113,7 +113,7 @@ function setupRegularPresetTaskFactory(
         options: { persistentOutput: true },
       },
       {
-        title: 'Prepare keys',
+        title: 'Register masternode',
         enabled: (ctx) => (
           ctx.nodeType === NODE_TYPE_MASTERNODE
           && ctx.fundingPrivateKeyString !== undefined
