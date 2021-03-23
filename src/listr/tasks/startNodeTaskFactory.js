@@ -78,16 +78,24 @@ function startNodeTaskFactory(
       {
         title: 'Download updates',
         enabled: () => isUpdate === true,
-        task: async () => dockerCompose.pull(config.toEnvs()),
+        skip: (ctx) => ctx.skipFurtherServiceUpdates === true,
+        task: async (ctx) => {
+          ctx.skipFurtherServiceUpdates = true;
+
+          await dockerCompose.pull(config.toEnvs());
+        },
       },
       {
         title: 'Build services',
+        skip: (ctx) => ctx.skipFurtherServiceBuilds === true,
         enabled: () => config.has('platform')
           && (
             config.get('platform.dapi.api.docker.build.path') !== null
             || config.get('platform.drive.abci.docker.build.path') !== null
           ),
-        task: () => {
+        task: (ctx) => {
+          ctx.skipFurtherServiceBuilds = true;
+
           const serviceBuildConfigs = [
             {
               name: 'Drive',
