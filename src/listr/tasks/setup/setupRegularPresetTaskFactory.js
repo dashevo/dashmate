@@ -129,6 +129,8 @@ function setupRegularPresetTaskFactory(
           // Write configs
           const configFiles = renderServiceTemplates(ctx.config);
           writeServiceConfigs(ctx.config.getName(), configFiles);
+
+          return registerMasternodeTask(ctx.config);
         },
         options: { persistentOutput: true },
       },
