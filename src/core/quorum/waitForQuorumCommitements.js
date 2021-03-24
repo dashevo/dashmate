@@ -37,13 +37,13 @@ async function checkDKGSessionCommitments(quorumHash, rpcClients) {
 
 /**
  *
- * @param {string} quorumHash
  * @param {RpcClient[]} rpcClients
+ * @param {string} quorumHash
  * @param {number} [timeout]
  * @param {number} [waitBeforeRetry]
  * @return {Promise<boolean>}
  */
-async function waitForQuorumCommitments(quorumHash, rpcClients, timeout = 15000, waitBeforeRetry = 100) {
+async function waitForQuorumCommitments(rpcClients,quorumHash, timeout = 15000, waitBeforeRetry = 100) {
   let isReady = false;
   let isOk = false;
   const deadline = Date.now() + timeout;

@@ -56,7 +56,7 @@ async function checkProbes(rpcClients) {
  * @param {number} [timeout]
  * @return {Promise<boolean>}
  */
-async function waitForMasternodeProbes(rpcClients, timeout = 30000) {
+async function waitForMasternodeProbesFactory(rpcClients, timeout = 30000) {
   let isReady = false;
   let isOk = false;
   const deadline = Date.now() + timeout;
@@ -73,4 +73,4 @@ async function waitForMasternodeProbes(rpcClients, timeout = 30000) {
   return isOk;
 }
 
-module.exports = waitForMasternodeProbes;
+module.exports = waitForMasternodeProbesFactory;

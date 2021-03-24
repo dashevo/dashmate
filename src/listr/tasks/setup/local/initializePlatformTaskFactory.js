@@ -1,5 +1,6 @@
 const { Listr } = require('listr2');
 const waitForCoreSync = require('../../../../core/waitForCoreSync');
+const RegtestNetwork = require('../../../../core/CoreRegtestNetwork')
 
 /**
  *
@@ -81,9 +82,9 @@ function initializePlatformTaskFactory(
       {
         title: 'Wait for quorums to be enabled',
         task: async (ctx) => {
-          const network = seedConfig.get('network');
+          const regtestNetwork = new RegtestNetwork(ctx.coreServices, seedConfig.get('network'));
 
-          await enableCoreQuorums(ctx.rpcClient, network);
+          await enableCoreQuorums(regtestNetwork);
         },
       },
       {

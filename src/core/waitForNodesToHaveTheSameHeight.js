@@ -1,24 +1,8 @@
-/**
- *
- * Wait until everybody has the same tip.
- * ync_blocks needs to be called with an rpc_connections set that has least
- * one node already synced to the latest, stable tip, otherwise there's a
- * chance it might return before all nodes are stably synced.
- *
- * Use getblockcount() instead of waitforblockheight() to determine the
- * initial max height because the two RPCs look at different internal global
- * variables (chainActive vs latestBlock) and the former gets updated
- * earlier.
- *
- * @param {RpcClient[]} rpcClients
- * @param {number} wait
- * @param {number} timeout
- * @return {Promise<*>}
- */
-async function waitForAllNodesToSyncBlocks(rpcClients, wait= 1000, timeout= 60000) {
+async function waitForNodesToHaveTheSameHeight(rpcClients) {
   const heights = await Promise.all(
-    rpcClients.map(rpc => {
-      return getBlockCount(rpc);
+    rpcClients.map(async (rpc) => {
+      const { result: blockCount } = await rpc.getBlockCount();
+      return blockCount;
     })
   );
 
@@ -58,4 +42,4 @@ async function waitForAllNodesToSyncBlocks(rpcClients, wait= 1000, timeout= 6000
   }
 }
 
-module.exports = waitForAllNodesToSyncBlocks;
+module.exports = waitForNodesToHaveTheSameHeight;

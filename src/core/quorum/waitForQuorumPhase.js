@@ -2,41 +2,13 @@
  *
  * @param {RpcClient[]} rpcClients
  * @param {string} quorumHash
- * @param {} phase
+ * @param {number} phase
  * @param {number} expectedMemberCount
- * @param {*} checkReceivedMessages
- * @param {number} checkReceivedMessagesCount
- * @param timeout
- * @param checkInterval
+ * @param {string} [checkReceivedMessages]
+ * @param {number} [checkReceivedMessagesCount]
  * @return {Promise<boolean>}
  */
-async function waitForQuorumPhase(rpcClients, quorumHash, phase, expectedMemberCount, checkReceivedMessages, checkReceivedMessagesCount, timeout = 30000, checkInterval = 100) {
-  const timeOut = Date.now() + timeout;
-  let isReady = false;
-  let dkgSessionIsOk = false;
-
-  while (isReady) {
-    await wait(checkInterval);
-    const dkgSessionIsOk = await checkDKGSessionPhase(rpcClients, quorumHash, phase, expectedMemberCount, checkReceivedMessages, checkReceivedMessagesCount);
-    if (dkgSessionIsOk || Date.now() > timeOut) {
-      isReady = true;
-    }
-  }
-
-  return dkgSessionIsOk;
-}
-
-/**
- *
- * @param {RpcClient[]} rpcClients
- * @param {string} quorumHash
- * @param {} phase
- * @param {number} expectedMemberCount
- * @param {*} checkReceivedMessages
- * @param {number} checkReceivedMessagesCount
- * @return {Promise<boolean>}
- */
-async function checkDKGSessionPhase(rpcClients, quorumHash, phase, expectedMemberCount, checkReceivedMessages, checkReceivedMessagesCount) {
+async function checkDKGSessionPhase(rpcClients, quorumHash, phase, expectedMemberCount, checkReceivedMessages, checkReceivedMessagesCount = 0) {
   let allOk = true;
   let memberCount = 0;
 
@@ -53,7 +25,7 @@ async function checkDKGSessionPhase(rpcClients, quorumHash, phase, expectedMembe
 
     const quorumHashDoesntMatch = llmqSession.quorumHash !== quorumHash;
     const sessionPhaseDoesntMatch = !llmqSession.hasOwnProperty("phase") || llmqSession.phase !== phase;
-    const receivedMessagesDoNotMatch = checkReceivedMessages != null && llmqSession[checkReceivedMessages] < checkReceivedMessagesCount;
+    const receivedMessagesDoNotMatch = checkReceivedMessages && llmqSession[checkReceivedMessages] < checkReceivedMessagesCount;
 
     const checkFailed = quorumHashDoesntMatch || sessionPhaseDoesntMatch || receivedMessagesDoNotMatch;
 
@@ -69,5 +41,34 @@ async function checkDKGSessionPhase(rpcClients, quorumHash, phase, expectedMembe
 
   return allOk;
 }
+
+/**
+ *
+ * @param {RpcClient[]} rpcClients
+ * @param {string} quorumHash
+ * @param {number} phase
+ * @param {number} expectedMemberCount
+ * @param {string} [checkReceivedMessagesType]
+ * @param {number} [checkReceivedMessagesCount]
+ * @param {number} [timeout]
+ * @param {number} [checkInterval]
+ * @return {Promise<boolean>}
+ */
+async function waitForQuorumPhase(rpcClients, quorumHash, phase, expectedMemberCount, checkReceivedMessagesType, checkReceivedMessagesCount, timeout = 30000, checkInterval = 100) {
+  const timeOut = Date.now() + timeout;
+  let isReady = false;
+  let dkgSessionIsOk = false;
+
+  while (isReady) {
+    await wait(checkInterval);
+    const dkgSessionIsOk = await checkDKGSessionPhase(rpcClients, quorumHash, phase, expectedMemberCount, checkReceivedMessagesType, checkReceivedMessagesCount);
+    if (dkgSessionIsOk || Date.now() > timeOut) {
+      isReady = true;
+    }
+  }
+
+  return dkgSessionIsOk;
+}
+
 
 module.exports = waitForQuorumPhase;
