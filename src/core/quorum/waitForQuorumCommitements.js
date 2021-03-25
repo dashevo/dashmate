@@ -55,7 +55,7 @@ async function waitForQuorumCommitments(rpcClients,quorumHash, timeout = 15000, 
     isReady = isOk;
 
     if (Date.now() > deadline) {
-      isReady = true;
+      throw new Error(`waitForQuorumCommitments deadline of ${timeout} exceeded`);
     }
   }
 

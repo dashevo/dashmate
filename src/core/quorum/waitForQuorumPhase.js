@@ -55,15 +55,19 @@ async function checkDKGSessionPhase(rpcClients, quorumHash, phase, expectedMembe
  * @return {Promise<boolean>}
  */
 async function waitForQuorumPhase(rpcClients, quorumHash, phase, expectedMemberCount, checkReceivedMessagesType, checkReceivedMessagesCount, timeout = 30000, checkInterval = 100) {
-  const timeOut = Date.now() + timeout;
+  const deadline = Date.now() + timeout;
   let isReady = false;
   let dkgSessionIsOk = false;
 
   while (isReady) {
     await wait(checkInterval);
     const dkgSessionIsOk = await checkDKGSessionPhase(rpcClients, quorumHash, phase, expectedMemberCount, checkReceivedMessagesType, checkReceivedMessagesCount);
-    if (dkgSessionIsOk || Date.now() > timeOut) {
+    if (dkgSessionIsOk) {
       isReady = true;
+    }
+
+    if (Date.now() > deadline) {
+      throw new Error(`waitForQuorumPhase deadline of ${timeout} exceeded`);
     }
   }
 

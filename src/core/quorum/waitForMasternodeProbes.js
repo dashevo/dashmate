@@ -74,7 +74,7 @@ async function waitForMasternodeProbes(regtestNetwork, timeout = 30000) {
     isReady = isOk;
 
     if (Date.now() > deadline) {
-      isReady = true;
+      throw new Error(`waitForMasternodeProbes deadline of ${timeout} exceeded`);
     }
   }
 

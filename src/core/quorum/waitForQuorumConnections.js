@@ -65,7 +65,7 @@ async function waitForQuorumConnections(regtestNetwork, expectedConnectionsCount
     isReady = isOk;
 
     if (Date.now() > deadline) {
-      isReady = true;
+      throw new Error(`waitForQuorumConnections deadline of ${timeout} exceeded`);
     }
   }
 
