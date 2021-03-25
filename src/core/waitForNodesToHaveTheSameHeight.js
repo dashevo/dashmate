@@ -8,8 +8,7 @@
 async function waitForNodesToHaveTheSameHeight(rpcClients, timeout = 60000, waitTime= 1000) {
   const heights = await Promise.all(
     rpcClients.map(async (rpc) => {
-      const { result: blockCount } = await rpc.getBlockCount();
-      return blockCount;
+      return rpc.getBlockCount().then(({ result }) => result);
     })
   );
 
@@ -19,9 +18,8 @@ async function waitForNodesToHaveTheSameHeight(rpcClients, timeout = 60000, wait
   let isReady = false;
 
   while (!isReady) {
-    const tips = await Promise.all(rpcClients.map(async (rpc) => {
-      const { result: tip } = await rpc.waitForBlockHeight(maxHeight, waitTime);
-      return tip;
+    const tips = await Promise.all(rpcClients.map((rpc) => {
+      return rpc.waitForBlockHeight(maxHeight, waitTime).then(({ result }) => result);
     }));
 
     const allTipsAreSameHeight = tips
@@ -34,13 +32,14 @@ async function waitForNodesToHaveTheSameHeight(rpcClients, timeout = 60000, wait
     if (allTipsAreSameHeight) {
       allTipsAreSameHash = tips
         .filter(tip => {
-          return tip.hash !== tip[0].hash;
+          return tip.hash !== tips[0].hash;
         }).length === 0;
 
       if (!allTipsAreSameHash) {
         throw new Error('Block sync failed, mismatched block hashes');
       }
 
+      // Exit the cycle once reached this point
       isReady = true;
     }
 

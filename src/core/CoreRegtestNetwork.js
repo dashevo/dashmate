@@ -1,3 +1,5 @@
+const { PrivateKey } = require('@dashevo/dashcore-lib');
+
 const waitForQuorumCommitments = require('./quorum/waitForQuorumCommitements');
 const waitForQuorumPhase = require('./quorum/waitForQuorumPhase');
 const waitForNodesToHaveTheSameHeight = require('./waitForNodesToHaveTheSameHeight');
@@ -34,10 +36,7 @@ class CoreRegtestNetwork {
    * @return {Promise<void>}
    */
   async bumpMocktime(time) {
-    this.mocktime += time;
-    for (const rpcClient of this.getAllRpcClients()) {
-      await rpcClient.setMockTime(this.mocktime);
-    }
+    await this.setMockTime(this.mocktime + 1);
   }
 
   /**
@@ -79,8 +78,24 @@ class CoreRegtestNetwork {
    * @return {Promise<void>}
    */
   async generate(count) {
+    const privateKey = new PrivateKey();
+    const address = privateKey.toAddress(this.network).toString();
+
     const rpc = this.coreServices[0].getRpcClient();
-    await rpc.generate(count);
+    await rpc.generateToAddress(count, address, 10000000);
+  }
+
+  /**
+   * Sets mock time for all nodes
+   *
+   * @param {number} mocktime
+   * @return {Promise<void>}
+   */
+  async setMockTime(mocktime) {
+    this.mocktime = mocktime;
+    for (const rpcClient of this.getAllRpcClients()) {
+      await rpcClient.setMockTime(mocktime);
+    }
   }
 
   /**
@@ -88,6 +103,7 @@ class CoreRegtestNetwork {
    * @return {Promise<void>}
    */
   async waitForAllNodesToHaveTheSameHeight() {
+
     return waitForNodesToHaveTheSameHeight(this.getAllRpcClients());
   }
 
