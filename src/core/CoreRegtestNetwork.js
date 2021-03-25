@@ -35,8 +35,8 @@ class CoreRegtestNetwork {
    */
   async bumpMocktime(time) {
     this.mocktime += time;
-    for (const coreService of this.coreServices) {
-      await coreService.setMockTime(this.mocktime);
+    for (const rpcClient of this.getAllRpcClients()) {
+      await rpcClient.setMockTime(this.mocktime);
     }
   }
 
