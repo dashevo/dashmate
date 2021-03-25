@@ -26,7 +26,7 @@ async function mineQuorum(regtestNetwork) {
     expectedCommitments=${expectedCommitments}`
   );
 
-  const quorums = await regtestNetwork.quorumList();
+  const initialQuorumList = await regtestNetwork.quorumList();
 
   const { result: bestBlockHeight } = await rpcClient.getBlockCount();
 
@@ -93,7 +93,7 @@ async function mineQuorum(regtestNetwork) {
 
   let newQuorumList = await regtestNetwork.quorumList();
 
-  while (isEqual(quorums, newQuorumList)) {
+  while (isEqual(initialQuorumList, newQuorumList)) {
     await wait(2000);
     await regtestNetwork.bumpMocktime(1);
     await regtestNetwork.generate(1);
