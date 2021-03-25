@@ -7,7 +7,6 @@ const wait = require('../../util/wait');
  * @return {Promise<boolean>}
  */
 async function checkDKGSessionCommitments(quorumHash, rpcClients) {
-  // This one doesn't have a wait stage
   let allOk = true;
 
   for (const rpc of rpcClients) {
@@ -41,25 +40,21 @@ async function checkDKGSessionCommitments(quorumHash, rpcClients) {
  * @param {string} quorumHash
  * @param {number} [timeout]
  * @param {number} [waitBeforeRetry]
- * @return {Promise<boolean>}
+ * @return {Promise<void>}
  */
 async function waitForQuorumCommitments(rpcClients,quorumHash, timeout = 15000, waitBeforeRetry = 100) {
-  let isReady = false;
-  let isOk = false;
   const deadline = Date.now() + timeout;
+  let isReady = false;
 
   while (!isReady) {
     await wait(waitBeforeRetry);
 
-    isOk = await checkDKGSessionCommitments(rpcClients);
-    isReady = isOk;
+    isReady = await checkDKGSessionCommitments(quorumHash, rpcClients);
 
     if (Date.now() > deadline) {
       throw new Error(`waitForQuorumCommitments deadline of ${timeout} exceeded`);
     }
   }
-
-  return isOk;
 }
 
 module.exports = waitForQuorumCommitments;

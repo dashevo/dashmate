@@ -53,23 +53,19 @@ async function checkQuorumConnections(regtestNetwork, expectedConnectionsCount) 
  * @param {CoreRegtestNetwork} regtestNetwork
  * @param {number} expectedConnectionsCount
  * @param {number} [timeout]
- * @return {Promise<boolean>}
+ * @return {Promise<void>}
  */
 async function waitForQuorumConnections(regtestNetwork, expectedConnectionsCount, timeout= 60000) {
-  let isReady = false;
-  let isOk = false;
   const deadline = Date.now() + timeout;
+  let isReady = false;
 
   while (!isReady) {
-    isOk = await checkQuorumConnections(regtestNetwork, expectedConnectionsCount);
-    isReady = isOk;
+    isReady = await checkQuorumConnections(regtestNetwork, expectedConnectionsCount);
 
     if (Date.now() > deadline) {
       throw new Error(`waitForQuorumConnections deadline of ${timeout} exceeded`);
     }
   }
-
-  return isOk;
 }
 
 module.exports = waitForQuorumConnections;

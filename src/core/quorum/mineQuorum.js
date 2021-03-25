@@ -8,12 +8,14 @@ const wait = require('../../util/wait');
  * @return {Promise<string>} - newly formed quorum hash
  */
 async function mineQuorum(regtestNetwork) {
+  // Those are default values for the quorum size 3 with all nodes behaving correctly
   const expectedMembers = 3;
-  const expectedContributions = 3;
   const expectedCommitments = 3;
-  const expectedConnections = 3;
-  const expectedJustifications = 3;
-  const expectedComplaints = 3;
+  const expectedConnections = 2;
+
+  const expectedContributions = 3;
+  const expectedJustifications = 0;
+  const expectedComplaints = 0;
 
   const rpcClient = regtestNetwork.getCoreServices()[0].getRpcClient();
 
@@ -26,34 +28,25 @@ async function mineQuorum(regtestNetwork) {
     expectedCommitments=${expectedCommitments}`
   );
 
-  console.log(1);
   const initialQuorumList = await regtestNetwork.quorumList();
 
-  console.log(2);
   const { result: bestBlockHeight } = await rpcClient.getBlockCount();
   const { result: bestBlockHash } = await rpcClient.getBestBlockHash();
   const { result: bestBlock } = await rpcClient.getBlock(bestBlockHash);
 
-  console.log(2.1);
   await regtestNetwork.waitForAllNodesToHaveTheSameHeight();
 
-  console.log(2.2);
   await regtestNetwork.setMockTime(bestBlock.time);
 
-  console.log(3);
   // move forward to next DKG
   const blocksUntilNextDKG = 24 - (bestBlockHeight % 24);
   if (blocksUntilNextDKG !== 0) {
-    console.log(4);
     await regtestNetwork.bumpMocktime(1);
-    console.log(5);
     await regtestNetwork.generate(blocksUntilNextDKG);
   }
 
-  console.log(6);
   await regtestNetwork.waitForAllNodesToHaveTheSameHeight();
 
-  console.log(7);
   const { result: quorumHash } = await rpcClient.getBestBlockHash();
 
   console.log("Waiting for phase 1 (init)");

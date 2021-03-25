@@ -7,9 +7,8 @@
 async function checkProbes(regtestNetwork) {
   const rpcClients = regtestNetwork.getAllRpcClients();
 
-  let masternodes = await Promise.all(rpcClients.map(async (rpc) => {
-    const { result: status } = await rpc.masternode('status');
-    return { rpc, status };
+  let masternodes = await Promise.all(rpcClients.map((rpc) => {
+    return rpc.masternode('status').then(({ result }) => { return { rpc, status: result };});
   }));
 
   masternodes = masternodes.filter(entry => !entry.status);
@@ -65,20 +64,16 @@ async function checkProbes(regtestNetwork) {
  * @return {Promise<boolean>}
  */
 async function waitForMasternodeProbes(regtestNetwork, timeout = 30000) {
-  let isReady = false;
-  let isOk = false;
   const deadline = Date.now() + timeout;
+  let isReady = false;
 
   while (!isReady) {
-    isOk = await checkProbes(regtestNetwork);
-    isReady = isOk;
+    isReady = await checkProbes(regtestNetwork);
 
     if (Date.now() > deadline) {
       throw new Error(`waitForMasternodeProbes deadline of ${timeout} exceeded`);
     }
   }
-
-  return isOk;
 }
 
 module.exports = waitForMasternodeProbes;
