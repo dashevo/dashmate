@@ -1,4 +1,5 @@
 /**
+ * Checks all mastrenodoes probes to incterconnected masternodes
  *
  * @param {CoreRegtestNetwork} regtestNetwork
  * @return {Promise<boolean>}
@@ -6,9 +7,15 @@
 async function checkProbes(regtestNetwork) {
   const rpcClients = regtestNetwork.getAllRpcClients();
 
-  for (const rpc of rpcClients) {
-    const { result: dkgStatus } = await rpc.quorum('dkgstatus');
-    const { session, quorumConnections } = dkgStatus;
+  let masternodes = await Promise.all(rpcClients.map(async (rpc) => {
+    const { result: status } = await rpc.masternode('status');
+    return { rpc, status };
+  }));
+
+  masternodes = masternodes.filter(entry => !entry.status);
+
+  for (const { rpc, status } of masternodes) {
+    const { result: { session, quorumConnections } } = await rpc.quorum('dkgstatus');
 
     if (Object.keys(session).length === 0) {
       continue;
@@ -20,13 +27,15 @@ async function checkProbes(regtestNetwork) {
     }
 
     for (let connection of quorumConnections['llmq_test']) {
-      // TODO: if connection is the current rpc node, skip
+      if (connection.proTxHash === status.proTxHash) {
+        continue;
+      }
+
       if (!connection.outbound) {
         const { result: mnInfo } = await rpc.protx('info', connection.proTxHash);
 
-        // TODO: add mnInfos to the functions
-        for (masternode in mnInfos) {
-          if (connection.protxHash === masternode.protxHash) {
+        for (const masternode in masternodes) {
+          if (connection.proTxHash === masternode.status.proTxHash) {
             // MN is expected to be online and functioning, so let's verify that the last successful
             // probe is not too old. Probes are retried after 50 minutes, while DKGs consider a probe
             // as failed after 60 minutes

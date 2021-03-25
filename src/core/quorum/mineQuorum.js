@@ -2,7 +2,7 @@ const isEqual = require('lodash.isequal');
 const wait = require('../../util/wait');
 
 /**
- * Ensures through all steps that a new quorum was successfully created
+ * Ensures through all steps that a new quorum was successfully created and is ready to perform signatures
  *
  * @param {CoreRegtestNetwork} regtestNetwork
  * @return {Promise<string>} - newly formed quorum hash
