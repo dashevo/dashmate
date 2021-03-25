@@ -110,7 +110,7 @@ class CoreRegtestNetwork {
   /**
    *
    * @param {string} quorumHash
-   * @return {Promise<boolean>}
+   * @return {Promise<void>}
    */
   async waitForQuorumCommitments(quorumHash) {
     return waitForQuorumCommitments(this.getAllRpcClients(), quorumHash);
@@ -123,7 +123,7 @@ class CoreRegtestNetwork {
    * @param {number} expectedMembersCount
    * @param {string} [checkReceivedMessagesType]
    * @param {number} [receivedMessagesCount]
-   * @return {Promise<boolean>}
+   * @return {Promise<void>}
    */
   async waitForQuorumPhase(quorumHash, phase, expectedMembersCount, checkReceivedMessagesType, receivedMessagesCount= 0) {
     return waitForQuorumPhase(this.getAllRpcClients(), quorumHash, phase, expectedMembersCount, checkReceivedMessagesType, receivedMessagesCount);
@@ -132,7 +132,7 @@ class CoreRegtestNetwork {
   /**
    *
    * @param {number} expectedConnectionsCount
-   * @return {Promise<boolean>}
+   * @return {Promise<void>}
    */
   async waitForQuorumConnections(expectedConnectionsCount) {
     return waitForQuorumConnections(this, expectedConnectionsCount);
@@ -141,7 +141,7 @@ class CoreRegtestNetwork {
   /**
    *
    * @param {number} [timeout]
-   * @return {Promise<boolean>}
+   * @return {Promise<void>}
    */
   async waitForMasternodeProbes(timeout) {
     return waitForMasternodeProbes(this, timeout);

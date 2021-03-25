@@ -61,7 +61,7 @@ async function checkProbes(regtestNetwork) {
  *
  * @param {CoreRegtestNetwork} regtestNetwork
  * @param {number} [timeout]
- * @return {Promise<boolean>}
+ * @return {Promise<void>}
  */
 async function waitForMasternodeProbes(regtestNetwork, timeout = 30000) {
   const deadline = Date.now() + timeout;

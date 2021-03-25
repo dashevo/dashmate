@@ -54,7 +54,7 @@ async function checkDKGSessionPhase(rpcClients, quorumHash, phase, expectedMembe
  * @param {number} [checkReceivedMessagesCount]
  * @param {number} [timeout]
  * @param {number} [checkInterval]
- * @return {Promise<boolean>}
+ * @return {Promise<void>}
  */
 async function waitForQuorumPhase(rpcClients, quorumHash, phase, expectedMemberCount, checkReceivedMessagesType, checkReceivedMessagesCount, timeout = 30000, checkInterval = 100) {
   const deadline = Date.now() + timeout;
