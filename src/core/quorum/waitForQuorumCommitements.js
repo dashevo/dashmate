@@ -11,7 +11,7 @@ async function checkDKGSessionCommitments(quorumHash, rpcClients) {
   let allOk = true;
 
   for (const rpc of rpcClients) {
-    const { result: dkgStatus } = rpc.quorum('dkgstatus');
+    const { result: dkgStatus } = await rpc.quorum('dkgstatus');
 
     if (!dkgStatus.minableCommitments) {
       allOk = false;

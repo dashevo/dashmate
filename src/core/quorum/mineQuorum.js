@@ -1,3 +1,4 @@
+const isEqual = require('lodash.isequal');
 const wait = require('../../util/wait');
 
 /**
@@ -25,7 +26,7 @@ async function mineQuorum(regtestNetwork) {
     expectedCommitments=${expectedCommitments}`
   );
 
-  const { result: quorums } = regtestNetwork.quorumList();
+  const quorums = await regtestNetwork.quorumList();
 
   const { result: bestBlockHeight } = await rpcClient.getBlockCount();
 
@@ -92,8 +93,7 @@ async function mineQuorum(regtestNetwork) {
 
   let newQuorumList = await regtestNetwork.quorumList();
 
-  // TODO: This should be deep equal to the quorums at the beginning
-  while (newQuorumList) {
+  while (isEqual(quorums, newQuorumList)) {
     await wait(2000);
     await regtestNetwork.bumpMocktime(1);
     await regtestNetwork.generate(1);

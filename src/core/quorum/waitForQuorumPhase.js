@@ -12,8 +12,8 @@ async function checkDKGSessionPhase(rpcClients, quorumHash, phase, expectedMembe
   let allOk = true;
   let memberCount = 0;
 
-  for (let mnClient of rpcClients) {
-    const { result: dkgStatus } = await mnClient.quorum("dkgstatus");
+  for (let rpc of rpcClients) {
+    const { result: dkgStatus } = await rpc.quorum("dkgstatus");
     const { session } = dkgStatus;
 
     if (!session.hasOwnProperty("llmq_test")) {

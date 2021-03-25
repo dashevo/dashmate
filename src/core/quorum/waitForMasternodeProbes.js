@@ -7,7 +7,7 @@ async function checkProbes(regtestNetwork) {
   const rpcClients = regtestNetwork.getAllRpcClients();
 
   for (const rpc of rpcClients) {
-    const dkgStatus = rpc.quorum('dkgstatus');
+    const { result: dkgStatus } = await rpc.quorum('dkgstatus');
     const { session, quorumConnections } = dkgStatus;
 
     if (Object.keys(session).length === 0) {
@@ -22,7 +22,7 @@ async function checkProbes(regtestNetwork) {
     for (let connection of quorumConnections['llmq_test']) {
       // TODO: if connection is the current rpc node, skip
       if (!connection.outbound) {
-        const mnInfo = await rpc.protx(connection.proTxHash);
+        const { result: mnInfo } = await rpc.protx('info', connection.proTxHash);
 
         // TODO: add mnInfos to the functions
         for (masternode in mnInfos) {
