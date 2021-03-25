@@ -1,6 +1,8 @@
 const waitForQuorumCommitments = require('./quorum/waitForQuorumCommitements');
 const waitForQuorumPhase = require('./quorum/waitForQuorumPhase');
 const waitForNodesToHaveTheSameHeight = require('./waitForNodesToHaveTheSameHeight');
+const waitForQuorumConnections = require('./quorum/waitForQuorumConnections');
+const waitForMasternodeProbes = require('./quorum/waitForMasternodeProbes');
 
 const GENESIS_TIME = 1417713337;
 
@@ -46,8 +48,29 @@ class CoreRegtestNetwork {
     return this.coreServices.map(coreService => coreService.getRpcClient());
   }
 
-  async waitForAllNodesToHaveTheSameHeight() {
-    await waitForNodesToHaveTheSameHeight(this.getAllRpcClients());
+  /**
+   *
+   * @param {number} [param]
+   * @return {Promise<*>}
+   */
+  async quorumList(param) {
+    const rpc = this.coreServices[0].getRpcClient();
+    const { result } = await rpc.quorum('list', param);
+
+    return result;
+  }
+
+  /**
+   *
+   * @param {number} param
+   * @param {string} taram
+   * @return {Promise<*>}
+   */
+  async quorumInfo(param, taram) {
+    const rpc = this.coreServices[0].getRpcClient();
+    const { result } = await rpc.quorum('info', param, taram);
+
+    return result;
   }
 
   /**
@@ -58,6 +81,14 @@ class CoreRegtestNetwork {
   async generate(count) {
     const rpc = this.coreServices[0].getRpcClient();
     await rpc.generate(count);
+  }
+
+  /**
+   *
+   * @return {Promise<void>}
+   */
+  async waitForAllNodesToHaveTheSameHeight() {
+    return waitForNodesToHaveTheSameHeight(this.getAllRpcClients());
   }
 
   /**
@@ -84,27 +115,20 @@ class CoreRegtestNetwork {
 
   /**
    *
-   * @param {number} [param]
-   * @return {Promise<*>}
+   * @param {number} expectedConnectionsCount
+   * @return {Promise<boolean>}
    */
-  async quorumList(param) {
-    const rpc = this.coreServices[0].getRpcClient();
-    const { result } = await rpc.quorum('list', param);
-
-    return result;
+  async waitForQuorumConnections(expectedConnectionsCount) {
+    return waitForQuorumConnections(this, expectedConnectionsCount);
   }
 
   /**
    *
-   * @param {number} param
-   * @param {string} taram
-   * @return {Promise<*>}
+   * @param {number} [timeout]
+   * @return {Promise<boolean>}
    */
-  async quorumInfo(param, taram) {
-    const rpc = this.coreServices[0].getRpcClient();
-    const { result } = await rpc.quorum('info', param, taram);
-
-    return result;
+  async waitForMasternodeProbes(timeout) {
+    return waitForMasternodeProbes(this, timeout);
   }
 }
 

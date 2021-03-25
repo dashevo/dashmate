@@ -1,14 +1,10 @@
-async function waitProbes(rpcClients) {
-  await bumpMockTimeForNodes(1, rpcClients);
-  return false;
-}
-
 /**
  *
- * @param {RpcClient[]} rpcClients
+ * @param {CoreRegtestNetwork} regtestNetwork
  * @return {Promise<boolean>}
  */
-async function checkProbes(rpcClients) {
+async function checkProbes(regtestNetwork) {
+  const rpcClients = regtestNetwork.getAllRpcClients();
 
   for (const rpc of rpcClients) {
     const dkgStatus = rpc.quorum('dkgstatus');
@@ -19,7 +15,8 @@ async function checkProbes(rpcClients) {
     }
 
     if (!quorumConnections || !quorumConnections['llmq_test']) {
-      return await waitProbes();
+      await regtestNetwork.bumpMocktime(1);
+      return false;
     }
 
     for (let connection of quorumConnections['llmq_test']) {
@@ -34,12 +31,14 @@ async function checkProbes(rpcClients) {
             // probe is not too old. Probes are retried after 50 minutes, while DKGs consider a probe
             // as failed after 60 minutes
             if (mnInfo['metaInfo']['lastOutboundSuccessElapsed'] > 55 * 60) {
-              return await waitProbes();
+              await regtestNetwork.bumpMocktime(1);
+              return false;
             }
           } else {
             // MN is expected to be offline, so let's only check that the last probe is not too long ago
             if (mnInfo['metaInfo']['lastOutboundAttemptElapsed'] > 55 * 60 && mnInfo['metaInfo']['lastOutboundSuccessElapsed'] > 55 * 60) {
-              return await waitProbes();
+              await regtestNetwork.bumpMocktime(1);
+              return false;
             }
           }
         }
@@ -52,17 +51,17 @@ async function checkProbes(rpcClients) {
 
 /**
  *
- * @param {RpcClient[]} rpcClients
+ * @param {CoreRegtestNetwork} regtestNetwork
  * @param {number} [timeout]
  * @return {Promise<boolean>}
  */
-async function waitForMasternodeProbesFactory(rpcClients, timeout = 30000) {
+async function waitForMasternodeProbes(regtestNetwork, timeout = 30000) {
   let isReady = false;
   let isOk = false;
   const deadline = Date.now() + timeout;
 
   while (!isReady) {
-    isOk = await checkProbes(rpcClients);
+    isOk = await checkProbes(regtestNetwork);
     isReady = isOk;
 
     if (Date.now() > deadline) {
@@ -73,4 +72,4 @@ async function waitForMasternodeProbesFactory(rpcClients, timeout = 30000) {
   return isOk;
 }
 
-module.exports = waitForMasternodeProbesFactory;
+module.exports = waitForMasternodeProbes;

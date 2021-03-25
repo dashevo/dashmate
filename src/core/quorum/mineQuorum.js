@@ -1,9 +1,10 @@
 const wait = require('../../util/wait');
 
 /**
+ * Ensures through all steps that a new quorum was successfully created
  *
  * @param {CoreRegtestNetwork} regtestNetwork
- * @return {Promise<*>}
+ * @return {Promise<string>} - newly formed quorum hash
  */
 async function mineQuorum(regtestNetwork) {
   const expectedMembers = 3;
@@ -12,13 +13,10 @@ async function mineQuorum(regtestNetwork) {
   const expectedConnections = 3;
   const expectedJustifications = 3;
   const expectedComplaints = 3;
-  const mninfos = [];
 
   const rpcClient = regtestNetwork.getCoreServices()[0].getRpcClient();
-  const rpcClients = regtestNetwork.getAllRpcClients();
 
   console.log(`Mining quorum:
-
     expectedMembers=${expectedMembers},
     expectedConnections=${expectedConnections},
     expectedContributions=${expectedContributions},
@@ -27,13 +25,12 @@ async function mineQuorum(regtestNetwork) {
     expectedCommitments=${expectedCommitments}`
   );
 
-  const nodes = []; // Get all RPC clients
-
   const { result: quorums } = regtestNetwork.quorumList();
 
   const { result: bestBlockHeight } = await rpcClient.getBlockCount();
+
   // move forward to next DKG
-  const blocksUntilNextDKG = 24 - (bestBlockHeight  % 24);
+  const blocksUntilNextDKG = 24 - (bestBlockHeight % 24);
   if (blocksUntilNextDKG !== 0) {
     await regtestNetwork.bumpMocktime(1);
     await regtestNetwork.generate(blocksUntilNextDKG);
@@ -46,13 +43,13 @@ async function mineQuorum(regtestNetwork) {
   console.log("Waiting for phase 1 (init)");
 
   await regtestNetwork.waitForQuorumPhase(quorumHash, 1, expectedMembers);
-  await waitForQuorumConnections(expectedConnections, nodes);
+  await regtestNetwork.waitForQuorumConnections(expectedConnections);
 
   const { result: sporks } = await rpcClient.spork('show');
   const isSpork21Active = sporks['SPORK_21_QUORUM_ALL_CONNECTED'] === 0;
 
   if (isSpork21Active) {
-    await waitForMasternodeProbes(mninfos);
+    await regtestNetwork.waitForMasternodeProbes();
   }
 
   await regtestNetwork.bumpMocktime(1);
@@ -95,7 +92,7 @@ async function mineQuorum(regtestNetwork) {
 
   let newQuorumList = await regtestNetwork.quorumList();
 
-  // This should be deep equal to the quorums at the beginning
+  // TODO: This should be deep equal to the quorums at the beginning
   while (newQuorumList) {
     await wait(2000);
     await regtestNetwork.bumpMocktime(1);
@@ -106,7 +103,7 @@ async function mineQuorum(regtestNetwork) {
 
   const quorumList = await regtestNetwork.quorumList(1);
   const newQuorumHash = quorumList["llmq_test"][0];
-  const quorum_info = regtestNetwork.quorumInfo(100, newQuorumHash);
+  const quorumInfo = regtestNetwork.quorumInfo(100, newQuorumHash);
 
   // Mine 8 (SIGN_HEIGHT_OFFSET) more blocks to make sure that the new quorum gets eligable for signing sessions
   await regtestNetwork.generate(8);

@@ -2,12 +2,13 @@ const wait = require('../../util/wait');
 
 /**
  *
- * @param {RpcClient[]} rpcClients
+ * @param {CoreRegtestNetwork} regtestNetwork
  * @param {number} expectedConnectionsCount
  * @return {Promise<boolean>}
  */
-async function checkQuorumConnections(rpcClients, expectedConnectionsCount) {
+async function checkQuorumConnections(regtestNetwork, expectedConnectionsCount) {
   let allOk = true;
+  const rpcClients = regtestNetwork.getAllRpcClients();
 
   for (const rpc of rpcClients) {
     const { result: dkgStatus } = await rpc.quorum('dkgstatus');
@@ -40,7 +41,7 @@ async function checkQuorumConnections(rpcClients, expectedConnectionsCount) {
   }
 
   if (!allOk) {
-    await bumpMockTimeForNodes(1, rpcClients);
+    await regtestNetwork.bumpMocktime(1);
     await wait(1000);
   }
 
@@ -49,18 +50,18 @@ async function checkQuorumConnections(rpcClients, expectedConnectionsCount) {
 
 /**
  *
+ * @param {CoreRegtestNetwork} regtestNetwork
  * @param {number} expectedConnectionsCount
- * @param {RpcClient[]} rpcClients
  * @param {number} [timeout]
  * @return {Promise<boolean>}
  */
-async function waitForQuorumConnectionsFactory(expectedConnectionsCount, rpcClients, timeout= 60000) {
+async function waitForQuorumConnections(regtestNetwork, expectedConnectionsCount, timeout= 60000) {
   let isReady = false;
   let isOk = false;
   const deadline = Date.now() + timeout;
 
   while (!isReady) {
-    isOk = await checkQuorumConnections(rpcClients, expectedConnectionsCount);
+    isOk = await checkQuorumConnections(regtestNetwork, expectedConnectionsCount);
     isReady = isOk;
 
     if (Date.now() > deadline) {
@@ -71,4 +72,4 @@ async function waitForQuorumConnectionsFactory(expectedConnectionsCount, rpcClie
   return isOk;
 }
 
-module.exports = waitForQuorumConnectionsFactory;
+module.exports = waitForQuorumConnections;
