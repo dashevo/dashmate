@@ -170,13 +170,16 @@ function registerMasternodeTaskFactory(
         ),
       },
       {
-        title: 'Reach 1000 blocks to enable DML',
+        title: 'Activating DIP8 to enable DML',
         enabled: () => config.get('network') === NETWORK_LOCAL,
         // eslint-disable-next-line consistent-return
         task: async (ctx, task) => {
           const { result: blockCount } = await ctx.coreService.getRpcClient().getBlockCount();
 
-          if (blockCount >= 1000) {
+          const { result: blockchainInfo } = await ctx.coreService.getRpcClient().getBlockchainInfo();
+          let isDip8Activated = blockchainInfo["bip9_softforks"]["dip0008"]["status"] === "active";
+
+          if (isDip8Activated) {
             // eslint-disable-next-line no-param-reassign
             task.skip = true;
 
@@ -185,15 +188,23 @@ function registerMasternodeTaskFactory(
 
           // eslint-disable-next-line consistent-return
           return new Observable(async (observer) => {
-            await generateBlocks(
-              ctx.coreService,
-              1000 - blockCount,
-              config.get('network'),
-              (blocks) => {
-                const remaining = 1000 - blockCount - blocks;
-                observer.next(`${remaining} ${remaining > 1 ? 'blocks' : 'block'} remaining`);
-              },
-            );
+            let blocksGenerated = 0;
+            const blocksToGenerateInOneStep = 10;
+
+            while (!isDip8Activated) {
+              await generateBlocks(
+                ctx.coreService,
+                blocksToGenerateInOneStep,
+                config.get('network'),
+                (blocks) => {
+                  blocksGenerated += 1;
+                  observer.next(`${blocksGenerated} blocks generated`);
+                },
+              );
+
+              const { result: blockchainInfo } = await ctx.coreService.getRpcClient().getBlockchainInfo();
+              isDip8Activated = blockchainInfo["bip9_softforks"]["dip0008"]["status"] === "active";
+            }
 
             observer.complete();
 

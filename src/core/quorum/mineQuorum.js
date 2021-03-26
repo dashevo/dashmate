@@ -29,13 +29,14 @@ async function mineQuorum(regtestNetwork, quorumType) {
     expectedCommitments=${expectedCommitments}`
   );
 
+  // Waiting up to 5 minutes to all nodes to catch up
+  await regtestNetwork.waitForAllNodesToHaveTheSameHeight(60 * 5 * 1000);
+
   const initialQuorumList = await regtestNetwork.quorumList();
 
   const { result: bestBlockHeight } = await rpcClient.getBlockCount();
   const { result: bestBlockHash } = await rpcClient.getBestBlockHash();
   const { result: bestBlock } = await rpcClient.getBlock(bestBlockHash);
-
-  await regtestNetwork.waitForAllNodesToHaveTheSameHeight();
 
   await regtestNetwork.setMockTime(bestBlock.time);
 

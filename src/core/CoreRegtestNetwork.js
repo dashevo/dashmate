@@ -100,11 +100,12 @@ class CoreRegtestNetwork {
 
   /**
    *
+   * @param {number} [timeout]
    * @return {Promise<void>}
    */
-  async waitForAllNodesToHaveTheSameHeight() {
+  async waitForAllNodesToHaveTheSameHeight(timeout) {
 
-    return waitForNodesToHaveTheSameHeight(this.getAllRpcClients());
+    return waitForNodesToHaveTheSameHeight(this.getAllRpcClients(), timeout);
   }
 
   /**
