@@ -5,9 +5,10 @@ const wait = require('../../util/wait');
  * Ensures through all steps that a new quorum was successfully created and is ready to perform signatures
  *
  * @param {CoreRegtestNetwork} regtestNetwork
+ * @param {string} quorumType
  * @return {Promise<string>} - newly formed quorum hash
  */
-async function mineQuorum(regtestNetwork) {
+async function mineQuorum(regtestNetwork, quorumType) {
   // Those are default values for the quorum size 3 with all nodes behaving correctly
   const expectedMembers = 3;
   const expectedCommitments = 3;
@@ -95,7 +96,7 @@ async function mineQuorum(regtestNetwork) {
   console.log("Waiting final commitment");
   await regtestNetwork.waitForQuorumCommitments(quorumHash);
 
-  console.log("Mining final commitment")
+  console.log("Mining final commitment");
   await regtestNetwork.bumpMocktime(1);
   await regtestNetwork.generate(1);
 
@@ -118,7 +119,7 @@ async function mineQuorum(regtestNetwork) {
 
   await regtestNetwork.waitForAllNodesToHaveTheSameHeight();
 
-  // console.log("New quorum: height=%d, quorumHash=%s, minedBlock=%s" % (quorum_info["height"], new_quorum, quorum_info["minedBlock"]));
+  console.log(`New quorum mined: height: ${quorumInfo.height}, quorum hash: ${newQuorumHash}, mined in block: ${quorumInfo.minedBlock}`);
 
   return newQuorumHash;
 }

@@ -14,6 +14,8 @@ async function waitForNodesToHaveTheSameHeight(rpcClients, timeout = 60000, wait
 
   const maxHeight = Math.max(...heights);
 
+  console.log(`Syncing all nodes ${rpcClients.length} to height ${maxHeight}`);
+
   const deadline = Date.now() + timeout;
   let isReady = false;
 

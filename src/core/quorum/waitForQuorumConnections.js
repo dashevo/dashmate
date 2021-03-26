@@ -26,15 +26,20 @@ async function checkQuorumConnections(regtestNetwork, expectedConnectionsCount) 
       break;
     }
 
+    const llmqTestConnections = llmqConnections['llmq_test'];
+
     let connectionsCount = 0;
 
-    for (let connection of llmqConnections['llmq_test']) {
+    console.dir(llmqTestConnections);
+
+    for (let connection of llmqTestConnections) {
       if (connection.connected) {
         connectionsCount += 1;
       }
     }
 
     if (connectionsCount < expectedConnectionsCount) {
+      console.log('Expected', expectedConnectionsCount, 'connections, got', connectionsCount);
       allOk = false;
       break;
     }
