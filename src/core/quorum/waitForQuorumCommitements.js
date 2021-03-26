@@ -12,24 +12,18 @@ async function checkDKGSessionCommitments(quorumHash, rpcClients) {
   for (const rpc of rpcClients) {
     const { result: dkgStatus } = await rpc.quorum('dkgstatus');
 
-    console.log("Dkg status:");
-    console.dir(dkgStatus);
     if (!dkgStatus.minableCommitments) {
       allOk = false;
       break;
     }
 
     const testQuorumCommitment = dkgStatus.minableCommitments["llmq_test"];
-    console.log("Commitment:");
-    console.dir(testQuorumCommitment);
 
     if (!testQuorumCommitment) {
       allOk = false;
       break;
     }
 
-    console.log("Comparing quorum hashes:");
-    console.log(testQuorumCommitment.quorumHash, quorumHash);
     if (testQuorumCommitment.quorumHash !== quorumHash) {
       allOk = false;
       break;

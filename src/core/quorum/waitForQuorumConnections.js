@@ -30,8 +30,6 @@ async function checkQuorumConnections(regtestNetwork, expectedConnectionsCount) 
 
     let connectionsCount = 0;
 
-    console.dir(llmqTestConnections);
-
     for (let connection of llmqTestConnections) {
       if (connection.connected) {
         connectionsCount += 1;
@@ -39,7 +37,6 @@ async function checkQuorumConnections(regtestNetwork, expectedConnectionsCount) 
     }
 
     if (connectionsCount < expectedConnectionsCount) {
-      console.log('Expected', expectedConnectionsCount, 'connections, got', connectionsCount);
       allOk = false;
       break;
     }
@@ -60,7 +57,7 @@ async function checkQuorumConnections(regtestNetwork, expectedConnectionsCount) 
  * @param {number} [timeout]
  * @return {Promise<void>}
  */
-async function waitForQuorumConnections(regtestNetwork, expectedConnectionsCount, timeout= 60000) {
+async function waitForQuorumConnections(regtestNetwork, expectedConnectionsCount, timeout= 300000) {
   const deadline = Date.now() + timeout;
   let isReady = false;
 

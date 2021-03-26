@@ -49,31 +49,6 @@ class CoreRegtestNetwork {
 
   /**
    *
-   * @param {number} [param]
-   * @return {Promise<*>}
-   */
-  async quorumList(param) {
-    const rpc = this.coreServices[0].getRpcClient();
-    const { result } = await rpc.quorum('list', param);
-
-    return result;
-  }
-
-  /**
-   *
-   * @param {number} param
-   * @param {string} taram
-   * @return {Promise<*>}
-   */
-  async quorumInfo(param, taram) {
-    const rpc = this.coreServices[0].getRpcClient();
-    const { result } = await rpc.quorum('info', param, taram);
-
-    return result;
-  }
-
-  /**
-   *
    * @param {number} count - block count to generate
    * @return {Promise<void>}
    */
@@ -104,7 +79,6 @@ class CoreRegtestNetwork {
    * @return {Promise<void>}
    */
   async waitForAllNodesToHaveTheSameHeight(timeout) {
-
     return waitForNodesToHaveTheSameHeight(this.getAllRpcClients(), timeout);
   }
 
@@ -124,9 +98,10 @@ class CoreRegtestNetwork {
    * @param {number} expectedMembersCount
    * @param {string} [checkReceivedMessagesType]
    * @param {number} [receivedMessagesCount]
+   * @param {number} [timeout]
    * @return {Promise<void>}
    */
-  async waitForQuorumPhase(quorumHash, phase, expectedMembersCount, checkReceivedMessagesType, receivedMessagesCount= 0) {
+  async waitForQuorumPhase(quorumHash, phase, expectedMembersCount, checkReceivedMessagesType, receivedMessagesCount= 0, timeout = 300000) {
     return waitForQuorumPhase(this.getAllRpcClients(), quorumHash, phase, expectedMembersCount, checkReceivedMessagesType, receivedMessagesCount);
   }
 

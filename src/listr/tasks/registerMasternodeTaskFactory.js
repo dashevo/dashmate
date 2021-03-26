@@ -176,15 +176,8 @@ function registerMasternodeTaskFactory(
         task: async (ctx, task) => {
           const { result: blockCount } = await ctx.coreService.getRpcClient().getBlockCount();
 
-          const { result: blockchainInfo } = await ctx.coreService.getRpcClient().getBlockchainInfo();
+          let { result: blockchainInfo } = await ctx.coreService.getRpcClient().getBlockchainInfo();
           let isDip8Activated = blockchainInfo["bip9_softforks"]["dip0008"]["status"] === "active";
-
-          if (isDip8Activated) {
-            // eslint-disable-next-line no-param-reassign
-            task.skip = true;
-
-            return;
-          }
 
           // eslint-disable-next-line consistent-return
           return new Observable(async (observer) => {
@@ -202,9 +195,11 @@ function registerMasternodeTaskFactory(
                 },
               );
 
-              const { result: blockchainInfo } = await ctx.coreService.getRpcClient().getBlockchainInfo();
-              isDip8Activated = blockchainInfo["bip9_softforks"]["dip0008"]["status"] === "active";
+              ({ result: blockchainInfo } = await ctx.coreService.getRpcClient().getBlockchainInfo());
+              isDip8Activated = blockchainInfo.bip9_softforks.dip0008.status === "active";
             }
+
+            observer.next(`DIP8 has been activated at height ${blockchainInfo.bip9_softforks.dip0008.since}`);
 
             observer.complete();
 

@@ -20,20 +20,10 @@ async function mineQuorum(regtestNetwork, quorumType) {
 
   const rpcClient = regtestNetwork.getCoreServices()[0].getRpcClient();
 
-  console.log(`Mining quorum:
-    expectedMembers=${expectedMembers},
-    expectedConnections=${expectedConnections},
-    expectedContributions=${expectedContributions},
-    expectedComplaints=${expectedComplaints},
-    expectedJustifications=${expectedJustifications},
-    expectedCommitments=${expectedCommitments}`
-  );
-
   // Waiting up to 5 minutes to all nodes to catch up
   await regtestNetwork.waitForAllNodesToHaveTheSameHeight(60 * 5 * 1000);
 
-  const initialQuorumList = await regtestNetwork.quorumList();
-
+  const { result: initialQuorumList } = await rpcClient.quorum("list");
   const { result: bestBlockHeight } = await rpcClient.getBlockCount();
   const { result: bestBlockHash } = await rpcClient.getBestBlockHash();
   const { result: bestBlock } = await rpcClient.getBlock(bestBlockHash);
@@ -101,26 +91,27 @@ async function mineQuorum(regtestNetwork, quorumType) {
   await regtestNetwork.bumpMocktime(1);
   await regtestNetwork.generate(1);
 
-  let newQuorumList = await regtestNetwork.quorumList();
+  let { result: newQuorumList } = await rpcClient.quorum("list");
 
+  console.log("Waiting for the new quorum to appear on the quorum list");
   while (isEqual(initialQuorumList, newQuorumList)) {
     await wait(2000);
     await regtestNetwork.bumpMocktime(1);
     await regtestNetwork.generate(1);
     await regtestNetwork.waitForAllNodesToHaveTheSameHeight();
-    newQuorumList = await regtestNetwork.quorumList();
+    ({ result: newQuorumList } = await rpcClient.quorum("list"));
   }
 
-  const quorumList = await regtestNetwork.quorumList(1);
+  const { result: quorumList } = await rpcClient.quorum("list", 1);
   const newQuorumHash = quorumList["llmq_test"][0];
-  const quorumInfo = regtestNetwork.quorumInfo(100, newQuorumHash);
+  const { result: quorumInfo } = await rpcClient.quorum('info', 100, newQuorumHash)
 
-  // Mine 8 (SIGN_HEIGHT_OFFSET) more blocks to make sure that the new quorum gets eligable for signing sessions
+  console.log("Ensuring that the new quorum is eligible for signing sessions");
+  // Mine 8 (SIGN_HEIGHT_OFFSET) more blocks to make sure that the new quorum gets eligible for signing sessions
   await regtestNetwork.generate(8);
-
   await regtestNetwork.waitForAllNodesToHaveTheSameHeight();
 
-  console.log(`New quorum mined: height: ${quorumInfo.height}, quorum hash: ${newQuorumHash}, mined in block: ${quorumInfo.minedBlock}`);
+  console.log(`New quorum mined. Quorum height: ${quorumInfo.height}, quorum hash: ${newQuorumHash}, mined in block: ${quorumInfo.minedBlock}`);
 
   return newQuorumHash;
 }
