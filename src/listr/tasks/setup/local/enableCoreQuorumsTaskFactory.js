@@ -97,6 +97,8 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
 
           ctx.quorumHash = quorumHash;
 
+          console.log(1);
+
           await waitForQuorumPhase(
             ctx.rpcClients,
             ctx.quorumHash,
@@ -104,11 +106,15 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
             ctx.expectedMembers,
           );
 
+          console.log(2);
+
           await waitForQuorumConnections(
             ctx.rpcClients,
             ctx.expectedConnections,
             ctx.bumpMockTime,
           );
+
+          console.log(3);
 
           const { result: sporks } = await ctx.firstRpcClient.spork('show');
           const isSpork21Active = sporks.SPORK_21_QUORUM_ALL_CONNECTED === 0;
@@ -120,6 +126,8 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
             );
           }
 
+          console.log(4);
+
           await ctx.bumpMockTime();
 
           await generateBlocks(
@@ -127,6 +135,8 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
             2,
             NETWORK_LOCAL,
           );
+
+          console.log(5);
 
           await waitForNodesToHaveTheSameHeight(
             ctx.rpcClients,
