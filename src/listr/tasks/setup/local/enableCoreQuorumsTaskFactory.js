@@ -46,7 +46,7 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
             ctx.mockTime += time;
 
             for (const rpcClient of ctx.rpcClients) {
-              await rpcClient.setMockTime(time);
+              await rpcClient.setMockTime(ctx.mockTime);
             }
           };
         },

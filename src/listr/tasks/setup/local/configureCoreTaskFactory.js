@@ -73,12 +73,10 @@ function configureCoreTaskFactory(
             );
 
             // Set private key to seed node
-            if (!config.isPlatformServicesEnabled()) {
-              config.set(
-                'core.spork.privateKey',
-                sporkPrivKey.toWIF(),
-              );
-            }
+            config.set(
+              'core.spork.privateKey',
+              sporkPrivKey.toWIF(),
+            );
 
             // Write configs
             const configFiles = renderServiceTemplates(config);
@@ -212,18 +210,6 @@ function configureCoreTaskFactory(
                 return new Listr(subTasks);
               },
             },
-            // {
-            //   title: 'Waiting for Core seed node to be avalable',
-            //   task: async (ctx) => {
-            //     ctx.rpcClient = createRpcClient({
-            //       port: seedConfig.get('core.rpc.port'),
-            //       user: seedConfig.get('core.rpc.user'),
-            //       pass: seedConfig.get('core.rpc.password'),
-            //     });
-            //
-            //     await waitForCoreSync(ctx.rpcClient);
-            //   },
-            // },
             {
               title: 'Enable sporks',
               task: async () => {
