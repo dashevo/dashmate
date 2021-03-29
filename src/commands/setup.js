@@ -103,10 +103,6 @@ class SetupCommand extends BaseCommand {
         fundingPrivateKeyString,
       });
     } catch (e) {
-      if (isVerbose) {
-        throw e;
-      }
-
       throw new MuteOneLineError(e);
     }
   }
