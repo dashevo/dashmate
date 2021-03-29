@@ -5,6 +5,8 @@ const {
   PrivateKey,
 } = require('@dashevo/dashcore-lib');
 
+const waitForNodesToHaveTheSameSporks = require('../../../../core/waitForNodesToHaveTheSameSporks');
+
 const { NETWORK_LOCAL } = require('../../../../constants');
 
 /**
@@ -222,6 +224,8 @@ function configureCoreTaskFactory(
                   sporks.map(async (spork) => (
                     activateCoreSpork(ctx.coreServices[0].getRpcClient(), spork))),
                 );
+
+                await waitForNodesToHaveTheSameSporks(ctx.coreServices);
               },
             },
             {
