@@ -238,7 +238,7 @@ function configureCoreTaskFactory(
 
                 await Promise.all(
                   sporks.map(async (spork) => (
-                    activateCoreSpork(ctx.rpcClient, spork))),
+                    activateCoreSpork(ctx.coreServices[0].getRpcClient(), spork))),
                 );
               },
             },
