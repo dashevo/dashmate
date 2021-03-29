@@ -97,6 +97,8 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
 
           ctx.quorumHash = quorumHash;
 
+          console.log(1);
+
           await waitForQuorumPhase(
             ctx.rpcClients,
             ctx.quorumHash,
@@ -104,11 +106,15 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
             ctx.expectedMembers,
           );
 
+          console.log(2);
+
           await waitForQuorumConnections(
             ctx.rpcClients,
             ctx.expectedConnections,
             ctx.bumpMockTime,
           );
+
+          console.log(3);
 
           const { result: sporks } = await ctx.firstRpcClient.spork('show');
           const isSpork21Active = sporks.SPORK_21_QUORUM_ALL_CONNECTED === 0;
@@ -120,6 +126,8 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
             );
           }
 
+          console.log(4);
+
           await ctx.bumpMockTime();
 
           await generateBlocks(
@@ -127,6 +135,8 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
             2,
             NETWORK_LOCAL,
           );
+
+          console.log(5);
 
           await waitForNodesToHaveTheSameHeight(
             ctx.rpcClients,
@@ -286,11 +296,11 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
             ({ result: newQuorumList } = await ctx.firstRpcClient.quorum('list'));
           }
 
-          const quorumList = await ctx.firstRpcClient.quorum('list', 1);
+          const { result: quorumList } = await ctx.firstRpcClient.quorum('list', 1);
 
           const newQuorumHash = quorumList[LLMQ_TYPE_TEST][0];
 
-          const quorumInfo = ctx.firstRpcClient.quorum('info', 100, newQuorumHash);
+          const { result: quorumInfo } = await ctx.firstRpcClient.quorum('info', 100, newQuorumHash);
 
           // Mine 8 (SIGN_HEIGHT_OFFSET) more blocks to make sure
           // that the new quorum gets eligable for signing sessions
