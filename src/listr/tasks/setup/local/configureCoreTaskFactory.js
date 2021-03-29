@@ -126,7 +126,7 @@ function configureCoreTaskFactory(
                 do {
                   ({
                     result: blockchainInfo,
-                  } = await ctx.coreService.getRpcClient().getBlockchainInfo());
+                  } = await ctx.coreService[0].getRpcClient().getBlockchainInfo());
 
                   isDip8Activated = blockchainInfo.bip9_softforks.dip0008.status === 'active';
 
@@ -135,7 +135,7 @@ function configureCoreTaskFactory(
                   }
 
                   await generateBlocks(
-                    ctx.coreService,
+                    ctx.coreService[0],
                     blocksToGenerateInOneStep,
                     NETWORK_LOCAL,
                     // eslint-disable-next-line no-loop-func
