@@ -84,7 +84,7 @@ function configureCoreTaskFactory(
 
           return new Listr([
             {
-              title: 'Starting Core nodes',
+              title: `Starting ${configGroup.length} wallets`,
               task: async () => {
                 const coreServices = [];
 
@@ -238,7 +238,7 @@ function configureCoreTaskFactory(
               },
             },
             {
-              title: 'Stopping nodes',
+              title: `Stopping ${configGroup.length} wallets`,
               task: async () => (Promise.all(
                 ctx.coreServices.map((coreService) => coreService.stop()),
               )),
