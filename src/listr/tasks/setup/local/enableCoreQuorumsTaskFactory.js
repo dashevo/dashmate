@@ -286,11 +286,11 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
             ({ result: newQuorumList } = await ctx.firstRpcClient.quorum('list'));
           }
 
-          const quorumList = await ctx.firstRpcClient.quorum('list', 1);
+          const { result: quorumList } = await ctx.firstRpcClient.quorum('list', 1);
 
           const newQuorumHash = quorumList[LLMQ_TYPE_TEST][0];
 
-          const quorumInfo = ctx.firstRpcClient.quorum('info', 100, newQuorumHash);
+          const { result: quorumInfo } = ctx.firstRpcClient.quorum('info', 100, newQuorumHash);
 
           // Mine 8 (SIGN_HEIGHT_OFFSET) more blocks to make sure
           // that the new quorum gets eligable for signing sessions
