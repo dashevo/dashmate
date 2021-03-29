@@ -5,12 +5,9 @@ const { LLMQ_TYPE_TEST } = require('../../constants');
 /**
  * @param {RpcClient[]} rpcClients
  * @param {number} expectedConnectionsCount
- * @param {Function} bumpMockTime
  * @return {Promise<boolean>}
  */
-async function checkQuorumConnections(rpcClients, expectedConnectionsCount, bumpMockTime) {
-  let allOk = true;
-
+async function checkQuorumConnections(rpcClients, expectedConnectionsCount) {
   for (const rpc of rpcClients) {
     const { result: dkgStatus } = await rpc.quorum('dkgstatus');
 
@@ -23,8 +20,7 @@ async function checkQuorumConnections(rpcClients, expectedConnectionsCount, bump
     const noLlmqTestConnections = noConnections || llmqConnections[LLMQ_TYPE_TEST] == null;
 
     if (noLlmqTestConnections) {
-      allOk = false;
-      break;
+      return false;
     }
 
     const llmqTestConnections = llmqConnections[LLMQ_TYPE_TEST];
@@ -38,18 +34,11 @@ async function checkQuorumConnections(rpcClients, expectedConnectionsCount, bump
     }
 
     if (connectionsCount < expectedConnectionsCount) {
-      allOk = false;
-      break;
+      return false;
     }
   }
 
-  if (!allOk) {
-    await bumpMockTime();
-
-    await wait(1000);
-  }
-
-  return allOk;
+  return true;
 }
 
 /**
@@ -73,8 +62,13 @@ async function waitForQuorumConnections(
     isReady = await checkQuorumConnections(
       rpcClients,
       expectedConnectionsCount,
-      bumpMockTime,
     );
+
+    if (!isReady) {
+      await bumpMockTime();
+
+      await wait(1000);
+    }
 
     if (Date.now() > deadline) {
       throw new Error(`waitForQuorumConnections deadline of ${timeout} exceeded`);

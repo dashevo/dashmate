@@ -20,7 +20,6 @@ async function checkDKGSessionPhase(
   checkReceivedMessagesType,
   checkReceivedMessagesCount = 0,
 ) {
-  let allOk = true;
   let memberCount = 0;
 
   for (const rpcClient of rpcClients) {
@@ -48,17 +47,11 @@ async function checkDKGSessionPhase(
       || receivedMessagesDoNotMatch;
 
     if (checkFailed) {
-      allOk = false;
-
-      break;
+      return false;
     }
   }
 
-  if (allOk && memberCount !== expectedMemberCount) {
-    return false;
-  }
-
-  return allOk;
+  return memberCount === expectedMemberCount;
 }
 
 /**
