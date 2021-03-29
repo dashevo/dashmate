@@ -59,19 +59,18 @@ function configureCoreTaskFactory(
           }));
 
           configGroup.forEach((config, i) => {
-            // seeds
+            // Set seeds
             config.set(
               'core.p2p.seeds',
               p2pSeeds.filter((seed, index) => index !== i),
             );
 
-            // sporks
+            // Set sporks key
             config.set(
               'core.spork.address',
               sporkAddress,
             );
 
-            // Set private key to seed node
             config.set(
               'core.spork.privateKey',
               sporkPrivKey.toWIF(),
@@ -84,7 +83,7 @@ function configureCoreTaskFactory(
 
           return new Listr([
             {
-              title: `Starting ${configGroup.length} wallets`,
+              title: 'Starting wallets',
               task: async () => {
                 const coreServices = [];
 
@@ -238,7 +237,7 @@ function configureCoreTaskFactory(
               },
             },
             {
-              title: `Stopping ${configGroup.length} wallets`,
+              title: 'Stopping wallets',
               task: async () => (Promise.all(
                 ctx.coreServices.map((coreService) => coreService.stop()),
               )),
