@@ -55,7 +55,10 @@ function configureTenderdashTaskFactory(
               masternodeConfigs.forEach((config, index) => {
                 config.set('platform.drive.tenderdash.genesis.genesis_time', genesisTime);
                 config.set('platform.drive.tenderdash.genesis.chain_id', chainId);
-                config.set('platform.drive.tenderdash.genesis.initial_core_chain_locked_height', ctx.initialHeight);
+                config.set(
+                  'platform.drive.tenderdash.genesis.initial_core_chain_locked_height',
+                  ctx.initialCoreChainLockedHeight,
+                );
 
                 const p2pPeers = masternodeConfigs
                   .filter((_, i) => i !== index)

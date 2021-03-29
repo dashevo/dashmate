@@ -1,5 +1,7 @@
 const wait = require('../../util/wait');
 
+const { LLMQ_TYPE_TEST } = require('../../constants');
+
 /**
  *
  * @param {string} quorumHash
@@ -17,7 +19,7 @@ async function checkDKGSessionCommitments(quorumHash, rpcClients) {
       break;
     }
 
-    const testQuorumCommitment = dkgStatus.minableCommitments["llmq_test"];
+    const testQuorumCommitment = dkgStatus.minableCommitments[LLMQ_TYPE_TEST];
 
     if (!testQuorumCommitment) {
       allOk = false;
@@ -41,7 +43,12 @@ async function checkDKGSessionCommitments(quorumHash, rpcClients) {
  * @param {number} [waitBeforeRetry]
  * @return {Promise<void>}
  */
-async function waitForQuorumCommitments(rpcClients,quorumHash, timeout = 60000, waitBeforeRetry = 100) {
+async function waitForQuorumCommitments(
+  rpcClients,
+  quorumHash,
+  timeout = 60000,
+  waitBeforeRetry = 100,
+) {
   const deadline = Date.now() + timeout;
   let isReady = false;
 

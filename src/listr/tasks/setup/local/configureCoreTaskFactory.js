@@ -1,7 +1,12 @@
 const { Listr } = require('listr2');
+
+const { Observable } = require('rxjs');
+
 const {
   PrivateKey,
 } = require('@dashevo/dashcore-lib');
+
+const { NETWORK_LOCAL } = require('../../../../constants');
 
 /**
  * @param {resolveDockerHostIp} resolveDockerHostIp
@@ -11,10 +16,10 @@ const {
  * @param {generateBlocks} generateBlocks
  * @param {waitForCoreSync} waitForCoreSync
  * @param {activateCoreSpork} activateCoreSpork
- * @param {enableCoreQuorums} enableCoreQuorums
  * @param {generateToAddressTask} generateToAddressTask
  * @param {registerMasternodeTask} registerMasternodeTask
  * @param {generateBlsKeys} generateBlsKeys
+ * @param {enableCoreQuorumsTask} enableCoreQuorumsTask
  * @return {configureCoreTask}
  */
 function configureCoreTaskFactory(
@@ -25,10 +30,10 @@ function configureCoreTaskFactory(
   generateBlocks,
   waitForCoreSync,
   activateCoreSpork,
-  enableCoreQuorums,
   generateToAddressTask,
   registerMasternodeTask,
   generateBlsKeys,
+  enableCoreQuorumsTask,
 ) {
   /**
    * @typedef {configureCoreTask}
@@ -108,6 +113,48 @@ function configureCoreTaskFactory(
               },
             },
             {
+              title: 'Activating DIP8 to enable DML',
+              // eslint-disable-next-line consistent-return
+              task: () => new Observable(async (observer) => {
+                let isDip8Activated = false;
+                let blockchainInfo;
+
+                let blocksGenerated = 0;
+
+                const blocksToGenerateInOneStep = 10;
+
+                do {
+                  ({
+                    result: blockchainInfo,
+                  } = await ctx.coreService.getRpcClient().getBlockchainInfo());
+
+                  isDip8Activated = blockchainInfo.bip9_softforks.dip0008.status === 'active';
+
+                  if (isDip8Activated) {
+                    break;
+                  }
+
+                  await generateBlocks(
+                    ctx.coreService,
+                    blocksToGenerateInOneStep,
+                    NETWORK_LOCAL,
+                    // eslint-disable-next-line no-loop-func
+                    (blocks) => {
+                      blocksGenerated += blocks;
+
+                      observer.next(`${blocksGenerated} blocks generated`);
+                    },
+                  );
+                } while (!isDip8Activated);
+
+                observer.next(`DIP8 has been activated at height ${blockchainInfo.bip9_softforks.dip0008.since}`);
+
+                observer.complete();
+
+                return this;
+              }),
+            },
+            {
               title: 'Register masternodes',
               task: () => {
                 const masternodeConfigs = configGroup.filter((config) => config.get('core.masternode.enable'));
@@ -166,14 +213,47 @@ function configureCoreTaskFactory(
                 return new Listr(subTasks);
               },
             },
+            // {
+            //   title: 'Waiting for Core seed node to be avalable',
+            //   task: async (ctx) => {
+            //     ctx.rpcClient = createRpcClient({
+            //       port: seedConfig.get('core.rpc.port'),
+            //       user: seedConfig.get('core.rpc.user'),
+            //       pass: seedConfig.get('core.rpc.password'),
+            //     });
+            //
+            //     await waitForCoreSync(ctx.rpcClient);
+            //   },
+            // },
             {
-              title: 'Setting initial height into the context',
+              title: 'Enable sporks',
+              task: async () => {
+                const sporks = [
+                  'SPORK_2_INSTANTSEND_ENABLED',
+                  'SPORK_3_INSTANTSEND_BLOCK_FILTERING',
+                  'SPORK_9_SUPERBLOCKS_ENABLED',
+                  'SPORK_17_QUORUM_DKG_ENABLED',
+                  'SPORK_19_CHAINLOCKS_ENABLED',
+                ];
+
+                await Promise.all(
+                  sporks.map(async (spork) => (
+                    activateCoreSpork(ctx.rpcClient, spork))),
+                );
+              },
+            },
+            {
+              title: 'Wait for quorums to be enabled',
+              task: () => enableCoreQuorumsTask(),
+            },
+            {
+              // Getting last height to use it as a initial core chain locked height for platform
               task: async () => {
                 const rpcClient = ctx.coreServices[0].getRpcClient();
-                const { result: initialHeight } = await rpcClient.getBlockCount();
+                const { result: initialCoreChainLockedHeight } = await rpcClient.getBlockCount();
 
-                ctx.initialHeight = initialHeight;
-              }
+                ctx.initialCoreChainLockedHeight = initialCoreChainLockedHeight;
+              },
             },
             {
               title: 'Stopping nodes',

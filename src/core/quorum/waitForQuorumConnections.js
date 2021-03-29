@@ -1,14 +1,15 @@
 const wait = require('../../util/wait');
 
+const { LLMQ_TYPE_TEST } = require('../../constants');
+
 /**
- *
- * @param {CoreRegtestNetwork} regtestNetwork
+ * @param {RpcClient[]} rpcClients
  * @param {number} expectedConnectionsCount
+ * @param {Function} bumpMockTime
  * @return {Promise<boolean>}
  */
-async function checkQuorumConnections(regtestNetwork, expectedConnectionsCount) {
+async function checkQuorumConnections(rpcClients, expectedConnectionsCount, bumpMockTime) {
   let allOk = true;
-  const rpcClients = regtestNetwork.getAllRpcClients();
 
   for (const rpc of rpcClients) {
     const { result: dkgStatus } = await rpc.quorum('dkgstatus');
@@ -19,18 +20,18 @@ async function checkQuorumConnections(regtestNetwork, expectedConnectionsCount) 
 
     const noConnections = dkgStatus.quorumConnections == null;
     const llmqConnections = dkgStatus.quorumConnections;
-    const noLlmqTestConnections = noConnections || llmqConnections['llmq_test'] == null;
+    const noLlmqTestConnections = noConnections || llmqConnections[LLMQ_TYPE_TEST] == null;
 
     if (noLlmqTestConnections) {
       allOk = false;
       break;
     }
 
-    const llmqTestConnections = llmqConnections['llmq_test'];
+    const llmqTestConnections = llmqConnections[LLMQ_TYPE_TEST];
 
     let connectionsCount = 0;
 
-    for (let connection of llmqTestConnections) {
+    for (const connection of llmqTestConnections) {
       if (connection.connected) {
         connectionsCount += 1;
       }
@@ -43,7 +44,8 @@ async function checkQuorumConnections(regtestNetwork, expectedConnectionsCount) 
   }
 
   if (!allOk) {
-    await regtestNetwork.bumpMocktime(1);
+    await bumpMockTime();
+
     await wait(1000);
   }
 
@@ -52,17 +54,27 @@ async function checkQuorumConnections(regtestNetwork, expectedConnectionsCount) 
 
 /**
  *
- * @param {CoreRegtestNetwork} regtestNetwork
+ * @param {RpcClient[]} rpcClients
  * @param {number} expectedConnectionsCount
+ * @param {Function} bumpMockTime
  * @param {number} [timeout]
  * @return {Promise<void>}
  */
-async function waitForQuorumConnections(regtestNetwork, expectedConnectionsCount, timeout= 300000) {
+async function waitForQuorumConnections(
+  rpcClients,
+  expectedConnectionsCount,
+  bumpMockTime,
+  timeout = 300000,
+) {
   const deadline = Date.now() + timeout;
   let isReady = false;
 
   while (!isReady) {
-    isReady = await checkQuorumConnections(regtestNetwork, expectedConnectionsCount);
+    isReady = await checkQuorumConnections(
+      rpcClients,
+      expectedConnectionsCount,
+      bumpMockTime,
+    );
 
     if (Date.now() > deadline) {
       throw new Error(`waitForQuorumConnections deadline of ${timeout} exceeded`);

@@ -170,44 +170,6 @@ function registerMasternodeTaskFactory(
         ),
       },
       {
-        title: 'Activating DIP8 to enable DML',
-        enabled: () => config.get('network') === NETWORK_LOCAL,
-        // eslint-disable-next-line consistent-return
-        task: async (ctx, task) => {
-          const { result: blockCount } = await ctx.coreService.getRpcClient().getBlockCount();
-
-          let { result: blockchainInfo } = await ctx.coreService.getRpcClient().getBlockchainInfo();
-          let isDip8Activated = blockchainInfo["bip9_softforks"]["dip0008"]["status"] === "active";
-
-          // eslint-disable-next-line consistent-return
-          return new Observable(async (observer) => {
-            let blocksGenerated = 0;
-            const blocksToGenerateInOneStep = 10;
-
-            while (!isDip8Activated) {
-              await generateBlocks(
-                ctx.coreService,
-                blocksToGenerateInOneStep,
-                config.get('network'),
-                (blocks) => {
-                  blocksGenerated += 1;
-                  observer.next(`${blocksGenerated} blocks generated`);
-                },
-              );
-
-              ({ result: blockchainInfo } = await ctx.coreService.getRpcClient().getBlockchainInfo());
-              isDip8Activated = blockchainInfo.bip9_softforks.dip0008.status === "active";
-            }
-
-            observer.next(`DIP8 has been activated at height ${blockchainInfo.bip9_softforks.dip0008.since}`);
-
-            observer.complete();
-
-            return this;
-          });
-        },
-      },
-      {
         title: 'Broadcast masternode registration transaction',
         task: async (ctx, task) => {
           const proRegTx = await registerMasternode(
