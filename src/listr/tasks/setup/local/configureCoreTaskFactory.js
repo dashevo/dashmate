@@ -1,5 +1,4 @@
 const { Listr } = require('listr2');
-
 const { Observable } = require('rxjs');
 
 const {
@@ -19,7 +18,6 @@ const { NETWORK_LOCAL } = require('../../../../constants');
  * @param {generateToAddressTask} generateToAddressTask
  * @param {registerMasternodeTask} registerMasternodeTask
  * @param {generateBlsKeys} generateBlsKeys
- * @param {enableCoreQuorumsTask} enableCoreQuorumsTask
  * @return {configureCoreTask}
  */
 function configureCoreTaskFactory(
@@ -33,7 +31,6 @@ function configureCoreTaskFactory(
   generateToAddressTask,
   registerMasternodeTask,
   generateBlsKeys,
-  enableCoreQuorumsTask,
 ) {
   /**
    * @typedef {configureCoreTask}
@@ -226,10 +223,6 @@ function configureCoreTaskFactory(
                     activateCoreSpork(ctx.coreServices[0].getRpcClient(), spork))),
                 );
               },
-            },
-            {
-              title: 'Wait for quorums to be enabled',
-              task: () => enableCoreQuorumsTask(),
             },
             {
               // Getting last height to use it as a initial core chain locked height for platform

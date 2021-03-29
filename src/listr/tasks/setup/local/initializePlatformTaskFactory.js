@@ -6,6 +6,7 @@ const { Listr } = require('listr2');
  * @param {initTask} initTask
  * @param {waitForNodeToBeReadyTask} waitForNodeToBeReadyTask
  * @param {DockerCompose} dockerCompose
+ * @param {enableCoreQuorumsTask} enableCoreQuorumsTask
  * @return {initializePlatformTask}
  */
 function initializePlatformTaskFactory(
@@ -13,6 +14,7 @@ function initializePlatformTaskFactory(
   initTask,
   waitForNodeToBeReadyTask,
   dockerCompose,
+  enableCoreQuorumsTask,
 ) {
   /**
    * @typedef initializePlatformTask
@@ -39,6 +41,10 @@ function initializePlatformTaskFactory(
 
           return new Listr(startNodeTasks);
         },
+      },
+      {
+        title: 'Wait for core quorums to be enabled',
+        task: () => enableCoreQuorumsTask(),
       },
       {
         title: 'Await for nodes to be ready',
