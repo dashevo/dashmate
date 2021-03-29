@@ -167,6 +167,15 @@ function configureCoreTaskFactory(
               },
             },
             {
+              title: 'Setting initial height into the context',
+              task: async () => {
+                const rpcClient = ctx.coreServices[0].getRpcClient();
+                const { result: initialHeight } = await rpcClient.getBlockCount();
+
+                ctx.initialHeight = initialHeight;
+              }
+            },
+            {
               title: 'Stopping nodes',
               task: async () => (Promise.all(
                 ctx.coreServices.map((coreService) => coreService.stop()),
