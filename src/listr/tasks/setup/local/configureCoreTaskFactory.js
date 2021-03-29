@@ -114,7 +114,6 @@ function configureCoreTaskFactory(
             },
             {
               title: 'Activating DIP8 to enable DML',
-              // eslint-disable-next-line consistent-return
               task: () => new Observable(async (observer) => {
                 let isDip8Activated = false;
                 let blockchainInfo;
