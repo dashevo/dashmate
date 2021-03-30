@@ -52,11 +52,64 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
         },
       },
       {
+        title: 'Await for peers to be connected',
+        task: async (ctx) => {
+          await Promise.all(
+            ctx.rpcClients.map(async (rpcClient) => {
+              let hasPeers = false;
+              let allPeersUpgraded = false;
+
+              do {
+                const { result: peers } = await rpcClient.getPeerInfo();
+
+                hasPeers = peers && peers.length > 2;
+
+                allPeersUpgraded = !peers.find((peer) => peer.version === 0);
+
+                if (!hasPeers || !allPeersUpgraded) {
+                  await wait(500);
+                }
+              } while (!hasPeers || !allPeersUpgraded);
+            }),
+          );
+
+          // await waitForCorePeersConnected(rpcClient);
+        },
+      },
+      {
         title: 'Waiting for all nodes to catch up',
-        task: (ctx) => waitForNodesToHaveTheSameHeight(
-          ctx.rpcClients,
-          WAIT_FOR_NODES_TIMEOUT,
-        ),
+        task: async (ctx) => {
+          // Set initial mock time
+          const { result: bestBlockHash } = await ctx.firstRpcClient.getBestBlockHash();
+          const { result: bestBlock } = await ctx.firstRpcClient.getBlock(bestBlockHash);
+
+          await ctx.bumpMockTime(bestBlock.time);
+
+          // Sync nodes
+          ctx.bumpMockTime();
+
+          await generateBlocks(
+            ctx.coreServices[0],
+            1,
+            NETWORK_LOCAL,
+          );
+
+          await waitForNodesToHaveTheSameHeight(
+            ctx.rpcClients,
+            WAIT_FOR_NODES_TIMEOUT,
+          );
+
+          const { result: masternodesStatus } = await ctx.firstRpcClient.masternodelist('status');
+
+          const hasNotEnabled = Boolean(
+            Object.values(masternodesStatus)
+              .find((status) => status !== 'ENABLED'),
+          );
+
+          if (hasNotEnabled) {
+            throw new Error('Not all masternodes are enabled');
+          }
+        },
       },
       {
         title: 'Start DKG session',
@@ -66,11 +119,6 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
           ctx.initialQuorumList = initialQuorumList;
 
           const { result: bestBlockHeight } = await ctx.firstRpcClient.getBlockCount();
-          const { result: bestBlockHash } = await ctx.firstRpcClient.getBestBlockHash();
-          const { result: bestBlock } = await ctx.firstRpcClient.getBlock(bestBlockHash);
-
-          // Set initial mock time
-          await ctx.bumpMockTime(bestBlock.time);
 
           // move forward to next DKG
           const blocksUntilNextDKG = 24 - (bestBlockHeight % 24);

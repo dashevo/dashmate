@@ -1,3 +1,5 @@
+const wait = require("../../../../util/wait");
+const createRpcClient = require("../../../../core/createRpcClient");
 const { Listr } = require('listr2');
 
 /**
@@ -34,7 +36,7 @@ function initializePlatformTaskFactory(
                 driveImageBuildPath: ctx.driveImageBuildPath,
                 dapiImageBuildPath: ctx.dapiImageBuildPath,
                 // run miner only at seed node
-                isMinerEnabled: !config.isPlatformServicesEnabled(),
+                // isMinerEnabled: !config.isPlatformServicesEnabled(),
               },
             ),
           }));
