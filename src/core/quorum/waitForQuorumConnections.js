@@ -8,8 +8,8 @@ const { LLMQ_TYPE_TEST } = require('../../constants');
  * @return {Promise<boolean>}
  */
 async function checkQuorumConnections(rpcClients, expectedConnectionsCount) {
-  for (const rpc of rpcClients) {
-    const { result: dkgStatus } = await rpc.quorum('dkgstatus');
+  for (const rpcClient of rpcClients) {
+    const { result: dkgStatus } = await rpcClient.quorum('dkgstatus');
 
     if (Object.keys(dkgStatus.session).length === 0) {
       continue;
@@ -17,21 +17,14 @@ async function checkQuorumConnections(rpcClients, expectedConnectionsCount) {
 
     const noConnections = dkgStatus.quorumConnections == null;
     const llmqConnections = dkgStatus.quorumConnections;
-    const noLlmqTestConnections = noConnections || llmqConnections[LLMQ_TYPE_TEST] == null;
 
-    if (noLlmqTestConnections) {
+    if (noConnections || llmqConnections[LLMQ_TYPE_TEST] == null) {
       return false;
     }
 
-    const llmqTestConnections = llmqConnections[LLMQ_TYPE_TEST];
-
-    let connectionsCount = 0;
-
-    for (const connection of llmqTestConnections) {
-      if (connection.connected) {
-        connectionsCount += 1;
-      }
-    }
+    const connectionsCount = llmqConnections[LLMQ_TYPE_TEST]
+      .filter((connection) => connection.connected)
+      .length;
 
     if (connectionsCount < expectedConnectionsCount) {
       return false;
