@@ -45,10 +45,6 @@ function initializePlatformTaskFactory(
         },
       },
       {
-        title: 'Wait for core quorums to be enabled',
-        task: () => enableCoreQuorumsTask(),
-      },
-      {
         title: 'Await for nodes to be ready',
         task: () => {
           const waitForNodeToBeReadyTasks = configGroup
