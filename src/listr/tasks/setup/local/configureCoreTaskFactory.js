@@ -255,7 +255,7 @@ function configureCoreTaskFactory(
               task: () => enableCoreQuorumsTask(),
             },
             {
-              // Getting last height to use it as a initial core chain locked height for platform
+              title: 'Setting initial core chain locked height',
               task: async (_, task) => {
                 const rpcClient = ctx.coreServices[0].getRpcClient();
                 const { result: initialCoreChainLockedHeight } = await rpcClient.getBlockCount();
