@@ -51,31 +51,6 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
           };
         },
       },
-      // {
-      //   title: 'Await for peers to be connected',
-      //   task: async (ctx) => {
-      //     await Promise.all(
-      //       ctx.rpcClients.map(async (rpcClient) => {
-      //         let hasPeers = false;
-      //         let allPeersUpgraded = false;
-      //
-      //         do {
-      //           const { result: peers } = await rpcClient.getPeerInfo();
-      //
-      //           hasPeers = peers && peers.length > 2;
-      //
-      //           allPeersUpgraded = !peers.find((peer) => peer.version === 0);
-      //
-      //           if (!hasPeers || !allPeersUpgraded) {
-      //             await wait(500);
-      //           }
-      //         } while (!hasPeers || !allPeersUpgraded);
-      //       }),
-      //     );
-      //
-      //     // await waitForCorePeersConnected(rpcClient);
-      //   },
-      // },
       {
         title: 'Waiting for all nodes to catch up',
         task: async (ctx) => {

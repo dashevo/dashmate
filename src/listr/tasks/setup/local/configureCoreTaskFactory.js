@@ -83,7 +83,7 @@ function configureCoreTaskFactory(
 
           return new Listr([
             {
-              title: 'Starting a wallet to register a masternode',
+              title: 'Starting a wallet',
               task: async () => {
                 const config = configGroup[0];
 
@@ -91,13 +91,15 @@ function configureCoreTaskFactory(
               },
             },
             {
-              title: 'Activating DIP3 to register a masternode',
+              title: 'Activating DIP3',
               task: () => new Observable(async (observer) => {
                 const dip3ActivationHeight = 500;
                 const blocksToGenerateInOneStep = 10;
 
                 let blocksGenerated = 0;
-                let { result: currentBlockHeight } = await ctx.coreService.getRpcClient().getBlockCount();
+                let {
+                  result: currentBlockHeight,
+                } = await ctx.coreService.getRpcClient().getBlockCount();
 
                 do {
                   ({
@@ -128,7 +130,8 @@ function configureCoreTaskFactory(
                 const amount = MASTERNODE_DASH_AMOUNT * configGroup.length;
                 return generateToAddressTask(
                   configGroup[0],
-                  amount)
+                  amount,
+                );
               },
             },
             {
@@ -136,7 +139,7 @@ function configureCoreTaskFactory(
               task: async () => {
                 const masternodeConfigs = configGroup.filter((config) => config.get('core.masternode.enable'));
 
-                const subTasks = masternodeConfigs.map((config, i) => ({
+                const subTasks = masternodeConfigs.map((config) => ({
                   title: `Register ${config.getName()} masternode`,
                   skip: () => {
                     if (config.get('core.masternode.operator.privateKey')) {
@@ -160,7 +163,7 @@ function configureCoreTaskFactory(
                     },
                     {
                       task: () => registerMasternodeTask(config),
-                    }
+                    },
                   ]),
                 }));
 
@@ -232,7 +235,7 @@ function configureCoreTaskFactory(
               title: 'Stopping wallet',
               task: async () => {
                 ctx.coreService.stop();
-              }
+              },
             },
             {
               title: 'Starting masternodes',
@@ -252,21 +255,22 @@ function configureCoreTaskFactory(
               task: () => enableCoreQuorumsTask(),
             },
             {
-              title: 'Setting initial chain lock height to the context',
               // Getting last height to use it as a initial core chain locked height for platform
-              task: async () => {
+              task: async (_, task) => {
                 const rpcClient = ctx.coreServices[0].getRpcClient();
                 const { result: initialCoreChainLockedHeight } = await rpcClient.getBlockCount();
 
                 ctx.initialCoreChainLockedHeight = initialCoreChainLockedHeight;
-                console.log(`Initial chain locked core height is set to: ${ctx.initialCoreChainLockedHeight}`);
+
+                // eslint-disable-next-line no-param-reassign
+                task.output = `Initial chain locked core height is set to: ${ctx.initialCoreChainLockedHeight}`;
               },
             },
             {
               title: 'Stopping masternodes',
               task: async () => (Promise.all(
                 ctx.coreServices.map((coreService) => coreService.stop()),
-              ))
+              )),
             },
           ]);
         },
