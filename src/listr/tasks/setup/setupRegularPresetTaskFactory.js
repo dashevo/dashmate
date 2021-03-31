@@ -122,7 +122,7 @@ function setupRegularPresetTaskFactory(
           ctx.nodeType === NODE_TYPE_MASTERNODE
           && ctx.fundingPrivateKeyString !== undefined
         ),
-        task: async (ctx) => {
+        task: (ctx) => {
           if (ctx.preset === PRESET_MAINNET) {
             throw new Error('For your own security, this tool will not process mainnet private keys. You should consider the private key you entered to be compromised.');
           }
@@ -134,7 +134,7 @@ function setupRegularPresetTaskFactory(
           const configFiles = renderServiceTemplates(ctx.config);
           writeServiceConfigs(ctx.config.getName(), configFiles);
 
-          await registerMasternodeTask(ctx.config);
+          return registerMasternodeTask(ctx.config);
         },
         options: { persistentOutput: true },
       },
