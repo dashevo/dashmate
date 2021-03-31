@@ -32,7 +32,7 @@ function initializePlatformTaskFactory(
                 driveImageBuildPath: ctx.driveImageBuildPath,
                 dapiImageBuildPath: ctx.dapiImageBuildPath,
                 // run miner only at seed node
-                // isMinerEnabled: !config.isPlatformServicesEnabled(),
+                isMinerEnabled: !config.isPlatformServicesEnabled(),
               },
             ),
           }));
@@ -41,7 +41,7 @@ function initializePlatformTaskFactory(
         },
       },
       {
-        title: 'Await for nodes to be ready',
+        title: 'Wait for nodes to be ready',
         task: () => {
           const waitForNodeToBeReadyTasks = configGroup
             .filter((config) => config.isPlatformServicesEnabled())
