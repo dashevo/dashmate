@@ -7,9 +7,11 @@ function stopAllContainersFactory(docker) {
   /**
    * @typedef {stopAllContainers}
    * @param {string[]} containersIds
+   * @param {Object} [options]
+   * @param {boolean} [options.remove]
    * @return {Promise<void>}
    */
-  async function stopAllContainers(containersIds, remove = false) {
+  async function stopAllContainers(containersIds, options = {}) {
     await Promise.all(containersIds.map(async (containerId) => {
       // stop all containers
       try {
@@ -19,7 +21,7 @@ function stopAllContainersFactory(docker) {
         if (status === 'running') {
           await container.stop();
 
-          if (remove) {
+          if (options.remove) {
             await container.remove();
           }
         }
