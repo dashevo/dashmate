@@ -4,14 +4,12 @@ const { Listr } = require('listr2');
  * @param {tenderdashInitTask} tenderdashInitTask
  * @param {renderServiceTemplates} renderServiceTemplates
  * @param {writeServiceConfigs} writeServiceConfigs
- * @param {resolveDockerHostIp} resolveDockerHostIp
  * @return {configureTenderdashTask}
  */
 function configureTenderdashTaskFactory(
   tenderdashInitTask,
   renderServiceTemplates,
   writeServiceConfigs,
-  resolveDockerHostIp,
 ) {
   /**
    * @typedef {configureTenderdashTask}
@@ -22,13 +20,9 @@ function configureTenderdashTaskFactory(
     return new Listr([
       {
         task: async (ctx) => {
-          if (!ctx.hostDockerInternalIp) {
-            ctx.hostDockerInternalIp = await resolveDockerHostIp();
-          }
+          const platformConfigs = configGroup.filter((config) => config.has('platform'));
 
-          const masternodeConfigs = configGroup.filter((config) => config.get('core.masternode.enable'));
-
-          const subTasks = masternodeConfigs.map((config) => ({
+          const subTasks = platformConfigs.map((config) => ({
             title: `Initialize ${config.getName()} Tenderdash`,
             task: () => tenderdashInitTask(config),
           }));
@@ -36,7 +30,7 @@ function configureTenderdashTaskFactory(
           // Interconnect Tenderdash nodes
           subTasks.push({
             task: async () => {
-              const validators = masternodeConfigs.map((config) => {
+              const validators = platformConfigs.map((config) => {
                 const validatorKey = config.get('platform.drive.tenderdash.validatorKey');
 
                 return {
@@ -50,9 +44,9 @@ function configureTenderdashTaskFactory(
               const randomChainIdPart = Math.floor(Math.random() * 60) + 1;
               const chainId = `dash_masternode_local_${randomChainIdPart}`;
 
-              const genesisTime = masternodeConfigs[0].get('platform.drive.tenderdash.genesis.genesis_time');
+              const genesisTime = platformConfigs[0].get('platform.drive.tenderdash.genesis.genesis_time');
 
-              masternodeConfigs.forEach((config, index) => {
+              platformConfigs.forEach((config, index) => {
                 config.set('platform.drive.tenderdash.genesis.genesis_time', genesisTime);
                 config.set('platform.drive.tenderdash.genesis.chain_id', chainId);
                 config.set(
@@ -60,7 +54,7 @@ function configureTenderdashTaskFactory(
                   ctx.initialCoreChainLockedHeight,
                 );
 
-                const p2pPeers = masternodeConfigs
+                const p2pPeers = platformConfigs
                   .filter((_, i) => i !== index)
                   .map((innerConfig) => {
                     const nodeId = innerConfig.get('platform.drive.tenderdash.nodeId');

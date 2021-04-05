@@ -25,7 +25,6 @@ module.exports = lodashMerge({}, baseConfig, {
       },
     },
   },
-  externalIp: '127.0.0.1',
   environment: 'development',
   network: NETWORK_LOCAL,
 });

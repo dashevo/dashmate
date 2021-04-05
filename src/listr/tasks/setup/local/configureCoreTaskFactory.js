@@ -10,7 +10,6 @@ const waitForNodesToHaveTheSameSporks = require('../../../../core/waitForNodesTo
 const { NETWORK_LOCAL, MASTERNODE_DASH_AMOUNT } = require('../../../../constants');
 
 /**
- * @param {resolveDockerHostIp} resolveDockerHostIp
  * @param {renderServiceTemplates} renderServiceTemplates
  * @param {writeServiceConfigs} writeServiceConfigs
  * @param {startCore} startCore
@@ -24,7 +23,6 @@ const { NETWORK_LOCAL, MASTERNODE_DASH_AMOUNT } = require('../../../../constants
  * @return {configureCoreTask}
  */
 function configureCoreTaskFactory(
-  resolveDockerHostIp,
   renderServiceTemplates,
   writeServiceConfigs,
   startCore,
@@ -45,10 +43,6 @@ function configureCoreTaskFactory(
     return new Listr([
       {
         task: async (ctx) => {
-          if (!ctx.hostDockerInternalIp) {
-            ctx.hostDockerInternalIp = await resolveDockerHostIp();
-          }
-
           const network = configGroup[0].get('network');
           const sporkPrivKey = new PrivateKey(undefined, network);
           const sporkAddress = sporkPrivKey.toAddress(network).toString();

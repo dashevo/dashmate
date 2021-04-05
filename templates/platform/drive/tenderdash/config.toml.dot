@@ -47,7 +47,7 @@ db_backend = "goleveldb"
 db_dir = "data"
 
 # Output level for logging, including package level options
-log_level = "main:info,state:info,statesync:info,*:error"
+log_level = "*:debug"
 
 # Output format: 'plain' (colored text) or 'json'
 log_format = "plain"
@@ -88,7 +88,7 @@ filter_peers = false
 [rpc]
 
 # TCP or UNIX socket address for the RPC server to listen on
-laddr = "tcp://0.0.0.0:26657"
+laddr = "tcp://0.0.0.0:{{=it.platform.drive.tenderdash.rpc.port}}"
 
 # A list of origins a cross-domain request can be executed from
 # Default value '[]' disables cors support
@@ -172,7 +172,7 @@ pprof_laddr = ""
 [p2p]
 
 # Address to listen for incoming connections
-laddr = "tcp://0.0.0.0:26656"
+laddr = "tcp://0.0.0.0:{{=it.platform.drive.tenderdash.p2p.port}}"
 
 # Address to advertise to peers for them to dial
 # If empty, will use the same port as the laddr,
