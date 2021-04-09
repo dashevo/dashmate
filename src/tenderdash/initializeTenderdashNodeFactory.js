@@ -57,7 +57,7 @@ function initializeTenderdashNodeFactory(dockerCompose, docker, dockerPull) {
       'echo ","',
       'cat $TMHOME/config/genesis.json',
       'echo ",\\""',
-      '/usr/bin/tenderdash show-node-id',
+      '/usr/bin/tenderdash show_node_id',
       'echo "\\""',
       'echo "]"',
       'rm -rf $TMHOME/config',
