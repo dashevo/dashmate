@@ -44,7 +44,7 @@ function initializeTenderdashNodeFactory(dockerCompose, docker, dockerPull) {
 
     const tenderdashImage = config.get('platform.drive.tenderdash.docker.image', true);
 
-    await dockerPull(tenderdashImage);
+    // await dockerPull(tenderdashImage);
 
     const writableStream = new WritableStream();
 

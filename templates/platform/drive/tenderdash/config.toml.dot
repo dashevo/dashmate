@@ -67,6 +67,16 @@ priv_validator_state_file = "data/priv_validator_state.json"
 # connections from an external PrivValidator process
 priv_validator_laddr = ""
 
+# Local Dash Core Host to connect to
+# If this is set, the node follows a Dash Core PrivValidator process
+priv_validator_core_rpc_host = "core:{{= it.core.rpc.port}}"
+
+# Local Dash Core RPC Username
+priv_validator_core_rpc_username = "{{= it.core.rpc.user}}"
+
+# Local Dash Core RPC Password
+priv_validator_core_rpc_password = "{{= it.core.rpc.password}}"
+
 # Path to the JSON file containing the private key to use for node authentication in the p2p protocol
 node_key_file = "config/node_key.json"
 

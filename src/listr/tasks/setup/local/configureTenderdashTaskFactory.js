@@ -42,6 +42,7 @@ function configureTenderdashTaskFactory(
                 return {
                   address: validatorKey.address,
                   pub_key: validatorKey.pub_key,
+                  pro_tx_hash: validatorKey.pro_tx_hash,
                   power: '1',
                   name: config.getName(),
                 };
@@ -74,7 +75,9 @@ function configureTenderdashTaskFactory(
                   });
 
                 config.set('platform.drive.tenderdash.p2p.persistentPeers', p2pPeers);
-                config.set('platform.drive.tenderdash.genesis.validators', validators);
+                config.set('platform.drive.tenderdash.genesis.quorum_hash', p2pPeers);
+                config.set('platform.drive.tenderdash.genesis.validators', []);
+                config.set('platform.drive.tenderdash.genesis.threshold_public_key', '');
 
                 const configFiles = renderServiceTemplates(config);
                 writeServiceConfigs(config.getName(), configFiles);
