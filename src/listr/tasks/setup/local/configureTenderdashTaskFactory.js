@@ -75,9 +75,9 @@ function configureTenderdashTaskFactory(
                   });
 
                 config.set('platform.drive.tenderdash.p2p.persistentPeers', p2pPeers);
-                config.set('platform.drive.tenderdash.genesis.quorum_hash', p2pPeers);
-                config.set('platform.drive.tenderdash.genesis.validators', []);
-                config.set('platform.drive.tenderdash.genesis.threshold_public_key', '');
+                config.set('platform.drive.tenderdash.genesis.quorum_hash', ctx.quorumHash);
+                // config.set('platform.drive.tenderdash.genesis.validators', null);
+                // config.set('platform.drive.tenderdash.genesis.threshold_public_key', '');
 
                 const configFiles = renderServiceTemplates(config);
                 writeServiceConfigs(config.getName(), configFiles);
