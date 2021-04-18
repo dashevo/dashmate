@@ -4,12 +4,11 @@ const ConfigBaseCommand = require('../oclif/command/ConfigBaseCommand');
 
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
 
-class RestartCommand extends ConfigBaseCommand {
+class UpdateCommand extends ConfigBaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
-   * @param {restartNodeTask} restartNodeTask
    * @param {Config} config
    * @return {Promise<void>}
    */
@@ -19,14 +18,13 @@ class RestartCommand extends ConfigBaseCommand {
       verbose: isVerbose,
     },
     dockerCompose,
-    restartNodeTask,
     config,
   ) {
     const tasks = new Listr(
       [
         {
-          title: `Restarting ${config.getName()} node`,
-          task: () => restartNodeTask(config),
+          title: 'Download updates',
+          task: () => dockerCompose.pull(config.toEnvs()),
         },
       ],
       {
@@ -48,13 +46,13 @@ class RestartCommand extends ConfigBaseCommand {
   }
 }
 
-RestartCommand.description = `Restart node
-...
-Restart node
+UpdateCommand.description = `Update node
+
+Download and update node software
 `;
 
-RestartCommand.flags = {
+UpdateCommand.flags = {
   ...ConfigBaseCommand.flags,
 };
 
-module.exports = RestartCommand;
+module.exports = UpdateCommand;

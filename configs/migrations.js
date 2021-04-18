@@ -90,12 +90,46 @@ module.exports = {
           config.group = null;
         }
 
-        // Add Tenderdash nodeId
-        config.platform.drive.tenderdash.nodeId = null;
+        if (typeof config.compose !== 'undefined') {
+          // Remove platform option for non platform configs
+          if (!config.compose.file.includes('docker-compose.platform.yml')) {
+            delete config.platform;
+          }
 
-        // Remove Insight API configuration
-        if (config.platform.dapi.insight) {
-          delete config.platform.dapi.insight;
+          // Remove compose option
+          delete config.compose;
+        }
+
+        if (typeof config.platform !== 'undefined') {
+          // Add Tenderdash node ID
+          config.platform.drive.tenderdash.nodeId = null;
+
+          // Add build options for DAPI and Drive
+          config.platform.drive.abci.docker.build = {
+            path: null,
+          };
+
+          config.platform.dapi.api.docker.build = {
+            path: null,
+          };
+
+          // Add consensus options
+          config.platform.drive.tenderdash.consensus = systemConfigs.base
+            .platform.drive.tenderdash.consensus;
+
+          // Remove fallbacks
+          if (typeof config.platform.drive.skipAssetLockConfirmationValidation !== 'undefined') {
+            delete config.platform.drive.skipAssetLockConfirmationValidation;
+          }
+
+          if (typeof config.platform.drive.passFakeAssetLockProofForTests !== 'undefined') {
+            delete config.platform.drive.passFakeAssetLockProofForTests;
+          }
+
+          // Remove Insight API configuration
+          if (config.platform.dapi.insight) {
+            delete config.platform.dapi.insight;
+          }
         }
       });
 

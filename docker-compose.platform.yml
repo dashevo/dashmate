@@ -45,7 +45,7 @@ services:
       - LOG_JSON_FILE_LEVEL=${PLATFORM_DRIVE_ABCI_LOG_JSON_FILE_LEVEL:?err}
       - LOG_JSON_FILE_PATH=/var/log/drive-json.log
       - INITIAL_CORE_CHAINLOCKED_HEIGHT=${PLATFORM_DRIVE_TENDERDASH_GENESIS_INITIAL_CORE_CHAIN_LOCKED_HEIGHT:-1}
-      - IDENTITY_SKIP_ASSET_LOCK_CONFIRMATION_VALIDATION=${PLATFORM_DRIVE_SKIP_ASSET_LOCK_CONFIRMATION_VALIDATION:?err}
+      - NETWORK=${NETWORK}
     command: npm run abci
 
   drive_tenderdash:
@@ -58,7 +58,7 @@ services:
       - 127.0.0.1:${PLATFORM_DRIVE_TENDERDASH_RPC_PORT:?err}:26657 # RPC
     volumes:
       - drive_tenderdash:/tenderdash
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/tenderdash:/tenderdash/config:ro
+      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/platform/drive/tenderdash:/tenderdash/config:ro
 
   dapi_api:
     image: ${PLATFORM_DAPI_API_DOCKER_IMAGE:?err}
@@ -112,7 +112,7 @@ services:
       - dapi_api
       - dapi_tx_filter_stream
     volumes:
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/grpc.yaml:/etc/envoy/envoy.yaml
+      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/platform/dapi/envoy/grpc.yaml:/etc/envoy/envoy.yaml
 
   dapi_nginx:
     image: ${PLATFORM_DAPI_NGINX_DOCKER_IMAGE:?err}
@@ -125,9 +125,9 @@ services:
       - ${PLATFORM_DAPI_NGINX_HTTP_PORT:?err}:80 # JSON RPC and gRPC Web
       - ${PLATFORM_DAPI_NGINX_GRPC_PORT:?err}:50051 # gRPC Native
     volumes:
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/default.conf:/etc/nginx/conf.d/default.conf
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/grpc.conf:/etc/nginx/conf.d/grpc.conf
-      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/errors.grpc_conf:/etc/nginx/conf.d/errors.grpc_conf
+      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/platform/dapi/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/platform/dapi/nginx/grpc.conf:/etc/nginx/conf.d/grpc.conf
+      - ${MN_HOME_DIR:?err}/${CONFIG_NAME:?err}/platform/dapi/nginx/errors.grpc_conf:/etc/nginx/conf.d/errors.grpc_conf
 
 volumes:
   drive_abci_data:

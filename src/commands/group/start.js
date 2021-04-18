@@ -4,7 +4,6 @@ const { flags: flagTypes } = require('@oclif/command');
 
 const GroupBaseCommand = require('../../oclif/command/GroupBaseCommand');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
-const wait = require('../../util/wait');
 
 class GroupStartCommand extends GroupBaseCommand {
   /**
@@ -13,21 +12,20 @@ class GroupStartCommand extends GroupBaseCommand {
    * @param {DockerCompose} dockerCompose
    * @param {startNodeTask} startNodeTask
    * @param {Config[]} configGroup
-   * @param {function} createTenderdashRpcClient
+   * @param {waitForNodeToBeReadyTask} waitForNodeToBeReadyTask
    * @return {Promise<void>}
    */
   async runWithDependencies(
     args,
     {
       update: isUpdate,
-      'drive-image-build-path': driveImageBuildPath,
-      'dapi-image-build-path': dapiImageBuildPath,
+      'wait-for-readiness': waitForReadiness,
       verbose: isVerbose,
     },
     dockerCompose,
     startNodeTask,
     configGroup,
-    createTenderdashRpcClient,
+    waitForNodeToBeReadyTask,
   ) {
     const groupName = configGroup[0].get('group');
 
@@ -42,8 +40,6 @@ class GroupStartCommand extends GroupBaseCommand {
                 task: () => startNodeTask(
                   config,
                   {
-                    driveImageBuildPath,
-                    dapiImageBuildPath,
                     isUpdate,
                   },
                 ),
@@ -52,28 +48,23 @@ class GroupStartCommand extends GroupBaseCommand {
           ),
         },
         {
-          title: 'Wait for Tenderdash',
-          task: async () => {
-            const tenderdashRpcClient = createTenderdashRpcClient();
+          title: 'Wait for nodes to be ready',
+          enabled: () => waitForReadiness,
+          task: () => {
+            const waitForNodeToBeReadyTasks = configGroup
+              .filter((config) => config.has('platform'))
+              .map((config) => ({
+                task: () => waitForNodeToBeReadyTask(config),
+              }));
 
-            let success = false;
-            do {
-              const response = await tenderdashRpcClient.request('status', {}).catch(() => {});
-
-              if (response) {
-                success = !response.error;
-              }
-
-              if (!success) {
-                await wait(2000);
-              }
-            } while (!success);
+            return new Listr(waitForNodeToBeReadyTasks);
           },
         },
       ],
       {
         renderer: isVerbose ? 'verbose' : 'default',
         rendererOptions: {
+          showTimer: isVerbose,
           clearOutput: false,
           collapse: false,
           showSubtasks: true,
@@ -93,9 +84,7 @@ GroupStartCommand.description = 'Start group nodes';
 
 GroupStartCommand.flags = {
   ...GroupBaseCommand.flags,
-  update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
-  'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
-  'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),
+  'wait-for-readiness': flagTypes.boolean({ char: 'w', description: 'wait for nodes to be ready', default: false }),
 };
 
 module.exports = GroupStartCommand;

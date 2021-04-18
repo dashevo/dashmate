@@ -12,38 +12,37 @@ class StartCommand extends ConfigBaseCommand {
    * @param {Object} flags
    * @param {DockerCompose} dockerCompose
    * @param {startNodeTask} startNodeTask
+   * @param {waitForNodeToBeReadyTask} waitForNodeToBeReadyTask
    * @param {Config} config
    * @return {Promise<void>}
    */
   async runWithDependencies(
     args,
     {
-      update: isUpdate,
-      'drive-image-build-path': driveImageBuildPath,
-      'dapi-image-build-path': dapiImageBuildPath,
+      'wait-for-readiness': waitForReadiness,
       verbose: isVerbose,
     },
     dockerCompose,
     startNodeTask,
+    waitForNodeToBeReadyTask,
     config,
   ) {
     const tasks = new Listr(
       [
         {
           title: `Start ${config.getName()} node`,
-          task: () => startNodeTask(
-            config,
-            {
-              driveImageBuildPath,
-              dapiImageBuildPath,
-              isUpdate,
-            },
-          ),
+          task: () => startNodeTask(config),
+        },
+        {
+          title: 'Wait for nodes to be ready',
+          enabled: () => waitForReadiness,
+          task: () => waitForNodeToBeReadyTask(config),
         },
       ],
       {
         renderer: isVerbose ? 'verbose' : 'default',
         rendererOptions: {
+          showTimer: isVerbose,
           clearOutput: false,
           collapse: false,
           showSubtasks: true,
@@ -60,15 +59,13 @@ class StartCommand extends ConfigBaseCommand {
 }
 
 StartCommand.description = `Start node
-...
+
 Start node
 `;
 
 StartCommand.flags = {
   ...ConfigBaseCommand.flags,
-  update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
-  'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
-  'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),
+  'wait-for-readiness': flagTypes.boolean({ char: 'w', description: 'wait for nodes to be ready', default: false }),
 };
 
 module.exports = StartCommand;

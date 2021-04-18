@@ -6,7 +6,6 @@ const { Listr } = require('listr2');
  * @param {tenderdashInitTask} tenderdashInitTask
  * @param {initTask} initTask
  * @param {startNodeTask} startNodeTask
- * @param {registerMasternodeTask} registerMasternodeTask
  * @param {generateToAddressTask} generateToAddressTask
  * @param {systemConfigs} systemConfigs
  * @return {resetNodeTask}
@@ -17,7 +16,6 @@ function resetNodeTaskFactory(
   tenderdashInitTask,
   initTask,
   startNodeTask,
-  registerMasternodeTask,
   generateToAddressTask,
   systemConfigs,
 ) {
@@ -26,8 +24,6 @@ function resetNodeTaskFactory(
    * @param {Config} config
    */
   function resetNodeTask(config) {
-    const isPlatformServicesEnabled = config.get('compose.file').includes('docker-compose.platform.yml');
-
     return new Listr([
       {
         title: 'Check services are not running',
@@ -44,7 +40,7 @@ function resetNodeTaskFactory(
       },
       {
         title: 'Remove platform services and associated data',
-        enabled: (ctx) => ctx.isPlatformOnlyReset && isPlatformServicesEnabled,
+        enabled: (ctx) => ctx.isPlatformOnlyReset && config.has('platform'),
         task: async () => {
           // Remove containers
           const coreContainerNames = ['core', 'sentinel'];
@@ -87,7 +83,7 @@ function resetNodeTaskFactory(
       {
         title: 'Initialize Tenderdash',
         enabled: (ctx) => (
-          !ctx.isHardReset && !ctx.skipPlatformInitialization && isPlatformServicesEnabled
+          !ctx.isHardReset && !ctx.skipPlatformInitialization && config.has('platform')
         ),
         task: () => tenderdashInitTask(config),
       },

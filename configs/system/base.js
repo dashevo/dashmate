@@ -7,7 +7,7 @@ module.exports = {
   group: null,
   core: {
     docker: {
-      image: 'dashpay/dashd:0.17.0.0-rc3-hotfix1',
+      image: 'dashpay/dashd:0.17.0.0-rc4',
     },
     p2p: {
       port: 20001,
@@ -65,7 +65,10 @@ module.exports = {
       },
       api: {
         docker: {
-          image: 'dashpay/dapi:0.18-dev',
+          image: 'dashpay/dapi:0.18',
+          build: {
+            path: null,
+          },
         },
       },
     },
@@ -77,7 +80,10 @@ module.exports = {
       },
       abci: {
         docker: {
-          image: 'dashpay/drive:0.18-dev',
+          image: 'dashpay/drive:0.19-dev',
+          build: {
+            path: null,
+          },
         },
         log: {
           stdout: {
@@ -105,6 +111,10 @@ module.exports = {
         rpc: {
           port: 26657,
         },
+        consensus: {
+          createEmptyBlocks: true,
+          createEmptyBlocksInterval: '3m',
+        },
         validatorKey: {
 
         },
@@ -116,8 +126,6 @@ module.exports = {
         },
         nodeId: null,
       },
-      skipAssetLockConfirmationValidation: false,
-      passFakeAssetLockProofForTests: false,
     },
     dpns: {
       contract: {
@@ -135,8 +143,5 @@ module.exports = {
   },
   externalIp: null,
   network: NETWORK_TESTNET,
-  compose: {
-    file: 'docker-compose.yml:docker-compose.platform.yml',
-  },
   environment: 'production',
 };

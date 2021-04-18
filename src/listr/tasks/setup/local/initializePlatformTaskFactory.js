@@ -1,22 +1,17 @@
 const { Listr } = require('listr2');
 
-const wait = require('../../../../util/wait');
-const baseConfig = require('../../../../../configs/system/base');
-const isSeedNode = require('../../../../util/isSeedNode');
-const getSeedNodeConfig = require('../../../../util/getSeedNodeConfig');
-
 /**
  *
  * @param {startNodeTask} startNodeTask
  * @param {initTask} initTask
- * @param {activateSporksTask} activateSporksTask
+ * @param {waitForNodeToBeReadyTask} waitForNodeToBeReadyTask
  * @param {DockerCompose} dockerCompose
  * @return {initializePlatformTask}
  */
 function initializePlatformTaskFactory(
   startNodeTask,
   initTask,
-  activateSporksTask,
+  waitForNodeToBeReadyTask,
   dockerCompose,
 ) {
   /**
@@ -26,13 +21,6 @@ function initializePlatformTaskFactory(
    */
   function initializePlatformTask(configGroup) {
     return new Listr([
-      {
-        task: () => {
-          // to activate sporks faster, set miner interval to 2s
-          const seedNodeConfig = getSeedNodeConfig(configGroup);
-          seedNodeConfig.set('core.miner.interval', '2s');
-        },
-      },
       {
         title: 'Starting nodes',
         task: async (ctx) => {
@@ -44,7 +32,7 @@ function initializePlatformTaskFactory(
                 driveImageBuildPath: ctx.driveImageBuildPath,
                 dapiImageBuildPath: ctx.dapiImageBuildPath,
                 // run miner only at seed node
-                isMinerEnabled: isSeedNode(config),
+                isMinerEnabled: !config.has('platform'),
               },
             ),
           }));
@@ -53,21 +41,31 @@ function initializePlatformTaskFactory(
         },
       },
       {
-        title: 'Wait 20 seconds to ensure all services are running',
-        task: () => wait(20000),
-      },
-      {
-        title: 'Activate sporks',
-        task: () => activateSporksTask(configGroup),
+        title: 'Wait for nodes to be ready',
+        task: () => {
+          const waitForNodeToBeReadyTasks = configGroup
+            .filter((config) => config.has('platform'))
+            .map((config) => ({
+              task: () => waitForNodeToBeReadyTask(config),
+            }));
+
+          return new Listr(waitForNodeToBeReadyTasks);
+        },
       },
       {
         task: () => initTask(configGroup[0]),
       },
       {
         task: () => {
-          // back to default
-          const seedNodeConfig = getSeedNodeConfig(configGroup);
-          seedNodeConfig.set('core.miner.interval', baseConfig.core.miner.interval);
+          // set platform data contracts
+          const [initializedConfig, ...otherConfigs] = configGroup;
+
+          otherConfigs
+            .filter((config) => config.has('platform'))
+            .forEach((config) => {
+              config.set('platform.dpns', initializedConfig.get('platform.dpns'));
+              config.set('platform.dashpay', initializedConfig.get('platform.dashpay'));
+            });
         },
       },
       {

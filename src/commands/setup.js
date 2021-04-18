@@ -11,6 +11,7 @@ const {
   PRESETS,
   NODE_TYPES,
   NODE_TYPE_MASTERNODE,
+  MASTERNODE_DASH_AMOUNT,
 } = require('../constants');
 
 class SetupCommand extends BaseCommand {
@@ -30,8 +31,7 @@ class SetupCommand extends BaseCommand {
     {
       'external-ip': externalIp,
       'operator-bls-private-key': operatorBlsPrivateKey,
-      'drive-image-build-path': driveImageBuildPath,
-      'dapi-image-build-path': dapiImageBuildPath,
+      'funding-private-key': fundingPrivateKeyString,
       'node-count': nodeCount,
       verbose: isVerbose,
     },
@@ -83,6 +83,7 @@ class SetupCommand extends BaseCommand {
     {
       renderer: isVerbose ? 'verbose' : 'default',
       rendererOptions: {
+        showTimer: isVerbose,
         clearOutput: false,
         collapse: false,
         showSubtasks: true,
@@ -91,13 +92,12 @@ class SetupCommand extends BaseCommand {
 
     try {
       await tasks.run({
-        driveImageBuildPath,
-        dapiImageBuildPath,
         preset,
         nodeType,
         nodeCount,
         externalIp,
         operatorBlsPrivateKey,
+        fundingPrivateKeyString,
       });
     } catch (e) {
       throw new MuteOneLineError(e);
@@ -126,9 +126,7 @@ SetupCommand.args = [{
 SetupCommand.flags = {
   'external-ip': flagTypes.string({ char: 'i', description: 'external ip' }),
   'operator-bls-private-key': flagTypes.string({ char: 'k', description: 'operator bls private key' }),
-  update: flagTypes.boolean({ char: 'u', description: 'download updated services before start', default: false }),
-  'drive-image-build-path': flagTypes.string({ description: 'drive\'s docker image build path', default: null }),
-  'dapi-image-build-path': flagTypes.string({ description: 'dapi\'s docker image build path', default: null }),
+  'funding-private-key': flagTypes.string({ char: 'p', description: `private key with more than ${MASTERNODE_DASH_AMOUNT} dash for funding collateral` }),
   'node-count': flagTypes.integer({ description: 'number of nodes to setup', default: null }),
   verbose: flagTypes.boolean({ char: 'v', description: 'use verbose mode for output', default: false }),
 };
