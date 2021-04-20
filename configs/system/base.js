@@ -145,6 +145,13 @@ module.exports = {
         blockHeight: null,
       },
     },
+    featureFlags: {
+      contract: {
+        id: null,
+        blockHeight: null,
+      },
+      ownerId: null,
+    },
   },
   externalIp: null,
   network: NETWORK_TESTNET,

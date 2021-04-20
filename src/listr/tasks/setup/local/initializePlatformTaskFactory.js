@@ -65,6 +65,7 @@ function initializePlatformTaskFactory(
             .forEach((config) => {
               config.set('platform.dpns', initializedConfig.get('platform.dpns'));
               config.set('platform.dashpay', initializedConfig.get('platform.dashpay'));
+              config.set('platform.featureFlags', initializedConfig.get('platform.featureFlags'));
             });
         },
       },
