@@ -48,7 +48,7 @@
   },
   "homepage": "https://github.com/dashevo/mn-bootstrap#readme",
   "dependencies": {
-    "@dashevo/dashcore-lib": "~0.19.22",
+    "@dashevo/dashcore-lib": "~0.19.23",
     "@dashevo/dashd-rpc": "~2.2.2",
     "@dashevo/dashpay-contract": "github:dashevo/dashpay-contract#bc4e9b2d0073e27bd716b3ae63ccfdd60d8c4f36",
     "@dashevo/dpns-contract": "~0.3.0-dev.6",
