@@ -125,6 +125,10 @@ module.exports = {
           if (typeof config.platform.drive.passFakeAssetLockProofForTests !== 'undefined') {
             delete config.platform.drive.passFakeAssetLockProofForTests;
           }
+
+          if (!config.platform.featureFlags) {
+            config.platform.featureFlags = systemConfigs.base.platform.featureFlags;
+          }
         }
       });
 
