@@ -63,7 +63,7 @@ function initializePlatformTaskFactory(
             ctx.featureFlagsIdentity,
             {
               enabled: true,
-              enableAtHeight: 70,
+              enableAtHeight: ctx.featureFlagsContractBlockHeight + 1,
             },
           );
 

@@ -282,6 +282,8 @@ function initTaskFactory(
 
           config.set('platform.featureFlags.contract.blockHeight', contractBlockHeight);
 
+          ctx.featureFlagsContractBlockHeight = contractBlockHeight;
+
           // eslint-disable-next-line no-param-reassign
           task.output = `Feature Flags contract block height: ${contractBlockHeight}`;
         },
