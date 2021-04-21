@@ -220,31 +220,36 @@ function initTaskFactory(
       {
         title: 'Register Feature Fags identity',
         task: async (ctx, task) => {
-          ctx.identity = await ctx.client.platform.identities.register(5);
+          ctx.featureFlagsIdentity = await ctx.client.platform.identities.register(5);
 
-          config.set('platform.featureFlags.ownerId', ctx.identity.getId().toString());
+          config.set('platform.featureFlags.ownerId', ctx.featureFlagsIdentity.getId().toString());
 
           // eslint-disable-next-line no-param-reassign
-          task.output = `Feature Flags identity: ${ctx.identity.getId().toString()}`;
+          task.output = `Feature Flags identity: ${ctx.featureFlagsIdentity.getId().toString()}`;
         },
         options: { persistentOutput: true },
       },
       {
         title: 'Register Feature Flags contract',
         task: async (ctx, task) => {
-          ctx.dataContract = await ctx.client.platform.contracts.create(
-            featureFlagsDocumentSchema, ctx.identity,
+          ctx.featureFlagsDataContract = await ctx.client.platform.contracts.create(
+            featureFlagsDocumentSchema, ctx.featureFlagsIdentity,
           );
+
+          ctx.client.getApps().set('featureFlags', {
+            contractId: ctx.featureFlagsDataContract.getId(),
+            contract: ctx.featureFlagsDataContract,
+          });
 
           ctx.dataContractStateTransition = await ctx.client.platform.contracts.broadcast(
-            ctx.dataContract,
-            ctx.identity,
+            ctx.featureFlagsDataContract,
+            ctx.featureFlagsIdentity,
           );
 
-          config.set('platform.featureFlags.contract.id', ctx.dataContract.getId().toString());
+          config.set('platform.featureFlags.contract.id', ctx.featureFlagsDataContract.getId().toString());
 
           // eslint-disable-next-line no-param-reassign
-          task.output = `Feature Flags contract ID: ${ctx.dataContract.getId().toString()}`;
+          task.output = `Feature Flags contract ID: ${ctx.featureFlagsDataContract.getId().toString()}`;
         },
         options: { persistentOutput: true },
       },

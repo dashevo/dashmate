@@ -56,6 +56,23 @@ function initializePlatformTaskFactory(
         task: () => initTask(configGroup[0]),
       },
       {
+        title: 'Activating feature flags',
+        task: async (ctx) => {
+          const document = await ctx.client.platform.documents.create(
+            'featureFlags.fixCumulativeFeesBug',
+            ctx.featureFlagsIdentity,
+            {
+              enabled: true,
+              enableAtHeight: 70,
+            },
+          );
+
+          await ctx.client.platform.documents.broadcast({
+            create: [document],
+          }, ctx.featureFlagsIdentity);
+        },
+      },
+      {
         task: () => {
           // set platform data contracts
           const [initializedConfig, ...otherConfigs] = configGroup;
