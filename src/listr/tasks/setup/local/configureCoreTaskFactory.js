@@ -233,7 +233,9 @@ function configureCoreTaskFactory(
             },
             {
               title: 'Stopping wallet',
-              task: () => ctx.coreService.stop(),
+              task: async () => {
+                await ctx.coreService.stop();
+              },
             },
             {
               title: 'Starting masternodes',

@@ -7,7 +7,7 @@ module.exports = {
   group: null,
   core: {
     docker: {
-      image: 'dashpay/dashd:0.17.0.0-rc3-hotfix1',
+      image: 'dashpay/dashd:0.17.0.0-rc4',
     },
     p2p: {
       port: 20001,
@@ -69,11 +69,6 @@ module.exports = {
           build: {
             path: null,
           },
-        },
-      },
-      insight: {
-        docker: {
-          image: 'dashpay/insight-api:3.1.1',
         },
       },
     },

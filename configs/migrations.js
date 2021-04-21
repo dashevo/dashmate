@@ -129,6 +129,11 @@ module.exports = {
           if (!config.platform.featureFlags) {
             config.platform.featureFlags = systemConfigs.base.platform.featureFlags;
           }
+
+          // Remove Insight API configuration
+          if (config.platform.dapi.insight) {
+            delete config.platform.dapi.insight;
+          }
         }
       });
 
