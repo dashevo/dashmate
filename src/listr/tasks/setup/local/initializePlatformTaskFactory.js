@@ -63,7 +63,7 @@ function initializePlatformTaskFactory(
             ctx.featureFlagsIdentity,
             {
               enabled: true,
-              enableAtHeight: ctx.featureFlagsContractBlockHeight + 1,
+              enableAtHeight: parseInt(ctx.featureFlagsContractBlockHeight, 10) + 1,
             },
           );
 
