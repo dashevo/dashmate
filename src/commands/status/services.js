@@ -3,9 +3,9 @@ const chalk = require('chalk');
 
 const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
 
-const BaseCommand = require('../../oclif/command/BaseCommand');
+const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 
-class ServicesStatusCommand extends BaseCommand {
+class ServicesStatusCommand extends ConfigBaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
@@ -29,7 +29,6 @@ class ServicesStatusCommand extends BaseCommand {
         drive_mongodb: 'Drive MongoDB',
         drive_abci: 'Drive ABCI',
         drive_tenderdash: 'Drive Tenderdash',
-        dapi_insight: 'DAPI Insight',
         dapi_api: 'DAPI API',
         dapi_tx_filter_stream: 'DAPI Transactions Filter Stream',
         dapi_envoy: 'DAPI Envoy',
@@ -90,7 +89,7 @@ class ServicesStatusCommand extends BaseCommand {
 ServicesStatusCommand.description = 'Show service status details';
 
 ServicesStatusCommand.flags = {
-  ...BaseCommand.flags,
+  ...ConfigBaseCommand.flags,
 };
 
 module.exports = ServicesStatusCommand;

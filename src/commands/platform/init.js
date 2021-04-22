@@ -1,11 +1,9 @@
 const { Listr } = require('listr2');
 
-const { flags: flagTypes } = require('@oclif/command');
-
-const BaseCommand = require('../../oclif/command/BaseCommand');
+const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 
-class InitCommand extends BaseCommand {
+class InitCommand extends ConfigBaseCommand {
   /**
    *
    * @param {Object} args
@@ -21,8 +19,6 @@ class InitCommand extends BaseCommand {
       'funding-private-key': fundingPrivateKeyString,
     },
     {
-      'drive-image-build-path': driveImageBuildPath,
-      'dapi-image-build-path': dapiImageBuildPath,
       verbose: isVerbose,
     },
     dockerCompose,
@@ -38,6 +34,7 @@ class InitCommand extends BaseCommand {
     {
       renderer: isVerbose ? 'verbose' : 'default',
       rendererOptions: {
+        showTimer: isVerbose,
         clearOutput: false,
         collapse: false,
         showSubtasks: true,
@@ -48,8 +45,6 @@ class InitCommand extends BaseCommand {
       await tasks.run({
         fundingPrivateKeyString,
         dapiAddress,
-        driveImageBuildPath,
-        dapiImageBuildPath,
       });
     } catch (e) {
       throw new MuteOneLineError(e);
@@ -74,15 +69,7 @@ InitCommand.args = [{
 }];
 
 InitCommand.flags = {
-  ...BaseCommand.flags,
-  'drive-image-build-path': flagTypes.string({
-    description: 'drive\'s docker image build path',
-    default: null,
-  }),
-  'dapi-image-build-path': flagTypes.string({
-    description: 'dapi\'s docker image build path',
-    default: null,
-  }),
+  ...ConfigBaseCommand.flags,
 };
 
 module.exports = InitCommand;

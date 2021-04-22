@@ -1,14 +1,14 @@
 const { Listr } = require('listr2');
 
-const BaseCommand = require('../oclif/command/BaseCommand');
+const ConfigBaseCommand = require('../oclif/command/ConfigBaseCommand');
 
 const MuteOneLineError = require('../oclif/errors/MuteOneLineError');
 
-class StopCommand extends BaseCommand {
+class StopCommand extends ConfigBaseCommand {
   /**
    * @param {Object} args
    * @param {Object} flags
-   * @param {DockerCompose} dockerCompose
+   * @param {stopNodeTask} stopNodeTask
    * @param {Config} config
    * @return {Promise<void>}
    */
@@ -17,18 +17,18 @@ class StopCommand extends BaseCommand {
     {
       verbose: isVerbose,
     },
-    dockerCompose,
+    stopNodeTask,
     config,
   ) {
     const tasks = new Listr([
       {
-        title: 'Stop node',
-        task: async () => dockerCompose.stop(config.toEnvs()),
+        task: async () => stopNodeTask(config),
       },
     ],
     {
       renderer: isVerbose ? 'verbose' : 'default',
       rendererOptions: {
+        showTimer: isVerbose,
         clearOutput: false,
         collapse: false,
         showSubtasks: true,
@@ -49,7 +49,7 @@ Stop node
 `;
 
 StopCommand.flags = {
-  ...BaseCommand.flags,
+  ...ConfigBaseCommand.flags,
 };
 
 module.exports = StopCommand;

@@ -51,7 +51,7 @@ class DockerCompose {
       throw new DockerComposeError(e);
     }
 
-    containerName = containerName.trim().split('\n').pop();
+    containerName = containerName.trim().split(/\r?\n/).pop();
 
     this.startedContainers.addContainer(containerName);
 
@@ -73,7 +73,15 @@ class DockerCompose {
     for (const containerId of coreContainerIds) {
       const container = this.docker.getContainer(containerId);
 
-      const { State: { Status: status } } = await container.inspect();
+      let status;
+
+      try {
+        ({ State: { Status: status } } = await container.inspect());
+      } catch (e) {
+        if (!e.message.includes(`No such container: ${containerId}`)) {
+          throw e;
+        }
+      }
 
       if (status === 'running') {
         return true;
@@ -95,8 +103,34 @@ class DockerCompose {
     try {
       await dockerCompose.upAll({
         ...this.getOptions(envs),
-        commandOptions: ['--build'],
       });
+    } catch (e) {
+      throw new DockerComposeError(e);
+    }
+  }
+
+  /**
+   * Build docker compose images
+   *
+   * @param {Object} envs
+   * @param {string} [serviceName]
+   * @param {string[]} [options]
+   * @return {Promise<void>}
+   */
+  async build(envs, serviceName = undefined, options = []) {
+    await this.throwErrorIfNotInstalled();
+
+    try {
+      if (serviceName) {
+        await dockerCompose.buildOne(serviceName, {
+          ...this.getOptions(envs),
+          commandOptions: options,
+        });
+      } else {
+        await dockerCompose.buildAll({
+          ...this.getOptions(envs),
+        });
+      }
     } catch (e) {
       throw new DockerComposeError(e);
     }
@@ -210,14 +244,14 @@ class DockerCompose {
 
     return psOutput
       .trim()
-      .split('\n')
+      .split(/\r?\n/)
       .filter(Boolean);
   }
 
   /**
    * Get list of Docker volumes
    * @param {Object} envs
-   * @return {string[]}
+   * @return {Promise<string[]>}
    */
   async getVolumeNames(envs) {
     let volumeOutput;
@@ -231,7 +265,7 @@ class DockerCompose {
 
     return volumeOutput
       .trim()
-      .split('\n');
+      .split(/\r?\n/);
   }
 
   /**
@@ -305,6 +339,22 @@ class DockerCompose {
       throw new Error('Docker Compose is not installed');
     }
 
+    // check docker version
+    const dockerVersion = await new Promise((resolve, reject) => {
+      this.docker.version((err, data) => {
+        if (err) {
+          return reject(err);
+        }
+
+        return resolve(data.Version);
+      });
+    });
+
+    if (semver.lt(dockerVersion.trim(), DockerCompose.DOCKER_MIN_VERSION)) {
+      throw new Error(`Update Docker to version ${DockerCompose.DOCKER_MIN_VERSION} or higher`);
+    }
+
+    // check docker compose version
     const { out: version } = await dockerCompose.version();
     if (semver.lt(version.trim(), DockerCompose.DOCKER_COMPOSE_MIN_VERSION)) {
       throw new Error(`Update Docker Compose to version ${DockerCompose.DOCKER_COMPOSE_MIN_VERSION} or higher`);
@@ -331,5 +381,6 @@ class DockerCompose {
 }
 
 DockerCompose.DOCKER_COMPOSE_MIN_VERSION = '1.25.0';
+DockerCompose.DOCKER_MIN_VERSION = '20.10.0';
 
 module.exports = DockerCompose;
