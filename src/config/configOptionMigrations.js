@@ -90,4 +90,9 @@ module.exports = {
 
     return options;
   },
+  '0.18.3': (name, options) => {
+    lodashSet(options, 'core.docker.image', systemConfigs.base.core.docker.image);
+
+    return options;
+  },
 };
