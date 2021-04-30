@@ -3,13 +3,12 @@ const { Listr } = require('listr2');
 const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 
-class InitCommand extends ConfigBaseCommand {
+class FeatureFlagCommand extends ConfigBaseCommand {
   /**
    *
    * @param {Object} args
    * @param {Object} flags
-   * @param {DockerCompose} dockerCompose
-   * @param {initTask} initTask
+   * @param {featureFlagTask} featureFlagTask
    * @param {Config} config
    * @return {Promise<void>}
    */
@@ -55,12 +54,12 @@ class InitCommand extends ConfigBaseCommand {
   }
 }
 
-InitCommand.description = `Feature flags
+FeatureFlagCommand.description = `Feature flags
 ...
 Register feature flags
 `;
 
-InitCommand.args = [{
+FeatureFlagCommand.args = [{
   name: 'name',
   required: true,
   description: 'name of the feature flag to process',
@@ -82,8 +81,8 @@ InitCommand.args = [{
   description: 'identity of the feature flags contract owner',
 }];
 
-InitCommand.flags = {
+FeatureFlagCommand.flags = {
   ...ConfigBaseCommand.flags,
 };
 
-module.exports = InitCommand;
+module.exports = FeatureFlagCommand;

@@ -4,11 +4,11 @@ const Dash = require('dash');
 
 /**
  *
- * @return {initTask}
+ * @return {featureFlagTask}
  */
 function featureFlagTaskFactory() {
   /**
-   * @typedef {initTask}
+   * @typedef {featureFlagTask}
    * @param {Config} config
    * @return {Listr}
    */
