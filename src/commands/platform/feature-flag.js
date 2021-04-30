@@ -67,7 +67,7 @@ FeatureFlagCommand.args = [{
 },
 {
   name: 'height',
-  required: false,
+  required: true,
   description: 'height of feature flag',
 },
 {
