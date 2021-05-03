@@ -362,6 +362,12 @@ skip_timeout_commit = false
 create_empty_blocks = {{? it.platform.drive.tenderdash.consensus.createEmptyBlocks }}true{{??}}false{{?}}
 create_empty_blocks_interval = "{{= it.platform.drive.tenderdash.consensus.createEmptyBlocksInterval }}"
 
+# Set the Dash Core quorum type
+quorum_type = 100
+
+# Set the App hash size
+app_hash_size = 20
+
 # Reactor sleep duration parameters
 peer_gossip_sleep_duration = "100ms"
 peer_query_maj23_sleep_duration = "2s"
