@@ -3,6 +3,7 @@ const { Listr } = require('listr2');
 const Dash = require('dash');
 const dpp = require('@dashevo/dpp');
 const DataTrigger = require('@dashevo/dpp/lib/dataTrigger/DataTrigger');
+const Identifier = require('@dashevo/dpp/lib/Identifier');
 const featureFlagsDocumentSchema = require('@dashevo/feature-flags-contract/schema/feature-flags-documents.json');
 
 /**
@@ -39,9 +40,16 @@ function featureFlagTaskFactory() {
         },
       },
       {
-        title: 'Get feature flag identity',
+        title: 'Register feature flag contract',
         task: async (ctx) => {
-          ctx.featureFlagsIdentity = await ctx.client.platform.identities.get(config.get('platform.featureFlags.ownerId'));
+          const featureFlagsContractId = config.get('platform.featureFlags.contract.id');
+          const featureFlagsContract = await ctx.client.platform.contracts.get(featureFlagsContractId);
+          ctx.client.apps.apps.featureFlags = {
+            contractId: Identifier.from(featureFlagsContractId),
+            featureFlagsContract,
+          };
+          const debug = ctx.client.getApps();
+          console.log(debug);
         },
       },
       {
@@ -61,12 +69,16 @@ function featureFlagTaskFactory() {
           // Doesn't work, this is a contract not a document???
           // const featureFlagStateTransition = await ctx.client.platform.documents.get(documentId);
 
+
+
+
           const submitFeatureFlagDocument = async () => {
             const featureFlagsFlag = `featureFlags.${ctx.featureFlagName}`;
             const identity = await ctx.client.platform.identities.get(config.get('platform.featureFlags.ownerId'));
+            const integerHeight = Number(ctx.height);
 
             const docProperties = {
-              enableAtHeight: ctx.height,
+              enableAtHeight: integerHeight,
             };
 
             // What does `getApps().set()` do, where is this documented?
@@ -76,6 +88,9 @@ function featureFlagTaskFactory() {
             //   contractId: ctx.featureFlagsDataContract.getId(),
             //   contract: ctx.featureFlagsDataContract,
             // });
+
+            const debug = ctx.client.getApps();
+            console.log(debug);
 
             const featureFlagDocument = await ctx.client.platform.documents.create(
               featureFlagsFlag,
