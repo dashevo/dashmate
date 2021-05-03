@@ -248,7 +248,6 @@ module.exports = {
                     enabledForPercentage: {
                       type: 'integer',
                       minimum: 0,
-                      maximum: 100,
                     },
                   },
                   required: ['enabledForPercentage', 'fillInterval', 'tokensPerFill', 'maxTokens'],
