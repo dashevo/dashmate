@@ -57,7 +57,7 @@ static_resources:
                               regex: "GET|POST|OPTIONS"
                       route:
                         cluster: tx_filter_stream
-                        max_grpc_timeout: 0s
+                        timeout: 0s
                     # core endpoint configutration
                     - match:
                         prefix: "/org.dash.platform.dapi.v0.Core"
@@ -68,7 +68,7 @@ static_resources:
                               regex: "GET|POST|OPTIONS"
                       route:
                         cluster: core_and_platform
-                        max_grpc_timeout: 0s
+                        timeout: 0s
                     # platform endpoint configutration
                     - match:
                         prefix: "/org.dash.platform.dapi.v0.Platform"
@@ -79,7 +79,7 @@ static_resources:
                               regex: "GET|POST|OPTIONS"
                       route:
                         cluster: core_and_platform
-                        max_grpc_timeout: 0s
+                        timeout: 0s
                     # health-check endpoint configuration
                     - match:
                         prefix: "/grpc.health.v1.Health"
@@ -90,7 +90,7 @@ static_resources:
                               regex: "GET|POST|OPTIONS"
                       route:
                         cluster: tx_filter_stream
-                        max_grpc_timeout: 0s
+                        timeout: 0s
                     # configuration of the static responses of unsupported api versions
                     # core static response
                     - match:
@@ -161,8 +161,8 @@ static_resources:
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.access_loggers.file.v3.FileAccessLog
                       path: /dev/stdout
-                      json_format:
-                        mapping:
+                      log_format:
+                        json_format:
                           timestamp: "%START_TIME%"
                           client: "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT%"
                           uri: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
@@ -218,22 +218,22 @@ static_resources:
                             prefix: "/org.dash.platform.dapi.v0.Core/subscribeToTransactionsWithProofs"
                           route:
                             cluster: tx_filter_stream
-                            max_grpc_timeout: 0s
+                            timeout: 0s
                         - match:
                             prefix: "/org.dash.platform.dapi.v0.Core"
                           route:
                             cluster: core_and_platform
-                            max_grpc_timeout: 0s
+                            timeout: 0s
                         - match:
                             prefix: "/org.dash.platform.dapi.v0.Platform"
                           route:
                             cluster: core_and_platform
-                            max_grpc_timeout: 0s
+                            timeout: 0s
                         - match:
                             prefix: "/grpc.health.v1.Health"
                           route:
                             cluster: tx_filter_stream
-                            max_grpc_timeout: 0s
+                            timeout: 0s
                         # configuration of the static responses of unsupported api versions
                         # core static response
                         - match:
