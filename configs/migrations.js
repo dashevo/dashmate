@@ -125,7 +125,18 @@ module.exports = {
           if (typeof config.platform.drive.passFakeAssetLockProofForTests !== 'undefined') {
             delete config.platform.drive.passFakeAssetLockProofForTests;
           }
+
+          if (!config.platform.featureFlags) {
+            config.platform.featureFlags = systemConfigs.base.platform.featureFlags;
+          }
+
+          // Remove Insight API configuration
+          if (config.platform.dapi.insight) {
+            delete config.platform.dapi.insight;
+          }
         }
+
+        config.core.docker.image = systemConfigs.base.core.docker.image;
       });
 
     // Replace local config to group template
