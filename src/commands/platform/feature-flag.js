@@ -17,7 +17,6 @@ class FeatureFlagCommand extends ConfigBaseCommand {
       name,
       height,
       'dapi-address': dapiAddress,
-      'feature-flags-identity': featureFlagsIdentity,
     },
     {
       verbose: isVerbose,
@@ -43,10 +42,9 @@ class FeatureFlagCommand extends ConfigBaseCommand {
 
     try {
       await tasks.run({
-        dapiAddress,
         name,
         height,
-        featureFlagsIdentity,
+        dapiAddress,
       });
     } catch (e) {
       throw new MuteOneLineError(e);
@@ -71,14 +69,9 @@ FeatureFlagCommand.args = [{
   description: 'height of feature flag',
 },
 {
-  name: 'dapiAddress',
+  name: 'dapi-address',
   required: false,
   description: 'DAPI address to send init transitions to',
-},
-{
-  name: 'feature-flags-identity',
-  required: false,
-  description: 'identity of the feature flags contract owner',
 }];
 
 FeatureFlagCommand.flags = {

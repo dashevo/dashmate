@@ -36,6 +36,12 @@ function featureFlagTaskFactory() {
         },
       },
       {
+        title: 'Get feature flag identity',
+        task: async (ctx) => {
+          ctx.featureFlagsIdentity = ctx.client.platform.identities.get(config.get('platform.featureFlags.ownerId'));
+        },
+      },
+      {
         title: 'Enable feature flag',
         task: async (ctx) => {
           const featureFlag = `featureFlags.${ctx.name}`;
