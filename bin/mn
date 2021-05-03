@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+process.env.DEBUG = '*';
+
 require('@oclif/command').run()
   .then(require('@oclif/command/flush'))
   // eslint-disable-next-line import/no-extraneous-dependencies
