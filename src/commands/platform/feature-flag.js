@@ -14,8 +14,9 @@ class FeatureFlagCommand extends ConfigBaseCommand {
    */
   async runWithDependencies(
     {
-      name,
+      'feature-flag-name': featureFlagName,
       height,
+      'feature-flag-identity-private-key': featureFlagIdentityPrivateKey,
       'dapi-address': dapiAddress,
     },
     {
@@ -42,8 +43,9 @@ class FeatureFlagCommand extends ConfigBaseCommand {
 
     try {
       await tasks.run({
-        name,
+        featureFlagName,
         height,
+        featureFlagIdentityPrivateKey,
         dapiAddress,
       });
     } catch (e) {
@@ -58,7 +60,7 @@ Register feature flags
 `;
 
 FeatureFlagCommand.args = [{
-  name: 'name',
+  name: 'feature-flag-name',
   required: true,
   description: 'name of the feature flag to process',
   options: ['updateConsensusParams', 'fixCumulativeFeesBug', 'verifyLLMQSignaturesWithCore'],
@@ -67,6 +69,11 @@ FeatureFlagCommand.args = [{
   name: 'height',
   required: true,
   description: 'height of feature flag',
+},
+{
+  name: 'feature-flag-identity-private-key',
+  required: true,
+  description: 'feature flag contract owner ID private key',
 },
 {
   name: 'dapi-address',
