@@ -26,7 +26,7 @@ static_resources:
                   filter_enabled:
                     runtime_key: local_rate_limit_enabled
                     default_value:
-                      numerator: 100
+                      numerator: {{=it.platform.dapi.envoy.rateLimiter.enabledForPercentage}}
                       denominator: HUNDRED
                   filter_enforced:
                     runtime_key: local_rate_limit_enforced
