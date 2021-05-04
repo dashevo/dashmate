@@ -18,7 +18,7 @@ class FeatureFlagCommand extends ConfigBaseCommand {
     {
       name: featureFlagName,
       height,
-      'feature-flag-identity-private-key': hdPrivateKey,
+      'hd-private-key': hdPrivateKey,
       'dapi-address': dapiAddress,
     },
     {
@@ -65,7 +65,7 @@ FeatureFlagCommand.args = [{
   name: 'name',
   required: true,
   description: 'name of the feature flag to process',
-  options: featureFlagTypes,
+  options: Object.values(featureFlagTypes),
 },
 {
   name: 'height',
