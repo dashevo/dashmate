@@ -48,8 +48,8 @@ function featureFlagTaskFactory() {
             contractId: Identifier.from(featureFlagsContractId),
             featureFlagsContract,
           };
-          const debug = ctx.client.getApps();
-          console.log(debug);
+          // const debug = ctx.client.getApps();
+          // console.log(debug);
         },
       },
       {
@@ -69,7 +69,11 @@ function featureFlagTaskFactory() {
           // Doesn't work, this is a contract not a document???
           // const featureFlagStateTransition = await ctx.client.platform.documents.get(documentId);
 
-
+          // console.log('Inspect existing document');
+          // const ffContract = await ctx.client.platform.contracts.get(config.get('platform.featureFlags.contract.id'));
+          // console.log(ffContract);
+          // const ffDocument = await ctx.client.platform.document.get(`featureFlags.${ctx.featureFlagName}`);
+          // console.log(ffDocument);
 
 
           const submitFeatureFlagDocument = async () => {
