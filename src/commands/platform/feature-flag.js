@@ -1,5 +1,7 @@
 const { Listr } = require('listr2');
 
+const featureFlagTypes = require('@dashevo/feature-flags-contract/lib/featureFlagTypes');
+
 const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 const MuteOneLineError = require('../../oclif/errors/MuteOneLineError');
 
@@ -14,9 +16,9 @@ class FeatureFlagCommand extends ConfigBaseCommand {
    */
   async runWithDependencies(
     {
-      'feature-flag-name': featureFlagName,
+      name: featureFlagName,
       height,
-      'feature-flag-identity-private-key': featureFlagIdentityPrivateKey,
+      'feature-flag-identity-private-key': hdPrivateKey,
       'dapi-address': dapiAddress,
     },
     {
@@ -45,7 +47,7 @@ class FeatureFlagCommand extends ConfigBaseCommand {
       await tasks.run({
         featureFlagName,
         height,
-        featureFlagIdentityPrivateKey,
+        hdPrivateKey,
         dapiAddress,
       });
     } catch (e) {
@@ -60,25 +62,25 @@ Register feature flags
 `;
 
 FeatureFlagCommand.args = [{
-  name: 'feature-flag-name',
+  name: 'name',
   required: true,
   description: 'name of the feature flag to process',
-  options: ['updateConsensusParams', 'fixCumulativeFeesBug', 'verifyLLMQSignaturesWithCore'],
+  options: featureFlagTypes,
 },
 {
   name: 'height',
   required: true,
-  description: 'height of feature flag',
+  description: 'height at which feature flag should be enabled',
 },
 {
-  name: 'feature-flag-identity-private-key',
+  name: 'hd-private-key',
   required: true,
-  description: 'feature flag contract owner ID private key',
+  description: 'feature flag hd private key',
 },
 {
   name: 'dapi-address',
-  required: false,
-  description: 'DAPI address to send init transitions to',
+  required: true,
+  description: 'DAPI address to send feature flags transitions to',
 }];
 
 FeatureFlagCommand.flags = {

@@ -220,7 +220,7 @@ function initTaskFactory(
       {
         title: 'Register Feature Flags identity',
         task: async (ctx, task) => {
-          ctx.featureFlagsIdentity = await ctx.client.platform.identities.register(50);
+          ctx.featureFlagsIdentity = await ctx.client.platform.identities.register(5000);
 
           config.set('platform.featureFlags.ownerId', ctx.featureFlagsIdentity.getId().toString());
 
