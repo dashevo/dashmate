@@ -19,6 +19,7 @@ static_resources:
                 typed_config:
                   "@type": type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
                   stat_prefix: http_local_rate_limiter
+                  # see documentation https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/v3/token_bucket.proto#envoy-v3-api-msg-type-v3-tokenbucket
                   token_bucket:
                     max_tokens: {{=it.platform.dapi.envoy.rateLimiter.maxTokens}}
                     tokens_per_fill: {{=it.platform.dapi.envoy.rateLimiter.tokensPerFill}}
