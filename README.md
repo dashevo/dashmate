@@ -55,7 +55,7 @@ $ mn update
 $ mn start
 ```
 
-If the platform layer has been wiped, you must additionally run `$ mn reset --platform-only --hard` followed by `mn setup -k <bls-key>` with your existing BLS private key after the first `mn stop` command.
+If the platform layer has been wiped, you must additionally run `mn reset --platform-only --hard` followed by `mn setup -k <bls-key>` with your existing BLS private key after the first `mn stop` command.
 
 ## Usage
 
