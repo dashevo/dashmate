@@ -1,3 +1,272 @@
+# [0.19.0](https://github.com/dashevo/mn-bootstrap/compare/v0.18.2...v0.19.0) (2021-05-06)
+
+
+### Features
+
+* implement feature-flag command ([#336](https://github.com/dashevo/mn-bootstrap/issues/336))
+* ChainLock Asset Lock Proofs ([#333](https://github.com/dashevo/mn-bootstrap/issues/333)) ([511c45f](https://github.com/dashevo/mn-bootstrap/commit/511c45f84276b699bed269ec9e2467300b0db079))
+* enable `verifyLLMQSignaturesWithCore` flag ([#334](https://github.com/dashevo/mn-bootstrap/issues/334)) ([d1ef767](https://github.com/dashevo/mn-bootstrap/commit/d1ef767289276bd00fd6a925a345ed3356c35f3a))
+* feature flags ([#329](https://github.com/dashevo/mn-bootstrap/issues/329)) ([ce592d6](https://github.com/dashevo/mn-bootstrap/commit/ce592d6ee17ac3e720d2bfba4acbaac5dcb946f6))
+* update DAPI to 0.19 ([#330](https://github.com/dashevo/mn-bootstrap/issues/330)) ([23e4c6f](https://github.com/dashevo/mn-bootstrap/commit/23e4c6f83557e30d44eaab70706c8ab807d94deb))
+* display tasks elapsed time in verbose mode ([#320](https://github.com/dashevo/mn-bootstrap/issues/320)) ([ddc76d3](https://github.com/dashevo/mn-bootstrap/commit/ddc76d3850de1e201cda59861b98035afefd2852))
+* NPM cache for DAPI and Drive builds ([#302](https://github.com/dashevo/mn-bootstrap/issues/302)) ([f346c2a](https://github.com/dashevo/mn-bootstrap/commit/f346c2a9a35ea6a37861a6f6cf1b979dfe153990))
+* tenderdash empty blocks configuration ([#315](https://github.com/dashevo/mn-bootstrap/issues/315)) ([1270143](https://github.com/dashevo/mn-bootstrap/commit/12701438c933859fbfb33d13fe1549ffa4bee965))
+* check docker version ([#310](https://github.com/dashevo/mn-bootstrap/issues/310)) ([f7092b1](https://github.com/dashevo/mn-bootstrap/commit/f7092b121de30750b5981bfe94f76271820c3cba))
+* skip Instant Lock verification in SDK ([#299](https://github.com/dashevo/mn-bootstrap/issues/299)) ([922da35](https://github.com/dashevo/mn-bootstrap/commit/922da35de700e7de670950d2167350f98038c8df))
+* update drive to 0.19-dev ([#303](https://github.com/dashevo/mn-bootstrap/issues/303)) ([39d8f92](https://github.com/dashevo/mn-bootstrap/commit/39d8f9206c75148830bee018216ccf264285a814))
+* register masternodes on testnet given funding privkey ([#288](https://github.com/dashevo/mn-bootstrap/issues/288)) ([6992cb7](https://github.com/dashevo/mn-bootstrap/commit/6992cb7260861fe8d7a35c38d018b4d1226a91f3))
+* wait for node to be ready option ([#295](https://github.com/dashevo/mn-bootstrap/issues/295)) ([4291afa](https://github.com/dashevo/mn-bootstrap/commit/4291afa498d7fe98e97afc1cc952b7dae91868d8))
+* wait for tenderdash on start ([#289](https://github.com/dashevo/mn-bootstrap/issues/289)) ([efe0f95](https://github.com/dashevo/mn-bootstrap/commit/efe0f950c05230d11fdda33fdf306df3884d813b))
+* activate sporks during local setup ([#286](https://github.com/dashevo/mn-bootstrap/issues/286)) ([acadfa2](https://github.com/dashevo/mn-bootstrap/commit/acadfa288b7ec4a4b63e8861621238ee5553d4c9))
+
+
+### Bug Fixes
+
+* config with name 'devnet' is not present ([#337](https://github.com/dashevo/mn-bootstrap/issues/337))
+* wait for masternodes to be synced before start miner ([#343](https://github.com/dashevo/mn-bootstrap/issues/343))
+*  cannot read property 'toString' of undefined ([#338](https://github.com/dashevo/mn-bootstrap/issues/338))
+* with docker compose 1.29 container.inspect throws error if the container isn't running ([#325](https://github.com/dashevo/mn-bootstrap/issues/325))
+* BlsSignatures is not a function ([#318](https://github.com/dashevo/mn-bootstrap/issues/318)) ([b7bed04](https://github.com/dashevo/mn-bootstrap/commit/b7bed04ac27a7e45e27012248c73cca6a7dcf7c5))
+* drive network is always set to "testnet" ([#321](https://github.com/dashevo/mn-bootstrap/issues/321)) ([ca00f04](https://github.com/dashevo/mn-bootstrap/commit/ca00f04db8e692718321d3cf35647b8d40e17cd0))
+* cannot register testnet mn ([#313](https://github.com/dashevo/mn-bootstrap/issues/313)) ([bc1dc12](https://github.com/dashevo/mn-bootstrap/commit/bc1dc12a5d5f17db0a766429fa84fca68a31a5e5))
+* grammar in some error messages ([#309](https://github.com/dashevo/mn-bootstrap/issues/309)) ([faeb1b2](https://github.com/dashevo/mn-bootstrap/commit/faeb1b25ddb39c7eae279bf122d777d2004be339))
+* grammar in task titles  ([#314](https://github.com/dashevo/mn-bootstrap/issues/314)) ([f56f025](https://github.com/dashevo/mn-bootstrap/commit/f56f025e8ac06e7ea579b0866190c13a461767b3))
+* setup local network doesn't work sometimes ([#311](https://github.com/dashevo/mn-bootstrap/issues/311)) ([1d2a8f7](https://github.com/dashevo/mn-bootstrap/commit/1d2a8f73a7e35747668988863db0a0202fb4d4a2))
+* invalid order of operations lead to Drive to never start ([#307](https://github.com/dashevo/mn-bootstrap/issues/307)) ([0aa761b](https://github.com/dashevo/mn-bootstrap/commit/0aa761bec199fcb093d674a854acd4c408c5d798))
+* waitForNodeTobeReady tasks were constructed in a wrong way ([#300](https://github.com/dashevo/mn-bootstrap/issues/300)) ([b2273bd](https://github.com/dashevo/mn-bootstrap/commit/b2273bd58fa3c3253dbacd66cbb57f934aa20638))
+* invalid if condition were used to determine local seed config ([#298](https://github.com/dashevo/mn-bootstrap/issues/298)) ([f762e25](https://github.com/dashevo/mn-bootstrap/commit/f762e25ca6a9dce4aebce1a7c233cdb95b93bf86))
+* progressCallback not found ([#296](https://github.com/dashevo/mn-bootstrap/issues/296)) ([1948f70](https://github.com/dashevo/mn-bootstrap/commit/1948f7067ed71920e3f4ece74fb80afd21ce26ca))
+* commands do not work on windows ([#291](https://github.com/dashevo/mn-bootstrap/issues/291)) ([f69b0e7](https://github.com/dashevo/mn-bootstrap/commit/f69b0e75097119a4b78a49076d376a844406ed28))
+* make services stop in a reverse order to avoid nodes getting banned ([#292](https://github.com/dashevo/mn-bootstrap/issues/292)) ([cef7b72](https://github.com/dashevo/mn-bootstrap/commit/cef7b72bb41305b35013d123dcd560906f2e18c5))
+* grouped configs are not allowed to use ([#282](https://github.com/dashevo/mn-bootstrap/issues/282)) ([b968b63](https://github.com/dashevo/mn-bootstrap/commit/b968b630600586630268d45d74a71fa624f6098b))
+
+
+### Reverts
+
+* fix BlsSignatures is not a function ([#319](https://github.com/dashevo/mn-bootstrap/issues/319)) ([5710ed5](https://github.com/dashevo/mn-bootstrap/commit/5710ed59a4ae24ce6e2f262a73639b7d3105b58f))
+
+
+
+## [0.18.2](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.12...v0.18.2) (2021-04-14)
+
+
+### Features
+
+* update to core 0.17.0.0-rc4 ([#326](https://github.com/dashevo/mn-bootstrap/issues/326)) ([a0bb778](https://github.com/dashevo/mn-bootstrap/commit/a0bb778952c5c83bcc5b69cc5c124b57b8c25b02))
+
+
+
+# [0.19.0-dev.12](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.11...v0.19.0-dev.12) (2021-04-06)
+
+
+### Bug Fixes
+
+* BlsSignatures is not a function ([#318](https://github.com/dashevo/mn-bootstrap/issues/318)) ([b7bed04](https://github.com/dashevo/mn-bootstrap/commit/b7bed04ac27a7e45e27012248c73cca6a7dcf7c5))
+* drive network is always set to "testnet" ([#321](https://github.com/dashevo/mn-bootstrap/issues/321)) ([ca00f04](https://github.com/dashevo/mn-bootstrap/commit/ca00f04db8e692718321d3cf35647b8d40e17cd0))
+
+
+### Features
+
+* display tasks elapsed time in verbose mode ([#320](https://github.com/dashevo/mn-bootstrap/issues/320)) ([ddc76d3](https://github.com/dashevo/mn-bootstrap/commit/ddc76d3850de1e201cda59861b98035afefd2852))
+* NPM cache for DAPI and Drive builds ([#302](https://github.com/dashevo/mn-bootstrap/issues/302)) ([f346c2a](https://github.com/dashevo/mn-bootstrap/commit/f346c2a9a35ea6a37861a6f6cf1b979dfe153990))
+* tenderdash empty blocks configuration ([#315](https://github.com/dashevo/mn-bootstrap/issues/315)) ([1270143](https://github.com/dashevo/mn-bootstrap/commit/12701438c933859fbfb33d13fe1549ffa4bee965))
+
+
+### Reverts
+
+* fix BlsSignatures is not a function ([#319](https://github.com/dashevo/mn-bootstrap/issues/319)) ([5710ed5](https://github.com/dashevo/mn-bootstrap/commit/5710ed59a4ae24ce6e2f262a73639b7d3105b58f))
+
+
+
+## [0.18.1](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.4...v0.18.1) (2021-03-09)
+
+
+### Features
+
+* update Drive and DAPI images ([0273d33](https://github.com/dashevo/mn-bootstrap/commit/0273d33d524bd6dfa7facdd708fe79d4a2e83328))
+
+
+
+# [0.19.0-dev.11](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.10...v0.19.0-dev.11) (2021-03-31)
+
+
+### Bug Fixes
+
+* cannot register testnet mn ([#313](https://github.com/dashevo/mn-bootstrap/issues/313)) ([bc1dc12](https://github.com/dashevo/mn-bootstrap/commit/bc1dc12a5d5f17db0a766429fa84fca68a31a5e5))
+* grammar in some error messages ([#309](https://github.com/dashevo/mn-bootstrap/issues/309)) ([faeb1b2](https://github.com/dashevo/mn-bootstrap/commit/faeb1b25ddb39c7eae279bf122d777d2004be339))
+* grammar in task titles  ([#314](https://github.com/dashevo/mn-bootstrap/issues/314)) ([f56f025](https://github.com/dashevo/mn-bootstrap/commit/f56f025e8ac06e7ea579b0866190c13a461767b3))
+* setup local network doesn't work sometimes ([#311](https://github.com/dashevo/mn-bootstrap/issues/311)) ([1d2a8f7](https://github.com/dashevo/mn-bootstrap/commit/1d2a8f73a7e35747668988863db0a0202fb4d4a2))
+
+
+### Features
+
+* check docker version ([#310](https://github.com/dashevo/mn-bootstrap/issues/310)) ([f7092b1](https://github.com/dashevo/mn-bootstrap/commit/f7092b121de30750b5981bfe94f76271820c3cba))
+
+
+
+# [0.19.0-dev.10](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.8...v0.19.0-dev.10) (2021-03-12)
+
+
+### Bug Fixes
+
+* invalid order of operations lead to Drive to never start ([#307](https://github.com/dashevo/mn-bootstrap/issues/307)) ([0aa761b](https://github.com/dashevo/mn-bootstrap/commit/0aa761bec199fcb093d674a854acd4c408c5d798))
+
+
+
+# [0.19.0-dev.8](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.7...v0.19.0-dev.8) (2021-03-12)
+
+
+### Features
+
+* update drive to 0.19-dev ([#303](https://github.com/dashevo/mn-bootstrap/issues/303)) ([39d8f92](https://github.com/dashevo/mn-bootstrap/commit/39d8f9206c75148830bee018216ccf264285a814))
+
+
+
+# [0.19.0-dev.7](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.6...v0.19.0-dev.7) (2021-03-11)
+
+
+### Bug Fixes
+
+* waitForNodeTobeReady tasks were constructed in a wrong way ([#300](https://github.com/dashevo/mn-bootstrap/issues/300)) ([b2273bd](https://github.com/dashevo/mn-bootstrap/commit/b2273bd58fa3c3253dbacd66cbb57f934aa20638))
+
+
+
+# [0.19.0-dev.6](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.5...v0.19.0-dev.6) (2021-03-11)
+
+
+### Features
+
+* skip Instant Lock verification in SDK ([#299](https://github.com/dashevo/mn-bootstrap/issues/299)) ([922da35](https://github.com/dashevo/mn-bootstrap/commit/922da35de700e7de670950d2167350f98038c8df))
+
+
+
+# [0.19.0-dev.5](https://github.com/dashevo/mn-bootstrap/compare/v0.18.1...v0.19.0-dev.5) (2021-03-10)
+
+
+### Bug Fixes
+
+* invalid if condition were used to determine local seed config ([#298](https://github.com/dashevo/mn-bootstrap/issues/298)) ([f762e25](https://github.com/dashevo/mn-bootstrap/commit/f762e25ca6a9dce4aebce1a7c233cdb95b93bf86))
+* progressCallback not found ([#296](https://github.com/dashevo/mn-bootstrap/issues/296)) ([1948f70](https://github.com/dashevo/mn-bootstrap/commit/1948f7067ed71920e3f4ece74fb80afd21ce26ca))
+
+
+### Features
+
+* register masternodes on testnet given funding privkey ([#288](https://github.com/dashevo/mn-bootstrap/issues/288)) ([6992cb7](https://github.com/dashevo/mn-bootstrap/commit/6992cb7260861fe8d7a35c38d018b4d1226a91f3))
+* wait for node to be ready option ([#295](https://github.com/dashevo/mn-bootstrap/issues/295)) ([4291afa](https://github.com/dashevo/mn-bootstrap/commit/4291afa498d7fe98e97afc1cc952b7dae91868d8))
+
+
+
+# [0.19.0-dev.4](https://github.com/dashevo/mn-bootstrap/compare/v0.18.0...v0.19.0-dev.4) (2021-03-05)
+
+
+### Bug Fixes
+
+* commands do not work on windows ([#291](https://github.com/dashevo/mn-bootstrap/issues/291)) ([f69b0e7](https://github.com/dashevo/mn-bootstrap/commit/f69b0e75097119a4b78a49076d376a844406ed28))
+* make services stop in a reverse order to avoid nodes getting banned ([#292](https://github.com/dashevo/mn-bootstrap/issues/292)) ([cef7b72](https://github.com/dashevo/mn-bootstrap/commit/cef7b72bb41305b35013d123dcd560906f2e18c5))
+
+
+
+# [0.19.0-dev.3](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.2...v0.19.0-dev.3) (2021-03-03)
+
+
+### Features
+
+* wait for tenderdash on start ([#289](https://github.com/dashevo/mn-bootstrap/issues/289)) ([efe0f95](https://github.com/dashevo/mn-bootstrap/commit/efe0f950c05230d11fdda33fdf306df3884d813b))
+
+
+
+# [0.19.0-dev.2](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.1...v0.19.0-dev.2) (2021-03-02)
+
+
+### Features
+
+* activate sporks during local setup ([#286](https://github.com/dashevo/mn-bootstrap/issues/286)) ([acadfa2](https://github.com/dashevo/mn-bootstrap/commit/acadfa288b7ec4a4b63e8861621238ee5553d4c9))
+
+
+
+# [0.19.0-dev.1](https://github.com/dashevo/mn-bootstrap/compare/v0.18.0-dev.12...v0.19.0-dev.1) (2021-02-25)
+
+
+### Bug Fixes
+
+* grouped configs are not allowed to use ([#282](https://github.com/dashevo/mn-bootstrap/issues/282)) ([b968b63](https://github.com/dashevo/mn-bootstrap/commit/b968b630600586630268d45d74a71fa624f6098b))
+
+
+
+## [0.18.1](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.4...v0.18.1) (2021-03-09)
+
+
+### Features
+
+* update Drive and DAPI images ([0273d33](https://github.com/dashevo/mn-bootstrap/commit/0273d33d524bd6dfa7facdd708fe79d4a2e83328))
+
+
+
+# [0.18.0](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.3...v0.18.0) (2021-03-03)
+
+
+### Bug Fixes
+
+* platform sync shows Infinity% ([#281](https://github.com/dashevo/mn-bootstrap/issues/281)) ([a40140b](https://github.com/dashevo/mn-bootstrap/commit/a40140b84b294ee304e7327056f47bdb4f483ffe))
+
+
+### Features
+
+* update Drive and DAPI images in migration file ([#279](https://github.com/dashevo/mn-bootstrap/issues/279)) ([a0fb0dd](https://github.com/dashevo/mn-bootstrap/commit/a0fb0dd5c4c5b011e4464dda251322d1fa6f40e1))
+
+
+
+# [0.19.0-dev.4](https://github.com/dashevo/mn-bootstrap/compare/v0.18.0...v0.19.0-dev.4) (2021-03-05)
+
+
+### Bug Fixes
+
+* commands do not work on windows ([#291](https://github.com/dashevo/mn-bootstrap/issues/291)) ([f69b0e7](https://github.com/dashevo/mn-bootstrap/commit/f69b0e75097119a4b78a49076d376a844406ed28))
+* make services stop in a reverse order to avoid nodes getting banned ([#292](https://github.com/dashevo/mn-bootstrap/issues/292)) ([cef7b72](https://github.com/dashevo/mn-bootstrap/commit/cef7b72bb41305b35013d123dcd560906f2e18c5))
+
+
+
+# [0.19.0-dev.3](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.2...v0.19.0-dev.3) (2021-03-03)
+
+
+### Features
+
+* wait for tenderdash on start ([#289](https://github.com/dashevo/mn-bootstrap/issues/289)) ([efe0f95](https://github.com/dashevo/mn-bootstrap/commit/efe0f950c05230d11fdda33fdf306df3884d813b))
+
+
+
+# [0.19.0-dev.2](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.1...v0.19.0-dev.2) (2021-03-02)
+
+
+### Features
+
+* activate sporks during local setup ([#286](https://github.com/dashevo/mn-bootstrap/issues/286)) ([acadfa2](https://github.com/dashevo/mn-bootstrap/commit/acadfa288b7ec4a4b63e8861621238ee5553d4c9))
+
+
+
+# [0.19.0-dev.1](https://github.com/dashevo/mn-bootstrap/compare/v0.18.0-dev.12...v0.19.0-dev.1) (2021-02-25)
+
+
+### Bug Fixes
+
+* grouped configs are not allowed to use ([#282](https://github.com/dashevo/mn-bootstrap/issues/282)) ([b968b63](https://github.com/dashevo/mn-bootstrap/commit/b968b630600586630268d45d74a71fa624f6098b))
+
+
+
+# [0.18.0](https://github.com/dashevo/mn-bootstrap/compare/v0.19.0-dev.3...v0.18.0) (2021-03-03)
+
+
+### Bug Fixes
+
+* platform sync shows Infinity% ([#281](https://github.com/dashevo/mn-bootstrap/issues/281)) ([a40140b](https://github.com/dashevo/mn-bootstrap/commit/a40140b84b294ee304e7327056f47bdb4f483ffe))
+
+
+### Features
+
+* update Drive and DAPI images in migration file ([#279](https://github.com/dashevo/mn-bootstrap/issues/279)) ([a0fb0dd](https://github.com/dashevo/mn-bootstrap/commit/a0fb0dd5c4c5b011e4464dda251322d1fa6f40e1))
+
+
+
 ## [0.18.2](https://github.com/dashevo/mn-bootstrap/compare/v0.18.1...v0.18.2) (2021-04-14)
 
 
