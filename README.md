@@ -9,6 +9,7 @@ Distribution package for Dash Masternode installation
 ## Table of Contents
 
 - [Install](#install)
+- [Update] (#update)
 - [Usage](#usage)
   - [Command line interface](#cli)
   - [Setup node](#setup-node)
