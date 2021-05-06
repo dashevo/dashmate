@@ -56,7 +56,7 @@ module.exports = {
           maxTokens: 300,
           tokensPerFill: 150,
           fillInterval: '60s',
-          enabledForPercentage: 100,
+          enabled: true,
         },
       },
       api: {

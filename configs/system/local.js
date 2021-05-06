@@ -12,7 +12,7 @@ module.exports = lodashMerge({}, baseConfig, {
     dapi: {
       envoy: {
         rateLimiter: {
-          enabledForPercentage: 0,
+          enabled: false,
         },
       },
     },

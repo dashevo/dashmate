@@ -26,7 +26,7 @@ static_resources:
                   filter_enabled:
                     runtime_key: local_rate_limit_enabled
                     default_value:
-                      numerator: {{=it.platform.dapi.envoy.rateLimiter.enabledForPercentage}}
+                      numerator: {{? it.platform.dapi.envoy.rateLimiter.enabled}}100{{??}}0{{?}}
                       denominator: HUNDRED
                   filter_enforced:
                     runtime_key: local_rate_limit_enforced
@@ -57,7 +57,6 @@ static_resources:
                               regex: "GET|POST|OPTIONS"
                       route:
                         cluster: tx_filter_stream
-                        timeout: 0s
                     # core endpoint configutration
                     - match:
                         prefix: "/org.dash.platform.dapi.v0.Core"
@@ -68,7 +67,6 @@ static_resources:
                               regex: "GET|POST|OPTIONS"
                       route:
                         cluster: core_and_platform
-                        timeout: 0s
                     # platform endpoint configutration
                     - match:
                         prefix: "/org.dash.platform.dapi.v0.Platform"
@@ -79,7 +77,6 @@ static_resources:
                               regex: "GET|POST|OPTIONS"
                       route:
                         cluster: core_and_platform
-                        timeout: 0s
                     # health-check endpoint configuration
                     - match:
                         prefix: "/grpc.health.v1.Health"
@@ -90,7 +87,6 @@ static_resources:
                               regex: "GET|POST|OPTIONS"
                       route:
                         cluster: tx_filter_stream
-                        timeout: 0s
                     # configuration of the static responses of unsupported api versions
                     # core static response
                     - match:
@@ -183,7 +179,7 @@ static_resources:
                       filter_enabled:
                         runtime_key: local_rate_limit_enabled
                         default_value:
-                          numerator: {{=it.platform.dapi.envoy.rateLimiter.enabledForPercentage}}
+                          numerator: {{? it.platform.dapi.envoy.rateLimiter.enabled}}100{{??}}0{{?}}
                           denominator: HUNDRED
                       filter_enforced:
                         runtime_key: local_rate_limit_enforced
@@ -218,22 +214,18 @@ static_resources:
                             prefix: "/org.dash.platform.dapi.v0.Core/subscribeToTransactionsWithProofs"
                           route:
                             cluster: tx_filter_stream
-                            timeout: 0s
                         - match:
                             prefix: "/org.dash.platform.dapi.v0.Core"
                           route:
                             cluster: core_and_platform
-                            timeout: 0s
                         - match:
                             prefix: "/org.dash.platform.dapi.v0.Platform"
                           route:
                             cluster: core_and_platform
-                            timeout: 0s
                         - match:
                             prefix: "/grpc.health.v1.Health"
                           route:
                             cluster: tx_filter_stream
-                            timeout: 0s
                         # configuration of the static responses of unsupported api versions
                         # core static response
                         - match:
@@ -270,21 +262,52 @@ static_resources:
                           direct_response:
                             status: 204
   clusters:
-    - name: core_and_platform
-      connect_timeout: 0.25s
-      type: logical_dns
-      http2_protocol_options: {}
-      lb_policy: round_robin
-      hosts: [{ socket_address: { address: dapi_api, port_value: 3005 }}]
-    - name: tx_filter_stream
-      connect_timeout: 0.25s
-      type: logical_dns
-      http2_protocol_options: {}
-      lb_policy: round_robin
-      hosts: [{ socket_address: { address: dapi_tx_filter_stream, port_value: 3006 }}]
-    - name: dapi_api_srv
-      connect_timeout: 30s
-      type: logical_dns
-      dns_lookup_family: V4_ONLY
-      lb_policy: round_robin
-      hosts: [{ socket_address: { address: dapi_api, port_value: 3004 }}]
+  - name: core_and_platform
+    connect_timeout: 0.25s
+    type: logical_dns
+    http2_protocol_options: {}
+    lb_policy: round_robin
+    load_assignment:
+      cluster_name: core_and_platform
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: dapi_api
+                port_value: 3005
+  - name: tx_filter_stream
+    connect_timeout: 0.25s
+    type: logical_dns
+    http2_protocol_options: {}
+    lb_policy: round_robin
+    load_assignment:
+      cluster_name: core_and_platform
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: dapi_tx_filter_stream
+                port_value: 3006
+  - name: dapi_api_srv
+    connect_timeout: 30s
+    type: logical_dns
+    dns_lookup_family: V4_ONLY
+    lb_policy: round_robin
+    load_assignment:
+      cluster_name: core_and_platform
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: dapi_api
+                port_value: 3004
+
+admin:
+  access_log_path: "/dev/null"
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 8081

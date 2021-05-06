@@ -244,13 +244,13 @@ module.exports = {
                     },
                     fillInterval: {
                       type: 'string',
+                      pattern: '^[0-9]+(.[0-9]+)?(m|s|h)$',
                     },
-                    enabledForPercentage: {
-                      type: 'integer',
-                      minimum: 0,
+                    enabled: {
+                      type: 'boolean',
                     },
                   },
-                  required: ['enabledForPercentage', 'fillInterval', 'tokensPerFill', 'maxTokens'],
+                  required: ['enabled', 'fillInterval', 'tokensPerFill', 'maxTokens'],
                   additionalProperties: false,
                 },
               },
