@@ -77,7 +77,7 @@ module.exports = {
 
     return configFile;
   },
-  '0.19.0-dev': (configFile) => {
+  '0.19.0': (configFile) => {
     // Add default group name if not present
     if (typeof configFile.defaultGroupName === 'undefined') {
       configFile.defaultGroupName = null;
@@ -137,6 +137,16 @@ module.exports = {
         }
 
         config.core.docker.image = systemConfigs.base.core.docker.image;
+        config.platform.dapi.api.docker.image = systemConfigs.base.platform.dapi.api.docker.image;
+        config.platform.drive.abci.docker.image = systemConfigs.base.platform.drive.abci.docker.image;
+
+        if (config.network === 'testnet') {
+          config.platform.drive.tenderdash.p2p.seeds = systemConfigs.testnet.platform.drive.tenderdash.p2p.seeds;
+          config.platform.drive.tenderdash.genesis = systemConfigs.testnet.platform.drive.tenderdash.genesis;
+          config.platform.dpns = systemConfigs.testnet.platform.dpns;
+          config.platform.dashpay = systemConfigs.testnet.platform.dashpay;
+          config.platform.featureFlags = systemConfigs.testnet.platform.featureFlags;
+        }
       });
 
     // Replace local config to group template
