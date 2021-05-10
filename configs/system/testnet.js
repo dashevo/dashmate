@@ -52,12 +52,12 @@ module.exports = lodashMerge({}, baseConfig, {
         p2p: {
           seeds: [
             {
-              id: '4bc75fcb13e37ad6473383ea92408a451ed1b6d1',
+              id: 'aa4c3870e6cebd575c80371b4ae0e902a2885e14',
               host: '54.189.200.56',
               port: 26656,
             },
             {
-              id: '173fcd535bccde1ed20ca8fb1519858dd5cef618',
+              id: '81c79324942867f694ee49108f05e744c343f5a1',
               host: '52.43.162.96',
               port: 26656,
             },
