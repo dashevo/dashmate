@@ -195,6 +195,9 @@ module.exports = {
           type: ['string', 'null'],
           minLength: 1,
         },
+        debug: {
+          type: ['boolean', 'null'],
+        },
       },
       required: ['docker', 'p2p', 'rpc', 'spork', 'masternode', 'miner', 'devnetName'],
       additionalProperties: false,
