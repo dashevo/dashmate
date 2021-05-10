@@ -3,4 +3,6 @@ version: '3.7'
 services:
   drive_abci:
     build: ${PLATFORM_DRIVE_ABCI_DOCKER_BUILD_PATH:?err}
+      cache_from:
+        - strophy/dapi:ci-test
     image: drive:local
