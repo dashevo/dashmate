@@ -137,6 +137,11 @@ module.exports = {
         }
 
         config.core.docker.image = systemConfigs.base.core.docker.image;
+
+        // Core debug
+        if (typeof config.code.debug === 'undefined') {
+          config.code.debug = false;
+        }
       });
 
     // Replace local config to group template

@@ -35,7 +35,7 @@ zmqpubhashblock=tcp://0.0.0.0:29998
 zmqpubrawchainlocksig=tcp://0.0.0.0:29998
 zmqpubrawtxlocksig=tcp://0.0.0.0:29998
 
-{{? it.core.debug}}debug=1{{?}}
+debug={{?it.core.debug}}1{{??}}0{{?}}
 
 {{? it.network === 'testnet'}}testnet=1
 llmq-qvvec-sync=llmq_100_67:0

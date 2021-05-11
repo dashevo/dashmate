@@ -196,7 +196,7 @@ module.exports = {
           minLength: 1,
         },
         debug: {
-          type: ['boolean', 'null'],
+          type: ['boolean'],
         },
       },
       required: ['docker', 'p2p', 'rpc', 'spork', 'masternode', 'miner', 'devnetName'],
