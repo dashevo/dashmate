@@ -122,6 +122,9 @@ class DockerCompose {
 
     try {
       if (serviceName) {
+        console.log(`Envs: ${envs}`);
+        console.log(`Building: ${serviceName}`);
+        console.log(`Build options: ${options}`);
         await dockerCompose.buildOne(serviceName, {
           ...this.getOptions(envs),
           commandOptions: options,
