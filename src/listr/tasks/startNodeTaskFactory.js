@@ -115,7 +115,8 @@ function startNodeTaskFactory(
                     task: async () => {
                       const envs = config.toEnvs();
 
-                      await dockerCompose.build(envs, serviceName);
+                      // await dockerCompose.build(envs, serviceName);
+                      await execAsync(`docker build -t ${serviceName}:local --load ${buildOptions.path}`);
                     },
                   },
                   {
