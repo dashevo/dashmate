@@ -1,13 +1,53 @@
-## [0.18.2](https://github.com/dashevo/mn-bootstrap/compare/v0.18.1...v0.18.2) (2021-04-14)
+# [0.19.0](https://github.com/dashevo/dashmate/compare/v0.18.2...v0.19.0) (2021-05-12)
 
 
 ### Features
 
-* update to core 0.17.0.0-rc4 ([#326](https://github.com/dashevo/mn-bootstrap/issues/326))
+* node groups ([#253](https://github.com/dashevo/dashmate/issues/253), [#337](https://github.com/dashevo/dashmate/issues/337), [#343](https://github.com/dashevo/dashmate/issues/343), [#338](https://github.com/dashevo/dashmate/issues/338), [#321](https://github.com/dashevo/dashmate/issues/321), [#313](https://github.com/dashevo/dashmate/issues/313), [#309](https://github.com/dashevo/dashmate/issues/309), [#314](https://github.com/dashevo/dashmate/issues/314), [#311](https://github.com/dashevo/dashmate/issues/311), [#307](https://github.com/dashevo/dashmate/issues/307), [#300](https://github.com/dashevo/dashmate/issues/300), [#298](https://github.com/dashevo/dashmate/issues/298), [#296](https://github.com/dashevo/dashmate/issues/296), [#291](https://github.com/dashevo/dashmate/issues/291), [#292](https://github.com/dashevo/dashmate/issues/292), [#282](https://github.com/dashevo/dashmate/issues/282))
+* rename mn-bootstrap to dashmate ([#324](https://github.com/dashevo/dashmate/issues/324))
+* ChainLock Asset Lock Proofs support ([#333](https://github.com/dashevo/dashmate/issues/333))
+* feature flags ([#329](https://github.com/dashevo/dashmate/issues/329), [#336](https://github.com/dashevo/dashmate/issues/336), [#350](https://github.com/dashevo/dashmate/issues/329), [#334](https://github.com/dashevo/dashmate/issues/334))
+* update DAPI to 0.19 ([#330](https://github.com/dashevo/dashmate/issues/330))
+* display tasks elapsed time in verbose mode ([#320](https://github.com/dashevo/dashmate/issues/320))
+* NPM cache for DAPI and Drive builds ([#302](https://github.com/dashevo/dashmate/issues/302))
+* tenderdash empty blocks configuration ([#315](https://github.com/dashevo/dashmate/issues/315))
+* check docker version ([#310](https://github.com/dashevo/dashmate/issues/310))
+* skip Instant Lock verification in SDK ([#299](https://github.com/dashevo/dashmate/issues/299))
+* update drive to 0.19 ([#303](https://github.com/dashevo/dashmate/issues/303))
+* register masternodes on testnet given funding privkey ([#288](https://github.com/dashevo/dashmate/issues/288))
+* wait for node to be ready option ([#295](https://github.com/dashevo/dashmate/issues/295))
+* wait for tenderdash on start ([#289](https://github.com/dashevo/dashmate/issues/289))
+* activate sporks during local setup ([#286](https://github.com/dashevo/dashmate/issues/286))
+
+
+### Bug Fixes
+
+* with docker compose 1.29 container.inspect throws error if the container isn't running ([#325](https://github.com/dashevo/dashmate/issues/325))
+
+
+### Documentation
+
+* add update docs ([#345](https://github.com/dashevo/dashmate/issues/345))
+
+
+### BREAKING CHANGES
+
+* the `setup local` command generates a local configs group
+* the `local` config now is a template and should be used to start a node
+* `mn` commands renamed to `dashmate`. Configs are now stored in `.dashmate` dir.
 
 
 
-## [0.18.1](https://github.com/dashevo/mn-bootstrap/compare/v0.18.0...v0.18.1) (2021-03-09)
+## [0.18.2](https://github.com/dashevo/dashmate/compare/v0.18.1...v0.18.2) (2021-04-14)
+
+
+### Features
+
+* update to core 0.17.0.0-rc4 ([#326](https://github.com/dashevo/dashmate/issues/326))
+
+
+
+## [0.18.1](https://github.com/dashevo/dashmate/compare/v0.18.0...v0.18.1) (2021-03-09)
 
 
 ### Features
