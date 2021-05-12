@@ -199,7 +199,7 @@ module.exports = {
           type: ['boolean'],
         },
       },
-      required: ['docker', 'p2p', 'rpc', 'spork', 'masternode', 'miner', 'devnetName'],
+      required: ['docker', 'p2p', 'rpc', 'spork', 'masternode', 'miner', 'devnetName', 'debug'],
       additionalProperties: false,
     },
     platform: {
