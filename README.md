@@ -9,6 +9,7 @@ Distribution package for Dash Masternode installation
 ## Table of Contents
 
 - [Install](#install)
+- [Update] (#update)
 - [Usage](#usage)
   - [Command line interface](#cli)
   - [Setup node](#setup-node)
@@ -44,6 +45,28 @@ $ npm install # optional: install CLI dependencies
 $ sudo npm link # optional: link CLI for system-wide execution
 ```
 
+## Update
+
+```bash
+$ mn stop
+$ git checkout master
+$ git pull
+$ mn update
+$ mn start
+```
+
+If the platform layer has been wiped, you must additionally reset platform data:
+
+```bash
+$ mn stop
+$ git checkout master
+$ git pull
+$ mn reset --platform-only --hard
+$ mn update
+$ mn setup -k <bls-key>
+$ mn start
+```
+
 ## Usage
 
 The package contains a CLI, Docker Compose and configuration files.
@@ -68,8 +91,8 @@ OPTIONS
   -i, --external-ip=external-ip                            external ip
   -k, --operator-bls-private-key=operator-bls-private-key  operator bls private key
   -p, --funding-private-key=funding-private-key            private key with more than 1000 dash for funding collateral
-  -u, --update                                             download updated services before start
   -v, --verbose                                            use verbose mode for output
+  --node-count=node-count                                  number of nodes to setup
 ```
 
 Supported presets:
@@ -125,9 +148,9 @@ USAGE
   $ dashmate start
 
 OPTIONS
-  -v, --verbose                                    use verbose mode for output
-  --config=config                                  configuration name to use
-  -u, --update                                     download updated services before starting
+  -v, --verbose             use verbose mode for output
+  -w, --wait-for-readiness  wait for nodes to be ready
+  --config=config           configuration name to use
 ```
 
 To start a masternode:
@@ -262,9 +285,9 @@ USAGE
   $ dashmate group:start
 
 OPTIONS
-  -u, --update   download updated services before start
-  -v, --verbose  use verbose mode for output
-  --group=group  group name to use
+  -v, --verbose             use verbose mode for output
+  -w, --wait-for-readiness  wait for nodes to be ready
+  --group=group             group name to use
 ```
 
 #### Stop group nodes
@@ -312,13 +335,13 @@ The `group:reset` command removes all data corresponding to the specified group 
 
 ```
 USAGE
-  $ dashmate reset
+  $ dashmate group:reset
 
 OPTIONS
-  -v, --verbose        use verbose mode for output
-  --config=config      configuration name to use
   -h, --hard           reset config as well as data
   -p, --platform-only  reset platform data only
+  -v, --verbose        use verbose mode for output
+  --group=group        group name to use
 ```
 
 With the hard reset mode enabled, corresponding configs will be reset as well. To proceed, running the node [setup](#setup-node) is required.

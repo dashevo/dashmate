@@ -7,7 +7,7 @@ module.exports = {
   group: null,
   core: {
     docker: {
-      image: 'dashpay/dashd:0.17.0.0-rc3-hotfix1',
+      image: 'dashpay/dashd:0.17.0.0-rc4-hotfix2',
     },
     p2p: {
       port: 20001,
@@ -65,15 +65,10 @@ module.exports = {
       },
       api: {
         docker: {
-          image: 'dashpay/dapi:0.18',
+          image: 'dashpay/dapi:0.19',
           build: {
             path: null,
           },
-        },
-      },
-      insight: {
-        docker: {
-          image: 'dashpay/insight-api:3.1.1',
         },
       },
     },
@@ -85,7 +80,7 @@ module.exports = {
       },
       abci: {
         docker: {
-          image: 'dashpay/drive:0.19-dev',
+          image: 'dashpay/drive:0.19',
           build: {
             path: null,
           },
@@ -144,6 +139,13 @@ module.exports = {
         id: null,
         blockHeight: null,
       },
+    },
+    featureFlags: {
+      contract: {
+        id: null,
+        blockHeight: null,
+      },
+      ownerId: null,
     },
   },
   externalIp: null,

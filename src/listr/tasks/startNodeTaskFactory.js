@@ -3,6 +3,7 @@ const { exec } = require('child_process');
 const { promisify } = require('util');
 
 const { Listr } = require('listr2');
+const { Observable } = require('rxjs');
 
 const { PrivateKey } = require('@dashevo/dashcore-lib');
 const { NETWORK_LOCAL } = require('../../constants');
@@ -11,6 +12,7 @@ const { NETWORK_LOCAL } = require('../../constants');
  *
  * @param {DockerCompose} dockerCompose
  * @param {waitForCorePeersConnected} waitForCorePeersConnected
+ * @param {waitForMasternodesSync} waitForMasternodesSync
  * @param {createRpcClient} createRpcClient
  * @param {Docker} docker
  * @return {startNodeTask}
@@ -18,6 +20,7 @@ const { NETWORK_LOCAL } = require('../../constants');
 function startNodeTaskFactory(
   dockerCompose,
   waitForCorePeersConnected,
+  waitForMasternodesSync,
   createRpcClient,
   docker,
 ) {
@@ -28,14 +31,12 @@ function startNodeTaskFactory(
    * @typedef {startNodeTask}
    * @param {Config} config
    * @param {Object} [options]
-   * @param {boolean} [options.isUpdate]
    * @param {boolean} [options.isMinerEnabled]
    * @return {Object}
    */
   function startNodeTask(
     config,
     {
-      isUpdate = undefined,
       isMinerEnabled = undefined,
     } = {},
   ) {
@@ -73,16 +74,6 @@ function startNodeTaskFactory(
           if (await dockerCompose.isServiceRunning(config.toEnvs())) {
             throw new Error('Running services detected. Please ensure all services are stopped for this config before starting');
           }
-        },
-      },
-      {
-        title: 'Download updates',
-        enabled: () => isUpdate === true,
-        skip: (ctx) => ctx.skipFurtherServiceUpdates === true,
-        task: async (ctx) => {
-          ctx.skipFurtherServiceUpdates = true;
-
-          await dockerCompose.pull(config.toEnvs());
         },
       },
       {
@@ -201,6 +192,30 @@ function startNodeTaskFactory(
           });
 
           await waitForCorePeersConnected(rpcClient);
+        },
+      },
+      {
+        title: 'Wait for sync',
+        enabled: () => config.get('network') === NETWORK_LOCAL,
+        task: async () => {
+          const rpcClient = createRpcClient({
+            port: config.get('core.rpc.port'),
+            user: config.get('core.rpc.user'),
+            pass: config.get('core.rpc.password'),
+          });
+
+          return new Observable(async (observer) => {
+            await waitForMasternodesSync(
+              rpcClient,
+              (verificationProgress) => {
+                observer.next(`${(verificationProgress * 100).toFixed(2)}% complete`);
+              },
+            );
+
+            observer.complete();
+
+            return this;
+          });
         },
       },
       {

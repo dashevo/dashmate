@@ -31,6 +31,7 @@ const startCoreFactory = require('./core/startCoreFactory');
 const createRpcClient = require('./core/createRpcClient');
 const waitForCoreStart = require('./core/waitForCoreStart');
 const waitForCoreSync = require('./core/waitForCoreSync');
+const waitForMasternodesSync = require('./core/waitForMasternodesSync');
 const waitForBlocks = require('./core/waitForBlocks');
 const waitForConfirmations = require('./core/waitForConfirmations');
 const generateBlsKeys = require('./core/generateBlsKeys');
@@ -48,6 +49,7 @@ const registerMasternode = require('./core/wallet/registerMasternode');
 const generateToAddressTaskFactory = require('./listr/tasks/wallet/generateToAddressTaskFactory');
 const registerMasternodeTaskFactory = require('./listr/tasks/registerMasternodeTaskFactory');
 const initTaskFactory = require('./listr/tasks/platform/initTaskFactory');
+const featureFlagTaskFactory = require('./listr/tasks/platform/featureFlagTaskFactory');
 const tenderdashInitTaskFactory = require('./listr/tasks/platform/tenderdashInitTaskFactory');
 const startNodeTaskFactory = require('./listr/tasks/startNodeTaskFactory');
 
@@ -118,6 +120,7 @@ async function createDIContainer(options) {
     createRpcClient: asValue(createRpcClient),
     waitForCoreStart: asValue(waitForCoreStart),
     waitForCoreSync: asValue(waitForCoreSync),
+    waitForMasternodesSync: asValue(waitForMasternodesSync),
     startCore: asFunction(startCoreFactory).singleton(),
     waitForBlocks: asValue(waitForBlocks),
     waitForConfirmations: asValue(waitForConfirmations),
@@ -154,6 +157,7 @@ async function createDIContainer(options) {
     generateToAddressTask: asFunction(generateToAddressTaskFactory).singleton(),
     registerMasternodeTask: asFunction(registerMasternodeTaskFactory).singleton(),
     initTask: asFunction(initTaskFactory).singleton(),
+    featureFlagTask: asFunction(featureFlagTaskFactory).singleton(),
     tenderdashInitTask: asFunction(tenderdashInitTaskFactory).singleton(),
     startNodeTask: asFunction(startNodeTaskFactory).singleton(),
     stopNodeTask: asFunction(stopNodeTaskFactory).singleton(),

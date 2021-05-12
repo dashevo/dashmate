@@ -38,6 +38,9 @@ services:
       - DPNS_TOP_LEVEL_IDENTITY=${PLATFORM_DPNS_OWNER_ID}
       - DASHPAY_CONTRACT_ID=${PLATFORM_DASHPAY_CONTRACT_ID}
       - DASHPAY_CONTRACT_BLOCK_HEIGHT=${PLATFORM_DASHPAY_CONTRACT_BLOCK_HEIGHT}
+      - FEATURE_FLAGS_CONTRACT_ID=${PLATFORM_FEATURE_FLAGS_CONTRACT_ID}
+      - FEATURE_FLAGS_CONTRACT_BLOCK_HEIGHT=${PLATFORM_FEATURE_FLAGS_CONTRACT_BLOCK_HEIGHT}
+      - FEATURE_FLAGS_TOP_LEVEL_IDENTITY=${PLATFORM_FEATURE_FLAGS_OWNER_ID}
       - NODE_ENV=${ENVIRONMENT:?err}
       - LOG_STDOUT_LEVEL=${PLATFORM_DRIVE_ABCI_LOG_STDOUT_LEVEL:?err}
       - LOG_PRETTY_FILE_LEVEL=${PLATFORM_DRIVE_ABCI_LOG_PRETTY_FILE_LEVEL:?err}
@@ -60,23 +63,13 @@ services:
       - drive_tenderdash:/tenderdash
       - ${DASHMATE_HOME_DIR:?err}/${CONFIG_NAME:?err}/platform/drive/tenderdash:/tenderdash/config:ro
 
-  dapi_insight:
-    image: ${PLATFORM_DAPI_INSIGHT_DOCKER_IMAGE:?err}
-    restart: unless-stopped
-    depends_on:
-      - core
-    volumes:
-      - ${DASHMATE_HOME_DIR:?err}/${CONFIG_NAME:?err}/platform/dapi/insight/dashcore-node.json:/insight/dashcore-node.json
-
   dapi_api:
     image: ${PLATFORM_DAPI_API_DOCKER_IMAGE:?err}
     restart: unless-stopped
     depends_on:
       - drive_tenderdash
-      - dapi_insight
       - core
     environment:
-      - INSIGHT_URI=http://dapi_insight:3001/insight-api
       - API_JSON_RPC_PORT=3004
       - API_GRPC_PORT=3005
       - DASHCORE_RPC_HOST=core
@@ -99,9 +92,7 @@ services:
     restart: unless-stopped
     depends_on:
       - core
-      - dapi_insight
     environment:
-      - INSIGHT_URI=http://dapi_insight:3001/insight-api
       - TX_FILTER_STREAM_GRPC_PORT=3006
       - DASHCORE_RPC_HOST=core
       - DASHCORE_RPC_PORT=${CORE_RPC_PORT:?err}
