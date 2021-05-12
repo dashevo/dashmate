@@ -244,7 +244,37 @@ function startNodeTaskFactory(
             ['--detach'],
           );
         },
-      }]);
+      },
+      {
+        title: 'Start bump mock time',
+        task: async () => {
+          const rpcClient = createRpcClient({
+            port: config.get('core.rpc.port'),
+            user: config.get('core.rpc.user'),
+            pass: config.get('core.rpc.password'),
+          });
+
+          const { result: bestBlockHash } = await rpcClient.getBestBlockHash();
+          const { result: bestBlock } = await rpcClient.getBlock(bestBlockHash);
+
+          const startTime = bestBlock.time;
+          const minerInterval = config.get('core.miner.interval');
+          const secondsToAdd = 150;
+
+          await dockerCompose.execCommand(
+            config.toEnvs(),
+            'core',
+            [
+              'bash',
+              '-c',
+              // eslint-disable-next-line no-useless-escape
+              `mocktime=${startTime}; while true; do mocktime=\$((mocktime + ${secondsToAdd})); dash-cli setmocktime \$mocktime; sleep ${minerInterval}; done`,
+            ],
+            ['--detach'],
+          );
+        },
+      },
+    ]);
   }
 
   return startNodeTask;
