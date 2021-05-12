@@ -46,26 +46,22 @@ module.exports = {
         docker: {
           image: 'envoyproxy/envoy:v1.16-latest',
         },
-      },
-      nginx: {
         http: {
           port: 3000,
         },
         grpc: {
           port: 3010,
         },
-        docker: {
-          image: 'nginx:latest',
-        },
         rateLimiter: {
-          enable: true,
-          rate: 120,
-          burst: 300,
+          maxTokens: 300,
+          tokensPerFill: 150,
+          fillInterval: '60s',
+          enabled: true,
         },
       },
       api: {
         docker: {
-          image: 'dashpay/dapi:0.19-dev',
+          image: 'dashpay/dapi:0.19',
           build: {
             path: null,
           },
@@ -80,7 +76,7 @@ module.exports = {
       },
       abci: {
         docker: {
-          image: 'dashpay/drive:0.19-dev',
+          image: 'dashpay/drive:0.19',
           build: {
             path: null,
           },
