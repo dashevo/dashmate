@@ -268,7 +268,19 @@ function startNodeTaskFactory(
               'bash',
               '-c',
               // eslint-disable-next-line no-useless-escape
-              `mocktime=${startTime}; while true; do mocktime=\$((mocktime + ${secondsToAdd})); dash-cli setmocktime \$mocktime; sleep ${minerInterval}; done`,
+              `
+              response=\$(dash-cli getblockchaininfo)
+              mediantime=$(echo $response | grep -o -E "\"mediantime\"\: [0-9]+" | awk -F: '{print $2}')
+              mocktime=${startTime};
+              while true;
+              do
+                response=$(dash-cli getblockchaininfo)
+                mediantime=$(echo $response | grep -o -E "\"mediantime\"\: [0-9]+" | awk -F: '{print $2}')
+                mocktime=\$((mediantime + ${secondsToAdd}));
+                dash-cli setmocktime \$mocktime;
+                sleep ${minerInterval};
+              done
+              `,
             ],
             ['--detach'],
           );
