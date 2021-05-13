@@ -248,42 +248,31 @@ function startNodeTaskFactory(
       {
         title: 'Start bump mock time',
         task: async () => {
-          const rpcClient = createRpcClient({
-            port: config.get('core.rpc.port'),
-            user: config.get('core.rpc.user'),
-            pass: config.get('core.rpc.password'),
-          });
-
-          const { result: bestBlockHash } = await rpcClient.getBestBlockHash();
-          const { result: bestBlock } = await rpcClient.getBlock(bestBlockHash);
-
-          const startTime = bestBlock.time;
           const minerInterval = config.get('core.miner.interval');
           const secondsToAdd = 150;
 
+          /* eslint-disable no-useless-escape */
           await dockerCompose.execCommand(
             config.toEnvs(),
             'core',
             [
               'bash',
               '-c',
-              // eslint-disable-next-line no-useless-escape
               `
-              response=\$(dash-cli getblockchaininfo)
-              mediantime=$(echo $response | grep -o -E "\"mediantime\"\: [0-9]+" | awk -F: '{print $2}')
-              mocktime=${startTime};
-              while true;
+              while true
               do
-                response=$(dash-cli getblockchaininfo)
-                mediantime=$(echo $response | grep -o -E "\"mediantime\"\: [0-9]+" | awk -F: '{print $2}')
-                mocktime=\$((mediantime + ${secondsToAdd}));
-                dash-cli setmocktime \$mocktime;
-                sleep ${minerInterval};
+                response=\$(dash-cli getblockchaininfo)
+                mediantime=\$(echo \${response} | grep -o -E '\"mediantime\"\: [0-9]+' |  cut -d ' ' -f2)
+                mocktime=\$((mediantime + ${secondsToAdd}))
+                dash-cli setmocktime \$mocktime
+                echo \$mocktime >> /tmp/mocktime
+                sleep ${minerInterval}
               done
               `,
             ],
             ['--detach'],
           );
+          /* eslint-enable no-useless-escape */
         },
       },
     ]);
