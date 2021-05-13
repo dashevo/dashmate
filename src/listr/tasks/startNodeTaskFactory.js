@@ -265,7 +265,6 @@ function startNodeTaskFactory(
                 mediantime=\$(echo \${response} | grep -o -E '\"mediantime\"\: [0-9]+' |  cut -d ' ' -f2)
                 mocktime=\$((mediantime + ${secondsToAdd}))
                 dash-cli setmocktime \$mocktime
-                echo \$mocktime >> /tmp/mocktime
                 sleep ${minerInterval}
               done
               `,
