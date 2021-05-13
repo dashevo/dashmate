@@ -140,6 +140,11 @@ module.exports = {
         config.core.docker.image = systemConfigs.base.core.docker.image;
         config.platform.dapi.api.docker.image = systemConfigs.base.platform.dapi.api.docker.image;
         config.platform.drive.abci.docker.image = systemConfigs.base.platform.drive.abci.docker.image;
+
+        // Core debug
+        if (typeof config.code.debug === 'undefined') {
+          config.code.debug = false;
+        }
       });
 
     // Update testnet seeds, genesis and contracts
