@@ -23,7 +23,7 @@ async function waitForMasternodesSync(rpcClient, progressCallback = () => {}) {
     } = await rpcClient.getBlockchainInfo());
 
     if (!isSynced) {
-      await wait(10000);
+      // await wait(10000);
       progressCallback(verificationProgress);
     }
   } while (!isSynced);
