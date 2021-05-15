@@ -58,11 +58,24 @@ function configureCoreTaskFactory(
             port: config.get('core.p2p.port'),
           }));
 
+          const seedNodes = configGroup.filter((config) => config.getName() === 'local_seed')
+            .map((config) => ({
+              host: ctx.hostDockerInternalIp,
+              port: config.get('core.p2p.port'),
+            }));
+
           configGroup.forEach((config, i) => {
+            let seedsToSet;
+            if (config.getName() === 'local_seed') {
+              seedsToSet = p2pSeeds.filter((seed, index) => index !== i);
+            } else {
+              seedsToSet = seedNodes;
+            }
+
             // Set seeds
             config.set(
               'core.p2p.seeds',
-              p2pSeeds.filter((seed, index) => index !== i),
+              seedsToSet,
             );
 
             // Set sporks key
