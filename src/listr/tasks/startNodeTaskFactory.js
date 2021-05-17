@@ -247,6 +247,7 @@ function startNodeTaskFactory(
       },
       {
         title: 'Start bump mock time',
+        enabled: () => config.get('network') === 'local',
         task: async () => {
           const minerInterval = config.get('core.miner.interval');
           const secondsToAdd = 150;
