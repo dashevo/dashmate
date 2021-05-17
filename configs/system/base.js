@@ -6,6 +6,7 @@ module.exports = {
   description: 'base config for use as template',
   group: null,
   core: {
+    debug: false,
     docker: {
       image: 'dashpay/dashd:0.17.0.0-rc4-hotfix2',
     },
