@@ -142,8 +142,8 @@ module.exports = {
         config.platform.drive.abci.docker.image = systemConfigs.base.platform.drive.abci.docker.image;
 
         // Core debug
-        if (typeof config.code.debug === 'undefined') {
-          config.code.debug = false;
+        if (typeof config.core.debug === 'undefined') {
+          config.core.debug = false;
         }
       });
 
