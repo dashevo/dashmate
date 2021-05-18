@@ -8,7 +8,7 @@ module.exports = {
   core: {
     debug: false,
     docker: {
-      image: 'dashpay/dashd:0.17.0.0-rc4-hotfix2',
+      image: 'dashpay/dashd:0.17.0.0-rc5',
     },
     p2p: {
       port: 20001,
