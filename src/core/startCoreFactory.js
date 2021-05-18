@@ -26,6 +26,7 @@ function startCoreFactory(
     options = {
       wallet: false,
       addressIndex: false,
+      whitelistLocalhost: false,
       ...options,
     };
 
@@ -45,6 +46,10 @@ function startCoreFactory(
 
     if (options.addressIndex) {
       coreCommand.push('--addressindex=1');
+    }
+
+    if (options.whitelistLocalhost) {
+      coreCommand.push('-whitelist=127.0.0.1');
     }
 
     const coreContainer = await dockerCompose.runService(

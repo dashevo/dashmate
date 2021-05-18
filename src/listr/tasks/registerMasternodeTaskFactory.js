@@ -49,7 +49,7 @@ function registerMasternodeTaskFactory(
         },
         task: async (ctx) => {
           ctx.coreServicePassed = false;
-          ctx.coreService = await startCore(config, { wallet: true, addressIndex: true });
+          ctx.coreService = await startCore(config, { wallet: true, addressIndex: true, whitelistLocalhost: true });
         },
       },
       {
