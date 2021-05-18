@@ -182,19 +182,6 @@ function startNodeTaskFactory(
         },
       },
       {
-        title: 'Wait for peers to be connected',
-        enabled: () => isMinerEnabled === true,
-        task: async () => {
-          const rpcClient = createRpcClient({
-            port: config.get('core.rpc.port'),
-            user: config.get('core.rpc.user'),
-            pass: config.get('core.rpc.password'),
-          });
-
-          await waitForCorePeersConnected(rpcClient);
-        },
-      },
-      {
         title: 'Wait for sync',
         enabled: () => config.get('network') === NETWORK_LOCAL,
         task: async () => {
@@ -216,6 +203,19 @@ function startNodeTaskFactory(
 
             return this;
           });
+        },
+      },
+      {
+        title: 'Wait for peers to be connected',
+        enabled: () => isMinerEnabled === true,
+        task: async () => {
+          const rpcClient = createRpcClient({
+            port: config.get('core.rpc.port'),
+            user: config.get('core.rpc.user'),
+            pass: config.get('core.rpc.password'),
+          });
+
+          await waitForCorePeersConnected(rpcClient);
         },
       },
       {
