@@ -45,6 +45,7 @@ const importPrivateKey = require('./core/wallet/importPrivateKey');
 const getAddressBalance = require('./core/wallet/getAddressBalance');
 const sendToAddress = require('./core/wallet/sendToAddress');
 const registerMasternode = require('./core/wallet/registerMasternode');
+const waitForBalanceToConfirm = require('./core/wallet/waitForBalanceToConfirm');
 
 const generateToAddressTaskFactory = require('./listr/tasks/wallet/generateToAddressTaskFactory');
 const registerMasternodeTaskFactory = require('./listr/tasks/registerMasternodeTaskFactory');
@@ -66,6 +67,7 @@ const configureTenderdashTaskFactory = require('./listr/tasks/setup/local/config
 const initializePlatformTaskFactory = require('./listr/tasks/setup/local/initializePlatformTaskFactory');
 const waitForNodeToBeReadyTaskFactory = require('./listr/tasks/platform/waitForNodeToBeReadyTaskFactory');
 const enableCoreQuorumsTaskFactory = require('./listr/tasks/setup/local/enableCoreQuorumsTaskFactory');
+const startGroupNodesTaskFactory = require('./listr/tasks/startGroupNodesTaskFactory');
 
 async function createDIContainer(options) {
   const container = createAwilixContainer({
@@ -140,6 +142,7 @@ async function createDIContainer(options) {
     getAddressBalance: asValue(getAddressBalance),
     sendToAddress: asValue(sendToAddress),
     registerMasternode: asValue(registerMasternode),
+    waitForBalanceToConfirm: asValue(waitForBalanceToConfirm),
   });
 
   /**
@@ -154,6 +157,7 @@ async function createDIContainer(options) {
    * Tasks
    */
   container.register({
+    startGroupNodesTask: asFunction(startGroupNodesTaskFactory).singleton(),
     generateToAddressTask: asFunction(generateToAddressTaskFactory).singleton(),
     registerMasternodeTask: asFunction(registerMasternodeTaskFactory).singleton(),
     initTask: asFunction(initTaskFactory).singleton(),

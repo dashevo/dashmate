@@ -6,6 +6,7 @@ const { Listr } = require('listr2');
  * @param {initTask} initTask
  * @param {waitForNodeToBeReadyTask} waitForNodeToBeReadyTask
  * @param {DockerCompose} dockerCompose
+ * @param {startGroupNodesTask} startGroupNodesTask
  * @return {initializePlatformTask}
  */
 function initializePlatformTaskFactory(
@@ -13,6 +14,7 @@ function initializePlatformTaskFactory(
   initTask,
   waitForNodeToBeReadyTask,
   dockerCompose,
+  startGroupNodesTask,
 ) {
   /**
    * @typedef initializePlatformTask
@@ -23,33 +25,10 @@ function initializePlatformTaskFactory(
     return new Listr([
       {
         title: 'Starting nodes',
-        task: async (ctx) => {
-          const startNodeTasks = configGroup.map((config) => ({
-            title: `Starting ${config.getName()} node`,
-            task: () => startNodeTask(
-              config,
-              {
-                driveImageBuildPath: ctx.driveImageBuildPath,
-                dapiImageBuildPath: ctx.dapiImageBuildPath,
-                // run miner only at seed node
-                isMinerEnabled: !config.has('platform'),
-              },
-            ),
-          }));
+        task: (ctx) => {
+          ctx.waitForReadiness = true;
 
-          return new Listr(startNodeTasks);
-        },
-      },
-      {
-        title: 'Wait for nodes to be ready',
-        task: () => {
-          const waitForNodeToBeReadyTasks = configGroup
-            .filter((config) => config.has('platform'))
-            .map((config) => ({
-              task: () => waitForNodeToBeReadyTask(config),
-            }));
-
-          return new Listr(waitForNodeToBeReadyTasks);
+          return startGroupNodesTask(configGroup);
         },
       },
       {
@@ -107,7 +86,7 @@ function initializePlatformTaskFactory(
             task: () => dockerCompose.stop(config.toEnvs()),
           }));
 
-          return new Listr(stopNodeTasks);
+          return new Listr(stopNodeTasks, { concurrent: true });
         },
       },
     ]);
