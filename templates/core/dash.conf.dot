@@ -3,6 +3,7 @@ daemon=0  # leave this set to 0 for Docker
 logtimestamps=1
 maxconnections=256
 printtoconsole=1
+debug={{? it.core.debug }}
 
 # JSONRPC
 server=1
@@ -34,8 +35,6 @@ zmqpubrawtxlock=tcp://0.0.0.0:29998
 zmqpubhashblock=tcp://0.0.0.0:29998
 zmqpubrawchainlocksig=tcp://0.0.0.0:29998
 zmqpubrawtxlocksig=tcp://0.0.0.0:29998
-
-debug={{?it.core.debug}}1{{??}}0{{?}}
 
 {{? it.network === 'testnet'}}testnet=1
 llmq-qvvec-sync=llmq_100_67:0

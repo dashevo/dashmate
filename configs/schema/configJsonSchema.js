@@ -196,7 +196,8 @@ module.exports = {
           minLength: 1,
         },
         debug: {
-          type: 'boolean',
+          type: 'integer',
+          enum: [0, 1],
         },
       },
       required: ['docker', 'p2p', 'rpc', 'spork', 'masternode', 'miner', 'devnetName', 'debug'],

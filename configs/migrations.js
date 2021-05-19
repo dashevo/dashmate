@@ -139,17 +139,16 @@ module.exports = {
         // Update image versions
         config.core.docker.image = systemConfigs.base.core.docker.image;
         config.platform.dapi.api.docker.image = systemConfigs.base.platform.dapi.api.docker.image;
-        config.platform.drive.abci.docker.image = systemConfigs.base.platform.drive.abci.docker.image;
-
-        // Core debug
-        if (typeof config.core.debug === 'undefined') {
-          config.core.debug = false;
-        }
+        config.platform.drive.abci.docker.image = systemConfigs.base.platform
+          .drive.abci.docker.image;
       });
 
     // Update testnet seeds, genesis and contracts
-    configFile.configs.testnet.platform.drive.tenderdash.p2p.seeds = systemConfigs.testnet.platform.drive.tenderdash.p2p.seeds;
-    configFile.configs.testnet.platform.drive.tenderdash.genesis = systemConfigs.testnet.platform.drive.tenderdash.genesis;
+    configFile.configs.testnet.platform.drive.tenderdash.p2p.seeds = systemConfigs.testnet.platform
+      .drive.tenderdash.p2p.seeds;
+    configFile.configs.testnet.platform.drive.tenderdash.genesis = systemConfigs.testnet.platform
+      .drive.tenderdash.genesis;
+
     configFile.configs.testnet.platform.dpns = systemConfigs.testnet.platform.dpns;
     configFile.configs.testnet.platform.dashpay = systemConfigs.testnet.platform.dashpay;
     configFile.configs.testnet.platform.featureFlags = systemConfigs.testnet.platform.featureFlags;
@@ -158,5 +157,14 @@ module.exports = {
     configFile.configs.local = systemConfigs.local;
 
     return configFile;
+  },
+  '0.20.0-dev': (configFile) => {
+    Object.entries(configFile.configs)
+      .forEach(([, config]) => {
+        // Core debug
+        if (typeof config.core.debug === 'undefined') {
+          config.core.debug = 0;
+        }
+      });
   },
 };
