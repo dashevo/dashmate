@@ -172,6 +172,10 @@ module.exports = {
         if (typeof config.core.debug === 'undefined') {
           config.core.debug = 0;
         }
+
+        // Update images
+        config.platform.drive.tenderdash.docker.image = systemConfigs.base.platform
+          .drive.tenderdash.docker.image;
       });
   },
 };
