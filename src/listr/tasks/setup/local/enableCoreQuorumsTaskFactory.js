@@ -242,7 +242,7 @@ function enableCoreQuorumsTaskFactory(generateBlocks) {
           let { result: newQuorumList } = await ctx.seedRpcClient.quorum('list');
 
           while (isEqual(ctx.initialQuorumList, newQuorumList)) {
-            await wait(2000);
+            await wait(300);
 
             await ctx.bumpMockTime();
 

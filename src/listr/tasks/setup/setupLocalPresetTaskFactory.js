@@ -72,6 +72,7 @@ function setupLocalPresetTaskFactory(
                   config.set('description', 'seed node for local network');
 
                   config.set('core.masternode.enable', false);
+                  config.set('core.miner.enable', true);
 
                   // Disable platform for the seed node
                   config.set('platform', undefined);

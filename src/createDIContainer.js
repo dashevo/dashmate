@@ -66,6 +66,7 @@ const configureTenderdashTaskFactory = require('./listr/tasks/setup/local/config
 const initializePlatformTaskFactory = require('./listr/tasks/setup/local/initializePlatformTaskFactory');
 const waitForNodeToBeReadyTaskFactory = require('./listr/tasks/platform/waitForNodeToBeReadyTaskFactory');
 const enableCoreQuorumsTaskFactory = require('./listr/tasks/setup/local/enableCoreQuorumsTaskFactory');
+const startGroupNodesTaskFactory = require('./listr/tasks/startGroupNodesTaskFactory');
 
 async function createDIContainer(options) {
   const container = createAwilixContainer({
@@ -154,6 +155,7 @@ async function createDIContainer(options) {
    * Tasks
    */
   container.register({
+    startGroupNodesTask: asFunction(startGroupNodesTaskFactory).singleton(),
     generateToAddressTask: asFunction(generateToAddressTaskFactory).singleton(),
     registerMasternodeTask: asFunction(registerMasternodeTaskFactory).singleton(),
     initTask: asFunction(initTaskFactory).singleton(),
