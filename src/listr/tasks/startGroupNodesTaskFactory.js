@@ -12,7 +12,7 @@ const { NETWORK_LOCAL } = require('../../constants');
  * @param {Docker} docker
  * @param {startNodeTask} startNodeTask
  * @param {waitForNodeToBeReadyTask} waitForNodeToBeReadyTask
- * @return {stat}
+ * @return {startGroupNodesTask}
  */
 function startGroupNodesTaskFactory(
   dockerCompose,
