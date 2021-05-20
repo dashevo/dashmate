@@ -22,6 +22,7 @@ listen=1
 dnsseed=0
 allowprivatenet=0
 externalip={{=it.externalIp}}
+whitelist={{=it.externalIp}}
 
 # Indices
 txindex=1
