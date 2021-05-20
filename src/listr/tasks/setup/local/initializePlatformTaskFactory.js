@@ -1,8 +1,6 @@
 const { Listr } = require('listr2');
 
 /**
- *
- * @param {startNodeTask} startNodeTask
  * @param {initTask} initTask
  * @param {waitForNodeToBeReadyTask} waitForNodeToBeReadyTask
  * @param {DockerCompose} dockerCompose
@@ -10,7 +8,6 @@ const { Listr } = require('listr2');
  * @return {initializePlatformTask}
  */
 function initializePlatformTaskFactory(
-  startNodeTask,
   initTask,
   waitForNodeToBeReadyTask,
   dockerCompose,
@@ -86,7 +83,7 @@ function initializePlatformTaskFactory(
             task: () => dockerCompose.stop(config.toEnvs()),
           }));
 
-          return new Listr(stopNodeTasks, { concurrent: true });
+          return new Listr(stopNodeTasks);
         },
       },
     ]);

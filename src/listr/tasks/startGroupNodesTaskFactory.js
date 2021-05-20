@@ -12,6 +12,7 @@ const { NETWORK_LOCAL } = require('../../constants');
  * @param {Docker} docker
  * @param {startNodeTask} startNodeTask
  * @param {waitForNodeToBeReadyTask} waitForNodeToBeReadyTask
+ * @param {buildServicesTask} buildServicesTask
  * @return {startGroupNodesTask}
  */
 function startGroupNodesTaskFactory(
@@ -22,6 +23,7 @@ function startGroupNodesTaskFactory(
   docker,
   startNodeTask,
   waitForNodeToBeReadyTask,
+  buildServicesTask,
 ) {
   /**
    * @typedef {startGroupNodesTask}
@@ -33,10 +35,24 @@ function startGroupNodesTaskFactory(
       config.get('core.miner.enable')
     ));
 
+    const platformBuildConfig = configGroup.find((config) => (
+      config.has('platform') && (
+        config.get('platform.dapi.api.docker.build.path') !== null
+      || config.get('platform.drive.abci.docker.build.path') !== null
+      )
+    ));
+
     return new Listr([
       {
+        title: 'Build services',
+        enabled: () => platformBuildConfig,
+        task: () => buildServicesTask(platformBuildConfig),
+      },
+      {
         title: 'Starting nodes',
-        task: async () => {
+        task: async (ctx) => {
+          ctx.skipBuildServices = true;
+
           const tasks = configGroup.map((config) => ({
             title: `Starting ${config.getName()} node`,
             task: () => startNodeTask(config),

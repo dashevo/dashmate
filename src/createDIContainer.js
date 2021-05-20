@@ -68,6 +68,7 @@ const initializePlatformTaskFactory = require('./listr/tasks/setup/local/initial
 const waitForNodeToBeReadyTaskFactory = require('./listr/tasks/platform/waitForNodeToBeReadyTaskFactory');
 const enableCoreQuorumsTaskFactory = require('./listr/tasks/setup/local/enableCoreQuorumsTaskFactory');
 const startGroupNodesTaskFactory = require('./listr/tasks/startGroupNodesTaskFactory');
+const buildServicesTaskFactory = require('./listr/tasks/buildServicesTaskFactory');
 
 async function createDIContainer(options) {
   const container = createAwilixContainer({
@@ -157,6 +158,7 @@ async function createDIContainer(options) {
    * Tasks
    */
   container.register({
+    buildServicesTask: asFunction(buildServicesTaskFactory).singleton(),
     startGroupNodesTask: asFunction(startGroupNodesTaskFactory).singleton(),
     generateToAddressTask: asFunction(generateToAddressTaskFactory).singleton(),
     registerMasternodeTask: asFunction(registerMasternodeTaskFactory).singleton(),
