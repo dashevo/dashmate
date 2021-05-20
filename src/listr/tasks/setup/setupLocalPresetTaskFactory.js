@@ -40,7 +40,7 @@ function setupLocalPresetTaskFactory(
         },
       },
       {
-        title: 'Set the miner interval',
+        title: 'Set the core miner interval',
         enabled: (ctx) => ctx.minerInterval === null,
         task: async (ctx, task) => {
           ctx.minerInterval = await task.prompt({
