@@ -37,8 +37,6 @@ fi
 
 ./bin/dashmate setup ${CONFIG_NAME} -v --node-count=${MASTERNODES_COUNT}
 
-echo "Setting development environment"
-./bin/dashmate config:set --config=${CONFIG_NAME} environment development
 echo "Setting log levels to trace"
 ./bin/dashmate config:set --config=${CONFIG_NAME} platform.drive.abci.log.stdout.level trace
 
