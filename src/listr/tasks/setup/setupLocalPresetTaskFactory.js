@@ -86,6 +86,8 @@ function setupLocalPresetTaskFactory(
                   config.set('description', 'seed node for local network');
 
                   config.set('core.masternode.enable', false);
+
+                  // Enable miner for the seed node
                   config.set('core.miner.enable', true);
                   config.set('core.miner.interval', ctx.minerInterval);
 
