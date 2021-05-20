@@ -31,7 +31,7 @@ class GroupStopCommand extends GroupBaseCommand {
             // if the miner is still running when stopping them
             new Listr(configGroup.reverse().map((config) => ({
               task: () => stopNodeTask(config),
-            })), { concurrent: true })
+            })))
           ),
         },
       ],
