@@ -45,7 +45,7 @@ function setupLocalPresetTaskFactory(
         task: async (ctx, task) => {
           ctx.minerInterval = await task.prompt({
             type: 'input',
-            message: 'Enter the interval between blocks',
+            message: 'Enter the interval between core blocks',
             initial: configFile.getConfig('base').options.core.miner.interval,
             validate: (state) => {
               if (state.match(/\d+(\.\d+)?(m|s)/)) {
