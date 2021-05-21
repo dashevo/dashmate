@@ -42,6 +42,19 @@ function setupLocalPresetTaskFactory(
         },
       },
       {
+        title: 'Enable debug output',
+        enabled: (ctx) => ctx.debug === null,
+        task: async (ctx, task) => {
+          ctx.debug = await task.prompt({
+            type: 'Toggle',
+            message: 'Enable debug output?',
+            enabled: 'yes',
+            disabled: 'no',
+            initial: 'no',
+          });
+        },
+      },
+      {
         title: 'Create local group configs',
         task: async (ctx) => {
           ctx.configGroup = new Array(ctx.nodeCount)
@@ -67,6 +80,9 @@ function setupLocalPresetTaskFactory(
                 config.set('core.p2p.port', 20001 + (i * 100));
                 config.set('core.rpc.port', 20002 + (i * 100));
                 config.set('externalIp', hostDockerInternalIp);
+
+                config.set('core.debug', ctx.debug ? 1 : 0);
+                config.set('platform.drive.abci.log.stdout.level', ctx.debug ? 'trace' : 'info');
 
                 if (config.getName() === 'local_seed') {
                   config.set('description', 'seed node for local network');

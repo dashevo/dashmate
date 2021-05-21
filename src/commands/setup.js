@@ -33,6 +33,7 @@ class SetupCommand extends BaseCommand {
       'operator-bls-private-key': operatorBlsPrivateKey,
       'funding-private-key': fundingPrivateKeyString,
       'node-count': nodeCount,
+      debug,
       verbose: isVerbose,
     },
     generateBlsKeys,
@@ -95,6 +96,7 @@ class SetupCommand extends BaseCommand {
         preset,
         nodeType,
         nodeCount,
+        debug,
         externalIp,
         operatorBlsPrivateKey,
         fundingPrivateKeyString,
@@ -129,6 +131,7 @@ SetupCommand.flags = {
   'funding-private-key': flagTypes.string({ char: 'p', description: `private key with more than ${MASTERNODE_DASH_AMOUNT} dash for funding collateral` }),
   'node-count': flagTypes.integer({ description: 'number of nodes to setup', default: null }),
   verbose: flagTypes.boolean({ char: 'v', description: 'use verbose mode for output', default: false }),
+  debug: flagTypes.boolean({ char: 'd', description: 'enable debug output', default: null }),
 };
 
 module.exports = SetupCommand;
