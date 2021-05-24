@@ -126,7 +126,9 @@ SetupCommand.args = [{
 }];
 
 SetupCommand.flags = {
-  'debug-logs': flagTypes.boolean({ char: 'd', description: 'enable debug logs', default: null }),
+  'debug-logs': flagTypes.boolean({
+    char: 'd', description: 'enable debug logs', allowNo: true, default: false,
+  }),
   'external-ip': flagTypes.string({ char: 'i', description: 'external ip' }),
   'operator-bls-private-key': flagTypes.string({ char: 'k', description: 'operator bls private key' }),
   'funding-private-key': flagTypes.string({ char: 'p', description: `private key with more than ${MASTERNODE_DASH_AMOUNT} dash for funding collateral` }),
