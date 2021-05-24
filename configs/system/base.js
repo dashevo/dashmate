@@ -112,6 +112,14 @@ module.exports = {
           createEmptyBlocks: true,
           createEmptyBlocksInterval: '3m',
         },
+        log: {
+          level: {
+            main: 'info',
+            state: 'info',
+            statesync: 'info',
+            '*': 'error',
+          },
+        },
         validatorKey: {
 
         },
