@@ -42,12 +42,12 @@ function setupLocalPresetTaskFactory(
         },
       },
       {
-        title: 'Enable debug output',
+        title: 'Enable debug logs',
         enabled: (ctx) => ctx.debugLogs === null,
         task: async (ctx, task) => {
           ctx.debugLogs = await task.prompt({
             type: 'Toggle',
-            message: 'Enable debug output?',
+            message: 'Enable debug logs?',
             enabled: 'yes',
             disabled: 'no',
             initial: 'no',
