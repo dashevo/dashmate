@@ -127,7 +127,7 @@ SetupCommand.args = [{
 
 SetupCommand.flags = {
   'debug-logs': flagTypes.boolean({
-    char: 'd', description: 'enable debug logs', allowNo: true, default: false,
+    char: 'd', description: 'enable debug logs', allowNo: true, default: null,
   }),
   'external-ip': flagTypes.string({ char: 'i', description: 'external ip' }),
   'operator-bls-private-key': flagTypes.string({ char: 'k', description: 'operator bls private key' }),
