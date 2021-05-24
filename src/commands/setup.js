@@ -34,6 +34,7 @@ class SetupCommand extends BaseCommand {
       'funding-private-key': fundingPrivateKeyString,
       'node-count': nodeCount,
       'debug-logs': debugLogs,
+      'miner-interval': minerInterval,
       verbose: isVerbose,
     },
     generateBlsKeys,
@@ -97,6 +98,7 @@ class SetupCommand extends BaseCommand {
         nodeType,
         nodeCount,
         debugLogs,
+        minerInterval,
         externalIp,
         operatorBlsPrivateKey,
         fundingPrivateKeyString,
@@ -133,6 +135,7 @@ SetupCommand.flags = {
   'operator-bls-private-key': flagTypes.string({ char: 'k', description: 'operator bls private key' }),
   'funding-private-key': flagTypes.string({ char: 'p', description: `private key with more than ${MASTERNODE_DASH_AMOUNT} dash for funding collateral` }),
   'node-count': flagTypes.integer({ description: 'number of nodes to setup', default: null }),
+  'miner-interval': flagTypes.string({ char: 'm', description: 'interval between blocks', default: null }),
   verbose: flagTypes.boolean({ char: 'v', description: 'use verbose mode for output', default: false }),
 };
 
