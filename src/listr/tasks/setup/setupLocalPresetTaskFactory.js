@@ -43,9 +43,9 @@ function setupLocalPresetTaskFactory(
       },
       {
         title: 'Enable debug output',
-        enabled: (ctx) => ctx.debug === null,
+        enabled: (ctx) => ctx.debugLogs === null,
         task: async (ctx, task) => {
-          ctx.debug = await task.prompt({
+          ctx.debugLogs = await task.prompt({
             type: 'Toggle',
             message: 'Enable debug output?',
             enabled: 'yes',
@@ -81,8 +81,8 @@ function setupLocalPresetTaskFactory(
                 config.set('core.rpc.port', 20002 + (i * 100));
                 config.set('externalIp', hostDockerInternalIp);
 
-                config.set('core.debug', ctx.debug ? 1 : 0);
-                config.set('platform.drive.abci.log.stdout.level', ctx.debug ? 'trace' : 'info');
+                config.set('core.debug', ctx.debugLogs ? 1 : 0);
+                config.set('platform.drive.abci.log.stdout.level', ctx.debugLogs ? 'trace' : 'info');
 
                 if (config.getName() === 'local_seed') {
                   config.set('description', 'seed node for local network');

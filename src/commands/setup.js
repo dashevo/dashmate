@@ -33,7 +33,7 @@ class SetupCommand extends BaseCommand {
       'operator-bls-private-key': operatorBlsPrivateKey,
       'funding-private-key': fundingPrivateKeyString,
       'node-count': nodeCount,
-      debug,
+      'debug-logs': debugLogs,
       verbose: isVerbose,
     },
     generateBlsKeys,
@@ -96,7 +96,7 @@ class SetupCommand extends BaseCommand {
         preset,
         nodeType,
         nodeCount,
-        debug,
+        debugLogs,
         externalIp,
         operatorBlsPrivateKey,
         fundingPrivateKeyString,
@@ -126,12 +126,12 @@ SetupCommand.args = [{
 }];
 
 SetupCommand.flags = {
+  'debug-logs': flagTypes.boolean({ char: 'd', description: 'enable debug logs', default: null }),
   'external-ip': flagTypes.string({ char: 'i', description: 'external ip' }),
   'operator-bls-private-key': flagTypes.string({ char: 'k', description: 'operator bls private key' }),
   'funding-private-key': flagTypes.string({ char: 'p', description: `private key with more than ${MASTERNODE_DASH_AMOUNT} dash for funding collateral` }),
   'node-count': flagTypes.integer({ description: 'number of nodes to setup', default: null }),
   verbose: flagTypes.boolean({ char: 'v', description: 'use verbose mode for output', default: false }),
-  debug: flagTypes.boolean({ char: 'd', description: 'enable debug output', default: null }),
 };
 
 module.exports = SetupCommand;
