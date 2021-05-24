@@ -359,6 +359,37 @@ module.exports = {
                   additionalProperties: false,
                   required: ['createEmptyBlocks', 'createEmptyBlocksInterval'],
                 },
+                log: {
+                  type: 'object',
+                  properties: {
+                    level: {
+                      type: 'object',
+                      properties: {
+                        main: {
+                          type: 'string',
+                          enum: ['debug', 'warn', 'info', 'error'],
+                        },
+                        state: {
+                          type: 'string',
+                          enum: ['debug', 'warn', 'info', 'error'],
+                        },
+                        statesync: {
+                          type: 'string',
+                          enum: ['debug', 'warn', 'info', 'error'],
+                        },
+                        '*': {
+                          type: 'string',
+                          enum: ['debug', 'warn', 'info', 'error'],
+                        },
+                      },
+                    },
+                    format: {
+                      type: 'string',
+                      enum: ['plain', 'json'],
+                    },
+                  },
+                  required: ['level', 'format'],
+                },
                 rpc: {
                   type: 'object',
                   properties: {
