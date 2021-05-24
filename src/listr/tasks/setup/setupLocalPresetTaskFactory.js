@@ -42,6 +42,37 @@ function setupLocalPresetTaskFactory(
         },
       },
       {
+        title: 'Enable debug logs',
+        enabled: (ctx) => ctx.debugLogs === null,
+        task: async (ctx, task) => {
+          ctx.debugLogs = await task.prompt({
+            type: 'Toggle',
+            message: 'Enable debug logs?',
+            enabled: 'yes',
+            disabled: 'no',
+            initial: 'no',
+          });
+        },
+      },
+      {
+        title: 'Set the core miner interval',
+        enabled: (ctx) => ctx.minerInterval === null,
+        task: async (ctx, task) => {
+          ctx.minerInterval = await task.prompt({
+            type: 'input',
+            message: 'Enter the interval between core blocks',
+            initial: configFile.getConfig('base').options.core.miner.interval,
+            validate: (state) => {
+              if (state.match(/\d+(\.\d+)?(m|s)/)) {
+                return true;
+              }
+
+              return 'Please enter a valid integer or decimal duration with m or s units';
+            },
+          });
+        },
+      },
+      {
         title: 'Create local group configs',
         task: async (ctx) => {
           ctx.configGroup = new Array(ctx.nodeCount)
@@ -68,11 +99,18 @@ function setupLocalPresetTaskFactory(
                 config.set('core.rpc.port', 20002 + (i * 100));
                 config.set('externalIp', hostDockerInternalIp);
 
+                config.set('core.debug', ctx.debugLogs ? 1 : 0);
+                config.set('platform.drive.abci.log.stdout.level', ctx.debugLogs ? 'trace' : 'info');
+
                 if (config.getName() === 'local_seed') {
                   config.set('description', 'seed node for local network');
 
                   config.set('core.masternode.enable', false);
                   config.set('core.miner.enable', true);
+
+                  // Enable miner for the seed node
+                  config.set('core.miner.enable', true);
+                  config.set('core.miner.interval', ctx.minerInterval);
 
                   // Disable platform for the seed node
                   config.set('platform', undefined);
