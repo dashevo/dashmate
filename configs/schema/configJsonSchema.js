@@ -363,23 +363,18 @@ module.exports = {
                   type: 'object',
                   properties: {
                     level: {
-                      type: 'object',
-                      properties: {
-                        main: {
-                          type: 'string',
-                          enum: ['debug', 'warn', 'info', 'error'],
-                        },
-                        state: {
-                          type: 'string',
-                          enum: ['debug', 'warn', 'info', 'error'],
-                        },
-                        statesync: {
-                          type: 'string',
-                          enum: ['debug', 'warn', 'info', 'error'],
-                        },
-                        '*': {
-                          type: 'string',
-                          enum: ['debug', 'warn', 'info', 'error'],
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          module: {
+                            type: 'string',
+                            enum: ['main', 'state', 'statesync', '*'],
+                          },
+                          level: {
+                            type: 'string',
+                            enum: ['debug', 'warn', 'info', 'error'],
+                          },
                         },
                       },
                     },
