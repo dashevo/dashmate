@@ -74,7 +74,7 @@ module.exports = {
     },
     tenderdashLogModule: {
       type: 'string',
-      enum: ['debug', 'warn', 'info', 'error'],
+      enum: ['debug', 'info', 'error'],
     },
   },
   properties: {
