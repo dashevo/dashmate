@@ -409,6 +409,7 @@ module.exports = {
                     },
                   },
                   required: ['level', 'format'],
+                  additionalProperties: false,
                 },
                 rpc: {
                   type: 'object',
