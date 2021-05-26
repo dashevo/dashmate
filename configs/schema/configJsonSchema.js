@@ -400,7 +400,7 @@ module.exports = {
                           $ref: '#/definitions/tenderdashLogModule',
                         },
                       },
-                      required: ['*'],
+                      minProperties: 1,
                       additionalProperties: false,
                     },
                     format: {
