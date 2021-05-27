@@ -48,23 +48,23 @@ $ sudo npm link # optional: link CLI for system-wide execution
 ## Update
 
 ```bash
-$ mn stop
+$ dashmate stop
 $ git checkout master
 $ git pull
-$ mn update
-$ mn start
+$ dashmate update
+$ dashmate start
 ```
 
 If the platform layer has been wiped, you must additionally reset platform data:
 
 ```bash
-$ mn stop
+$ dashmate stop
 $ git checkout master
 $ git pull
-$ mn reset --platform-only --hard
-$ mn update
-$ mn setup -k <bls-key>
-$ mn start
+$ dashmate reset --platform-only --hard
+$ dashmate update
+$ dashmate setup -k <bls-key>
+$ dashmate start
 ```
 
 ## Usage
@@ -90,6 +90,7 @@ ARGUMENTS
 OPTIONS
   -i, --external-ip=external-ip                            external ip
   -k, --operator-bls-private-key=operator-bls-private-key  operator bls private key
+  -m, --miner-interval=miner-interval                      interval between blocks
   -p, --funding-private-key=funding-private-key            private key with more than 1000 dash for funding collateral
   -v, --verbose                                            use verbose mode for output
   --node-count=node-count                                  number of nodes to setup

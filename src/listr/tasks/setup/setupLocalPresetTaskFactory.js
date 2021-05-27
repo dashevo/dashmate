@@ -6,12 +6,14 @@ const { PRESET_LOCAL } = require('../../../constants');
  * @param {configureCoreTask} configureCoreTask
  * @param {configureTenderdashTask} configureTenderdashTask
  * @param {configureTenderdashTask} initializePlatformTask
+ * @param {resolveDockerHostIp} resolveDockerHostIp
  */
 function setupLocalPresetTaskFactory(
   configFile,
   configureCoreTask,
   configureTenderdashTask,
   initializePlatformTask,
+  resolveDockerHostIp,
 ) {
   /**
    * @typedef {setupLocalPresetTask}
@@ -40,8 +42,39 @@ function setupLocalPresetTaskFactory(
         },
       },
       {
+        title: 'Enable debug logs',
+        enabled: (ctx) => ctx.debugLogs === null,
+        task: async (ctx, task) => {
+          ctx.debugLogs = await task.prompt({
+            type: 'Toggle',
+            message: 'Enable debug logs?',
+            enabled: 'yes',
+            disabled: 'no',
+            initial: 'no',
+          });
+        },
+      },
+      {
+        title: 'Set the core miner interval',
+        enabled: (ctx) => ctx.minerInterval === null,
+        task: async (ctx, task) => {
+          ctx.minerInterval = await task.prompt({
+            type: 'input',
+            message: 'Enter the interval between core blocks',
+            initial: configFile.getConfig('base').options.core.miner.interval,
+            validate: (state) => {
+              if (state.match(/\d+(\.\d+)?(m|s)/)) {
+                return true;
+              }
+
+              return 'Please enter a valid integer or decimal duration with m or s units';
+            },
+          });
+        },
+      },
+      {
         title: 'Create local group configs',
-        task: (ctx) => {
+        task: async (ctx) => {
           ctx.configGroup = new Array(ctx.nodeCount)
             .fill(undefined)
             .map((value, i) => `local_${i + 1}`)
@@ -53,6 +86,8 @@ function setupLocalPresetTaskFactory(
                 : configFile.createConfig(configName, PRESET_LOCAL)
             ));
 
+          const hostDockerInternalIp = await resolveDockerHostIp();
+
           const subTasks = ctx.configGroup.map((config, i) => (
             {
               title: `Create ${config.getName()} config`,
@@ -62,12 +97,25 @@ function setupLocalPresetTaskFactory(
                 config.set('group', 'local');
                 config.set('core.p2p.port', 20001 + (i * 100));
                 config.set('core.rpc.port', 20002 + (i * 100));
-                config.set('externalIp', '127.0.0.1');
+                config.set('externalIp', hostDockerInternalIp);
+
+                if (ctx.debugLogs) {
+                  config.set('core.debug', 1);
+                  config.set('platform.drive.abci.log.stdout.level', 'trace');
+                  config.set('platform.drive.tenderdash.log.level', {
+                    '*': 'debug',
+                  });
+                }
 
                 if (config.getName() === 'local_seed') {
                   config.set('description', 'seed node for local network');
 
                   config.set('core.masternode.enable', false);
+                  config.set('core.miner.enable', true);
+
+                  // Enable miner for the seed node
+                  config.set('core.miner.enable', true);
+                  config.set('core.miner.interval', ctx.minerInterval);
 
                   // Disable platform for the seed node
                   config.set('platform', undefined);
