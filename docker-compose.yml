@@ -28,5 +28,16 @@ services:
       - NETWORK=${NETWORK?:err}
       - SENTINEL_ARGS=-b
 
+  tor:
+    image: ${CORE_TOR_DOCKER_IMAGE:?err}
+    restart: unless-stopped
+    ports:
+      - ${CORE_TOR_PROXY_PORT:?err}:${CORE_TOR_PROXY_PORT:?err}
+      - 127.0.0.1:${CORE_TOR_CONTROL_PORT:?err}:${CORE_TOR_CONTROL_PORT:?err}
+    volumes:
+      - ${DASHMATE_HOME_DIR:?err}/${CONFIG_NAME:?err}/core/torrc:/etc/tor/torrc
+    environment:
+      - PASSWORD=${CORE_TOR_CONTROL_PASSWORD}
+
 volumes:
   core_data:
