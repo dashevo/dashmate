@@ -36,16 +36,13 @@ fi
 # -d is for debug, -m is for miner interval for the network
 ./bin/dashmate setup ${CONFIG_NAME} -v -d -m "${MINING_INTERVAL_IN_SECONDS}s" --node-count=${MASTERNODES_COUNT}
 
-echo "Setting log levels to trace"
-./bin/dashmate config:set --config=${CONFIG_NAME} platform.drive.abci.log.stdout.level trace
-
 for (( NODE_INDEX=1; NODE_INDEX<=MASTERNODES_COUNT; NODE_INDEX++ ))
 do
   ./bin/dashmate config:set --config=${CONFIG_NAME}_${NODE_INDEX} core.miner.interval "${MINING_INTERVAL_IN_SECONDS}s"
 done
 
 echo "Sending 1000 tDash to the ${FAUCET_ADDRESS} for tests"
-./bin/dashmate wallet:mint 1000 --config=${CONFIG_NAME}_1 --address=${FAUCET_ADDRESS}
+./bin/dashmate wallet:mint 1000 --config=${CONFIG_NAME}_seed --address=${FAUCET_ADDRESS}
 
 if [ $BUILD_DAPI_AFTER_SETUP == true ]
 then
