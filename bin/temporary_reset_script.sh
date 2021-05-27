@@ -33,13 +33,7 @@ then
   ./bin/dashmate config:set --config=${CONFIG_NAME} platform.dapi.api.docker.build.path $DAPI_REPO_PATH
 fi
 
-# -d is for debug, -m is for miner interval for the network
-./bin/dashmate setup ${CONFIG_NAME} -v -d -m "${MINING_INTERVAL_IN_SECONDS}s" --node-count=${MASTERNODES_COUNT}
-
-for (( NODE_INDEX=1; NODE_INDEX<=MASTERNODES_COUNT; NODE_INDEX++ ))
-do
-  ./bin/dashmate config:set --config=${CONFIG_NAME}_${NODE_INDEX} core.miner.interval "${MINING_INTERVAL_IN_SECONDS}s"
-done
+./bin/dashmate setup ${CONFIG_NAME} --verbose --debug-logs --miner-interval="${MINING_INTERVAL_IN_SECONDS}s" --node-count=${MASTERNODES_COUNT}
 
 echo "Sending 1000 tDash to the ${FAUCET_ADDRESS} for tests"
 ./bin/dashmate wallet:mint 1000 --config=${CONFIG_NAME}_seed --address=${FAUCET_ADDRESS}
@@ -53,6 +47,6 @@ then
   done
 fi
 
-./bin/dashmate group:start
+./bin/dashmate group:start --wait-for-readiness
 
 echo "Funding key is ${FAUCET_PRIVATE_KEY}"
