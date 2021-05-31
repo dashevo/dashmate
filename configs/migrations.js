@@ -184,6 +184,10 @@ module.exports = {
         if (typeof config.platform.drive.tenderdash.log === 'undefined') {
           config.platform.drive.tenderdash.log = systemConfigs.base.platform.drive.tenderdash.log;
         }
+
+        if (typeof config.core.tor === 'undefined') {
+          config.core.tor = systemConfigs.base.core.tor;
+        }
       });
   },
 };
