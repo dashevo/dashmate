@@ -143,6 +143,10 @@ class Config {
   toEnvs() {
     const dockerComposeFiles = ['docker-compose.yml'];
 
+    if (this.get('core.tor.enable') === true) {
+      dockerComposeFiles.push('docker-compose.tor.yml');
+    }
+
     if (this.has('platform')) {
       dockerComposeFiles.push('docker-compose.platform.yml');
 
