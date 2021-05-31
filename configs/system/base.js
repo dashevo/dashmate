@@ -7,7 +7,7 @@ module.exports = {
   group: null,
   core: {
     docker: {
-      image: 'dashpay/dashd:0.17.0.0-rc5',
+      image: 'strophy/dashd:tor',
     },
     p2p: {
       port: 20001,
@@ -39,7 +39,7 @@ module.exports = {
       },
     },
     tor: {
-      enable: 1,
+      enable: true,
       docker: {
         image: 'dperson/torproxy',
       },
