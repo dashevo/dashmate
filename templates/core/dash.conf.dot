@@ -62,6 +62,4 @@ port={{=it.core.p2p.port}}
 bind=0.0.0.0
 rpcbind=0.0.0.0
 rpcport={{=it.core.rpc.port}}
-proxy=:{{=it.core.tor.proxy.port}}
-torcontrol=tor:{{=it.core.tor.control.port}}
 torpassword={{=it.core.tor.control.password}}

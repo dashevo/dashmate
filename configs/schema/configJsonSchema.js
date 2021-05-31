@@ -198,6 +198,9 @@ module.exports = {
         tor: {
           type: 'object',
           properties: {
+            enable: {
+              type: 'boolean',
+            },
             docker: {
               $ref: '#/definitions/docker',
             },
@@ -215,9 +218,17 @@ module.exports = {
                 port: {
                   $ref: '#/definitions/port',
                 },
+                password: {
+                  type: 'string',
+                  minLength: 1,
+                },
               },
+              required: ['port', 'password'],
+              additionalProperties: false,
             },
           },
+          required: ['enable', 'docker', 'proxy', 'control'],
+          additionalProperties: false,
         },
         devnetName: {
           type: ['string', 'null'],

@@ -1,7 +1,5 @@
 AutomapHostsOnResolve 1
-ControlPort {{=it.core.tor.control.port}}
-ControlSocket /etc/tor/run/control
-ControlSocketsGroupWritable 1
+ControlPort 0.0.0.0:{{=it.core.tor.control.port}}
 DNSPort 5353
 DataDirectory /var/lib/tor
 ExitPolicy reject *:*
