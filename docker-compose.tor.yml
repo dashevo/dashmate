@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  tor:
+  core_tor:
     image: ${CORE_TOR_DOCKER_IMAGE:?err}
     restart: unless-stopped
     ports:
