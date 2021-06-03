@@ -13,9 +13,9 @@ services:
 
   core:
     depends_on:
-      - tor
+      - core_tor
     environment:
-      - TOR_CONTROL_HOST=tor
+      - TOR_CONTROL_HOST=core_tor
       - TOR_CONTROL_PORT=${CORE_TOR_CONTROL_PORT}
       - TOR_CONTROL_PASSWORD=${CORE_TOR_CONTROL_PASSWORD}
       - TOR_PROXY_PORT=${CORE_TOR_PROXY_PORT}
