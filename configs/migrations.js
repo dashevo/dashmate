@@ -179,14 +179,14 @@ module.exports = {
             config.platform.drive.tenderdash.consensus.createEmptyBlocks.createEmptyBlocksInterval = '3m';
           }
 
-          // Update images
-          config.platform.drive.tenderdash.docker.image = systemConfigs.base.platform
-            .drive.tenderdash.docker.image;
-
           // Tenderdash logging levels
           if (typeof config.platform.drive.tenderdash.log === 'undefined') {
             config.platform.drive.tenderdash.log = systemConfigs.base.platform.drive.tenderdash.log;
           }
+
+          // Update images
+          config.platform.drive.tenderdash.docker.image = systemConfigs.base.platform
+            .drive.tenderdash.docker.image;
         }
       });
   },
