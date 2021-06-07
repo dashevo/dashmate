@@ -8,6 +8,11 @@ const baseConfig = require('./base');
 
 module.exports = lodashMerge({}, baseConfig, {
   description: 'template for local configs',
+  core: {
+    tor: {
+      enable: false,
+    },
+  },
   platform: {
     dapi: {
       envoy: {
