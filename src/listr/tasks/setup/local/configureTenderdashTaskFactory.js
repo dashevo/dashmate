@@ -60,7 +60,7 @@ function configureTenderdashTaskFactory(
 
                 config.set(
                   'platform.drive.tenderdash.genesis.quorum_type',
-                  config.get('platform.drive.abci.validatorSet.llmqType'),
+                  config.get('platform.drive.abci.validatorSet.llmqType').toString(),
                 );
 
                 config.set('platform.drive.tenderdash.genesis.quorum_hash', ctx.quorumHash);
