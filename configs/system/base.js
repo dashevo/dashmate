@@ -39,7 +39,7 @@ module.exports = {
       },
     },
     tor: {
-      enable: true,
+      enable: false,
       docker: {
         image: 'dperson/torproxy',
       },

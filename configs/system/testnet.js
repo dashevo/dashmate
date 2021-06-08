@@ -15,6 +15,9 @@ module.exports = lodashMerge({}, baseConfig, {
     rpc: {
       port: 19998,
     },
+    tor: {
+      enable: true,
+    },
   },
   platform: {
     dpns: {
