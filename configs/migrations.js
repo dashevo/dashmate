@@ -160,5 +160,17 @@ module.exports = {
         // Update image version
         config.core.docker.image = systemConfigs.base.core.docker.image;
       });
+
+    return configFile;
+  },
+  '0.19.2': (configFile) => {
+    Object.entries(configFile.configs)
+      .forEach(([, config]) => {
+        // Update image version
+        config.core.docker.image = systemConfigs.base.core.docker.image;
+        config.core.sentinel.docker.image = systemConfigs.base.core.sentinel.docker.image;
+      });
+
+    return configFile;
   },
 };
