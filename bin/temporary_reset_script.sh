@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 #COLLATERAL_KEY=
 #COLLATERAL_ADDRESS=
 
