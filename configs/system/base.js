@@ -35,7 +35,7 @@ module.exports = {
     },
     sentinel: {
       docker: {
-        image: 'dashpay/sentinel:1.6',
+        image: 'dashpay/sentinel:1.6.0',
       },
     },
     devnetName: null,
