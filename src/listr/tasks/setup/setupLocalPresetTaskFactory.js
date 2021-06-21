@@ -79,8 +79,8 @@ function setupLocalPresetTaskFactory(
                   config.set('platform.drive.tenderdash.p2p.port', 26656 + (i * 100));
                   config.set('platform.drive.tenderdash.rpc.port', 26657 + (i * 100));
 
-                  config.set('platform.drive.abci.log.prettyFile.path', `/tmp/drive_pretty_${nodeIndex}.log`);
-                  config.set('platform.drive.abci.log.jsonFile.path', `/tmp/drive_json_${nodeIndex}.log`);
+                  config.set('platform.drive.abci.log.prettyFile.path', `./tmp/drive_pretty_${nodeIndex}.log`);
+                  config.set('platform.drive.abci.log.jsonFile.path', `./tmp/drive_json_${nodeIndex}.log`);
                 }
               },
             }
