@@ -51,10 +51,13 @@ function initTaskFactory(
             clientOpts.dapiAddresses = [ctx.dapiAddress];
           }
 
+          const nodeCount = ctx.nodeCount || 1;
+
           const faucetClient = new Dash.Client({
             ...clientOpts,
             wallet: {
               privateKey: ctx.fundingPrivateKeyString,
+              waitForInstantLockTimeout: nodeCount * 60000,
             },
           });
 
@@ -62,6 +65,7 @@ function initTaskFactory(
             ...clientOpts,
             wallet: {
               mnemonic: null,
+              waitForInstantLockTimeout: nodeCount * 60000,
             },
           });
 
