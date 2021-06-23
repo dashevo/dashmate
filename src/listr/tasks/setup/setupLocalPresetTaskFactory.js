@@ -5,7 +5,7 @@ const { PRESET_LOCAL } = require('../../../constants');
  * @param {ConfigFile} configFile
  * @param {configureCoreTask} configureCoreTask
  * @param {configureTenderdashTask} configureTenderdashTask
- * @param {initializePlatformTask} initializePlatformTask
+ * @param {configureTenderdashTask} initializePlatformTask
  * @param {resolveDockerHostIp} resolveDockerHostIp
  */
 function setupLocalPresetTaskFactory(
