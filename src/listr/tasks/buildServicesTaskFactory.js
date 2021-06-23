@@ -55,6 +55,7 @@ function buildServicesTaskFactory(
             },
             {
               title: 'Update NPM cache',
+              enabled: () => false,
               task: async () => {
                 // Build node_modules stage only to access to npm cache
                 const buildStream = await docker.buildImage({

@@ -5,6 +5,9 @@ const dockerCompose = require('docker-compose');
 const hasbin = require('hasbin');
 const semver = require('semver');
 
+const { exec } = require('child_process');
+const { promisify } = require('util');
+
 const DockerComposeError = require('./errors/DockerComposeError');
 const ServiceAlreadyRunningError = require('./errors/ServiceAlreadyRunningError');
 const ServiceIsNotRunningError = require('./errors/ServiceIsNotRunningError');
@@ -118,22 +121,35 @@ class DockerCompose {
    * @return {Promise<void>}
    */
   async build(envs, serviceName = undefined, options = []) {
-    await this.throwErrorIfNotInstalled();
+    const execAsync = promisify(exec);
+
+    const checkComposeV2 = true;
+    await this.throwErrorIfNotInstalled(checkComposeV2);
 
     try {
       if (serviceName) {
-        await dockerCompose.buildOne(serviceName, {
-          ...this.getOptions(envs),
-          commandOptions: options,
-        });
+        await execAsync(`docker compose build --progress plain ${serviceName}`);
       } else {
-        await dockerCompose.buildAll({
-          ...this.getOptions(envs),
-        });
+        await execAsync('docker compose build --progress plain');
       }
     } catch (e) {
       throw new DockerComposeError(e);
     }
+
+    // try {
+    //   if (serviceName) {
+    //     await dockerCompose.buildOne(serviceName, {
+    //       ...this.getOptions(envs),
+    //       commandOptions: options,
+    //     });
+    //   } else {
+    //     await dockerCompose.buildAll({
+    //       ...this.getOptions(envs),
+    //     });
+    //   }
+    // } catch (e) {
+    //   throw new DockerComposeError(e);
+    // }
   }
 
   /**
@@ -330,7 +346,7 @@ class DockerCompose {
    * @private
    * @return {Promise<void>}
    */
-  async throwErrorIfNotInstalled() {
+  async throwErrorIfNotInstalled(checkComposeV2 = false) {
     if (!hasbin.sync('docker')) {
       throw new Error('Docker is not installed');
     }
@@ -354,10 +370,19 @@ class DockerCompose {
       throw new Error(`Update Docker to version ${DockerCompose.DOCKER_MIN_VERSION} or higher`);
     }
 
-    // check docker compose version
+    // check docker-compose version
     const { out: version } = await dockerCompose.version();
     if (semver.lt(version.trim(), DockerCompose.DOCKER_COMPOSE_MIN_VERSION)) {
       throw new Error(`Update Docker Compose to version ${DockerCompose.DOCKER_COMPOSE_MIN_VERSION} or higher`);
+    }
+
+    // check docker compose version (CI only)
+    if (checkComposeV2) {
+      const execAsync = promisify(exec);
+      await execAsync('docker compose version')
+        .catch(() => {
+          throw new Error('Docker Compose V2 is not installed');
+        });
     }
   }
 
