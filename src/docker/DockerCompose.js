@@ -125,8 +125,6 @@ class DockerCompose {
 
     const checkComposeV2 = true;
     await this.throwErrorIfNotInstalled(checkComposeV2);
-    // const rawEnvs = this.getOptions(envs).env;
-    // const parsedEnvs = Object.keys(rawEnvs).map((key) => `${key}=${rawEnvs[key]}`).join(' ');
 
     try {
       if (serviceName) {
@@ -137,21 +135,6 @@ class DockerCompose {
     } catch (e) {
       throw new DockerComposeError(e);
     }
-
-    // try {
-    //   if (serviceName) {
-    //     await dockerCompose.buildOne(serviceName, {
-    //       ...this.getOptions(envs),
-    //       commandOptions: options,
-    //     });
-    //   } else {
-    //     await dockerCompose.buildAll({
-    //       ...this.getOptions(envs),
-    //     });
-    //   }
-    // } catch (e) {
-    //   throw new DockerComposeError(e);
-    // }
   }
 
   /**
