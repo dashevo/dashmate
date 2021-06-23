@@ -130,7 +130,7 @@ class DockerCompose {
       if (serviceName) {
         await execAsync(`docker compose build --progress plain ${serviceName}`, { ...this.getOptions(envs) });
       } else {
-        await execAsync('docker compose build --progress plain');
+        await execAsync('docker compose build --progress plain', { ...this.getOptions(envs) });
       }
     } catch (e) {
       throw new DockerComposeError(e);
