@@ -125,12 +125,12 @@ class DockerCompose {
 
     const checkComposeV2 = true;
     await this.throwErrorIfNotInstalled(checkComposeV2);
-    const rawEnvs = this.getOptions(envs).env;
-    const parsedEnvs = Object.keys(rawEnvs).map((key) => `${key}=${rawEnvs[key]}`).join(' ');
+    // const rawEnvs = this.getOptions(envs).env;
+    // const parsedEnvs = Object.keys(rawEnvs).map((key) => `${key}=${rawEnvs[key]}`).join(' ');
 
     try {
       if (serviceName) {
-        await execAsync(`docker compose build --progress plain --build-arg ${parsedEnvs} ${serviceName}`);
+        await execAsync(`docker compose build --progress plain ${serviceName}`, { ...this.getOptions(envs) });
       } else {
         await execAsync('docker compose build --progress plain');
       }
