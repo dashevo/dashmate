@@ -361,7 +361,7 @@ class DockerCompose {
       throw new Error(`Update Docker Compose to version ${DockerCompose.DOCKER_COMPOSE_MIN_VERSION} or higher`);
     }
 
-    // check docker compose version (CI only)
+    // check docker compose v2 version (CI only)
     if (checkComposeV2) {
       const execAsync = promisify(exec);
       await execAsync('docker compose version')
