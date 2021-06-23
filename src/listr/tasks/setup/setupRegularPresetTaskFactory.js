@@ -10,6 +10,7 @@ const {
   NODE_TYPES,
   NODE_TYPE_MASTERNODE,
   PRESET_MAINNET,
+  PRESET_TESTNET,
 } = require('../../../constants');
 
 /**
@@ -140,6 +141,9 @@ function setupRegularPresetTaskFactory(
       },
       {
         title: 'Initialize Tenderdash',
+        enabled: (ctx) => (
+          ctx.preset === PRESET_TESTNET
+        ),
         task: (ctx) => tenderdashInitTask(ctx.config),
       },
       {
