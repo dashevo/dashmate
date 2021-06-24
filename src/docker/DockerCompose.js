@@ -101,15 +101,24 @@ class DockerCompose {
    * @return {Promise<void>}
    */
   async up(envs) {
-    await this.throwErrorIfNotInstalled();
+    const execAsync = promisify(exec);
+
+    const checkComposeV2 = true;
+    await this.throwErrorIfNotInstalled(checkComposeV2);
 
     try {
-      await dockerCompose.upAll({
-        ...this.getOptions(envs),
-      });
+      await execAsync('docker compose up', { ...this.getOptions(envs) });
     } catch (e) {
       throw new DockerComposeError(e);
     }
+
+    // try {
+    //   await dockerCompose.upAll({
+    //     ...this.getOptions(envs),
+    //   });
+    // } catch (e) {
+    //   throw new DockerComposeError(e);
+    // }
   }
 
   /**
