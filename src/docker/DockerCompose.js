@@ -128,13 +128,15 @@ class DockerCompose {
 
     try {
       if (serviceName) {
-        await execAsync(`docker compose build --progress plain ${serviceName}`, { ...this.getOptions(envs) });
+        await execAsync('docker buildx bake -f docker-compose.platform.build-drive.yml', { ...this.getOptions(envs) });
       } else {
         await execAsync('docker compose build --progress plain', { ...this.getOptions(envs) });
       }
     } catch (e) {
       throw new DockerComposeError(e);
     }
+    // Maybe use this instad?
+    // docker build --progress plain --target=node_modules --load -t strophy/drive:ci-test ../js-drive
   }
 
   /**
