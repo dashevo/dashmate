@@ -101,24 +101,23 @@ class DockerCompose {
    * @return {Promise<void>}
    */
   async up(envs) {
-    const execAsync = promisify(exec);
-
-    const checkComposeV2 = true;
-    await this.throwErrorIfNotInstalled(checkComposeV2);
-
-    try {
-      await execAsync('docker compose up -d', { ...this.getOptions(envs) });
-    } catch (e) {
-      throw new DockerComposeError(e);
+    const composeV2Installed = await this.isComposeV2Installed();
+    if (composeV2Installed === true) {
+      const execAsync = promisify(exec);
+      try {
+        await execAsync('docker compose up -d', { ...this.getOptions(envs) });
+      } catch (e) {
+        throw new DockerComposeError(e);
+      }
+    } else {
+      try {
+        await dockerCompose.upAll({
+          ...this.getOptions(envs),
+        });
+      } catch (e) {
+        throw new DockerComposeError(e);
+      }
     }
-
-    // try {
-    //   await dockerCompose.upAll({
-    //     ...this.getOptions(envs),
-    //   });
-    // } catch (e) {
-    //   throw new DockerComposeError(e);
-    // }
   }
 
   /**
@@ -129,7 +128,7 @@ class DockerCompose {
    * @param {string[]} [options]
    * @return {Promise<void>}
    */
-  async build(envs, serviceName = undefined, options = []) {
+  async build(envs, serviceName = undefined) {
     const execAsync = promisify(exec);
 
     const checkComposeV2 = true;
@@ -137,15 +136,18 @@ class DockerCompose {
 
     try {
       if (serviceName) {
-        await execAsync('docker buildx bake -f docker-compose.platform.build-drive.yml', { ...this.getOptions(envs) });
+        // Temporarily build with buildx bake until docker compose build selects correct builder
+        if (serviceName === 'drive_abci') {
+          await execAsync('docker buildx bake -f docker-compose.platform.build-drive.yml', { ...this.getOptions(envs) });
+        } else if (serviceName === 'dapi_api') {
+          await execAsync('docker buildx bake -f docker-compose.platform.build-dapi.yml', { ...this.getOptions(envs) });
+        }
       } else {
         await execAsync('docker compose build --progress plain', { ...this.getOptions(envs) });
       }
     } catch (e) {
       throw new DockerComposeError(e);
     }
-    // Maybe use this instad?
-    // docker build --progress plain --target=node_modules --load -t strophy/drive:ci-test ../js-drive
   }
 
   /**
@@ -340,6 +342,22 @@ class DockerCompose {
 
   /**
    * @private
+   * @return {boolean}
+   */
+  async isComposeV2Installed() {
+    let v2Installed = true;
+
+    const execAsync = promisify(exec);
+    await execAsync('docker compose')
+      .catch(() => {
+        v2Installed = false;
+      });
+
+    return v2Installed;
+  }
+
+  /**
+   * @private
    * @return {Promise<void>}
    */
   async throwErrorIfNotInstalled(checkComposeV2 = false) {
@@ -349,6 +367,13 @@ class DockerCompose {
 
     if (!hasbin.sync('docker-compose')) {
       throw new Error('Docker Compose is not installed');
+    }
+
+    if (checkComposeV2) {
+      const v2Installed = await this.isComposeV2Installed();
+      if (v2Installed === false) {
+        throw new Error('Docker Compose V2 is not installed');
+      }
     }
 
     // check docker version
@@ -370,15 +395,6 @@ class DockerCompose {
     const { out: version } = await dockerCompose.version();
     if (semver.lt(version.trim(), DockerCompose.DOCKER_COMPOSE_MIN_VERSION)) {
       throw new Error(`Update Docker Compose to version ${DockerCompose.DOCKER_COMPOSE_MIN_VERSION} or higher`);
-    }
-
-    // check docker compose v2 version (CI only)
-    if (checkComposeV2) {
-      const execAsync = promisify(exec);
-      await execAsync('docker compose version')
-        .catch(() => {
-          throw new Error('Docker Compose V2 is not installed');
-        });
     }
   }
 
