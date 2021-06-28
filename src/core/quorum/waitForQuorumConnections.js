@@ -3,7 +3,7 @@ const wait = require('../../util/wait');
 const { LLMQ_TYPE_TEST } = require('../../constants');
 
 /**
- * @param {RpcClient[]} rpcClients
+ * @param {RpcClient} rpcClient
  * @param {number} expectedConnectionsCount
  * @return {Promise<boolean>}
  */
