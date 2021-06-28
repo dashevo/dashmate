@@ -105,7 +105,7 @@ class DockerCompose {
     if (composeV2Installed === true) {
       const execAsync = promisify(exec);
       try {
-        await execAsync('docker compose up -d', { ...this.getOptions(envs) });
+        await execAsync('docker compose up --no-build -d', { ...this.getOptions(envs) });
       } catch (e) {
         throw new DockerComposeError(e);
       }
@@ -137,10 +137,11 @@ class DockerCompose {
     try {
       if (serviceName) {
         // Temporarily build with buildx bake until docker compose build selects correct builder
+        // https://github.com/docker/compose-cli/issues/1840
         if (serviceName === 'drive_abci') {
-          await execAsync('docker buildx bake -f docker-compose.platform.build-drive.yml', { ...this.getOptions(envs) });
+          await execAsync('docker buildx bake --load -f docker-compose.platform.build-drive.yml', { ...this.getOptions(envs) });
         } else if (serviceName === 'dapi_api') {
-          await execAsync('docker buildx bake -f docker-compose.platform.build-dapi.yml', { ...this.getOptions(envs) });
+          await execAsync('docker buildx bake --load -f docker-compose.platform.build-dapi.yml', { ...this.getOptions(envs) });
         }
       } else {
         await execAsync('docker compose build --progress plain', { ...this.getOptions(envs) });
