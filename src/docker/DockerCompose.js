@@ -13,6 +13,8 @@ const ServiceAlreadyRunningError = require('./errors/ServiceAlreadyRunningError'
 const ServiceIsNotRunningError = require('./errors/ServiceIsNotRunningError');
 const ContainerIsNotPresentError = require('./errors/ContainerIsNotPresentError');
 
+const execAsync = promisify(exec);
+
 class DockerCompose {
   /**
    * @param {Docker} docker
@@ -23,6 +25,7 @@ class DockerCompose {
     this.docker = docker;
     this.startedContainers = startedContainers;
     this.homeDirPath = homeDirPath;
+    this.isDockerSetupVerified = false;
   }
 
   /**
@@ -35,6 +38,8 @@ class DockerCompose {
    * @return {Promise<Container>}
    */
   async runService(envs, serviceName, command = [], options = []) {
+    await this.throwErrorIfNotInstalled();
+
     if (await this.isServiceRunning(envs, serviceName)) {
       throw new ServiceAlreadyRunningError(serviceName);
     }
@@ -101,22 +106,19 @@ class DockerCompose {
    * @return {Promise<void>}
    */
   async up(envs) {
-    const composeV2Installed = await this.isComposeV2Installed();
-    if (composeV2Installed === true) {
-      const execAsync = promisify(exec);
-      try {
-        await execAsync('docker compose up --no-build -d', { ...this.getOptions(envs) });
-      } catch (e) {
-        throw new DockerComposeError(e);
+    await this.throwErrorIfNotInstalled();
+
+    try {
+      if (process.env.DOCKER_COMPOSE_V2) {
+        await execAsync(
+          'docker compose up --no-build -d',
+          this.getOptions(envs),
+        );
+      } else {
+        await dockerCompose.upAll(this.getOptions(envs));
       }
-    } else {
-      try {
-        await dockerCompose.upAll({
-          ...this.getOptions(envs),
-        });
-      } catch (e) {
-        throw new DockerComposeError(e);
-      }
+    } catch (e) {
+      throw new DockerComposeError(e);
     }
   }
 
@@ -125,27 +127,27 @@ class DockerCompose {
    *
    * @param {Object} envs
    * @param {string} [serviceName]
-   * @param {string[]} [options]
    * @return {Promise<void>}
    */
   async build(envs, serviceName = undefined) {
-    const execAsync = promisify(exec);
-
-    const checkComposeV2 = true;
-    await this.throwErrorIfNotInstalled(checkComposeV2);
+    await this.throwErrorIfNotInstalled();
 
     try {
-      if (serviceName) {
-        // Temporarily build with buildx bake until docker compose build selects correct builder
-        // https://github.com/docker/compose-cli/issues/1840
-        if (serviceName === 'drive_abci') {
-          await execAsync('docker buildx bake --load -f docker-compose.platform.build-drive.yml', { ...this.getOptions(envs) });
-        } else if (serviceName === 'dapi_api') {
-          await execAsync('docker buildx bake --load -f docker-compose.platform.build-dapi.yml', { ...this.getOptions(envs) });
-        }
-      } else {
-        await execAsync('docker compose build --progress plain', { ...this.getOptions(envs) });
+      let driveArg = '-f docker-compose.platform.build-drive.yml';
+      let dapiArg = '-f docker-compose.platform.build-dapi.yml';
+
+      if (serviceName === 'drive_abci') {
+        dapiArg = '';
+      } else if (serviceName === 'dapi_api') {
+        driveArg = '';
       }
+
+      // Temporarily build with buildx bake until docker compose build selects correct builder
+      // https://github.com/docker/compose-cli/issues/1840
+      await execAsync(
+        `docker buildx bake --load ${driveArg} ${dapiArg}`,
+        this.getOptions(envs),
+      );
     } catch (e) {
       throw new DockerComposeError(e);
     }
@@ -343,41 +345,20 @@ class DockerCompose {
 
   /**
    * @private
-   * @return {boolean}
-   */
-  async isComposeV2Installed() {
-    let v2Installed = true;
-
-    const execAsync = promisify(exec);
-    await execAsync('docker compose')
-      .catch(() => {
-        v2Installed = false;
-      });
-
-    return v2Installed;
-  }
-
-  /**
-   * @private
    * @return {Promise<void>}
    */
-  async throwErrorIfNotInstalled(checkComposeV2 = false) {
+  async throwErrorIfNotInstalled() {
+    if (this.isDockerSetupVerified) {
+      return;
+    }
+
+    this.isDockerSetupVerified = true;
+
+    // Check docker
     if (!hasbin.sync('docker')) {
       throw new Error('Docker is not installed');
     }
 
-    if (!hasbin.sync('docker-compose')) {
-      throw new Error('Docker Compose is not installed');
-    }
-
-    if (checkComposeV2) {
-      const v2Installed = await this.isComposeV2Installed();
-      if (v2Installed === false) {
-        throw new Error('Docker Compose V2 is not installed');
-      }
-    }
-
-    // check docker version
     const dockerVersion = await new Promise((resolve, reject) => {
       this.docker.version((err, data) => {
         if (err) {
@@ -392,10 +373,22 @@ class DockerCompose {
       throw new Error(`Update Docker to version ${DockerCompose.DOCKER_MIN_VERSION} or higher`);
     }
 
-    // check docker-compose version
-    const { out: version } = await dockerCompose.version();
-    if (semver.lt(version.trim(), DockerCompose.DOCKER_COMPOSE_MIN_VERSION)) {
-      throw new Error(`Update Docker Compose to version ${DockerCompose.DOCKER_COMPOSE_MIN_VERSION} or higher`);
+    // Check docker compose
+    if (process.env.DOCKER_COMPOSE_V2) {
+      try {
+        await execAsync('docker compose');
+      } catch (e) {
+        throw new Error('Docker Compose V2 is not installed');
+      }
+    } else {
+      if (!hasbin.sync('docker-compose')) {
+        throw new Error('Docker Compose is not installed');
+      }
+
+      const { out: version } = await dockerCompose.version();
+      if (semver.lt(version.trim(), DockerCompose.DOCKER_COMPOSE_MIN_VERSION)) {
+        throw new Error(`Update Docker Compose to version ${DockerCompose.DOCKER_COMPOSE_MIN_VERSION} or higher`);
+      }
     }
   }
 
