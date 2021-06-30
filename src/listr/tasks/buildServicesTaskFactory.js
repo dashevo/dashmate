@@ -19,8 +19,8 @@ function buildServicesTaskFactory(
       task: async () => {
         const envs = config.toEnvs();
 
-        const doDriveBuild = config.get('platform.drive.abci.docker.build');
-        const doDAPIBuild = config.get('platform.dapi.api.docker.build');
+        const doDriveBuild = config.get('platform.drive.abci.docker.build.path');
+        const doDAPIBuild = config.get('platform.dapi.api.docker.build.path');
 
         let serviceName;
         if (doDriveBuild && doDAPIBuild) {
