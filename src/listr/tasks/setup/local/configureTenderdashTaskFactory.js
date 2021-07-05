@@ -43,6 +43,11 @@ function configureTenderdashTaskFactory(
                   ctx.initialCoreChainLockedHeight,
                 );
 
+                config.set(
+                  'platform.drive.tenderdash.genesis.node_pro_tx_hash',
+                  ctx.proTxHashes[index],
+                );
+
                 const p2pPeers = masternodeConfigs
                   .filter((_, i) => i !== index)
                   .map((innerConfig) => {
@@ -63,7 +68,7 @@ function configureTenderdashTaskFactory(
                   config.get('platform.drive.abci.validatorSet.llmqType').toString(),
                 );
 
-                config.set('platform.drive.tenderdash.genesis.quorum_hash', ctx.quorumHash);
+                config.set('platform.drive.tenderdash.genesis.quorum_hash', null);
 
                 const configFiles = renderServiceTemplates(config);
                 writeServiceConfigs(config.getName(), configFiles);

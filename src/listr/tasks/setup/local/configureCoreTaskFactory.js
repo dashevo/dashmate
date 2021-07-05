@@ -141,6 +141,8 @@ function configureCoreTaskFactory(
               task: async () => {
                 const masternodeConfigs = configGroup.filter((config) => config.get('core.masternode.enable'));
 
+                ctx.proTxHashes = [];
+
                 const subTasks = masternodeConfigs.map((config) => ({
                   title: `Register ${config.getName()} masternode`,
                   skip: () => {
@@ -165,6 +167,11 @@ function configureCoreTaskFactory(
                     },
                     {
                       task: () => registerMasternodeTask(config),
+                    },
+                    {
+                      task: () => {
+                        ctx.proTxHashes.push(ctx.proTxHash);
+                      },
                     },
                   ]),
                 }));
