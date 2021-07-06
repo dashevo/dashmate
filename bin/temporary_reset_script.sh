@@ -45,7 +45,7 @@ fi
 ./bin/dashmate setup ${CONFIG_NAME} --verbose --debug-logs --miner-interval="${MINING_INTERVAL_IN_SECONDS}s" --node-count=${MASTERNODES_COUNT}
 
 echo "Sending 1000 tDash to the ${FAUCET_ADDRESS} for tests"
-./bin/dashmate wallet:mint 1000 --config=${CONFIG_NAME}_seed --address=${FAUCET_ADDRESS}
+./bin/dashmate wallet:mint 1000 --config=${CONFIG_NAME}_seed --address=${FAUCET_ADDRESS} --verbose
 
 if [ $BUILD_DAPI_AFTER_SETUP == true ]
 then
@@ -56,6 +56,6 @@ then
   done
 fi
 
-./bin/dashmate group:start --wait-for-readiness
+./bin/dashmate group:start --wait-for-readiness --verbose
 
 echo "Funding key is ${FAUCET_PRIVATE_KEY}"
