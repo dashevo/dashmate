@@ -42,7 +42,6 @@ zmqpubrawtxlocksig=tcp://0.0.0.0:29998
 {{? it.network === 'testnet'}}testnet=1
 [test]
 {{?? it.network === 'local'}}
-llmq-qvvec-sync=llmq_test:0
 regtest=1
 [regtest]
 sporkaddr={{=it.core.spork.address}}
