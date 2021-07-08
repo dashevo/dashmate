@@ -1,6 +1,7 @@
 const {
   NETWORK_TESTNET,
 } = require('../../src/constants');
+const os = require('os');
 
 module.exports = {
   description: 'base config for use as template',
@@ -91,11 +92,11 @@ module.exports = {
           },
           prettyFile: {
             level: 'silent',
-            path: '/tmp/base-drive-pretty.log',
+            path: path.join(os.tmpdir(), `/base-drive-pretty.log`),
           },
           jsonFile: {
             level: 'silent',
-            path: '/tmp/base-drive-json.json',
+            path: path.join(os.tmpdir(), `/base-drive-json.log`),
           },
         },
       },
