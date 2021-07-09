@@ -2,6 +2,7 @@ const {
   NETWORK_TESTNET,
 } = require('../../src/constants');
 const os = require('os');
+const path = require('path');
 
 module.exports = {
   description: 'base config for use as template',
