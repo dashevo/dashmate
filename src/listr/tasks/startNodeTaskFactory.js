@@ -1,4 +1,6 @@
 const fs = require('fs');
+const path = require('path');
+
 const { exec } = require('child_process');
 const { promisify } = require('util');
 
@@ -57,12 +59,14 @@ function startNodeTaskFactory(
       const prettyFilePath = config.get('platform.drive.abci.log.prettyFile.path');
 
       if (!fs.existsSync(prettyFilePath)) {
+        fs.mkdirSync(path.dirname(prettyFilePath), { recursive: true });
         fs.writeFileSync(prettyFilePath, '');
       }
 
       const jsonFilePath = config.get('platform.drive.abci.log.jsonFile.path');
 
       if (!fs.existsSync(jsonFilePath)) {
+        fs.mkdirSync(path.dirname(jsonFilePath), { recursive: true });
         fs.writeFileSync(jsonFilePath, '');
       }
     }
