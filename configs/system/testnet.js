@@ -43,10 +43,10 @@ module.exports = lodashMerge({}, baseConfig, {
       abci: {
         log: {
           prettyFile: {
-            path: path.join(os.tmpdir(), `/testnet-drive-pretty.log`),
+            path: path.join(os.tmpdir(), '/testnet-drive-pretty.log'),
           },
           jsonFile: {
-            path: path.join(os.tmpdir(), `/testnet-drive-json.log`),
+            path: path.join(os.tmpdir(), '/testnet-drive-json.log'),
           },
         },
       },

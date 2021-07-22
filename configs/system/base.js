@@ -90,11 +90,11 @@ module.exports = {
           },
           prettyFile: {
             level: 'silent',
-            path: path.join(os.tmpdir(), `/base-drive-pretty.log`),
+            path: path.join(os.tmpdir(), '/base-drive-pretty.log'),
           },
           jsonFile: {
             level: 'silent',
-            path: path.join(os.tmpdir(), `/base-drive-json.log`),
+            path: path.join(os.tmpdir(), '/base-drive-json.log'),
           },
         },
         validatorSet: {
