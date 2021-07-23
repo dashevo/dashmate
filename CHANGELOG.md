@@ -33,7 +33,7 @@
 
 * setup local command requests miner interval and debug logs
 * Tenderdash v0.4.0 is not supported anymore
-* building services from path required compose v2 installed and `DOCKER_COMPOSE_V2` env to set
+* building services from path required compose v2 installed and `DOCKER_COMPOSE_V2` env to be set
 * platform services 0.19 and lower not supported
 
 
