@@ -21,7 +21,7 @@
 * enable debug logs option for setup local command ([#362](https://github.com/dashevo/dashmate/issues/362))
 * enable and request miner interval for setup local ([#360](https://github.com/dashevo/dashmate/pull/360))
 * configure tenderdash log level ([#364](https://github.com/dashevo/dashmate/pull/364))
-* migrate Drive state tree to black3 ([#402](https://github.com/dashevo/dashmate/issues/402))
+* migrate Drive state tree to blake3 ([#402](https://github.com/dashevo/dashmate/issues/402))
 * support minor Core updates ([#379](https://github.com/dashevo/dashmate/issues/379))
 * configure validator set LLMQ type ([#376](https://github.com/dashevo/dashmate/issues/376))
 * update DPP to 0.20.0 ([#381](https://github.com/dashevo/dashmate/issues/381))
@@ -34,7 +34,7 @@
 * setup local command requests miner interval and debug logs
 * Tenderdash v0.4.0 is not supported anymore
 * building services from path required compose v2 installed and `DOCKER_COMPOSE_V2` env to set
-* platform services 0.19 and lower are not supporting
+* platform services 0.19 and lower not supported
 
 
 
