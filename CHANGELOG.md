@@ -1,3 +1,7 @@
+## [0.20.2](https://github.com/dashevo/dashmate/compare/v0.20.1...v0.20.2) (2021-08-04)
+
+
+
 ## [0.20.1](https://github.com/dashevo/dashmate/compare/v0.20.0...v0.20.1) (2021-07-28)
 
 
