@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+PATH_TO_SCRIPT=$(realpath $0)
+PATH_TO_BIN_DIRECTORY=$(dirname $PATH_TO_SCRIPT)
+PROJECT_ROOT=$(dirname $PATH_TO_BIN_DIRECTORY)
+
 set -e
 
 #COLLATERAL_KEY=
@@ -42,7 +46,7 @@ then
   ./bin/dashmate config:set --config=${CONFIG_NAME} platform.dapi.api.docker.build.path $DAPI_REPO_PATH
 fi
 
-./bin/dashmate setup ${CONFIG_NAME} --verbose --debug-logs --miner-interval="${MINING_INTERVAL_IN_SECONDS}s" --node-count=${MASTERNODES_COUNT}
+./bin/dashmate setup ${CONFIG_NAME} --verbose --debug-logs --miner-interval="${MINING_INTERVAL_IN_SECONDS}s" --node-count=${MASTERNODES_COUNT} | tee ${PROJECT_ROOT}/setup.log
 
 echo "Sending 1000 tDash to the ${FAUCET_ADDRESS} for tests"
 ./bin/dashmate wallet:mint 1000 --config=${CONFIG_NAME}_seed --address=${FAUCET_ADDRESS} --verbose
@@ -57,5 +61,3 @@ then
 fi
 
 ./bin/dashmate group:start --wait-for-readiness --verbose
-
-echo "Funding key is ${FAUCET_PRIVATE_KEY}"
