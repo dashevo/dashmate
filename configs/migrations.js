@@ -213,7 +213,7 @@ module.exports = {
 
           config.core.docker.image = systemConfigs.base.core.docker.image;
 
-          config.core.sentinel.image = systemConfigs.base.sentinel.docker.image;
+          config.core.sentinel.image = systemConfigs.base.core.sentinel.docker.image;
         }
       });
 
