@@ -51,7 +51,7 @@
     "@dashevo/dashcore-lib": "~0.19.25",
     "@dashevo/dashd-rpc": "~2.3.0",
     "@dashevo/dashpay-contract": "github:dashevo/dashpay-contract#update-dpp",
-    "@dashevo/dpns-contract": "github:dashevo/dpns-contract#update-dpp",
+    "@dashevo/dpns-contract": "github:dashevo/dpns-contract",
     "@dashevo/dpp": "~0.21.0-dev.4",
     "@dashevo/feature-flags-contract": "~0.2.0",
     "@dashevo/wallet-lib": "github:dashevo/wallet-lib#convenient-errors",
