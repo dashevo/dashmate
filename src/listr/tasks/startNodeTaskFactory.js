@@ -41,12 +41,20 @@ function startNodeTaskFactory(
     if (config.has('platform')) {
       const prettyFilePath = config.get('platform.drive.abci.log.prettyFile.path');
 
+      if (fs.lstatSync(prettyFilePath).isDirectory()) {
+        fs.rmdirSync(prettyFilePath, { recursive: true });
+      }
+
       if (!fs.existsSync(prettyFilePath)) {
         fs.mkdirSync(path.dirname(prettyFilePath), { recursive: true });
         fs.writeFileSync(prettyFilePath, '');
       }
 
       const jsonFilePath = config.get('platform.drive.abci.log.jsonFile.path');
+
+      if (fs.lstatSync(jsonFilePath).isDirectory()) {
+        fs.rmdirSync(jsonFilePath, { recursive: true });
+      }
 
       if (!fs.existsSync(jsonFilePath)) {
         fs.mkdirSync(path.dirname(jsonFilePath), { recursive: true });

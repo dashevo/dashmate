@@ -4,7 +4,6 @@ const os = require('os');
 const path = require('path');
 
 const { PRESET_LOCAL } = require('../../../constants');
-const touchFile = require('../../../util/touchFile');
 
 /**
  * @param {ConfigFile} configFile
@@ -145,9 +144,6 @@ function setupLocalPresetTaskFactory(
 
                   config.set('platform.drive.abci.log.prettyFile.path', drivePrettyLogFile);
                   config.set('platform.drive.abci.log.jsonFile.path', driveJsonLogFile);
-
-                  touchFile(drivePrettyLogFile);
-                  touchFile(driveJsonLogFile);
                 }
               },
             }
