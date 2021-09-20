@@ -353,9 +353,21 @@ module.exports = {
                   additionalProperties: false,
                   required: ['stdout', 'prettyFile', 'jsonFile'],
                 },
+                validatorSet: {
+                  type: 'object',
+                  properties: {
+                    llmqType: {
+                      type: 'number',
+                      // https://github.com/dashevo/dashcore-lib/blob/286c33a9d29d33f05d874c47a9b33764a0be0cf1/lib/constants/index.js#L42-L57
+                      enum: [1, 2, 3, 4, 100, 101, 102],
+                    },
+                  },
+                  additionalProperties: false,
+                  required: ['llmqType'],
+                },
               },
               additionalProperties: false,
-              required: ['docker', 'log'],
+              required: ['docker', 'log', 'validatorSet'],
             },
             tenderdash: {
               properties: {
@@ -456,9 +468,6 @@ module.exports = {
                   required: ['port'],
                   additionalProperties: false,
                 },
-                validatorKey: {
-                  type: 'object',
-                },
                 nodeKey: {
                   type: 'object',
                 },
@@ -469,7 +478,7 @@ module.exports = {
                   type: ['string', 'null'],
                 },
               },
-              required: ['docker', 'p2p', 'rpc', 'consensus', 'validatorKey', 'nodeKey', 'genesis', 'nodeId'],
+              required: ['docker', 'p2p', 'rpc', 'consensus', 'nodeKey', 'genesis', 'nodeId'],
               additionalProperties: false,
             },
           },

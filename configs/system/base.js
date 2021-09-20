@@ -1,3 +1,6 @@
+const os = require('os');
+const path = require('path');
+
 const {
   NETWORK_TESTNET,
 } = require('../../src/constants');
@@ -35,7 +38,7 @@ module.exports = {
     },
     sentinel: {
       docker: {
-        image: 'dashpay/sentinel:1.5.0',
+        image: 'dashpay/sentinel:1.6.0',
       },
     },
     tor: {
@@ -75,7 +78,7 @@ module.exports = {
       },
       api: {
         docker: {
-          image: 'dashpay/dapi:0.19',
+          image: 'dashpay/dapi:0.20',
           build: {
             path: null,
           },
@@ -90,7 +93,7 @@ module.exports = {
       },
       abci: {
         docker: {
-          image: 'dashpay/drive:0.19',
+          image: 'dashpay/drive:0.20',
           build: {
             path: null,
           },
@@ -101,17 +104,20 @@ module.exports = {
           },
           prettyFile: {
             level: 'silent',
-            path: '/tmp/base-drive-pretty.log',
+            path: path.join(os.tmpdir(), '/base-drive-pretty.log'),
           },
           jsonFile: {
             level: 'silent',
-            path: '/tmp/base-drive-json.json',
+            path: path.join(os.tmpdir(), '/base-drive-json.log'),
           },
+        },
+        validatorSet: {
+          llmqType: 4,
         },
       },
       tenderdash: {
         docker: {
-          image: 'dashpay/tenderdash:0.34.3',
+          image: 'dashpay/tenderdash:0.6.0-dev.2',
         },
         p2p: {
           port: 26656,
@@ -133,9 +139,6 @@ module.exports = {
             '*': 'error',
           },
           format: 'plain',
-        },
-        validatorKey: {
-
         },
         nodeKey: {
 

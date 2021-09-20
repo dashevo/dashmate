@@ -44,7 +44,6 @@ function startGroupNodesTaskFactory(
 
     return new Listr([
       {
-        title: 'Build services',
         enabled: () => platformBuildConfig,
         task: () => buildServicesTask(platformBuildConfig),
       },
@@ -85,7 +84,11 @@ function startGroupNodesTaskFactory(
         title: 'Adjust Core mock time',
         enabled: () => minerConfig && minerConfig.get('network') === NETWORK_LOCAL,
         task: async () => {
+          // TASK RATIONALE:
+          // During DKG sessions, nodes can make only 1 quorum request per 10 minutes.
+          // If mocktime is not adjusted, quorums will start failing to form after some time.
           const minerInterval = minerConfig.get('core.miner.interval');
+          // 2.5 minutes - mimics the behaviour of the real network
           const secondsToAdd = 150;
 
           const tasks = configGroup.map((config) => ({
@@ -99,15 +102,14 @@ function startGroupNodesTaskFactory(
                   'bash',
                   '-c',
                   `
-              while true
-              do
-                response=\$(dash-cli getblockchaininfo)
-                mediantime=\$(echo \${response} | grep -o -E '\"mediantime\"\: [0-9]+' |  cut -d ' ' -f2)
-                mocktime=\$((mediantime + ${secondsToAdd}))
-                dash-cli setmocktime \$mocktime
-                sleep ${minerInterval}
-              done
-              `,
+                  response=\$(dash-cli getblockchaininfo);
+                  mocktime=\$(echo \${response} | grep -o -E '\"mediantime\"\: [0-9]+' |  cut -d ' ' -f2);
+                  while true; do
+                    mocktime=\$((mocktime + ${secondsToAdd}));
+                    dash-cli setmocktime \$mocktime;
+                    sleep ${minerInterval};
+                  done
+                  `,
                 ],
                 ['--detach'],
               );
@@ -139,7 +141,10 @@ function startGroupNodesTaskFactory(
             [
               'bash',
               '-c',
-              `while true; do dash-cli generatetoaddress 1 ${minerAddress}; sleep ${minerInterval}; done`,
+              `while true; do
+                dash-cli generatetoaddress 1 ${minerAddress};
+                sleep ${minerInterval};
+              done`,
             ],
             ['--detach'],
           );

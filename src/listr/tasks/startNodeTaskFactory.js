@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 const { Listr } = require('listr2');
 const { Observable } = require('rxjs');
@@ -40,13 +41,25 @@ function startNodeTaskFactory(
     if (config.has('platform')) {
       const prettyFilePath = config.get('platform.drive.abci.log.prettyFile.path');
 
+      // Remove directory that could potentially be created by Docker mount
+      if (fs.lstatSync(prettyFilePath).isDirectory()) {
+        fs.rmdirSync(prettyFilePath, { recursive: true });
+      }
+
       if (!fs.existsSync(prettyFilePath)) {
+        fs.mkdirSync(path.dirname(prettyFilePath), { recursive: true });
         fs.writeFileSync(prettyFilePath, '');
       }
 
       const jsonFilePath = config.get('platform.drive.abci.log.jsonFile.path');
 
+      // Remove directory that could potentially be created by Docker mount
+      if (fs.lstatSync(jsonFilePath).isDirectory()) {
+        fs.rmdirSync(jsonFilePath, { recursive: true });
+      }
+
       if (!fs.existsSync(jsonFilePath)) {
+        fs.mkdirSync(path.dirname(jsonFilePath), { recursive: true });
         fs.writeFileSync(jsonFilePath, '');
       }
     }
@@ -61,7 +74,6 @@ function startNodeTaskFactory(
         },
       },
       {
-        title: 'Build services',
         enabled: (ctx) => !ctx.skipBuildServices && config.has('platform')
           && (
             config.get('platform.dapi.api.docker.build.path') !== null

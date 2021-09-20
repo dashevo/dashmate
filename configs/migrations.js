@@ -164,8 +164,20 @@ module.exports = {
         // Update image version
         config.core.docker.image = systemConfigs.base.core.docker.image;
       });
+
+    return configFile;
   },
-  '0.20.0-dev': (configFile) => {
+  '0.19.2': (configFile) => {
+    Object.entries(configFile.configs)
+      .forEach(([, config]) => {
+        // Update image version
+        config.core.docker.image = systemConfigs.base.core.docker.image;
+        config.core.sentinel.docker.image = systemConfigs.base.core.sentinel.docker.image;
+      });
+
+    return configFile;
+  },
+  '0.20.0': (configFile) => {
     Object.entries(configFile.configs)
       .forEach(([, config]) => {
         // Core debug
@@ -173,21 +185,76 @@ module.exports = {
           config.core.debug = 0;
         }
 
-        // Set empty block interval back to 3
         if (config.platform) {
+          // Set empty block interval back to 3
           if (config.platform.drive.tenderdash.consensus.createEmptyBlocks.createEmptyBlocksInterval === '10s') {
             config.platform.drive.tenderdash.consensus.createEmptyBlocks.createEmptyBlocksInterval = '3m';
           }
-        }
 
-        // Tenderdash logging levels
-        if (typeof config.platform.drive.tenderdash.log === 'undefined') {
-          config.platform.drive.tenderdash.log = systemConfigs.base.platform.drive.tenderdash.log;
+          // Tenderdash logging levels
+          if (typeof config.platform.drive.tenderdash.log === 'undefined') {
+            config.platform.drive.tenderdash.log = systemConfigs.base.platform.drive.tenderdash.log;
+          }
+
+          // Remove validator set
+          if (typeof config.platform.drive.tenderdash.validatorKey === 'undefined') {
+            delete config.platform.drive.tenderdash.validatorKey;
+          }
+
+          // Update images
+          config.platform.drive.tenderdash.docker.image = systemConfigs.base.platform
+            .drive.tenderdash.docker.image;
+
+          config.platform.drive.abci.docker.image = systemConfigs.base.platform
+            .drive.abci.docker.image;
+
+          config.platform.dapi.api.docker.image = systemConfigs.base.platform
+            .drive.tenderdash.docker.image;
+
+          config.core.docker.image = systemConfigs.base.core.docker.image;
+
+          config.core.sentinel.docker.image = systemConfigs.base.core.sentinel.docker.image;
         }
 
         if (typeof config.core.tor === 'undefined') {
           config.core.tor = systemConfigs.base.core.tor;
         }
       });
+
+    // Set validator set LLMQ Type
+    configFile.configs.base.platform.drive.abci.validatorSet.llmqType = systemConfigs.base
+      .platform.drive.abci.validatorSet.llmqType;
+
+    configFile.configs.local.platform.drive.abci.validatorSet.llmqType = systemConfigs.local
+      .platform.drive.abci.validatorSet.llmqType;
+
+    Object.entries(configFile.configs)
+      .filter(([, config]) => config.group === 'local' && config.platform)
+      .forEach(([, config]) => {
+        config.platform.drive.abci.validatorSet.llmqType = systemConfigs.local
+          .platform.drive.abci.validatorSet.llmqType;
+      });
+
+    // Update testnet seeds, genesis and contracts
+    configFile.configs.testnet.platform.drive.tenderdash.p2p.seeds = systemConfigs.testnet.platform
+      .drive.tenderdash.p2p.seeds;
+    configFile.configs.testnet.platform.drive.tenderdash.genesis = systemConfigs.testnet.platform
+      .drive.tenderdash.genesis;
+
+    configFile.configs.testnet.platform.dpns = systemConfigs.testnet.platform.dpns;
+    configFile.configs.testnet.platform.dashpay = systemConfigs.testnet.platform.dashpay;
+    configFile.configs.testnet.platform.featureFlags = systemConfigs.testnet.platform.featureFlags;
+
+    return configFile;
+  },
+  '0.20.2': (configFile) => {
+    // Update contracts
+    configFile.configs.testnet.platform.drive.tenderdash.genesis = systemConfigs.testnet.platform
+      .drive.tenderdash.genesis;
+    configFile.configs.testnet.platform.dpns = systemConfigs.testnet.platform.dpns;
+    configFile.configs.testnet.platform.dashpay = systemConfigs.testnet.platform.dashpay;
+    configFile.configs.testnet.platform.featureFlags = systemConfigs.testnet.platform.featureFlags;
+
+    return configFile;
   },
 };
