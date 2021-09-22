@@ -54,7 +54,7 @@
     "@dashevo/dpns-contract": "github:dashevo/dpns-contract",
     "@dashevo/dpp": "~0.21.0-dev.6",
     "@dashevo/feature-flags-contract": "~0.2.0",
-    "@dashevo/wallet-lib": "~7.21.0-dev.7",
+    "@dashevo/wallet-lib": "github:dashevo/wallet-lib#update-dpp",
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
     "@oclif/errors": "^1.3.4",
