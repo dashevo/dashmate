@@ -9,6 +9,7 @@ const presets = {
   PRESET_TESTNET: 'testnet',
   PRESET_LOCAL: 'local',
   PRESET_MAINNET: 'mainnet',
+  PRESET_SCHNAPPS: 'schnapps',
 };
 
 const nodeTypes = {
