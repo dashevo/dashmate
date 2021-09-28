@@ -257,4 +257,14 @@ module.exports = {
 
     return configFile;
   },
+  '0.21.0': (configFile) => {
+    Object.entries(configFile.configs)
+      .forEach(([, config]) => {
+        if (typeof config.core.tor === 'undefined') {
+          config.core.tor = systemConfigs.base.core.tor;
+        }
+      });
+
+    return configFile;
+  },
 };
