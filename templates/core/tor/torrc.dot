@@ -1,11 +1,7 @@
 AutomapHostsOnResolve 1
-ControlPort 0.0.0.0:{{=it.core.tor.control.port}}
 DNSPort 5353
 DataDirectory /var/lib/tor
 ExitPolicy reject *:*
 Log notice stderr
 RunAsDaemon 0
-SocksPort 0.0.0.0:{{=it.core.tor.proxy.port}} IsolateDestAddr
-TransPort 0.0.0.0:9040
 User tor
-VirtualAddrNetworkIPv4 10.192.0.0/10

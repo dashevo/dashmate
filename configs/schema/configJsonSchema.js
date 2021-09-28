@@ -204,30 +204,8 @@ module.exports = {
             docker: {
               $ref: '#/definitions/docker',
             },
-            proxy: {
-              type: 'object',
-              properties: {
-                port: {
-                  $ref: '#/definitions/port',
-                },
-              },
-            },
-            control: {
-              type: 'object',
-              properties: {
-                port: {
-                  $ref: '#/definitions/port',
-                },
-                password: {
-                  type: 'string',
-                  minLength: 1,
-                },
-              },
-              required: ['port', 'password'],
-              additionalProperties: false,
-            },
           },
-          required: ['enable', 'docker', 'proxy', 'control'],
+          required: ['enable', 'docker'],
           additionalProperties: false,
         },
         devnetName: {

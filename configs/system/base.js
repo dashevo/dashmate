@@ -46,13 +46,6 @@ module.exports = {
       docker: {
         image: 'dperson/torproxy',
       },
-      proxy: {
-        port: 9050,
-      },
-      control: {
-        port: 9051,
-        password: 'torcontrolpassword',
-      },
     },
     debug: 0,
     devnetName: null,

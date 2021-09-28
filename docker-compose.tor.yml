@@ -9,13 +9,4 @@ services:
     volumes:
       - ${DASHMATE_HOME_DIR:?err}/${CONFIG_NAME:?err}/core/tor/torrc:/etc/tor/torrc
     environment:
-      - PASSWORD=${CORE_TOR_CONTROL_PASSWORD}
-
-  core:
-    depends_on:
-      - core_tor
-    environment:
-      - TOR_CONTROL_HOST=core_tor
-      - TOR_CONTROL_PORT=${CORE_TOR_CONTROL_PORT}
-      - TOR_CONTROL_PASSWORD=${CORE_TOR_CONTROL_PASSWORD}
-      - TOR_PROXY_PORT=${CORE_TOR_PROXY_PORT}
+      - SERVICE=${CORE_P2P_PORT:?err};core:${CORE_P2P_PORT:?err}
