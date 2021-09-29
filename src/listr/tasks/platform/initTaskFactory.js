@@ -161,7 +161,7 @@ function initTaskFactory(
           try {
             ctx.identity = await ctx.client.platform.identities.register(5);
           } catch (e) {
-            console.log(e);
+            console.error('Register identity for Dashpay', e);
 
             throw e;
           }
