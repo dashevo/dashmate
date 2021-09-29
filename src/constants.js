@@ -1,3 +1,6 @@
+const path = require('path');
+const os = require('os');
+
 const networks = {
   NETWORK_LOCAL: 'local',
   NETWORK_DEVNET: 'devnet',
@@ -22,6 +25,8 @@ const quorumTypes = {
 
 const MASTERNODE_DASH_AMOUNT = 1000;
 
+const HOME_DIR_PATH = path.resolve(os.homedir(), '.dashmate');
+
 module.exports = {
   ...networks,
   ...presets,
@@ -32,4 +37,5 @@ module.exports = {
   NODE_TYPES: Object.values(nodeTypes),
   QUORUM_TYPES: Object.values(quorumTypes),
   MASTERNODE_DASH_AMOUNT,
+  HOME_DIR_PATH,
 };
