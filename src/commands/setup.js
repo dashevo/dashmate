@@ -104,6 +104,8 @@ class SetupCommand extends BaseCommand {
         fundingPrivateKeyString,
       });
     } catch (e) {
+      console.error(e);
+
       throw new MuteOneLineError(e);
     }
   }
