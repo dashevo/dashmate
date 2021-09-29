@@ -9,7 +9,8 @@ const {
 const Docker = require('dockerode');
 
 const path = require('path');
-const os = require('os');
+
+const { HOME_DIR_PATH: homeDirPath } = require('./constants');
 
 const ensureHomeDirFactory = require('./ensureHomeDirFactory');
 const ConfigFileJsonRepository = require('./config/configFile/ConfigFileJsonRepository');
@@ -70,7 +71,7 @@ const enableCoreQuorumsTaskFactory = require('./listr/tasks/setup/local/enableCo
 const startGroupNodesTaskFactory = require('./listr/tasks/startGroupNodesTaskFactory');
 const buildServicesTaskFactory = require('./listr/tasks/buildServicesTaskFactory');
 
-async function createDIContainer(options) {
+async function createDIContainer() {
   const container = createAwilixContainer({
     injectionMode: InjectionMode.CLASSIC,
   });
@@ -78,8 +79,6 @@ async function createDIContainer(options) {
   /**
    * Config
    */
-  const homeDirPath = options.DASHMATE_HOME_DIR ? options.DASHMATE_HOME_DIR : path.resolve(os.homedir(), '.dashmate');
-
   container.register({
     homeDirPath: asValue(homeDirPath),
     configFilePath: asValue(path.join(homeDirPath, 'config.json')),
