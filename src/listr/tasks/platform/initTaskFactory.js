@@ -158,13 +158,8 @@ function initTaskFactory(
       {
         title: 'Register identity for Dashpay',
         task: async (ctx, task) => {
-          try {
-            ctx.identity = await ctx.client.platform.identities.register(5);
-          } catch (e) {
-            console.error('Register identity for Dashpay', e);
+          ctx.identity = await ctx.client.platform.identities.register(5);
 
-            throw e;
-          }
           // eslint-disable-next-line no-param-reassign
           task.output = `Dashpay's owner identity: ${ctx.identity.getId()}`;
         },
