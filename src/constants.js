@@ -26,6 +26,7 @@ const quorumTypes = {
 const MASTERNODE_DASH_AMOUNT = 1000;
 
 const HOME_DIR_PATH = path.resolve(os.homedir(), '.dashmate');
+const CONFIG_FILE_PATH = path.join(HOME_DIR_PATH, 'config.json');
 
 module.exports = {
   ...networks,
@@ -38,4 +39,5 @@ module.exports = {
   QUORUM_TYPES: Object.values(quorumTypes),
   MASTERNODE_DASH_AMOUNT,
   HOME_DIR_PATH,
+  CONFIG_FILE_PATH,
 };

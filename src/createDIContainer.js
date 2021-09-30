@@ -8,10 +8,6 @@ const {
 
 const Docker = require('dockerode');
 
-const path = require('path');
-
-const { HOME_DIR_PATH: homeDirPath } = require('./constants');
-
 const ensureHomeDirFactory = require('./ensureHomeDirFactory');
 const ConfigFileJsonRepository = require('./config/configFile/ConfigFileJsonRepository');
 const createSystemConfigsFactory = require('./config/systemConfigs/createSystemConfigsFactory');
@@ -80,8 +76,6 @@ async function createDIContainer() {
    * Config
    */
   container.register({
-    homeDirPath: asValue(homeDirPath),
-    configFilePath: asValue(path.join(homeDirPath, 'config.json')),
     ensureHomeDir: asFunction(ensureHomeDirFactory).singleton(),
     configFileRepository: asClass(ConfigFileJsonRepository).singleton(),
     systemConfigs: asValue(systemConfigs),

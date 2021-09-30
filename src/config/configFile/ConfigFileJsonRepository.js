@@ -5,6 +5,8 @@ const Ajv = require('ajv');
 const Config = require('../Config');
 const ConfigFile = require('./ConfigFile');
 
+const { CONFIG_FILE_PATH: configFilePath } = require('../../constants');
+
 const configFileJsonSchema = require('../../../configs/schema/configFileJsonSchema');
 
 const ConfigFileNotFoundError = require('../errors/ConfigFileNotFoundError');
@@ -14,10 +16,9 @@ const packageJson = require('../../../package.json');
 
 class ConfigFileJsonRepository {
   /**
-   * @param {string} configFilePath
    * @param {migrateConfigFile} migrateConfigFile
    */
-  constructor(configFilePath, migrateConfigFile) {
+  constructor(migrateConfigFile) {
     this.configFilePath = configFilePath;
     this.migrateConfigFile = migrateConfigFile;
     this.ajv = new Ajv();

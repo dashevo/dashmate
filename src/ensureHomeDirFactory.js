@@ -3,11 +3,12 @@ const fs = require('fs');
 const CouldNotCreateHomeDirError = require('./config/errors/CouldNotCreateHomeDirError');
 const HomeDirIsNotWritableError = require('./config/errors/HomeDirIsNotWritableError');
 
+const { HOME_DIR_PATH: homeDirPath } = require('./constants');
+
 /**
- * @param {string} homeDirPath
  * @return {ensureHomeDir}
  */
-function ensureHomeDirFactory(homeDirPath) {
+function ensureHomeDirFactory() {
   /**
    * @typedef {ensureHomeDir}
    * @return {string} homeDirPath

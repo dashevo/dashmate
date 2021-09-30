@@ -2,11 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const rimraf = require('rimraf');
 
+const { HOME_DIR_PATH: homeDirPath } = require('../constants');
+
 /**
- * @param {string} homeDirPath
  * @return {writeServiceConfigs}
  */
-function writeServiceConfigsFactory(homeDirPath) {
+function writeServiceConfigsFactory() {
   /**
    * Write service config files
    *
