@@ -25,7 +25,9 @@ const quorumTypes = {
 
 const MASTERNODE_DASH_AMOUNT = 1000;
 
-const HOME_DIR_PATH = path.resolve(os.homedir(), '.dashmate');
+const HOME_DIR_PATH = process.env.DASHMATE_HOME_DIR
+  ? process.env.DASHMATE_HOME_DIR
+  : path.resolve(os.homedir(), '.dashmate');
 const CONFIG_FILE_PATH = path.join(HOME_DIR_PATH, 'config.json');
 
 module.exports = {
