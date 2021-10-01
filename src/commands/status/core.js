@@ -98,16 +98,22 @@ class CoreStatusCommand extends ConfigBaseCommand {
         }
       }
     }
-    const sentinelVersion = (await dockerCompose.execCommand(
-      config.toEnvs(),
-      'sentinel',
-      'python bin/sentinel.py -v',
-    )).out.split(/\r?\n/)[0].replace(/Dash Sentinel v/, '');
-    let sentinelState = (await dockerCompose.execCommand(
-      config.toEnvs(),
-      'sentinel',
-      'python bin/sentinel.py',
-    )).out.split(/\r?\n/)[0];
+
+    let sentinelVersion;
+    let sentinelState;
+    if (config.options.core.masternode.enable) {
+      sentinelVersion = (await dockerCompose.execCommand(
+        config.toEnvs(),
+        'sentinel',
+        'python bin/sentinel.py -v',
+      )).out.split(/\r?\n/)[0].replace(/Dash Sentinel v/, '');
+      // eslint-disable-next-line prefer-destructuring
+      sentinelState = (await dockerCompose.execCommand(
+        config.toEnvs(),
+        'sentinel',
+        'python bin/sentinel.py',
+      )).out.split(/\r?\n/)[0];
+    }
 
     // Determine status
     let status;
@@ -158,10 +164,12 @@ class CoreStatusCommand extends ConfigBaseCommand {
       blocks = chalk.red(coreBlocks);
     }
 
-    if (sentinelState === '') {
-      sentinelState = chalk.green('No errors');
-    } else {
-      sentinelState = chalk.red(sentinelState);
+    if (config.options.core.masternode.enable) {
+      if (sentinelState === '') {
+        sentinelState = chalk.green('No errors');
+      } else {
+        sentinelState = chalk.red(sentinelState);
+      }
     }
 
     // Build table
@@ -180,8 +188,10 @@ class CoreStatusCommand extends ConfigBaseCommand {
       rows.push(['Remote block height', explorerBlockHeight]);
     }
     rows.push(['Difficulty', coreDifficulty]);
-    rows.push(['Sentinel version', sentinelVersion]);
-    rows.push(['Sentinel status', (sentinelState)]);
+    if (config.options.core.masternode.enable) {
+      rows.push(['Sentinel version', sentinelVersion]);
+      rows.push(['Sentinel status', (sentinelState)]);
+    }
 
     const output = table(rows, { singleLine: true });
 

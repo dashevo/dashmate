@@ -21,8 +21,13 @@ class ServicesStatusCommand extends ConfigBaseCommand {
   ) {
     const serviceHumanNames = {
       core: 'Core',
-      sentinel: 'Sentinel',
     };
+
+    if (config.options.core.masternode.enable) {
+      Object.assign(serviceHumanNames, {
+        sentinel: 'Sentinel',
+      });
+    }
 
     if (config.options.network !== 'mainnet') {
       Object.assign(serviceHumanNames, {
