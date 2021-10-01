@@ -23,13 +23,13 @@ class ServicesStatusCommand extends ConfigBaseCommand {
       core: 'Core',
     };
 
-    if (config.options.core.masternode.enable) {
+    if (config.get('core.masternode.enable')) {
       Object.assign(serviceHumanNames, {
         sentinel: 'Sentinel',
       });
     }
 
-    if (config.options.network !== 'mainnet') {
+    if (config.get('network') !== 'mainnet') {
       Object.assign(serviceHumanNames, {
         drive_mongodb: 'Drive MongoDB',
         drive_abci: 'Drive ABCI',

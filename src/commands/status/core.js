@@ -70,7 +70,7 @@ class CoreStatusCommand extends ConfigBaseCommand {
 
     let corePortState;
     try {
-      const corePortStateRes = await fetch(`https://mnowatch.org/${config.options.core.p2p.port}/`);
+      const corePortStateRes = await fetch(`https://mnowatch.org/${config.get('core.p2p.port')}/`);
       corePortState = await corePortStateRes.text();
     } catch (e) {
       if (e.name === 'FetchError') {
@@ -82,9 +82,9 @@ class CoreStatusCommand extends ConfigBaseCommand {
 
     let coreVersion = networkInfo.subversion.replace(/\/|\(.*?\)|Dash Core:/g, '');
     let explorerBlockHeight;
-    if (insightURLs[config.options.network]) {
+    if (insightURLs[config.get('network')]) {
       try {
-        const explorerBlockHeightRes = await fetch(`${insightURLs[config.options.network]}/status`);
+        const explorerBlockHeightRes = await fetch(`${insightURLs[config.get('network')]}/status`);
         ({
           info: {
             blocks: explorerBlockHeight,
@@ -101,7 +101,7 @@ class CoreStatusCommand extends ConfigBaseCommand {
 
     let sentinelVersion;
     let sentinelState;
-    if (config.options.core.masternode.enable) {
+    if (config.get('core.masternode.enable')) {
       sentinelVersion = (await dockerCompose.execCommand(
         config.toEnvs(),
         'sentinel',
@@ -164,7 +164,7 @@ class CoreStatusCommand extends ConfigBaseCommand {
       blocks = chalk.red(coreBlocks);
     }
 
-    if (config.options.core.masternode.enable) {
+    if (config.get('core.masternode.enable')) {
       if (sentinelState === '') {
         sentinelState = chalk.green('No errors');
       } else {
@@ -179,16 +179,16 @@ class CoreStatusCommand extends ConfigBaseCommand {
     rows.push(['Status', status]);
     rows.push(['Sync asset', mnsyncStatus.AssetName]);
     rows.push(['Peer count', peerInfo.length]);
-    rows.push(['P2P service', `${config.options.externalIp}:${config.options.core.p2p.port}`]);
-    rows.push(['P2P port', `${config.options.core.p2p.port} ${corePortState}`]);
-    rows.push(['RPC service', `127.0.0.1:${config.options.core.rpc.port}`]);
+    rows.push(['P2P service', `${config.get('externalIp')}:${config.get('core.p2p.port')}`]);
+    rows.push(['P2P port', `${config.get('core.p2p.port')} ${corePortState}`]);
+    rows.push(['RPC service', `127.0.0.1:${config.get('core.rpc.port')}`]);
     rows.push(['Block height', blocks]);
     rows.push(['Header height', coreHeaders]);
-    if (insightURLs[config.options.network]) {
+    if (insightURLs[config.get('network')]) {
       rows.push(['Remote block height', explorerBlockHeight]);
     }
     rows.push(['Difficulty', coreDifficulty]);
-    if (config.options.core.masternode.enable) {
+    if (config.get('core.masternode.enable')) {
       rows.push(['Sentinel version', sentinelVersion]);
       rows.push(['Sentinel status', (sentinelState)]);
     }
