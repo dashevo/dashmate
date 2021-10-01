@@ -1,6 +1,5 @@
 const { Listr } = require('listr2');
 
-const os = require('os');
 const path = require('path');
 
 const {
