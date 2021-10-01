@@ -13,7 +13,7 @@ const ServiceAlreadyRunningError = require('./errors/ServiceAlreadyRunningError'
 const ServiceIsNotRunningError = require('./errors/ServiceIsNotRunningError');
 const ContainerIsNotPresentError = require('./errors/ContainerIsNotPresentError');
 
-const { HOME_DIR_PATH: homeDirPath } = require('../constants');
+const { HOME_DIR_PATH } = require('../constants');
 
 const execAsync = promisify(exec);
 
@@ -25,7 +25,7 @@ class DockerCompose {
   constructor(docker, startedContainers) {
     this.docker = docker;
     this.startedContainers = startedContainers;
-    this.homeDirPath = homeDirPath;
+    this.homeDirPath = HOME_DIR_PATH;
     this.isDockerSetupVerified = false;
   }
 
