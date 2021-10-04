@@ -401,7 +401,7 @@ class DockerCompose {
     const env = {
       ...process.env,
       ...envs,
-      HOME_DIR_PATH,
+      DASHMATE_HOME_DIR: HOME_DIR_PATH,
     };
 
     return {
