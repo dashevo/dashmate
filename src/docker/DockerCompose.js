@@ -25,7 +25,6 @@ class DockerCompose {
   constructor(docker, startedContainers) {
     this.docker = docker;
     this.startedContainers = startedContainers;
-    this.homeDirPath = HOME_DIR_PATH;
     this.isDockerSetupVerified = false;
   }
 
@@ -402,7 +401,7 @@ class DockerCompose {
     const env = {
       ...process.env,
       ...envs,
-      DASHMATE_HOME_DIR: this.homeDirPath,
+      HOME_DIR_PATH,
     };
 
     return {

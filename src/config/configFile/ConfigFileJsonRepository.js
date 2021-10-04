@@ -5,7 +5,7 @@ const Ajv = require('ajv');
 const Config = require('../Config');
 const ConfigFile = require('./ConfigFile');
 
-const { CONFIG_FILE_PATH: configFilePath } = require('../../constants');
+const { CONFIG_FILE_PATH } = require('../../constants');
 
 const configFileJsonSchema = require('../../../configs/schema/configFileJsonSchema');
 
@@ -19,7 +19,7 @@ class ConfigFileJsonRepository {
    * @param {migrateConfigFile} migrateConfigFile
    */
   constructor(migrateConfigFile) {
-    this.configFilePath = configFilePath;
+    this.configFilePath = CONFIG_FILE_PATH;
     this.migrateConfigFile = migrateConfigFile;
     this.ajv = new Ajv();
   }
