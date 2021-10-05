@@ -16,9 +16,12 @@ async function waitForMasternodesSync(rpcClient, progressCallback = () => {}) {
     try {
       await rpcClient.mnsync('next');
     } catch (e) {
-      if (!['ECONNABORTED', 'ECONNREFUSED', 'ETIMEDOUT', -28].includes(e.code)) {
+      // Core RPC is not started yet
+      if (!e.message.includes('Dash JSON-RPC: Request Error: ') && e.code !== -28) {
         throw e;
       }
+
+      progressCallback(verificationProgress);
 
       // Wait for Core RPC is started
       await wait(50);
