@@ -15,8 +15,8 @@ async function waitForMasternodesSync(rpcClient, progressCallback = () => {}) {
   do {
     try {
       await rpcClient.mnsync('next');
-    } catch(e) {
-      if (e.code !== -28) {
+    } catch (e) {
+      if (!['ECONNABORTED', 'ECONNREFUSED', 'ETIMEDOUT', -28].includes(e.code)) {
         throw e;
       }
 
