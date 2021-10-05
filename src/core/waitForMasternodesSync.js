@@ -12,24 +12,19 @@ async function waitForMasternodesSync(rpcClient, progressCallback = () => {}) {
   let isSynced = false;
   let verificationProgress = 0.0;
 
-  // Wait for RPC to be ready
-  let isReady = false;
   do {
     try {
-      await wait(10);
-      await rpcClient.mnsync('status');
-    } catch (e) {
+      await rpcClient.mnsync('next');
+    } catch(e) {
       if (e.code !== -28) {
         throw e;
-      } else {
-        continue;
       }
-    }
-    isReady = true;
-  } while (!isReady);
 
-  do {
-    await rpcClient.mnsync('next');
+      // Wait for Core RPC is started
+      await wait(50);
+
+      continue;
+    }
 
     ({
       result: { IsSynced: isSynced },
