@@ -2,10 +2,13 @@ const { Listr } = require('listr2');
 
 /**
  * @param {DockerCompose} dockerCompose
- *
+ * @param {createRpcClient} createRpcClient
  * @return {stopNodeTask}
  */
-function stopNodeTaskFactory(dockerCompose) {
+function stopNodeTaskFactory(
+  dockerCompose,
+  createRpcClient,
+) {
   /**
    * Stop node
    * @typedef stopNodeTask
@@ -13,10 +16,7 @@ function stopNodeTaskFactory(dockerCompose) {
    *
    * @return {Listr}
    */
-  function stopNodeTask(
-    config,
-    createRpcClient,
-  ) {
+  function stopNodeTask(config) {
     return new Listr([
       {
         title: 'Save mock time',

@@ -9,7 +9,6 @@ class GroupStopCommand extends GroupBaseCommand {
    * @param {DockerCompose} dockerCompose
    * @param {stopNodeTask} stopNodeTask
    * @param {Config[]} configGroup
-   * @param {createRpcClient} createRpcClient
    * @return {Promise<void>}
    */
   async runWithDependencies(
@@ -20,7 +19,6 @@ class GroupStopCommand extends GroupBaseCommand {
     dockerCompose,
     stopNodeTask,
     configGroup,
-    createRpcClient,
   ) {
     const groupName = configGroup[0].get('group');
 
@@ -32,7 +30,7 @@ class GroupStopCommand extends GroupBaseCommand {
             // So we stop the miner first, as there's a chance that MNs will get banned
             // if the miner is still running when stopping them
             new Listr(configGroup.reverse().map((config) => ({
-              task: () => stopNodeTask(config, createRpcClient),
+              task: () => stopNodeTask(config),
             })))
           ),
         },
