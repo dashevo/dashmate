@@ -19,7 +19,7 @@ function stopNodeTaskFactory(
   function stopNodeTask(config) {
     return new Listr([
       {
-        title: 'Save mock time',
+        title: 'Save core node time',
         enabled: () => config.getName().startsWith('local_'),
         task: async () => {
           const rpcClient = createRpcClient({
