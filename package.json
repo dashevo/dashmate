@@ -8,7 +8,8 @@
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint .",
     "prepack": "oclif-dev manifest && oclif-dev readme",
-    "version": "oclif-dev readme && git add README.md"
+    "version": "oclif-dev readme && git add README.md",
+    "test": "mocha './test/**/*.spec.js'"
   },
   "repository": {
     "type": "git",
@@ -91,10 +92,14 @@
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.22.2",
+    "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
+    "dirty-chai": "^2.0.1",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",
-    "globby": "^10.0.2"
+    "globby": "^10.0.2",
+    "mocha": "^9.1.2"
   },
   "files": [
     "bin",
