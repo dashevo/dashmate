@@ -4,8 +4,10 @@ const chalk = require('chalk');
 
 const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 const CoreService = require('../../core/CoreService');
+const getFormat = require('../../util/getFormat');
 
 const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
+const { OUTPUT_FORMATS } = require('../../constants');
 
 class CoreStatusCommand extends ConfigBaseCommand {
   /**
@@ -172,28 +174,42 @@ class CoreStatusCommand extends ConfigBaseCommand {
       }
     }
 
-    // Build table
-    rows.push(['Version', coreVersion]);
-    rows.push(['Latest version', latestVersion]);
-    rows.push(['Network', coreChain]);
-    rows.push(['Status', status]);
-    rows.push(['Sync asset', mnsyncStatus.AssetName]);
-    rows.push(['Peer count', peerInfo.length]);
-    rows.push(['P2P service', `${config.get('externalIp')}:${config.get('core.p2p.port')}`]);
-    rows.push(['P2P port', `${config.get('core.p2p.port')} ${corePortState}`]);
-    rows.push(['RPC service', `127.0.0.1:${config.get('core.rpc.port')}`]);
-    rows.push(['Block height', blocks]);
-    rows.push(['Header height', coreHeaders]);
-    if (insightURLs[config.get('network')]) {
-      rows.push(['Remote block height', explorerBlockHeight]);
-    }
-    rows.push(['Difficulty', coreDifficulty]);
+    const outputRows = {
+      Version: coreVersion,
+      'Latest version': latestVersion,
+      Network: coreChain,
+      Status: status,
+      'Sync asset': mnsyncStatus.AssetName,
+      'Peer count': peerInfo.length,
+      'P2P service': `${config.get('externalIp')}:${config.get('core.p2p.port')}`,
+      'P2P port': `${config.get('core.p2p.port')} ${corePortState}`,
+      'RPC service': `127.0.0.1:${config.get('core.rpc.port')}`,
+      'Block height': blocks,
+      'Header height': coreHeaders,
+      Difficulty: coreDifficulty,
+    };
+
     if (config.get('core.masternode.enable')) {
-      rows.push(['Sentinel version', sentinelVersion]);
-      rows.push(['Sentinel status', (sentinelState)]);
+      outputRows['Sentinel version'] = sentinelVersion;
+      outputRows['Sentinel status'] = (sentinelState);
     }
 
-    const output = table(rows, { singleLine: true });
+    if (insightURLs[config.get('network')]) {
+      outputRows['Remote block height'] = explorerBlockHeight;
+    }
+
+    const outputFormat = getFormat(flags);
+    let output;
+    if (outputFormat === OUTPUT_FORMATS.JSON) {
+      output = JSON.stringify(outputRows);
+    } else {
+      // Build table
+      Object.keys(outputRows).forEach((key) => {
+        rows.push([key, outputRows[key]]);
+      });
+
+      output = table(rows, { singleLine: true });
+    }
 
     // eslint-disable-next-line no-console
     console.log(output);

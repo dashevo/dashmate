@@ -129,6 +129,7 @@ BaseCommand.flags = {
     description: 'use verbose mode for output',
     default: false,
   }),
+  format: flagTypes.string(),
 };
 
 module.exports = BaseCommand;
