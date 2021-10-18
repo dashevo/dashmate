@@ -1,6 +1,7 @@
 const { table } = require('table');
 const fetch = require('node-fetch');
 const chalk = require('chalk');
+const stripAnsi = require('strip-ansi');
 
 const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 const CoreService = require('../../core/CoreService');
@@ -8,6 +9,7 @@ const getFormat = require('../../util/getFormat');
 
 const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
 const { OUTPUT_FORMATS } = require('../../constants');
+const { ansi } = require('chalk');
 
 class CoreStatusCommand extends ConfigBaseCommand {
   /**
@@ -201,7 +203,7 @@ class CoreStatusCommand extends ConfigBaseCommand {
     const outputFormat = getFormat(flags);
     let output;
     if (outputFormat === OUTPUT_FORMATS.JSON) {
-      output = JSON.stringify(outputRows);
+      output = stripAnsi(JSON.stringify(outputRows));
     } else {
       // Build table
       Object.keys(outputRows).forEach((key) => {
