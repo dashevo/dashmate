@@ -8,13 +8,13 @@ function stripAnsi(string) {
     '(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))',
   ].join('|');
 
-  const ansiRegex = new RegExp(pattern, false);
+  const ansiRegex = new RegExp(pattern, 'g');
 
   if (typeof string !== 'string') {
     throw new TypeError(`Expected a \`string\`, got \`${typeof string}\``);
   }
 
-  return string.replace(ansiRegex(), '');
+  return string.replace(ansiRegex, '');
 }
 
 module.exports = stripAnsi;
