@@ -1,7 +1,7 @@
 const { table } = require('table');
 const fetch = require('node-fetch');
 const chalk = require('chalk');
-const stripAnsi = require('strip-ansi');
+const stripAnsi = require('../../util/stripAnsi');
 
 const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 const CoreService = require('../../core/CoreService');
@@ -9,7 +9,6 @@ const getFormat = require('../../util/getFormat');
 
 const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
 const { OUTPUT_FORMATS } = require('../../constants');
-const { ansi } = require('chalk');
 
 class CoreStatusCommand extends ConfigBaseCommand {
   /**
