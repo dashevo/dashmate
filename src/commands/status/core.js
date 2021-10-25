@@ -200,6 +200,7 @@ class CoreStatusCommand extends ConfigBaseCommand {
     }
 
     const outputFormat = getFormat(flags);
+    console.log(outputFormat);
     let output;
     if (outputFormat === OUTPUT_FORMATS.JSON) {
       output = stripAnsi(JSON.stringify(outputRows));

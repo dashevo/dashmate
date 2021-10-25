@@ -1,16 +1,20 @@
+const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 const os = require('os');
 const publicIp = require('public-ip');
 const prettyMs = require('pretty-ms');
 const prettyByte = require('pretty-bytes');
 const { table } = require('table');
+const getFormat = require('../../util/getFormat');
+const stripAnsi = require('../../util/stripAnsi');
+const { OUTPUT_FORMATS } = require('../../constants');
 
 const BaseCommand = require('../../oclif/command/BaseCommand');
 
-class HostStatusCommand extends BaseCommand {
+class HostStatusCommand extends ConfigBaseCommand {
   /**
    * @return {Promise<void>}
    */
-  async runWithDependencies() {
+  async runWithDependencies(flags) {
     const rows = [];
 
     rows.push(['Hostname', os.hostname()]);
@@ -23,14 +27,26 @@ class HostStatusCommand extends BaseCommand {
     rows.push(['Memory', `${prettyByte(os.totalmem())} / ${prettyByte(os.freemem())}`]);
     rows.push(['CPUs', os.cpus().length]);
     rows.push(['IP', await publicIp.v4()]);
-
-    const output = table(rows, { singleLine: true });
-
+    
+    const outputFormat = getFormat(flags);
+    console.log(flags);
+    let output;
+    
+    if (outputFormat === OUTPUT_FORMATS.JSON) {
+      output = stripAnsi(JSON.stringify(outputRows));
+    }
+    else {
+    output = table(rows, { singleLine: true });
+    }
     // eslint-disable-next-line no-console
     console.log(output);
   }
 }
 
 HostStatusCommand.description = 'Show host status details';
+
+HostStatusCommand.flags = {
+  ...ConfigBaseCommand.flags,
+};
 
 module.exports = HostStatusCommand;
