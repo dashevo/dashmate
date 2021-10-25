@@ -1,9 +1,11 @@
 const { Listr } = require('listr2');
 
-const os = require('os');
 const path = require('path');
 
-const { PRESET_LOCAL } = require('../../../constants');
+const {
+  PRESET_LOCAL,
+  HOME_DIR_PATH,
+} = require('../../../constants');
 
 /**
  * @param {ConfigFile} configFile
@@ -103,12 +105,9 @@ function setupLocalPresetTaskFactory(
                 config.set('core.rpc.port', 20002 + (i * 100));
                 config.set('externalIp', hostDockerInternalIp);
 
+                // Setup Core debug logs
                 if (ctx.debugLogs) {
                   config.set('core.debug', 1);
-                  config.set('platform.drive.abci.log.stdout.level', 'trace');
-                  config.set('platform.drive.tenderdash.log.level', {
-                    '*': 'debug',
-                  });
                 }
 
                 // Although not all nodes are miners, all nodes should be aware of
@@ -134,8 +133,21 @@ function setupLocalPresetTaskFactory(
                   config.set('platform.drive.tenderdash.p2p.port', 26656 + (i * 100));
                   config.set('platform.drive.tenderdash.rpc.port', 26657 + (i * 100));
 
-                  config.set('platform.drive.abci.log.prettyFile.path', path.join(os.tmpdir(), `/drive_pretty_${nodeIndex}.log`));
-                  config.set('platform.drive.abci.log.jsonFile.path', path.join(os.tmpdir(), `/drive_json_${nodeIndex}.log`));
+                  // Setup logs
+                  if (ctx.debugLogs) {
+                    config.set('platform.drive.abci.log.stdout.level', 'trace');
+                    config.set('platform.drive.abci.log.prettyFile.level', 'trace');
+
+                    config.set('platform.drive.tenderdash.log.level', {
+                      '*': 'debug',
+                    });
+                  }
+
+                  const drivePrettyLogFile = path.join(HOME_DIR_PATH, config.getName(), 'logs', 'drive_pretty.log');
+                  const driveJsonLogFile = path.join(HOME_DIR_PATH, config.getName(), 'logs', 'drive_json.log');
+
+                  config.set('platform.drive.abci.log.prettyFile.path', drivePrettyLogFile);
+                  config.set('platform.drive.abci.log.jsonFile.path', driveJsonLogFile);
                 }
               },
             }

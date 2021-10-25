@@ -213,7 +213,7 @@ module.exports = {
 
           config.core.docker.image = systemConfigs.base.core.docker.image;
 
-          config.core.sentinel.image = systemConfigs.base.sentinel.docker.image;
+          config.core.sentinel.docker.image = systemConfigs.base.core.sentinel.docker.image;
         }
       });
 
@@ -225,7 +225,7 @@ module.exports = {
       .platform.drive.abci.validatorSet.llmqType;
 
     Object.entries(configFile.configs)
-      .filter(([, config]) => config.group === 'local')
+      .filter(([, config]) => config.group === 'local' && config.platform)
       .forEach(([, config]) => {
         config.platform.drive.abci.validatorSet.llmqType = systemConfigs.local
           .platform.drive.abci.validatorSet.llmqType;
@@ -250,6 +250,15 @@ module.exports = {
     configFile.configs.testnet.platform.dpns = systemConfigs.testnet.platform.dpns;
     configFile.configs.testnet.platform.dashpay = systemConfigs.testnet.platform.dashpay;
     configFile.configs.testnet.platform.featureFlags = systemConfigs.testnet.platform.featureFlags;
+
+    return configFile;
+  },
+  '0.21.0': (configFile) => {
+    Object.entries(configFile.configs)
+      .forEach(([, config]) => {
+        // Add median time to config
+        config.core.miner.mediantime = systemConfigs.base.core.miner.mediantime;
+      });
 
     return configFile;
   },
