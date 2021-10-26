@@ -21,23 +21,23 @@ module.exports = lodashMerge({}, baseConfig, {
   platform: {
     dpns: {
       contract: {
-        id: 'EBnvxB5RSW8NbBbXdRS3zPqFEaZnjCZ8WeurjvLTaru7',
-        blockHeight: 7,
+        id: 'Bw9PUC3aSEGQ4j5qrvpNLrRNFPVMiUHZLr1atgfYJcmf',
+        blockHeight: 19,
       },
-      ownerId: '7ziiQcPfHqhR5CnCnhQKT4H4x5XpKaf8XJpjzvZShDpu',
+      ownerId: '3nJjUPiVbwvKRpZ6pLUwVjcFoEJdeqPqakobctF3uECU',
     },
     dashpay: {
       contract: {
-        id: 'GAvZdha4t3mCQyvCVvv7LMYw3CXN4X5hvFZ4S6qCAdod',
-        blockHeight: 17,
+        id: '2Vuou3EfbrtunwCZvQp1XS5PXZ5CgC1pGBz4VPT4ojmy',
+        blockHeight: 28,
       },
     },
     featureFlags: {
       contract: {
-        id: 'G65EGcE8eQ16g7a9UBEawWpWn5ZCShca6LSqKDr7v4UP',
-        blockHeight: 22,
+        id: '7jr118TzVYZoA9XcwYBjUghVF1RT77vfeTzxJEgbaKEU',
+        blockHeight: 34,
       },
-      ownerId: '3DrVJw283cW8HFS4Zpu1Q9pmpEKuQEmvX6wDung1rjvU',
+      ownerId: 'CQSDSPkdCXRQWX74SQHddWfBEQbKPW3XhqkeEoa7jZXn',
     },
     drive: {
       abci: {
