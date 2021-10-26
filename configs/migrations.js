@@ -209,7 +209,7 @@ module.exports = {
             .drive.abci.docker.image;
 
           config.platform.dapi.api.docker.image = systemConfigs.base.platform
-            .drive.tenderdash.docker.image;
+            .dapi.api.docker.image;
 
           config.core.docker.image = systemConfigs.base.core.docker.image;
 
@@ -268,7 +268,7 @@ module.exports = {
             .drive.abci.docker.image;
 
           config.platform.dapi.api.docker.image = systemConfigs.base.platform
-            .drive.tenderdash.docker.image;
+            .dapi.api.docker.image;
         }
       });
 
