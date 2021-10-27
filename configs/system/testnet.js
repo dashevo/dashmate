@@ -67,7 +67,7 @@ module.exports = lodashMerge({}, baseConfig, {
         },
         genesis: {
           genesis_time: '2021-07-22T12:57:05.429Z',
-          chain_id: 'dash-testnet-5',
+          chain_id: 'dash-testnet-6',
           initial_height: '0',
           initial_core_chain_locked_height: 542300,
           initial_proposal_core_chain_lock: null,
@@ -83,7 +83,9 @@ module.exports = lodashMerge({}, baseConfig, {
               max_age_duration: '172800000000000',
             },
             validator: {
-              pub_key_types: ['bls12381'],
+              pub_key_types: [
+                'bls12381',
+              ],
             },
             version: {},
           },
