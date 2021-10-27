@@ -32,7 +32,7 @@ Distribution package for Dash Masternode installation
 
 * [Docker](https://docs.docker.com/engine/installation/) (v18.06.0+)
 * [Docker Compose](https://docs.docker.com/compose/install/) (v1.25.0+)
-* [Node.js](https://nodejs.org/en/download/) (v10.0+)
+* [Node.js](https://nodejs.org/en/download/) (v16.0+, NPM v8.0+)
 
 For Linux installations you may optionally wish to follow the [post-installation steps](https://docs.docker.com/engine/install/linux-postinstall/) to manage Docker as a non-root user, otherwise you will have to run CLI and Docker commands with `sudo`.
 
