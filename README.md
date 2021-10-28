@@ -36,7 +36,7 @@ Distribution package for Dash Masternode installation
 
 For Linux installations you may optionally wish to follow the [post-installation steps](https://docs.docker.com/engine/install/linux-postinstall/) to manage Docker as a non-root user, otherwise you will have to run CLI and Docker commands with `sudo`.
 
-Note that Docker Compose v2 is not yet supported. Docker Desktop will automatically enable Docker Compose v2 under Windows and macOS, please go to "Settings -> General -> Use Docker Compose V2" and disable the checkbox to use Dashmate.
+**Note that Docker Compose v2 is not yet supported. Docker Desktop will automatically enable Docker Compose v2 under Windows and macOS, please go to "Settings -> General -> Use Docker Compose V2" and disable the checkbox to use Dashmate.**
 
 ### Distribution package
 
