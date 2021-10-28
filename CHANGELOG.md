@@ -3,6 +3,7 @@
 
 ### Features
 
+* update network parameters and migrations for `testnet-6` ([#457](https://github.com/dashevo/dashmate/pull/457))
 * add a script to configure test suite ([#410](https://github.com/dashevo/dashmate/issues/410), [#447](https://github.com/dashevo/dashmate/issues/447))
 
 
