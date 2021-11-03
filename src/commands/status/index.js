@@ -14,7 +14,7 @@ class StatusCommand extends ConfigBaseCommand {
     outputStatusOverview,
     config,
   ) {
-    await outputStatusOverview(config);
+    await outputStatusOverview(config, flags);
   }
 }
 

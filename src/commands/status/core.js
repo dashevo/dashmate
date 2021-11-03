@@ -1,7 +1,7 @@
 const { table } = require('table');
 const fetch = require('node-fetch');
 const chalk = require('chalk');
-const stripAnsi = require('../../util/stripAnsi');
+const stripAnsi = require('strip-ansi');
 
 const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 const CoreService = require('../../core/CoreService');
@@ -26,8 +26,6 @@ class CoreStatusCommand extends ConfigBaseCommand {
     createRpcClient,
     config,
   ) {
-    const rows = [];
-
     const coreService = new CoreService(
       config,
       createRpcClient(
@@ -199,17 +197,18 @@ class CoreStatusCommand extends ConfigBaseCommand {
       outputRows['Remote block height'] = explorerBlockHeight;
     }
 
-    const outputFormat = getFormat(flags);
-    console.log(outputFormat);
     let output;
-    if (outputFormat === OUTPUT_FORMATS.JSON) {
-      output = stripAnsi(JSON.stringify(outputRows));
+
+    if (getFormat(flags) === OUTPUT_FORMATS.JSON) {
+      Object.keys(outputRows).forEach((key) => {
+        outputRows[key] = stripAnsi(outputRows[key]);
+      });
+      output = JSON.stringify(outputRows);
     } else {
-      // Build table
+      const rows = [];
       Object.keys(outputRows).forEach((key) => {
         rows.push([key, outputRows[key]]);
       });
-
       output = table(rows, { singleLine: true });
     }
 

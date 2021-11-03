@@ -1,22 +1,18 @@
-const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 const os = require('os');
 const publicIp = require('public-ip');
 const prettyMs = require('pretty-ms');
 const prettyByte = require('pretty-bytes');
 const { table } = require('table');
-const getFormat = require('../../util/getFormat');
-const stripAnsi = require('../../util/stripAnsi');
-const { OUTPUT_FORMATS } = require('../../constants');
 
-const BaseCommand = require('../../oclif/command/BaseCommand');
+const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
+const getFormat = require('../../util/getFormat');
+const { OUTPUT_FORMATS } = require('../../constants');
 
 class HostStatusCommand extends ConfigBaseCommand {
   /**
    * @return {Promise<void>}
    */
   async runWithDependencies(args, flags) {
-    const rows = [];
-
     const outputRows = {
       Hostname: os.hostname(),
       Uptime: prettyMs(os.uptime() * 1000),
@@ -26,33 +22,21 @@ class HostStatusCommand extends ConfigBaseCommand {
       Diskfree: 0,
       Memory: `${prettyByte(os.totalmem())} / ${prettyByte(os.freemem())}`,
       CPUs: os.cpus().length,
-      IP: await publicIp.v4()
-    }
+      IP: await publicIp.v4(),
+    };
 
-    //rows.push(['Hostname', os.hostname()]);
-    //rows.push(['Uptime', prettyMs(os.uptime() * 1000)]);
-    //rows.push(['Platform', os.platform()]);
-    //rows.push(['Arch', os.arch()]);
-    //rows.push(['Username', os.userInfo().username]);
-    //rows.push(['Loadavg', os.loadavg().map((load) => load.toFixed(2))]);
-    //rows.push(['Diskfree', 0]); // Waiting for feature: https://github.com/nodejs/node/pull/31351
-    //rows.push(['Memory', `${prettyByte(os.totalmem())} / ${prettyByte(os.freemem())}`]);
-    //rows.push(['CPUs', os.cpus().length]);
-    //rows.push(['IP', await publicIp.v4()]);
-    
-    const outputFormat = getFormat(flags);
-    //console.log(flags);
     let output;
-    
-    if (outputFormat === OUTPUT_FORMATS.JSON) {
-      output = stripAnsi(JSON.stringify(outputRows));
-    }
-    else {
+
+    if (getFormat(flags) === OUTPUT_FORMATS.JSON) {
+      output = JSON.stringify(outputRows);
+    } else {
+      const rows = [];
       Object.keys(outputRows).forEach((key) => {
         rows.push([key, outputRows[key]]);
       });
       output = table(rows, { singleLine: true });
     }
+
     // eslint-disable-next-line no-console
     console.log(output);
   }

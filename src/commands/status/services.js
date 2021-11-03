@@ -1,5 +1,8 @@
 const { table } = require('table');
 const chalk = require('chalk');
+const stripAnsi = require('strip-ansi');
+const getFormat = require('../../util/getFormat');
+const { OUTPUT_FORMATS } = require('../../constants');
 
 const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
 
@@ -40,9 +43,7 @@ class ServicesStatusCommand extends ConfigBaseCommand {
       });
     }
 
-    const tableRows = [
-      ['Service', 'Container ID', 'Image', 'Status'],
-    ];
+    const outputRows = [];
 
     for (const [serviceName, serviceDescription] of Object.entries(serviceHumanNames)) {
       let containerId;
@@ -70,7 +71,7 @@ class ServicesStatusCommand extends ConfigBaseCommand {
         statusText = (status === 'running' ? chalk.green : chalk.red)(status);
       }
 
-      tableRows.push([
+      outputRows.push([
         serviceDescription,
         containerId ? containerId.slice(0, 12) : undefined,
         image,
@@ -78,15 +79,29 @@ class ServicesStatusCommand extends ConfigBaseCommand {
       ]);
     }
 
-    const tableConfig = {
-      // singleLine: true,
-      drawHorizontalLine: (index, size) => index === 0 || index === 1 || index === size,
-    };
+    let output;
 
-    const tableOutput = table(tableRows, tableConfig);
+    if (getFormat(flags) === OUTPUT_FORMATS.JSON) {
+      outputRows.forEach((outputRow, i) => {
+        outputRow.forEach((value, j) => {
+          // eslint-disable-next-line no-param-reassign
+          outputRow[j] = stripAnsi(value);
+        });
+        outputRows[i] = outputRow;
+      });
+      output = JSON.stringify(outputRows);
+    } else {
+      outputRows.unshift(['Service', 'Container ID', 'Image', 'Status']);
+
+      const tableConfig = {
+        drawHorizontalLine: (index, size) => index === 0 || index === 1 || index === size,
+      };
+
+      output = table(outputRows, tableConfig);
+    }
 
     // eslint-disable-next-line no-console
-    console.log(tableOutput);
+    console.log(output);
   }
 }
 
