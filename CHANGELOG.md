@@ -1,3 +1,28 @@
+# [0.21.0](https://github.com/dashevo/dashmate/compare/v0.20.2...v0.21.0) (2021-10-25)
+
+
+### Features
+
+* update network parameters and migrations for `testnet-6` ([#457](https://github.com/dashevo/dashmate/pull/457))
+* add a script to configure test suite ([#410](https://github.com/dashevo/dashmate/issues/410), [#447](https://github.com/dashevo/dashmate/issues/447))
+
+
+### Bug Fixes
+
+* incorrect queue predictions returned by status command ([#416](https://github.com/dashevo/dashmate/issues/416))
+* drive log files were missing upon setup ([#428](https://github.com/dashevo/dashmate/issues/428))
+* error running status command on the seed node ([#424](https://github.com/dashevo/dashmate/issues/424))
+* migration to v0.20.0 fails ([#426](https://github.com/dashevo/dashmate/issues/426))
+* no such file or directory, drive_pretty_1.log ([#431](https://github.com/dashevo/dashmate/issues/431))
+* unavailable log settings on the seed node ([#427](https://github.com/dashevo/dashmate/issues/427))
+* `debug-logs` option doesn't apply to file logs ([#442](https://github.com/dashevo/dashmate/issues/442))
+* Dash JSON-RPC: Request Error: socket hang up ([#444](https://github.com/dashevo/dashmate/issues/444))
+* issues related to keeping log files in /tmp ([#437](https://github.com/dashevo/dashmate/issues/437))
+* various sentinel container errors on full nodes ([#443](https://github.com/dashevo/dashmate/issues/443))
+* core database contains a block from the future ([#448](https://github.com/dashevo/dashmate/issues/448))
+
+
+
 ## [0.20.2](https://github.com/dashevo/dashmate/compare/v0.20.1...v0.20.2) (2021-08-04)
 
 
