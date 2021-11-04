@@ -1,5 +1,5 @@
 /**
- * Extracts fomat from flags
+ * Extracts format from flags
  *
  * @param {Object} flags
  * @returns {false|string}
