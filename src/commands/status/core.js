@@ -1,14 +1,12 @@
-const { table } = require('table');
 const fetch = require('node-fetch');
 const chalk = require('chalk');
-const stripAnsi = require('strip-ansi');
 
 const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 const CoreService = require('../../core/CoreService');
 const getFormat = require('../../util/getFormat');
+const printObject = require('../../printers/printObject');
 
 const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
-const { OUTPUT_FORMATS } = require('../../constants');
 
 class CoreStatusCommand extends ConfigBaseCommand {
   /**
@@ -197,23 +195,7 @@ class CoreStatusCommand extends ConfigBaseCommand {
       outputRows['Remote block height'] = explorerBlockHeight;
     }
 
-    let output;
-
-    if (getFormat(flags) === OUTPUT_FORMATS.JSON) {
-      Object.keys(outputRows).forEach((key) => {
-        outputRows[key] = stripAnsi(outputRows[key]);
-      });
-      output = JSON.stringify(outputRows);
-    } else {
-      const rows = [];
-      Object.keys(outputRows).forEach((key) => {
-        rows.push([key, outputRows[key]]);
-      });
-      output = table(rows, { singleLine: true });
-    }
-
-    // eslint-disable-next-line no-console
-    console.log(output);
+    printObject(outputRows, getFormat(flags));
   }
 }
 

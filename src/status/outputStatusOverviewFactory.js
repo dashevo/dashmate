@@ -1,7 +1,5 @@
-const { table } = require('table');
 const fetch = require('node-fetch');
 const chalk = require('chalk');
-const stripAnsi = require('strip-ansi');
 
 const ContainerIsNotPresentError = require('../docker/errors/ContainerIsNotPresentError');
 const ServiceIsNotRunningError = require('../docker/errors/ServiceIsNotRunningError');
@@ -9,8 +7,7 @@ const ServiceIsNotRunningError = require('../docker/errors/ServiceIsNotRunningEr
 const CoreService = require('../core/CoreService');
 const blocksToTime = require('../util/blocksToTime');
 const getPaymentQueuePosition = require('../util/getPaymentQueuePosition');
-const getFormat = require('../util/getFormat');
-const { OUTPUT_FORMATS } = require('../constants');
+const printObject = require('../printers/printObject');
 
 /**
  *
@@ -27,7 +24,7 @@ function outputStatusOverviewFactory(
    * @param {Config} config
    * @return void
    */
-  async function outputStatusOverview(config, flags) {
+  async function outputStatusOverview(config, format) {
     const coreService = new CoreService(
       config,
       createRpcClient(
@@ -256,23 +253,7 @@ function outputStatusOverviewFactory(
       }
     }
 
-    let output;
-
-    if (getFormat(flags) === OUTPUT_FORMATS.JSON) {
-      Object.keys(outputRows).forEach((key) => {
-        outputRows[key] = stripAnsi(outputRows[key]);
-      });
-      output = JSON.stringify(outputRows);
-    } else {
-      const rows = [];
-      Object.keys(outputRows).forEach((key) => {
-        rows.push([key, outputRows[key]]);
-      });
-      output = table(rows, { singleLine: true });
-    }
-
-    // eslint-disable-next-line no-console
-    console.log(output);
+    printObject(outputRows, format);
   }
 
   return outputStatusOverview;

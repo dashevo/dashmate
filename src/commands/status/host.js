@@ -2,11 +2,10 @@ const os = require('os');
 const publicIp = require('public-ip');
 const prettyMs = require('pretty-ms');
 const prettyByte = require('pretty-bytes');
-const { table } = require('table');
 
 const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 const getFormat = require('../../util/getFormat');
-const { OUTPUT_FORMATS } = require('../../constants');
+const printObject = require('../../printers/printObject');
 
 class HostStatusCommand extends ConfigBaseCommand {
   /**
@@ -25,20 +24,7 @@ class HostStatusCommand extends ConfigBaseCommand {
       IP: await publicIp.v4(),
     };
 
-    let output;
-
-    if (getFormat(flags) === OUTPUT_FORMATS.JSON) {
-      output = JSON.stringify(outputRows);
-    } else {
-      const rows = [];
-      Object.keys(outputRows).forEach((key) => {
-        rows.push([key, outputRows[key]]);
-      });
-      output = table(rows, { singleLine: true });
-    }
-
-    // eslint-disable-next-line no-console
-    console.log(output);
+    printObject(outputRows, getFormat(flags));
   }
 }
 

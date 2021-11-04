@@ -1,13 +1,11 @@
-const { table } = require('table');
 const chalk = require('chalk');
-const stripAnsi = require('strip-ansi');
 
 const ConfigBaseCommand = require('../../oclif/command/ConfigBaseCommand');
 const CoreService = require('../../core/CoreService');
 const blocksToTime = require('../../util/blocksToTime');
 const getPaymentQueuePosition = require('../../util/getPaymentQueuePosition');
 const getFormat = require('../../util/getFormat');
-const { OUTPUT_FORMATS } = require('../../constants');
+const printObject = require('../../printers/printObject');
 
 const ContainerIsNotPresentError = require('../../docker/errors/ContainerIsNotPresentError');
 
@@ -148,23 +146,7 @@ class MasternodeStatusCommand extends ConfigBaseCommand {
       outputRows['Next paymen] = time'] = `in ${blocksToTime(paymentQueuePosition)}`;
     }
 
-    let output;
-
-    if (getFormat(flags) === OUTPUT_FORMATS.JSON) {
-      Object.keys(outputRows).forEach((key) => {
-        outputRows[key] = stripAnsi(outputRows[key]);
-      });
-      output = JSON.stringify(outputRows);
-    } else {
-      const rows = [];
-      Object.keys(outputRows).forEach((key) => {
-        rows.push([key, outputRows[key]]);
-      });
-      output = table(rows, { singleLine: true });
-    }
-
-    // eslint-disable-next-line no-console
-    console.log(output);
+    printObject(outputRows, getFormat(flags));
   }
 }
 
