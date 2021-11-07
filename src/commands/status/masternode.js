@@ -143,7 +143,7 @@ class MasternodeStatusCommand extends ConfigBaseCommand {
       outputRows['Last paid block'] = masternodeDmnState.lastPaidHeight;
       outputRows['Last paid time'] = lastPaidTime;
       outputRows['Payment queue position'] = `${paymentQueuePosition}/${masternodeEnabledCount}`;
-      outputRows['Next paymen] = time'] = `in ${blocksToTime(paymentQueuePosition)}`;
+      outputRows['Next payment time'] = `in ${blocksToTime(paymentQueuePosition)}`;
     }
 
     printObject(outputRows, getFormat(flags));
