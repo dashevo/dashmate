@@ -10,9 +10,11 @@ services:
     volumes:
       - core_data:/dash
       - ${DASHMATE_HOME_DIR:?err}/${CONFIG_NAME:?err}/core/dash.conf:/dash/.dashcore/dash.conf
-    command:
-      - dashd
-      - -masternodeblsprivkey=${CORE_MASTERNODE_OPERATOR_PRIVATE_KEY}
+    command: bash -c "if [[ $CORE_MASTERNODE_ENABLE = true ]]; then
+                   dashd -masternodeblsprivkey=${CORE_MASTERNODE_OPERATOR_PRIVATE_KEY};
+                else
+                   dashd;
+                fi"
 
 volumes:
   core_data:
